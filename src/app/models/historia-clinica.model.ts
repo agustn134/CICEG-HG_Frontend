@@ -1,0 +1,44 @@
+import { DocumentoClinico } from './documento-clinico.model';
+
+export interface HistoriaClinica {
+  id_historia_clinica: number;
+  id_documento: number;
+  antecedentes_heredo_familiares?: string;
+  habitos_higienicos?: string;
+  habitos_alimenticios?: string;
+  actividad_fisica?: string;
+  ocupacion?: string;
+  vivienda?: string;
+  toxicomanias?: string;
+  menarca?: string;
+  ritmo_menstrual?: string;
+  inicio_vida_sexual?: string;
+  fecha_ultima_regla?: Date;
+  fecha_ultimo_parto?: Date;
+  gestas?: number;
+  partos?: number;
+  cesareas?: number;
+  abortos?: number;
+  hijos_vivos?: number;
+  metodo_planificacion?: string;
+  enfermedades_infancia?: string;
+  enfermedades_adulto?: string;
+  cirugias_previas?: string;
+  traumatismos?: string;
+  alergias?: string;
+  padecimiento_actual?: string;
+  sintomas_generales?: string;
+  aparatos_sistemas?: string;
+  exploracion_general?: string;
+  exploracion_cabeza?: string;
+  exploracion_cuello?: string;
+  exploracion_torax?: string;
+  exploracion_abdomen?: string;
+  exploracion_columna?: string;
+  exploracion_extremidades?: string;
+  exploracion_genitales?: string;
+  impresion_diagnostica?: string;
+  plan_diagnostico?: string;
+  plan_terapeutico?: string;
+  pronostico?: string;
+}

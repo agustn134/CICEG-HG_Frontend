@@ -1,0 +1,143 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <!-- Logo -->
+    <a href="/app" class="text-xl font-bold text-blue-600">SICEC-HG</a>
+
+    <!-- Menú principal (Desktop) -->
+    <ul class="hidden md:flex space-x-1">
+      @for (menu of menuItems; track menu.title)
+      {
+        <li class="relative">
+          <button
+            (click)="toggleDropdown(menu.title)"
+            class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus:outline-none"
+            [attr.aria-expanded]="activeDropdown === menu.title ? 'true' : 'false'"
+            aria-haspopup="true"
+          >
+            {{ menu.title }}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-1 w-3 h-3 transition-transform duration-300 group-hover:text-blue-700"
+              [class.rotate-180]="activeDropdown === menu.title"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          @if (activeDropdown === menu.title) {
+            <div class="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50 animate-fadeIn">
+              <ul class="py-1 text-sm text-gray-700">
+                @for (item of menu.items; track item.name)
+                {
+                  <li>
+                    <a
+                      [href]="item.path"
+                      class="block px-4 py-2 hover:bg-gray-100 hover:text-blue-600 rounded-md transition-colors"
+                    >
+                      {{ item.name }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+
+    <!-- Botón de usuario / Sesión -->
+    <div class="flex items-center space-x-4">
+      <!-- Modo demo temporal -->
+      <span class="text-sm text-gray-700 hidden sm:inline">Modo demo - Sin sesión iniciada</span>
+      
+      <!-- Botón Login (opcional) -->
+      <!-- <button 
+        (click)="login()" 
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+        Iniciar Sesión
+      </button> -->
+    </div>
+  </div>
+
+  <!-- Menú Mobile -->
+  <div class="md:hidden flex justify-end px-4 py-2">
+    <button
+      (click)="toggleMobileMenu()"
+      class="text-gray-600 hover:text-gray-900 focus:outline-none"
+      aria-label="Toggle mobile menu"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menú móvil desplegado -->
+  @if (isMobileMenuOpen) {
+    <div class="md:hidden bg-white shadow-lg rounded-md p-4 space-y-2">
+      @for (menu of menuItems; track menu.title)
+      {
+        <div class="space-y-2">
+          <button
+            (click)="toggleDropdown(menu.title)"
+            class="w-full flex justify-between items-center text-left text-gray-800 font-medium"
+          >
+            {{ menu.title }}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-4 h-4 transition-transform"
+              [class.rotate-180]="activeDropdown === menu.title"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          @if (activeDropdown === menu.title) {
+            <ul class="pl-4 space-y-2">
+              @for (item of menu.items; track item.name)
+              {
+                <li>
+                  <a
+                    [href]="item.path"
+                    class="block text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 p-2 rounded-md"
+                  >
+                    {{ item.name }}
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <!-- Opción login en móvil -->
+      <div class="pt-2">
+        <span class="text-xs text-gray-500">Demo · Sin sesión</span>
+      </div>
+    </div>
+  }
+</nav>

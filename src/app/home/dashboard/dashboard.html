@@ -1,0 +1,107 @@
+<div class="space-y-6">
+  <!-- Welcome Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">
+      Bienvenido, {{ user.nombre }} {{ user.apellido_paterno }}
+    </h1>
+    <p class="text-gray-600">
+      Panel de control del Sistema de Expediente Clínico Electrónico
+    </p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <app-stats-card title="Pacientes Registrados" value="1,284" description="Total de pacientes en el sistema"
+      iconName="user" trendValue="12" trendLabel="vs mes anterior" positiveTrend="true"></app-stats-card>
+
+    <app-stats-card title="Expedientes Activos" value="156" description="Expedientes en proceso" iconName="archive"
+      trendValue="8" trendLabel="vs semana anterior" positiveTrend="true"></app-stats-card>
+
+    <app-stats-card title="Documentos Hoy" value="24" description="Documentos creados hoy"
+      iconName="file-text"></app-stats-card>
+
+    <app-stats-card title="Pendientes" value="7" description="Documentos por completar" iconName="clock"
+      trendValue="-15" trendLabel="vs ayer" positiveTrend="false"></app-stats-card>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Quick Actions -->
+    <div class="border rounded-lg shadow-sm p-6">
+      <h2 class="text-xl font-semibold mb-4">Acciones Rápidas</h2>
+      <p class="text-sm text-gray-500 mb-4">Accesos directos a funciones frecuentes</p>
+
+      <div class="space-y-3">
+        @for (action of quickActions; track action.title) {
+        <a [href]="action.href"
+          class="flex items-start space-x-3 w-full justify-start h-auto p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+          <span class="h-5 w-5 mt-1 text-blue-600">
+            @switch (action.icon) {
+            @case ('user') {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mt-0.5 text-blue-600">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            }
+            @case ('file-text') {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mt-0.5 text-blue-600">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>
+            }
+            @case ('archive') {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mt-0.5 text-blue-600">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <path d="M7 12h10M7 16h10"></path>
+            </svg>
+            }
+            @case ('clock') {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mt-0.5 text-blue-600">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            }
+            }
+          </span>
+
+          <div class="text-left">
+            <div class="font-medium">{{ action.title }}</div>
+            <div class="text-sm text-gray-500">{{ action.description }}</div>
+          </div>
+        </a>
+        }
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="lg:col-span-2 border rounded-lg shadow-sm p-6">
+      <h2 class="text-xl font-semibold mb-4">Actividad Reciente</h2>
+      <p class="text-sm text-muted-foreground mb-4">Últimas acciones realizadas en el sistema</p>
+
+      <div class="space-y-4">
+        @for (activity of recentActivities; track activity.id) {
+        <div class="flex items-center justify-between pb-3 border-b border-gray-100 last:border-0">
+          <div class="flex-1">
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-sm">{{ activity.type }}</span>
+              <span
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ getStatusColor(activity.status) }}">
+                {{ activity.status }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">{{ activity.patient }}</p>
+          </div>
+          <span class="text-xs text-gray-500">{{ activity.time }}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

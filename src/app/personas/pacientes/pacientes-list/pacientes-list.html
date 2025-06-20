@@ -1,0 +1,117 @@
+
+
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Pacientes</h1>
+      <p class="text-gray-600">Gestión de pacientes registrados</p>
+    </div>
+    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+        stroke="currentColor" class="w-4 h-4 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Nuevo Paciente
+    </button>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="mb-4">
+      <div class="relative">
+        <input [(ngModel)]="searchTerm" (input)="filterPacientes()" placeholder="Buscar por nombre, apellidos o CURP..."
+          class="pl-8 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" class="w-5 h-5 absolute left-2 top-2.5 text-gray-400">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.608 10.608z" />
+        </svg>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nombre Completo
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              CURP
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Edad
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Sexo
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Teléfono
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Alergias
+            </th>
+            <th scope="col"
+              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let patient of filteredPacientes; trackBy: trackByPatientId">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ patient.nombre }} {{ patient.apellido_paterno }}
+                {{ patient.apellido_materno }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500">{{ patient.curp }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500">{{ calculateAge(patient.fecha_nacimiento) }} años</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ patient.sexo === 'M' ? 'Masculino' : 'Femenino' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500">{{ patient.telefono || 'N/A' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getAlergiaClass(patient.alergias)">
+                {{ patient.alergias || 'No especificado' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button class="text-indigo-600 hover:text-indigo-900 flex justify-end">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.158 1.158 0 010-1.643c.928-.928 2.464-.928 3.392 0l1.053 1.053L21 4.5v15l-2.269-2.269" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="filteredPacientes.length === 0" class="text-center py-8">
+        <p class="text-gray-500">
+          {{ searchTerm ? 'No se encontraron pacientes' : 'No hay pacientes registrados' }}
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <p class="mt-2 text-gray-500">Cargando pacientes...</p>
+    </div>
+  </div>
+</div>
