@@ -36,7 +36,7 @@ import { SignosVitales } from './gestion-expedientes/signos-vitales/signos-vital
 // ===== Documentos Clínicos =====
 import { HistoriasClinicasService } from './services/documentos-clinicos/historias-clinicas.service';
 import { NotasUrgencias } from './documentos-clinicos/notas-urgencias/notas-urgencias';
-import { NotasEvolucion } from './documentos-clinicos/notas-evolucion/notas-evolucion';
+import { NotasEvolucionComponent } from './documentos-clinicos/notas-evolucion/notas-evolucion';
 import { NotasInterconsulta } from './documentos-clinicos/notas-interconsulta/notas-interconsulta';
 import { NotasPreoperatoria } from './documentos-clinicos/notas-preoperatoria/notas-preoperatoria';
 import { NotasPreanestesica } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
@@ -64,7 +64,7 @@ export const routes: Routes = [
   // { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
 
-  
+
 
   // === Rutas protegidas (deben estar protegidas con AuthGuard)
   { path: '', redirectTo: '/app', pathMatch: 'full' },
@@ -101,14 +101,14 @@ export const routes: Routes = [
         path: 'documentos-clinicos/historias-clinicas',
         component: HistoriasClinicasComponent,
       },
-      
+
       {
         path: 'documentos-clinicos/notas-urgencias',
         component: NotasUrgencias,
       },
       {
         path: 'documentos-clinicos/notas-evolucion',
-        component: NotasEvolucion,
+        component: NotasEvolucionComponent,
       },
       {
         path: 'documentos-clinicos/notas-interconsulta',

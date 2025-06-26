@@ -1,8 +1,169 @@
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-in-out forwards;
+/* C:\CICEG-HG-APP\src\app\shared\navbar\navbar.css */
+
+/* === ANIMACIONES PERSONALIZADAS USANDO TAILWIND === */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+/* Animaciones que no están disponibles por defecto en Tailwind */
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar personalizado para mejor UX */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Mejoras de accesibilidad */
+.focus-visible:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Backdrop blur personalizado para navbar scroll */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Asegurar que las transiciones sean suaves */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Override para botones del navbar */
+.navbar-button {
+  @apply relative inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.navbar-button:hover {
+  @apply bg-gray-50 text-blue-600;
+}
+
+.navbar-button.active {
+  @apply bg-blue-50 text-blue-600;
+}
+
+/* Dropdown animations usando transform */
+.dropdown-enter {
+  @apply opacity-0 scale-95 transform;
+}
+
+.dropdown-enter-active {
+  @apply opacity-100 scale-100 transition-all duration-200 ease-out;
+}
+
+.dropdown-exit {
+  @apply opacity-100 scale-100;
+}
+
+.dropdown-exit-active {
+  @apply opacity-0 scale-95 transition-all duration-150 ease-in;
+}
+
+/* Mobile menu sliding animation */
+.mobile-menu-enter {
+  @apply transform translate-x-full;
+}
+
+.mobile-menu-enter-active {
+  @apply transform translate-x-0 transition-transform duration-300 ease-out;
+}
+
+.mobile-menu-exit {
+  @apply transform translate-x-0;
+}
+
+.mobile-menu-exit-active {
+  @apply transform translate-x-full transition-transform duration-300 ease-in;
+}
+
+/* Hamburger menu animation */
+.hamburger-line {
+  @apply absolute block w-6 h-0.5 bg-current transition-all duration-300 transform;
+}
+
+/* Responsive utilities específicas */
+@media (max-width: 1024px) {
+  .dropdown-container {
+    @apply relative;
+  }
+}
+
+/* Ensure proper z-index layering */
+.navbar-dropdown {
+  @apply z-50;
+}
+
+.mobile-overlay {
+  @apply z-40;
+}
+
+.mobile-menu {
+  @apply z-50;
+}
+
+/* Active link styling */
+.router-link-active {
+  @apply bg-blue-50 text-blue-600 border-r-2 border-blue-500;
+}
+
+/* Gradient backgrounds para mejor apariencia */
+.gradient-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.gradient-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+}
+
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out forwards;
 }
