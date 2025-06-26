@@ -20,9 +20,9 @@ export * from './administrador.model';
 export * from './servicio.model';
 export * from './area-interconsulta.model';
 export * from './guia-clinica.model';
-// export * from './estudio-medico.model';
+export * from './estudio-medico.model';
 export * from './medicamento.model';
-// export * from './tipo-sangre.model';
+export * from './tipo-sangre.model';
 export * from './tipo-documento.model';
 
 // ==========================================
@@ -31,7 +31,7 @@ export * from './tipo-documento.model';
 export * from './expediente.model';
 export * from './cama.model';
 export * from './internamiento.model';
-// export * from './signos-vitales.model';
+export * from './signos-vitales.model';
 
 // ==========================================
 // EXPORTACIONES DOCUMENTOS CLÍNICOS
@@ -40,14 +40,14 @@ export * from './documento-clinico.model';
 export * from './historia-clinica.model';
 export * from './nota-urgencias.model';
 export * from './nota-evolucion.model';
-// export * from './nota-interconsulta.model';
+export * from './nota-interconsulta.model';
 export * from './nota-preoperatoria.model';
-// export * from './nota-preanestesica.model';
-// export * from './nota-postoperatoria.model';
+export * from './nota-preanestesica.model';
+export * from './nota-postoperatoria.model';
 export * from './nota-postanestesica.model';
 export * from './nota-egreso.model';
 export * from './consentimiento-informado.model';
-export * from './solicitud-estudio.model';
+// export * from './solicitud-estudio.model'; // COMENTADO para evitar conflicto
 export * from './referencia-traslado.model';
 export * from './prescripcion-medicamento.model';
 export * from './registro-transfusion.model';

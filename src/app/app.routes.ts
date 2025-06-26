@@ -25,7 +25,8 @@ import { Administradores } from './personas/administradores/administradores';
 import { Pacientes } from './personas/pacientes/pacientes';
 import { PacientesListComponent } from './personas/pacientes/pacientes-list/pacientes-list';
 import { PersonalMedico } from './personas/personal-medico/personal-medico';
-import { Persona } from './personas/persona/persona';
+import { PersonasComponent } from './personas/personas/personas';
+// import { Persona } from './personas/persona/persona';
 
 // ===== Gestión de Expedientes =====
 import { Expedientes } from './gestion-expedientes/expedientes/expedientes';
@@ -34,9 +35,9 @@ import { Internamientos } from './gestion-expedientes/internamientos/internamien
 import { SignosVitales } from './gestion-expedientes/signos-vitales/signos-vitales';
 
 // ===== Documentos Clínicos =====
-import { HistoriasClinicasService } from './services/documentos-clinicos/historias-clinicas.service';
+// import { HistoriasClinicasService } from './services/documentos-clinicos/historias-clinicas.service';
 import { NotasUrgencias } from './documentos-clinicos/notas-urgencias/notas-urgencias';
-import { NotasEvolucionComponent } from './documentos-clinicos/notas-evolucion/notas-evolucion';
+import { NotasEvolucion } from './documentos-clinicos/notas-evolucion/notas-evolucion';
 import { NotasInterconsulta } from './documentos-clinicos/notas-interconsulta/notas-interconsulta';
 import { NotasPreoperatoria } from './documentos-clinicos/notas-preoperatoria/notas-preoperatoria';
 import { NotasPreanestesica } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
@@ -54,7 +55,7 @@ import { NotasPsicologia } from './notas-especializadas/notas-psicologia/notas-p
 import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nutricion';
 
 import { Documentos } from './documentos-clinicos/documentos/documentos';
-import { HistoriasClinicasComponent } from './documentos-clinicos/historias-clinicas/historias-clinicas';
+import { HistoriasClinicas} from './documentos-clinicos/historias-clinicas/historias-clinicas';
 import { Login } from './auth/login/login';
 
 export const routes: Routes = [
@@ -87,7 +88,7 @@ export const routes: Routes = [
       { path: 'personas/pacientes', component: Pacientes },
       {path: 'personas/pacientes-list', component: PacientesListComponent },
       { path: 'personas/personal-medico', component: PersonalMedico },
-      { path: 'personas', component: Persona }, // Última ruta general
+      { path: 'personas', component: PersonasComponent }, // Última ruta general
 
       // ===== Gestión de Expedientes =====
       { path: 'gestion-expedientes/expedientes', component: Expedientes },
@@ -99,7 +100,7 @@ export const routes: Routes = [
       { path: 'documentos-clinicos/documentos', component: Documentos },
       {
         path: 'documentos-clinicos/historias-clinicas',
-        component: HistoriasClinicasComponent,
+        component: HistoriasClinicas,
       },
 
       {
@@ -108,7 +109,7 @@ export const routes: Routes = [
       },
       {
         path: 'documentos-clinicos/notas-evolucion',
-        component: NotasEvolucionComponent,
+        component: NotasEvolucion,
       },
       {
         path: 'documentos-clinicos/notas-interconsulta',

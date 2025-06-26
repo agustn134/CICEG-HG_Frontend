@@ -1,11 +1,9 @@
-<!-- Historia Clínica Form Template -->
-<div class="min-h-screen bg-gray-50 py-8">
+<!-- <div class="min-h-screen bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
-    <!-- Encabezado -->
+
     <div class="mb-8">
-      <button 
-        type="button" 
+      <button
+        type="button"
         (click)="onCancel()"
         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-4">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,7 +11,7 @@
         </svg>
         Volver
       </button>
-      
+
       <h1 class="text-3xl font-bold text-gray-900 mb-2">
         {{ isEditMode ? 'Editar Historia Clínica' : 'Nueva Historia Clínica' }}
       </h1>
@@ -23,8 +21,7 @@
     </div>
 
     <form [formGroup]="historiaForm" (ngSubmit)="onSubmit()" class="space-y-8">
-      
-      <!-- 1. Información del Documento -->
+
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Información del Documento</h3>
@@ -36,8 +33,8 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 ID Documento <span class="text-red-500">*</span>
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 formControlName="id_documento"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 [class.border-red-500]="isFieldInvalid('id_documento')"
@@ -50,7 +47,6 @@
         </div>
       </div>
 
-      <!-- 2. Antecedentes Heredo-Familiares -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Antecedentes Heredo-Familiares</h3>
@@ -61,7 +57,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Antecedentes Heredo-Familiares
             </label>
-            <textarea 
+            <textarea
               formControlName="antecedentes_heredo_familiares"
               rows="4"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -71,7 +67,6 @@
         </div>
       </div>
 
-      <!-- 3. Hábitos y Estilo de Vida -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Hábitos y Estilo de Vida</h3>
@@ -83,66 +78,66 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Hábitos Higiénicos
               </label>
-              <textarea 
+              <textarea
                 formControlName="habitos_higienicos"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describa los hábitos de higiene">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Hábitos Alimenticios
               </label>
-              <textarea 
+              <textarea
                 formControlName="habitos_alimenticios"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describa los hábitos alimenticios">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Actividad Física
               </label>
-              <textarea 
+              <textarea
                 formControlName="actividad_fisica"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describa la actividad física que realiza">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Ocupación
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 formControlName="ocupacion"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ocupación del paciente">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Vivienda
               </label>
-              <textarea 
+              <textarea
                 formControlName="vivienda"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describa las condiciones de vivienda">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Toxicomanías
               </label>
-              <textarea 
+              <textarea
                 formControlName="toxicomanias"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -153,7 +148,6 @@
         </div>
       </div>
 
-      <!-- 4. Antecedentes Gineco-Obstétricos -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Antecedentes Gineco-Obstétricos</h3>
@@ -165,120 +159,120 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Menarca
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 formControlName="menarca"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Edad de la primera menstruación">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Ritmo Menstrual
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 formControlName="ritmo_menstrual"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ej: 28x4 (ciclo x días)">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Inicio Vida Sexual
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 formControlName="inicio_vida_sexual"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Edad de inicio">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Última Regla
               </label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 formControlName="fecha_ultima_regla"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Último Parto
               </label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 formControlName="fecha_ultimo_parto"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Gestas
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 formControlName="gestas"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Número de embarazos">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Partos
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 formControlName="partos"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Número de partos">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Cesáreas
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 formControlName="cesareas"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Número de cesáreas">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Abortos
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 formControlName="abortos"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Número de abortos">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Hijos Vivos
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 formControlName="hijos_vivos"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Número de hijos vivos">
             </div>
-            
+
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Método de Planificación Familiar
               </label>
-              <select 
+              <select
                 formControlName="metodo_planificacion"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">Seleccione un método</option>
@@ -291,7 +285,6 @@
         </div>
       </div>
 
-      <!-- 5. Antecedentes Patológicos -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Antecedentes Patológicos</h3>
@@ -303,55 +296,55 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Enfermedades de la Infancia
               </label>
-              <textarea 
+              <textarea
                 formControlName="enfermedades_infancia"
                 rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enfermedades padecidas durante la infancia">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Enfermedades del Adulto
               </label>
-              <textarea 
+              <textarea
                 formControlName="enfermedades_adulto"
                 rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enfermedades padecidas en la edad adulta">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Cirugías Previas
               </label>
-              <textarea 
+              <textarea
                 formControlName="cirugias_previas"
                 rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Cirugías realizadas anteriormente">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Traumatismos
               </label>
-              <textarea 
+              <textarea
                 formControlName="traumatismos"
                 rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Traumatismos o accidentes previos">
               </textarea>
             </div>
-            
+
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Alergias
               </label>
-              <textarea 
+              <textarea
                 formControlName="alergias"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -362,7 +355,6 @@
         </div>
       </div>
 
-      <!-- 6. Padecimiento Actual -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Padecimiento Actual</h3>
@@ -374,7 +366,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Padecimiento Actual <span class="text-red-500">*</span>
               </label>
-              <textarea 
+              <textarea
                 formControlName="padecimiento_actual"
                 rows="5"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -385,25 +377,25 @@
                 {{ getFieldError('padecimiento_actual') }}
               </p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   Síntomas Generales
                 </label>
-                <textarea 
+                <textarea
                   formControlName="sintomas_generales"
                   rows="4"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Fiebre, pérdida de peso, astenia, adinamia, etc.">
                 </textarea>
               </div>
-              
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   Aparatos y Sistemas
                 </label>
-                <textarea 
+                <textarea
                   formControlName="aparatos_sistemas"
                   rows="4"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -415,7 +407,6 @@
         </div>
       </div>
 
-      <!-- 7. Exploración Física -->
       <div class="bg-white shadow-sm rounded-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Exploración Física</h3>
@@ -427,60 +418,60 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Exploración General
               </label>
-              <textarea 
+              <textarea
                 formControlName="exploracion_general"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Estado general, signos vitales, etc.">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Cabeza
               </label>
-              <textarea 
+              <textarea
                 formControlName="exploracion_cabeza"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Exploración de cabeza y cara">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Cuello
               </label>
-              <textarea 
+              <textarea
                 formControlName="exploracion_cuello"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Exploración del cuello">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Tórax
               </label>
-              <textarea 
+              <textarea
                 formControlName="exploracion_torax"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Exploración del tórax y aparato respiratorio">
               </textarea>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Abdomen
               </label>
-              <textarea 
+              <textarea
                 formControlName="exploracion_abdomen"
                 rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Exploración abdominal">
               </textarea>
             </div>
-            
-            <div>
+
+            <div> -->

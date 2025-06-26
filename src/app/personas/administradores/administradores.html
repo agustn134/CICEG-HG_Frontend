@@ -1,7 +1,5 @@
-<!-- Container Principal -->
-<div class="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+<!-- <div class="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
   <div class="max-w-7xl mx-auto">
-    <!-- Header -->
     <div class="mb-8">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -14,7 +12,7 @@
             </h1>
             <p class="text-gray-600 mt-1">Gestión de usuarios administradores del sistema</p>
           </div>
-          <button 
+          <button
             (click)="openModal()"
             class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,10 +23,8 @@
         </div>
       </div>
     </div>
-    <!-- Filtros y Búsqueda -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Búsqueda -->
         <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
           <div class="relative">
@@ -42,7 +38,6 @@
               class="pl-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
           </div>
         </div>
-        <!-- Filtro Nivel de Acceso -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Nivel de Acceso</label>
           <select
@@ -56,7 +51,6 @@
             <option value="5">Administrador (5)</option>
           </select>
         </div>
-        <!-- Filtro Estado -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
           <select
@@ -67,7 +61,6 @@
             <option value="false">Inactivos</option>
           </select>
         </div>
-        <!-- Botón Limpiar Filtros -->
         <div class="flex items-end">
           <button
             (click)="searchTerm = ''; filtroNivelAcceso = ''; filtroActivo = ''"
@@ -77,30 +70,27 @@
         </div>
       </div>
     </div>
-    <!-- Loading Spinner -->
     <div *ngIf="isLoading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
-    <!-- Grid de Administradores -->
     <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-      <div 
+      <div
         *ngFor="let admin of paginatedAdministradores"
         class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-        <!-- Header de la tarjeta -->
         <div class="p-6 pb-4">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                <img 
-                  *ngIf="admin.foto" 
-                  [src]="admin.foto" 
+                <img
+                  *ngIf="admin.foto"
+                  [src]="admin.foto"
                   [alt]="admin.usuario"
                   class="w-full h-full object-cover">
-                <svg 
-                  *ngIf="!admin.foto" 
-                  class="w-6 h-6 text-gray-400" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  *ngIf="!admin.foto"
+                  class="w-6 h-6 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
@@ -110,17 +100,15 @@
                 <p class="text-sm text-gray-500">ID: {{admin.id_administrador}}</p>
               </div>
             </div>
-            <!-- Toggle Estado -->
             <label class="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 [checked]="admin.activo"
                 (change)="toggleStatus(admin)"
                 class="sr-only peer">
               <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          <!-- Información -->
           <div class="space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-600">Persona ID:</span>
@@ -128,7 +116,7 @@
             </div>
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-600">Nivel:</span>
-              <span 
+              <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 [class]="getNivelAccesoColor(admin.nivel_acceso)">
                 {{getNivelAccesoLabel(admin.nivel_acceso)}}
@@ -136,7 +124,7 @@
             </div>
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-600">Estado:</span>
-              <span 
+              <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 [class]="admin.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
                 {{admin.activo ? 'Activo' : 'Inactivo'}}
@@ -144,7 +132,6 @@
             </div>
           </div>
         </div>
-        <!-- Acciones -->
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
           <div class="flex space-x-2">
             <button
@@ -167,7 +154,6 @@
         </div>
       </div>
     </div>
-    <!-- Mensaje sin resultados -->
     <div *ngIf="!isLoading && filteredAdministradores.length === 0" class="text-center py-12">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
@@ -175,7 +161,6 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron administradores</h3>
       <p class="mt-1 text-sm text-gray-500">Intenta ajustar los filtros o crear un nuevo administrador.</p>
     </div>
-    <!-- Paginación -->
     <div *ngIf="!isLoading && totalPages > 1" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-700">
@@ -205,13 +190,11 @@
     </div>
   </div>
 </div>
-<!-- Modal -->
-<div 
+<div
   *ngIf="showModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
   (click)="closeModal()">
   <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl bg-white rounded-lg shadow-lg" (click)="$event.stopPropagation()">
-    <!-- Header Modal -->
     <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200">
       <h3 class="text-lg font-semibold text-gray-900">
         {{editingId ? 'Editar Administrador' : 'Nuevo Administrador'}}
@@ -224,10 +207,8 @@
         </svg>
       </button>
     </div>
-    <!-- Formulario -->
     <form [formGroup]="administradorForm" (ngSubmit)="onSubmit()">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- ID Persona -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             ID Persona <span class="text-red-500">*</span>
@@ -243,7 +224,6 @@
             <span *ngIf="f['id_persona'].errors?.['min']">El ID debe ser mayor a 0</span>
           </div>
         </div>
-        <!-- Usuario -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Usuario <span class="text-red-500">*</span>
@@ -260,7 +240,6 @@
             <span *ngIf="f['usuario'].errors?.['maxlength']">Máximo 50 caracteres</span>
           </div>
         </div>
-        <!-- Contraseña -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Contraseña <span class="text-red-500">*</span>
@@ -276,7 +255,6 @@
             <span *ngIf="f['contrasena'].errors?.['minlength']">Mínimo 6 caracteres</span>
           </div>
         </div>
-        <!-- Nivel de Acceso -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Nivel de Acceso <span class="text-red-500">*</span>
@@ -295,7 +273,6 @@
             <span *ngIf="f['nivel_acceso'].errors?.['required']">El nivel de acceso es requerido</span>
           </div>
         </div>
-        <!-- Foto -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Foto (URL) (opcional)
@@ -306,7 +283,6 @@
             class="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="URL de la foto">
         </div>
-        <!-- Estado -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Estado <span class="text-red-500">*</span>
@@ -331,4 +307,4 @@
       </button>
     </form>
   </div>
-</div>
+</div> -->
