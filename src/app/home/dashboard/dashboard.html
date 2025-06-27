@@ -1,5 +1,5 @@
 <div class="space-y-6">
-  <!-- Welcome Header -->
+
   <div>
     <h1 class="text-2xl font-bold text-gray-900">
       Bienvenido, {{ user.nombre }} {{ user.apellido_paterno }}
@@ -9,23 +9,7 @@
     </p>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <app-stats-card title="Pacientes Registrados" value="1,284" description="Total de pacientes en el sistema"
-      iconName="user" trendValue="12" trendLabel="vs mes anterior" positiveTrend="true"></app-stats-card>
-
-    <app-stats-card title="Expedientes Activos" value="156" description="Expedientes en proceso" iconName="archive"
-      trendValue="8" trendLabel="vs semana anterior" positiveTrend="true"></app-stats-card>
-
-    <app-stats-card title="Documentos Hoy" value="24" description="Documentos creados hoy"
-      iconName="file-text"></app-stats-card>
-
-    <app-stats-card title="Pendientes" value="7" description="Documentos por completar" iconName="clock"
-      trendValue="-15" trendLabel="vs ayer" positiveTrend="false"></app-stats-card>
-  </div>
-
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Quick Actions -->
     <div class="border rounded-lg shadow-sm p-6">
       <h2 class="text-xl font-semibold mb-4">Acciones Rápidas</h2>
       <p class="text-sm text-gray-500 mb-4">Accesos directos a funciones frecuentes</p>
@@ -80,7 +64,6 @@
       </div>
     </div>
 
-    <!-- Recent Activity -->
     <div class="lg:col-span-2 border rounded-lg shadow-sm p-6">
       <h2 class="text-xl font-semibold mb-4">Actividad Reciente</h2>
       <p class="text-sm text-muted-foreground mb-4">Últimas acciones realizadas en el sistema</p>
@@ -92,7 +75,7 @@
             <div class="flex items-center space-x-2">
               <span class="font-medium text-sm">{{ activity.type }}</span>
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ getStatusColor(activity.status) }}">
+                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ (activity.status) }}">
                 {{ activity.status }}
               </span>
             </div>

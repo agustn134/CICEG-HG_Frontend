@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class NotasUrgencias {
+  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/notas-urgencias';
 
   constructor() { }
 }

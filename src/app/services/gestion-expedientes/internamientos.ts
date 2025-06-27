@@ -5,5 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class Internamientos {
 
+  private readonly API_URL = 'http://localhost:3000/api/personas/internamientos';
+
   constructor() { }
 }

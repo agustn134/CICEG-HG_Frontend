@@ -5,5 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class NotasPsicologia {
 
+  private readonly API_URL = 'http://localhost:3000/api/notas-especializadas/notas-nutricion';
+
   constructor() { }
 }

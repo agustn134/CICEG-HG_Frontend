@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { PacientesListComponent } from './pacientes-list/pacientes-list';
 
 @Component({
   selector: 'app-pacientes',
-  imports: [PacientesListComponent],
+  imports: [],
   templateUrl: './pacientes.html',
   styleUrl: './pacientes.css'
 })

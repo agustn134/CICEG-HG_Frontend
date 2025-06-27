@@ -5,5 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class SolicitudesEstudio {
 
+  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/solicitudes-estudio';
+
+
   constructor() { }
 }

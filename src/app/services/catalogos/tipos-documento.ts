@@ -5,5 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class TiposDocumento {
 
+  private readonly API_URL = 'http://localhost:3000/api/catalogos/tipos-documento';
+
   constructor() { }
 }
