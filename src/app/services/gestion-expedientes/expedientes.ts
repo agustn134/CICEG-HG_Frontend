@@ -1,538 +1,533 @@
+// src/app/services/gestion-expedientes/expedientes.service.ts
 import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { BaseService } from '../base.service';
+import {
+  Expediente,
+  CreateExpedienteDto,
+  UpdateExpedienteDto,
+  ApiResponse,
+  Genero
+} from '../../models';
+
+// ==========================================
+// INTERFACES ESPECÍFICAS PARA EL SERVICIO
+// ==========================================
+export interface ExpedienteCompleto {
+  id_expediente: number;
+  numero_expediente: string;
+  fecha_apertura: string;
+  estado: 'Activo' | 'Cerrado' | 'Archivado' | 'Suspendido' | 'Eliminado';
+  notas_administrativas?: string;
+
+  // Datos del paciente
+  id_paciente: number;
+  alergias?: string;
+  transfusiones?: string;
+  detalles_transfusiones?: string;
+  familiar_responsable?: string;
+  parentesco_familiar?: string;
+  telefono_familiar?: string;
+  ocupacion?: string;
+  escolaridad?: string;
+  lugar_nacimiento?: string;
+
+  // Datos de la persona
+  id_persona: number;
+  nombre: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+  fecha_nacimiento: string;
+  sexo: Genero;
+  curp?: string;
+  telefono?: string;
+  correo_electronico?: string;
+  domicilio?: string;
+  estado_civil?: string;
+  religion?: string;
+  tipo_sangre?: string;
+  edad: number;
+
+  // Estadísticas del expediente
+  total_documentos: number;
+  documentos_activos: number;
+  total_internamientos: number;
+  internamientos_activos: number;
+  requiere_validacion_reingreso?: boolean;
+
+  // Información relacionada
+  documentos_clinicos?: DocumentoClinico[];
+  internamientos?: Internamiento[];
+  ultimos_signos_vitales?: SignosVitales[];
+}
+
+export interface DocumentoClinico {
+  id_documento: number;
+  fecha_elaboracion: string;
+  estado: string;
+  tipo_documento: string;
+  descripcion_tipo_documento?: string;
+  medico_creador?: string;
+  especialidad_medico?: string;
+  subtipo_documento: string;
+}
+
+export interface Internamiento {
+  id_internamiento: number;
+  fecha_ingreso: string;
+  fecha_egreso?: string;
+  motivo_ingreso: string;
+  diagnostico_ingreso?: string;
+  diagnostico_egreso?: string;
+  tipo_egreso?: string;
+  observaciones?: string;
+  servicio?: string;
+  cama?: string;
+  area_cama?: string;
+  subarea_cama?: string;
+  medico_responsable?: string;
+  especialidad_medico?: string;
+  dias_estancia: number;
+}
+
+export interface SignosVitales {
+  id_signos_vitales: number;
+  fecha_toma: string;
+  temperatura?: number;
+  presion_arterial_sistolica?: number;
+  presion_arterial_diastolica?: number;
+  frecuencia_cardiaca?: number;
+  frecuencia_respiratoria?: number;
+  saturacion_oxigeno?: number;
+  glucosa?: number;
+  peso?: number;
+  talla?: number;
+  imc?: number;
+  observaciones?: string;
+}
+
+export interface ExpedienteBusqueda {
+  id_expediente: number;
+  numero_expediente: string;
+  fecha_apertura: string;
+  estado: string;
+  nombre_paciente: string;
+  curp?: string;
+  edad: number;
+  sexo: Genero;
+  internamiento_activo: number;
+}
+
+export interface ExpedientesPorPaciente {
+  paciente: {
+    id_paciente: number;
+    nombre_completo: string;
+  };
+  expedientes: {
+    id_expediente: number;
+    numero_expediente: string;
+    fecha_apertura: string;
+    estado: string;
+    notas_administrativas?: string;
+    total_documentos: number;
+    total_internamientos: number;
+    internamientos_activos: number;
+    ultima_actividad?: string;
+    ultimo_ingreso?: string;
+  }[];
+  total_expedientes: number;
+}
+
+export interface DashboardExpedientes {
+  estadisticas: {
+    total_expedientes: number;
+    expedientes_activos: number;
+    expedientes_cerrados: number;
+    expedientes_archivados: number;
+    expedientes_mes_actual: number;
+    expedientes_semana_actual: number;
+  };
+  expedientes_con_internamiento_activo: {
+    id_expediente: number;
+    numero_expediente: string;
+    nombre_paciente: string;
+    fecha_ingreso: string;
+    servicio?: string;
+    cama?: string;
+    medico_responsable?: string;
+    dias_estancia: number;
+  }[];
+  expedientes_mas_activos: {
+    id_expediente: number;
+    numero_expediente: string;
+    nombre_paciente: string;
+    total_documentos: number;
+    documentos_semana: number;
+    ultima_actividad?: string;
+  }[];
+  alertas_activas: {
+    tipo_alerta: string;
+    mensaje: string;
+    fecha_alerta: string;
+    numero_expediente?: string;
+    nombre_paciente?: string;
+  }[];
+}
+
+export interface ValidacionAcceso {
+  requiere_validacion: boolean;
+  id_validacion?: number;
+  acceso_inmediato: boolean;
+}
+
+export interface AuditoriaExpediente {
+  expediente: {
+    numero_expediente: string;
+    nombre_paciente: string;
+  };
+  auditorias: {
+    id_auditoria: number;
+    fecha_acceso: string;
+    accion: string;
+    datos_anteriores?: any;
+    datos_nuevos?: any;
+    ip_acceso?: string;
+    navegador?: string;
+    tiempo_sesion?: number;
+    observaciones?: string;
+    medico_nombre?: string;
+    especialidad?: string;
+    numero_cedula?: string;
+  }[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    pages: number;
+  };
+}
+
+export interface AlertasExpediente {
+  todas: Alerta[];
+  por_tipo: {
+    CRITICA: Alerta[];
+    ADVERTENCIA: Alerta[];
+    INFORMATIVA: Alerta[];
+  };
+  resumen: {
+    total: number;
+    activas: number;
+    revisadas: number;
+    cerradas: number;
+  };
+}
+
+export interface Alerta {
+  id_alerta: number;
+  tipo_alerta: 'CRITICA' | 'ADVERTENCIA' | 'INFORMATIVA';
+  mensaje: string;
+  fecha_alerta: string;
+  estado: 'ACTIVA' | 'REVISADA' | 'CERRADA';
+  fecha_revision?: string;
+  acciones_tomadas?: string;
+  medico_generador?: string;
+  medico_revisor?: string;
+}
+
+export interface ValidacionReingreso {
+  id_medico_validador: number;
+  peso_actual: number;
+  talla_actual: number;
+  presion_arterial_sistolica: number;
+  presion_arterial_diastolica: number;
+  temperatura: number;
+  alergias_confirmadas: string;
+  medicamentos_actuales: string;
+  contacto_emergencia_actual: string;
+  observaciones_validacion?: string;
+}
+
+export interface ExpedienteFilters {
+  estado?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  paciente_id?: number;
+  tiene_internamiento_activo?: boolean;
+  buscar?: string;
+  limit?: number;
+  offset?: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class Expedientes {
+export class ExpedientesService extends BaseService<Expediente> {
+  protected override endpoint = '/gestion-expedientes/expedientes';
 
-  private readonly API_URL = 'http://localhost:3000/api/personas/expedientes';
+  // ==========================================
+  // MÉTODOS CRUD PRINCIPALES CON FILTROS ESPECÍFICOS
+  // ==========================================
 
-  constructor() { }
+  /**
+   * Obtener todos los expedientes con filtros específicos
+   * GET /api/gestion-expedientes/expedientes
+   */
+  getExpedientes(filters?: ExpedienteFilters): Observable<ApiResponse<Expediente[]>> {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.estado) params = params.set('estado', filters.estado);
+      if (filters.fecha_inicio) params = params.set('fecha_inicio', filters.fecha_inicio);
+      if (filters.fecha_fin) params = params.set('fecha_fin', filters.fecha_fin);
+      if (filters.paciente_id) params = params.set('paciente_id', filters.paciente_id.toString());
+      if (filters.tiene_internamiento_activo !== undefined) {
+        params = params.set('tiene_internamiento_activo', filters.tiene_internamiento_activo.toString());
+      }
+      if (filters.buscar) params = params.set('buscar', filters.buscar);
+      if (filters.limit) params = params.set('limit', filters.limit.toString());
+      if (filters.offset) params = params.set('offset', filters.offset.toString());
+    }
+
+    return this.http.get<ApiResponse<Expediente[]>>(this.buildUrl(), { params });
+  }
+
+  /**
+   * Obtener expediente por ID con información completa
+   * GET /api/gestion-expedientes/expedientes/:id
+   */
+  getExpedienteCompleto(id: number): Observable<ApiResponse<ExpedienteCompleto>> {
+    return this.getById(id) as Observable<ApiResponse<ExpedienteCompleto>>;
+  }
+
+  /**
+   * Crear nuevo expediente con opciones avanzadas
+   * POST /api/gestion-expedientes/expedientes
+   */
+  createExpedienteCompleto(data: CreateExpedienteDto & {
+    crear_historia_clinica?: boolean;
+    id_medico_creador?: number;
+  }): Observable<ApiResponse<Expediente>> {
+    return this.create(data);
+  }
+
+  /**
+   * Eliminar expediente con opción de forzar
+   * DELETE /api/gestion-expedientes/expedientes/:id
+   */
+  deleteExpediente(id: number, options?: {
+    force?: boolean;
+    id_medico_eliminador?: number;
+    motivo_eliminacion?: string;
+  }): Observable<ApiResponse<any>> {
+    const data = options || {};
+    return this.customPost(`/${id}`, data); // Usamos POST porque enviamos datos en el body
+  }
+
+  // ==========================================
+  // MÉTODOS ESPECÍFICOS DE LA API
+  // ==========================================
+
+  /**
+   * Buscar expedientes para autocomplete
+   * GET /api/gestion-expedientes/expedientes/buscar
+   */
+  buscarExpedientes(query: string, activosSolo: boolean = true): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+    return this.customGet('/buscar', { q: query, activos_solo: activosSolo });
+  }
+
+  /**
+   * Obtener dashboard de expedientes
+   * GET /api/gestion-expedientes/expedientes/dashboard
+   */
+  getDashboard(): Observable<ApiResponse<DashboardExpedientes>> {
+    return this.customGet('/dashboard');
+  }
+
+  /**
+   * Obtener expedientes por paciente
+   * GET /api/gestion-expedientes/expedientes/paciente/:id_paciente
+   */
+  getExpedientesPorPaciente(idPaciente: number, incluirEliminados: boolean = false): Observable<ApiResponse<ExpedientesPorPaciente>> {
+    return this.customGet(`/paciente/${idPaciente}`, { incluir_eliminados: incluirEliminados });
+  }
+
+  /**
+   * Validar acceso a expediente (para reingresos)
+   * POST /api/gestion-expedientes/expedientes/:id/validar-acceso
+   */
+  validarAccesoExpediente(idExpediente: number, data: {
+    id_medico: number;
+    justificacion_acceso?: string;
+  }): Observable<ApiResponse<ValidacionAcceso>> {
+    return this.customPost(`/${idExpediente}/validar-acceso`, data);
+  }
+
+  /**
+   * Completar validación de reingreso
+   * POST /api/gestion-expedientes/expedientes/:id/validar-reingreso
+   */
+  validarReingreso(idExpediente: number, data: ValidacionReingreso): Observable<ApiResponse<any>> {
+    return this.customPost(`/${idExpediente}/validar-reingreso`, data);
+  }
+
+  /**
+   * Obtener auditoría del expediente
+   * GET /api/gestion-expedientes/expedientes/:id/auditoria
+   */
+  getAuditoria(idExpediente: number, filters?: {
+    fecha_inicio?: string;
+    fecha_fin?: string;
+    tipo_accion?: string;
+    id_medico?: number;
+    limit?: number;
+    offset?: number;
+  }): Observable<ApiResponse<AuditoriaExpediente>> {
+    return this.customGet(`/${idExpediente}/auditoria`, filters);
+  }
+
+  /**
+   * Obtener alertas del expediente
+   * GET /api/gestion-expedientes/expedientes/:id/alertas
+   */
+  getAlertas(idExpediente: number, filters?: {
+    estado_alerta?: 'ACTIVA' | 'REVISADA' | 'CERRADA' | 'todas';
+    tipo_alerta?: 'CRITICA' | 'ADVERTENCIA' | 'INFORMATIVA';
+  }): Observable<ApiResponse<AlertasExpediente>> {
+    return this.customGet(`/${idExpediente}/alertas`, filters);
+  }
+
+  /**
+   * Actualizar alerta específica
+   * PUT /api/gestion-expedientes/expedientes/:id/alertas/:id_alerta
+   */
+  updateAlerta(idExpediente: number, idAlerta: number, data: {
+    estado?: 'ACTIVA' | 'REVISADA' | 'CERRADA';
+    acciones_tomadas?: string;
+    id_medico_revisor?: number;
+  }): Observable<ApiResponse<Alerta>> {
+    return this.customPut(`/${idExpediente}/alertas/${idAlerta}`, data);
+  }
+
+  /**
+   * Generar reporte del expediente
+   * GET /api/gestion-expedientes/expedientes/:id/reporte
+   */
+  generarReporte(idExpediente: number, options?: {
+    incluir_documentos?: boolean;
+    incluir_internamientos?: boolean;
+  }): Observable<ApiResponse<any>> {
+    return this.customGet(`/${idExpediente}/reporte`, options);
+  }
+
+  // ==========================================
+  // MÉTODOS DE UTILIDAD
+  // ==========================================
+
+  /**
+   * Obtener expedientes activos
+   */
+  getExpedientesActivos(filters?: Omit<ExpedienteFilters, 'estado'>): Observable<ApiResponse<Expediente[]>> {
+    return this.getExpedientes({ ...filters, estado: 'Activo' });
+  }
+
+  /**
+   * Obtener expedientes con internamientos activos
+   */
+  getExpedientesConInternamientoActivo(filters?: Omit<ExpedienteFilters, 'tiene_internamiento_activo'>): Observable<ApiResponse<Expediente[]>> {
+    return this.getExpedientes({ ...filters, tiene_internamiento_activo: true });
+  }
+
+  /**
+   * Verificar si un expediente requiere validación de reingreso
+   */
+  verificarValidacionReingreso(idExpediente: number, idMedico: number): Observable<ApiResponse<ValidacionAcceso>> {
+    return this.validarAccesoExpediente(idExpediente, { id_medico: idMedico });
+  }
+
+  /**
+   * Cerrar expediente (cambiar estado a Cerrado)
+   */
+  cerrarExpediente(idExpediente: number, data: {
+    notas_administrativas?: string;
+    id_medico_modificador?: number;
+  }): Observable<ApiResponse<Expediente>> {
+    return this.update(idExpediente, { ...data });
+  }
+
+  /**
+   * Archivar expediente
+   */
+  archivarExpediente(idExpediente: number, data: {
+    notas_administrativas?: string;
+    id_medico_modificador?: number;
+  }): Observable<ApiResponse<Expediente>> {
+    return this.update(idExpediente, { ...data });
+  }
+
+  /**
+   * Reactivar expediente
+   */
+  reactivarExpediente(idExpediente: number, data: {
+    notas_administrativas?: string;
+    id_medico_modificador?: number;
+  }): Observable<ApiResponse<Expediente>> {
+    return this.update(idExpediente, { ...data });
+  }
+
+  /**
+   * Obtener estadísticas de expedientes (override del método base)
+   */
+  override getEstadisticas(): Observable<ApiResponse<any>> {
+    return this.getDashboard();
+  }
+
+  /**
+   * Buscar expedientes por número
+   */
+  buscarPorNumero(numeroExpediente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+    return this.buscarExpedientes(numeroExpediente);
+  }
+
+  /**
+   * Buscar expedientes por paciente (nombre, CURP, etc.)
+   */
+  buscarPorPaciente(queryPaciente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+    return this.buscarExpedientes(queryPaciente);
+  }
+
+  /**
+   * Obtener expedientes del día actual
+   */
+  getExpedientesHoy(): Observable<ApiResponse<Expediente[]>> {
+    const hoy = new Date().toISOString().split('T')[0];
+    return this.getExpedientes({
+      fecha_inicio: hoy,
+      fecha_fin: hoy
+    });
+  }
+
+  /**
+   * Obtener expedientes de la semana actual
+   */
+  getExpedientesSemana(): Observable<ApiResponse<Expediente[]>> {
+    const hoy = new Date();
+    const inicioSemana = new Date(hoy.setDate(hoy.getDate() - hoy.getDay()));
+    const finSemana = new Date(hoy.setDate(hoy.getDate() - hoy.getDay() + 6));
+
+    return this.getExpedientes({
+      fecha_inicio: inicioSemana.toISOString().split('T')[0],
+      fecha_fin: finSemana.toISOString().split('T')[0]
+    });
+  }
+
+  /**
+   * Obtener expedientes por rango de fechas
+   */
+  getExpedientesPorRango(fechaInicio: string, fechaFin: string): Observable<ApiResponse<Expediente[]>> {
+    return this.getExpedientes({
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin
+    });
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // src/app/services/gestion-expedientes/expedientes.ts
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { map } from 'rxjs/operators';
-// import { BaseService } from '../base.service';
-// import { ApiResponse, BaseFilters } from '../../models/base.models';
-
-// // ==========================================
-// // INTERFACES ESPECÍFICAS DE EXPEDIENTES
-// // ==========================================
-
-// export interface Expediente {
-//   id_expediente: number;
-//   numero_expediente: string;
-//   id_paciente: number;
-//   fecha_apertura: string;
-//   fecha_ultima_consulta?: string;
-//   activo: boolean;
-//   observaciones?: string;
-//   created_at?: string;
-//   updated_at?: string;
-
-//   // Información del paciente
-//   paciente?: {
-//     id_paciente: number;
-//     nombre: string;
-//     apellido_paterno: string;
-//     apellido_materno?: string;
-//     fecha_nacimiento: string;
-//     genero: string;
-//     numero_telefono?: string;
-//     email?: string;
-//   };
-
-//   // Estadísticas del expediente
-//   total_consultas?: number;
-//   total_internamientos?: number;
-//   total_documentos?: number;
-//   ultimo_diagnostico?: string;
-//   medico_tratante?: string;
-//   servicio_actual?: string;
-// }
-
-// export interface ExpedienteFilters extends BaseFilters {
-//   numero_expediente?: string;
-//   id_paciente?: number;
-//   nombre_paciente?: string;
-//   fecha_apertura_inicio?: string;
-//   fecha_apertura_fin?: string;
-//   con_internamientos_activos?: boolean;
-//   servicio?: string;
-//   medico_tratante?: number;
-// }
-
-// export interface CreateExpedienteDto {
-//   id_paciente: number;
-//   observaciones?: string;
-//   activo?: boolean;
-// }
-
-// export interface UpdateExpedienteDto extends Partial<CreateExpedienteDto> {
-//   id_expediente: number;
-// }
-
-// export interface ExpedienteCompleto extends Expediente {
-//   internamientos: any[];
-//   documentos_clinicos: any[];
-//   signos_vitales: any[];
-//   alertas_medicas: any[];
-//   historial_accesos: any[];
-// }
-
-// export interface AlertaExpediente {
-//   id_alerta: number;
-//   tipo_alerta: 'medicamento' | 'alergia' | 'condicion' | 'procedimiento' | 'otra';
-//   descripcion: string;
-//   nivel_criticidad: 'baja' | 'media' | 'alta' | 'critica';
-//   fecha_creacion: string;
-//   activa: boolean;
-//   creado_por: string;
-// }
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class ExpedientesService extends BaseService<Expediente> {
-//   protected override endpoint = '/gestion-expedientes/expedientes';
-
-//   // ==========================================
-//   // MÉTODOS CRUD EXTENDIDOS
-//   // ==========================================
-
-//   /**
-//    * Obtener todos los expedientes con filtros específicos
-//    */
-//   override getAll(filters?: ExpedienteFilters): Observable<ApiResponse<Expediente[]>> {
-//     return super.getAll(filters);
-//   }
-
-//   /**
-//    * Buscar expedientes por número o datos del paciente
-//    */
-//   buscarExpediente(termino: string): Observable<Expediente[]> {
-//     return this.customGet<Expediente[]>('/buscar', { termino }).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener expediente completo con todos los datos relacionados
-//    */
-//   getExpedienteCompleto(idExpediente: number): Observable<ExpedienteCompleto> {
-//     return this.customGet<ExpedienteCompleto>(`/${idExpediente}/completo`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   // ==========================================
-//   // GESTIÓN DE EXPEDIENTES
-//   // ==========================================
-
-//   /**
-//    * Crear expediente con validaciones automáticas
-//    */
-//   override create(data: CreateExpedienteDto): Observable<ApiResponse<Expediente>> {
-//     return super.create(data);
-//   }
-
-//   /**
-//    * Generar número de expediente automático
-//    */
-//   generarNumeroExpediente(): Observable<string> {
-//     return this.customGet<{ numero: string }>('/generar-numero').pipe(
-//       map(response => response.data!.numero)
-//     );
-//   }
-
-//   /**
-//    * Validar acceso al expediente
-//    */
-//   validarAcceso(idExpediente: number, motivoAcceso: string): Observable<{
-//     acceso_permitido: boolean;
-//     motivo_denegacion?: string;
-//     requiere_autorizacion?: boolean;
-//   }> {
-//     return this.customPost<any>(`/${idExpediente}/validar-acceso`, { motivo_acceso: motivoAcceso }).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Registrar acceso al expediente (auditoría)
-//    */
-//   registrarAcceso(idExpediente: number, tipoAcceso: string, observaciones?: string): Observable<boolean> {
-//     return this.customPost<any>(`/${idExpediente}/registrar-acceso`, {
-//       tipo_acceso: tipoAcceso,
-//       observaciones
-//     }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   /**
-//    * Cerrar expediente (dar de alta)
-//    */
-//   cerrarExpediente(idExpediente: number, motivoCierre: string, observaciones?: string): Observable<boolean> {
-//     return this.customPatch<any>(`/${idExpediente}/cerrar`, {
-//       motivo_cierre: motivoCierre,
-//       observaciones
-//     }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   /**
-//    * Reactivar expediente
-//    */
-//   reactivarExpediente(idExpediente: number, motivo: string): Observable<boolean> {
-//     return this.customPatch<any>(`/${idExpediente}/reactivar`, { motivo }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   // ==========================================
-//   // GESTIÓN DE ALERTAS
-//   // ==========================================
-
-//   /**
-//    * Obtener alertas del expediente
-//    */
-//   getAlertas(idExpediente: number): Observable<AlertaExpediente[]> {
-//     return this.customGet<AlertaExpediente[]>(`/${idExpediente}/alertas`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Crear nueva alerta
-//    */
-//   crearAlerta(idExpediente: number, alerta: Partial<AlertaExpediente>): Observable<AlertaExpediente> {
-//     return this.customPost<AlertaExpediente>(`/${idExpediente}/alertas`, alerta).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Actualizar alerta existente
-//    */
-//   actualizarAlerta(idExpediente: number, idAlerta: number, alerta: Partial<AlertaExpediente>): Observable<AlertaExpediente> {
-//     return this.customPut<AlertaExpediente>(`/${idExpediente}/alertas/${idAlerta}`, alerta).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Desactivar alerta
-//    */
-//   desactivarAlerta(idExpediente: number, idAlerta: number): Observable<boolean> {
-//     return this.customPatch<any>(`/${idExpediente}/alertas/${idAlerta}/desactivar`, {}).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   // ==========================================
-//   // HISTORIAL Y AUDITORÍA
-//   // ==========================================
-
-//   /**
-//    * Obtener historial completo de accesos
-//    */
-//   getHistorialAccesos(idExpediente: number, filtros?: {
-//     fecha_inicio?: string;
-//     fecha_fin?: string;
-//     tipo_acceso?: string;
-//     usuario?: string;
-//   }): Observable<ApiResponse<any[]>> {
-//     return this.customGet<any[]>(`/${idExpediente}/auditoria`, filtros);
-//   }
-
-//   /**
-//    * Obtener historial de modificaciones
-//    */
-//   getHistorialModificaciones(idExpediente: number): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idExpediente}/historial-modificaciones`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener línea de tiempo del expediente
-//    */
-//   getLineaTiempo(idExpediente: number): Observable<{
-//     eventos: {
-//       fecha: string;
-//       tipo: string;
-//       descripcion: string;
-//       usuario: string;
-//       detalles?: any;
-//     }[];
-//   }> {
-//     return this.customGet<any>(`/${idExpediente}/linea-tiempo`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   // ==========================================
-//   // DOCUMENTOS CLÍNICOS
-//   // ==========================================
-
-//   /**
-//    * Obtener todos los documentos del expediente
-//    */
-//   getDocumentos(idExpediente: number, filtros?: {
-//     tipo_documento?: string;
-//     fecha_inicio?: string;
-//     fecha_fin?: string;
-//     medico?: number;
-//   }): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idExpediente}/documentos`, filtros).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener documentos por tipo específico
-//    */
-//   getDocumentosPorTipo(idExpediente: number, tipoDocumento: string): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idExpediente}/documentos/${tipoDocumento}`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener última historia clínica
-//    */
-//   getUltimaHistoriaClinica(idExpediente: number): Observable<any> {
-//     return this.customGet<any>(`/${idExpediente}/ultima-historia-clinica`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Obtener últimos signos vitales
-//    */
-//   getUltimosSignosVitales(idExpediente: number, limite: number = 5): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idExpediente}/ultimos-signos-vitales`, { limite }).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   // ==========================================
-//   // INTERNAMIENTOS
-//   // ==========================================
-
-//   /**
-//    * Obtener internamientos del expediente
-//    */
-//   getInternamientos(idExpediente: number, soloActivos: boolean = false): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idExpediente}/internamientos`, { solo_activos: soloActivos }).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener internamiento activo
-//    */
-//   getInternamientoActivo(idExpediente: number): Observable<any | null> {
-//     return this.customGet<any>(`/${idExpediente}/internamiento-activo`).pipe(
-//       map(response => response.data)
-//     );
-//   }
-
-//   /**
-//    * Verificar si tiene internamiento activo
-//    */
-//   tieneInternamientoActivo(idExpediente: number): Observable<boolean> {
-//     return this.getInternamientoActivo(idExpediente).pipe(
-//       map(internamiento => !!internamiento)
-//     );
-//   }
-
-//   // ==========================================
-//   // ESTADÍSTICAS Y REPORTES
-//   // ==========================================
-
-//   /**
-//    * Obtener estadísticas del expediente
-//    */
-//   getEstadisticasExpediente(idExpediente: number): Observable<{
-//     total_consultas: number;
-//     total_internamientos: number;
-//     total_documentos: number;
-//     dias_hospitalizacion_total: number;
-//     ultimo_ingreso: string;
-//     diagnosticos_frecuentes: string[];
-//     medicamentos_recurrentes: string[];
-//     alergias_conocidas: string[];
-//   }> {
-//     return this.customGet<any>(`/${idExpediente}/estadisticas`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Generar reporte completo del expediente
-//    */
-//   generarReporte(idExpediente: number, incluir: {
-//     historia_clinica?: boolean;
-//     documentos_clinicos?: boolean;
-//     signos_vitales?: boolean;
-//     internamientos?: boolean;
-//     alertas?: boolean;
-//   } = {}): Observable<any> {
-//     return this.customPost<any>(`/${idExpediente}/reporte`, incluir).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Exportar expediente completo
-//    */
-//   exportarExpediente(idExpediente: number, formato: 'pdf' | 'excel' = 'pdf'): Observable<Blob> {
-//     return this.http.get(`${this.buildUrl()}/${idExpediente}/exportar`, {
-//       params: { formato },
-//       responseType: 'blob'
-//     });
-//   }
-
-//   // ==========================================
-//   // BÚSQUEDAS Y CONSULTAS ESPECIALES
-//   // ==========================================
-
-//   /**
-//    * Buscar expedientes por criterios múltiples
-//    */
-//   busquedaAvanzada(criterios: {
-//     numero_expediente?: string;
-//     nombre_paciente?: string;
-//     apellido_paterno?: string;
-//     fecha_nacimiento?: string;
-//     numero_telefono?: string;
-//     email?: string;
-//     diagnostico?: string;
-//     medicamento?: string;
-//   }): Observable<Expediente[]> {
-//     return this.customPost<Expediente[]>('/busqueda-avanzada', criterios).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener expedientes por paciente
-//    */
-//   getExpedientesPorPaciente(idPaciente: number): Observable<Expediente[]> {
-//     return this.customGet<Expediente[]>(`/paciente/${idPaciente}`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener expedientes con alertas activas
-//    */
-//   getExpedientesConAlertas(nivel?: 'baja' | 'media' | 'alta' | 'critica'): Observable<Expediente[]> {
-//     return this.customGet<Expediente[]>('/con-alertas', { nivel }).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener expedientes que requieren seguimiento
-//    */
-//   getExpedientesSeguimiento(): Observable<Expediente[]> {
-//     return this.customGet<Expediente[]>('/requieren-seguimiento').pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   // ==========================================
-//   // VALIDACIONES
-//   // ==========================================
-
-//   /**
-//    * Validar si se puede crear un nuevo expediente para un paciente
-//    */
-//   puedeCrearExpediente(idPaciente: number): Observable<{
-//     puede_crear: boolean;
-//     motivo?: string;
-//     expediente_activo?: number;
-//   }> {
-//     return this.customGet<any>('/validar-creacion', { id_paciente: idPaciente }).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Validar número de expediente único
-//    */
-//   validarNumeroExpediente(numero: string, excluirId?: number): Observable<boolean> {
-//     const params: any = { numero };
-//     if (excluirId) params.excluir_id = excluirId;
-
-//     return this.customGet<{ disponible: boolean }>('/validar-numero', params).pipe(
-//       map(response => response.data?.disponible || false)
-//     );
-//   }
-
-//   // ==========================================
-//   // MÉTODOS DE UTILIDAD
-//   // ==========================================
-
-//   /**
-//    * Obtener resumen rápido del expediente
-//    */
-//   getResumenRapido(idExpediente: number): Observable<{
-//     paciente: string;
-//     edad: number;
-//     ultimo_diagnostico: string;
-//     dias_ultima_consulta: number;
-//     alertas_activas: number;
-//     internamiento_activo: boolean;
-//   }> {
-//     return this.customGet<any>(`/${idExpediente}/resumen`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Verificar compatibilidad para procedimientos
-//    */
-//   verificarCompatibilidad(idExpediente: number, tipoProcedimiento: string): Observable<{
-//     compatible: boolean;
-//     alertas: string[];
-//     recomendaciones: string[];
-//   }> {
-//     return this.customPost<any>(`/${idExpediente}/verificar-compatibilidad`, {
-//       tipo_procedimiento: tipoProcedimiento
-//     }).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-// }
