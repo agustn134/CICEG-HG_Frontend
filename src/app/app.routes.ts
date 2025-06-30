@@ -32,8 +32,8 @@ import { PersonasComponent } from './personas/personas/personas';
 
 // ===== Gestión de Expedientes =====
 import { Expedientes } from './gestion-expedientes/expedientes/expedientes';
-import { Camas } from './gestion-expedientes/camas/camas';
-import { Internamientos } from './gestion-expedientes/internamientos/internamientos';
+import { CamasComponent } from './gestion-expedientes/camas/camas';
+import { InternamientosComponent } from './gestion-expedientes/internamientos/internamientos';
 import { SignosVitalesComponent } from './gestion-expedientes/signos-vitales/signos-vitales';
 
 // ===== Documentos Clínicos =====
@@ -110,8 +110,8 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'expedientes', pathMatch: 'full' },
           { path: 'expedientes', component: Expedientes },
-          { path: 'camas', component: Camas },
-          { path: 'internamientos', component: Internamientos },
+          { path: 'camas', component: CamasComponent },
+          { path: 'internamientos', component: InternamientosComponent },
           { path: 'signos-vitales', component: SignosVitalesComponent },
         ]
       },
