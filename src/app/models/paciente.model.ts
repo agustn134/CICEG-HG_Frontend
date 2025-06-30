@@ -149,6 +149,8 @@ export interface Paciente extends BaseEntity, AuditInfo {
 // ==========================================
 // PACIENTE COMPLETO CON TODA LA INFORMACIÓN
 // ==========================================
+import { ExpedienteResumen } from './expediente.model';
+
 export interface PacienteCompleto extends Paciente {
   expedientes?: ExpedienteResumen[];
   ultimo_internamiento_info?: {
@@ -166,14 +168,14 @@ export interface PacienteCompleto extends Paciente {
 // ==========================================
 // RESUMEN DE EXPEDIENTE PARA PACIENTE
 // ==========================================
-export interface ExpedienteResumen {
-  id_expediente: number;
-  numero_expediente: string;
-  estado: 'Activo' | 'Cerrado' | 'Transferido';
-  fecha_creacion: string;
-  total_documentos: number;
-  internamientos_activos: number;
-}
+// export interface ExpedienteResumen {
+//   id_expediente: number;
+//   numero_expediente: string;
+//   estado: 'Activo' | 'Cerrado' | 'Transferido';
+//   fecha_creacion: string;
+//   total_documentos: number;
+//   internamientos_activos: number;
+// }
 
 // ==========================================
 // RESULTADO DE BÚSQUEDA DE PACIENTES

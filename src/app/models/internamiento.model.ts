@@ -1,6 +1,7 @@
 // src/app/models/internamiento.model.ts
 import { BaseEntity, AuditInfo, BaseFilters, TipoEgreso } from './base.models';
-
+// En internamiento.model.ts, actualiza los imports:
+import { DocumentoClinicoResumen, SignosVitalesResumen } from './expediente.model';
 // ==========================================
 // INTERFACE INTERNAMIENTO (MAPEO DIRECTO CON BACKEND)
 // ==========================================
@@ -50,6 +51,7 @@ export interface Internamiento extends BaseEntity, AuditInfo {
   ultima_actividad?: string;
 }
 
+
 // ==========================================
 // INTERFACE PARA VISTA DETALLADA (getInternamientoById)
 // ==========================================
@@ -81,31 +83,31 @@ export interface InternamientoDetallado extends Internamiento {
 // ==========================================
 // INTERFACES AUXILIARES
 // ==========================================
-export interface DocumentoClinicoResumen {
-  id_documento: number;
-  fecha_elaboracion: string;
-  estado: string;
-  tipo_documento: string;
-  medico_creador?: string;
-  especialidad_creador?: string;
-  subtipo_documento?: string;
-}
+// export interface DocumentoClinicoResumen {
+//   id_documento: number;
+//   fecha_elaboracion: string;
+//   estado: string;
+//   tipo_documento: string;
+//   medico_creador?: string;
+//   especialidad_creador?: string;
+//   subtipo_documento?: string;
+// }
 
-export interface SignosVitalesResumen {
-  id_signos_vitales: number;
-  fecha_toma: string;
-  temperatura?: number;
-  presion_arterial_sistolica?: number;
-  presion_arterial_diastolica?: number;
-  frecuencia_cardiaca?: number;
-  frecuencia_respiratoria?: number;
-  saturacion_oxigeno?: number;
-  glucosa?: number;
-  peso?: number;
-  talla?: number;
-  imc?: number;
-  observaciones?: string;
-}
+// export interface SignosVitalesResumen {
+//   id_signos_vitales: number;
+//   fecha_toma: string;
+//   temperatura?: number;
+//   presion_arterial_sistolica?: number;
+//   presion_arterial_diastolica?: number;
+//   frecuencia_cardiaca?: number;
+//   frecuencia_respiratoria?: number;
+//   saturacion_oxigeno?: number;
+//   glucosa?: number;
+//   peso?: number;
+//   talla?: number;
+//   imc?: number;
+//   observaciones?: string;
+// }
 
 export interface PrescripcionResumen {
   id_prescripcion: number;

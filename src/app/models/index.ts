@@ -47,7 +47,6 @@ export * from './nota-postoperatoria.model';
 export * from './nota-postanestesica.model';
 export * from './nota-egreso.model';
 export * from './consentimiento-informado.model';
-// export * from './solicitud-estudio.model'; // COMENTADO para evitar conflicto
 export * from './referencia-traslado.model';
 export * from './prescripcion-medicamento.model';
 export * from './registro-transfusion.model';
