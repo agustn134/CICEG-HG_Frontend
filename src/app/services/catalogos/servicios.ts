@@ -1,348 +1,328 @@
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class Servicios {
-
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/servicios';
-
-  constructor() { }
-}
-
-
-
-
-
-
-
-
-
-
-
-// // src/app/services/catalogos/servicios.ts
 // import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { map } from 'rxjs/operators';
-// import { BaseService } from '../base.service';
-// import { ApiResponse, BaseFilters } from '../../models/base.models';
-
-// // ==========================================
-// // INTERFACES ESPECÍFICAS
-// // ==========================================
-
-// export interface Servicio {
-//   id_servicio: number;
-//   nombre: string;
-//   descripcion?: string;
-//   activo: boolean;
-//   created_at?: string;
-//   updated_at?: string;
-
-//   // Estadísticas adicionales
-//   total_personal?: number;
-//   personal_activo?: number;
-//   total_pacientes_atendidos?: number;
-//   promedio_estancia?: number;
-// }
-
-// export interface ServicioFilters extends BaseFilters {
-//   nombre?: string;
-//   con_personal?: boolean;
-//   con_pacientes?: boolean;
-// }
-
-// export interface CreateServicioDto {
-//   nombre: string;
-//   descripcion?: string;
-//   activo?: boolean;
-// }
-
-// export interface UpdateServicioDto extends Partial<CreateServicioDto> {
-//   id_servicio: number;
-// }
-
-// export interface ServicioEstadisticas {
-//   total_servicios: number;
-//   servicios_activos: number;
-//   servicios_inactivos: number;
-//   servicios_con_personal: number;
-//   servicios_sin_personal: number;
-//   promedio_personal_por_servicio: number;
-//   servicio_con_mas_personal: {
-//     nombre: string;
-//     total_personal: number;
-//   };
-//   distribución_por_turno: {
-//     matutino: number;
-//     vespertino: number;
-//     nocturno: number;
-//     jornada_acumulada: number;
-//   };
-// }
 
 // @Injectable({
 //   providedIn: 'root'
 // })
-// export class ServiciosService extends BaseService<Servicio> {
-//   protected override endpoint = '/catalogos/servicios';
+// export class Servicios {
 
-//   // ==========================================
-//   // MÉTODOS CRUD EXTENDIDOS
-//   // ==========================================
+//   private readonly API_URL = 'http://localhost:3000/api/catalogos/servicios';
 
-//   /**
-//    * Obtener todos los servicios con filtros específicos
-//    */
-//   override getAll(filters?: ServicioFilters): Observable<ApiResponse<Servicio[]>> {
-//     return super.getAll(filters);
-//   }
-
-//   /**
-//    * Buscar servicios por nombre
-//    */
-//   buscarPorNombre(nombre: string): Observable<Servicio[]> {
-//     return this.search(nombre).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener servicios activos (para selects/dropdowns)
-//    */
-//   getServiciosActivos(): Observable<Servicio[]> {
-//     return this.getActivos().pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   // ==========================================
-//   // MÉTODOS ESPECÍFICOS DE SERVICIOS
-//   // ==========================================
-
-//   /**
-//    * Obtener estadísticas completas de servicios
-//    */
-//   // override getEstadisticas(): Observable<ServicioEstadisticas> {
-//   //   return super.getEstadisticas().pipe(
-//   //     map(response => response.data!)
-//   //   );
-//   // }
-
-//   /**
-//    * Obtener servicios con personal asignado
-//    */
-//   getServiciosConPersonal(): Observable<Servicio[]> {
-//     return this.customGet<Servicio[]>('/con-personal').pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener servicios sin personal asignado
-//    */
-//   getServiciosSinPersonal(): Observable<Servicio[]> {
-//     return this.customGet<Servicio[]>('/sin-personal').pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener personal asignado a un servicio específico
-//    */
-//   getPersonalDelServicio(idServicio: number): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idServicio}/personal`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener pacientes actualmente en un servicio
-//    */
-//   getPacientesDelServicio(idServicio: number): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idServicio}/pacientes`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener historial de pacientes atendidos en un servicio
-//    */
-//   getHistorialPacientes(idServicio: number, filters?: {
-//     fecha_inicio?: string;
-//     fecha_fin?: string;
-//     page?: number;
-//     limit?: number;
-//   }): Observable<ApiResponse<any[]>> {
-//     return this.customGet<any[]>(`/${idServicio}/historial-pacientes`, filters);
-//   }
-
-//   /**
-//    * Obtener camas disponibles en un servicio
-//    */
-//   getCamasDisponibles(idServicio: number): Observable<any[]> {
-//     return this.customGet<any[]>(`/${idServicio}/camas-disponibles`).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Obtener estadísticas específicas de un servicio
-//    */
-//   getEstadisticasServicio(idServicio: number): Observable<{
-//     total_personal: number;
-//     personal_por_turno: any;
-//     ocupacion_promedio: number;
-//     tiempo_estancia_promedio: number;
-//     pacientes_mes_actual: number;
-//     ingresos_por_mes: any[];
-//   }> {
-//     return this.customGet<any>(`/${idServicio}/estadisticas`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   // ==========================================
-//   // MÉTODOS DE GESTIÓN AVANZADA
-//   // ==========================================
-
-//   /**
-//    * Asignar personal a un servicio
-//    */
-//   asignarPersonal(idServicio: number, idPersonalMedico: number): Observable<boolean> {
-//     return this.customPost<any>(`/${idServicio}/asignar-personal`, {
-//       id_personal_medico: idPersonalMedico
-//     }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   /**
-//    * Remover personal de un servicio
-//    */
-//   removerPersonal(idServicio: number, idPersonalMedico: number): Observable<boolean> {
-//     return this.customPost<any>(`/${idServicio}/remover-personal`, {
-//       id_personal_medico: idPersonalMedico
-//     }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   /**
-//    * Transferir paciente entre servicios
-//    */
-//   transferirPaciente(idPaciente: number, servicioOrigen: number, servicioDestino: number, motivo: string): Observable<boolean> {
-//     return this.customPost<any>('/transferir-paciente', {
-//       id_paciente: idPaciente,
-//       servicio_origen: servicioOrigen,
-//       servicio_destino: servicioDestino,
-//       motivo: motivo
-//     }).pipe(
-//       map(response => response.success)
-//     );
-//   }
-
-//   /**
-//    * Obtener capacidad y ocupación de un servicio
-//    */
-//   getCapacidadServicio(idServicio: number): Observable<{
-//     capacidad_total: number;
-//     ocupacion_actual: number;
-//     porcentaje_ocupacion: number;
-//     camas_disponibles: number;
-//     camas_mantenimiento: number;
-//     lista_espera: number;
-//   }> {
-//     return this.customGet<any>(`/${idServicio}/capacidad`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   // ==========================================
-//   // MÉTODOS DE VALIDACIÓN
-//   // ==========================================
-
-//   /**
-//    * Validar si un nombre de servicio está disponible
-//    */
-//   validarNombreDisponible(nombre: string, idExcluir?: number): Observable<boolean> {
-//     const params: any = { nombre };
-//     if (idExcluir) {
-//       params.excluir_id = idExcluir;
-//     }
-
-//     return this.customGet<{ disponible: boolean }>('/validar-nombre', params).pipe(
-//       map(response => response.data?.disponible || false)
-//     );
-//   }
-
-//   /**
-//    * Verificar si se puede eliminar un servicio
-//    */
-//   puedeEliminar(idServicio: number): Observable<{
-//     puede_eliminar: boolean;
-//     motivos: string[];
-//     personal_asignado: number;
-//     pacientes_activos: number;
-//   }> {
-//     return this.customGet<any>(`/${idServicio}/puede-eliminar`).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   // ==========================================
-//   // MÉTODOS DE UTILIDAD
-//   // ==========================================
-
-//   /**
-//    * Obtener servicios más utilizados
-//    */
-//   getServiciosMasUtilizados(limite: number = 10): Observable<Servicio[]> {
-//     return this.customGet<Servicio[]>('/mas-utilizados', { limite }).pipe(
-//       map(response => response.data || [])
-//     );
-//   }
-
-//   /**
-//    * Generar reporte de actividad de servicios
-//    */
-//   generarReporteActividad(filtros: {
-//     fecha_inicio: string;
-//     fecha_fin: string;
-//     incluir_inactivos?: boolean;
-//   }): Observable<{
-//     servicios: any[];
-//     resumen: any;
-//     graficos: any;
-//   }> {
-//     return this.customPost<any>('/reporte-actividad', filtros).pipe(
-//       map(response => response.data!)
-//     );
-//   }
-
-//   /**
-//    * Exportar listado de servicios
-//    */
-//   exportarServicios(formato: 'excel' | 'pdf' | 'csv' = 'excel'): Observable<Blob> {
-//     return this.http.get(`${this.buildUrl()}/exportar`, {
-//       params: { formato },
-//       responseType: 'blob'
-//     });
-//   }
-
-//   /**
-//    * Importar servicios desde archivo
-//    */
-//   importarServicios(archivo: File): Observable<{
-//     exitosos: number;
-//     errores: number;
-//     detalles: any[];
-//   }> {
-//     const formData = new FormData();
-//     formData.append('archivo', archivo);
-
-//     return this.http.post<ApiResponse<any>>(`${this.buildUrl()}/importar`, formData).pipe(
-//       map(response => response.data!)
-//     );
-//   }
+//   constructor() { }
 // }
+// src/app/services/catalogos/servicios.ts
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, retry, finalize } from 'rxjs/operators';
+
+import {
+  Servicio,
+  CreateServicioDto,
+  UpdateServicioDto,
+  ServicioFilters
+} from '../../models/servicio.model';
+import { ApiResponse, API_CONFIG } from '../../models/base.models';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ServiciosService {
+  private http = inject(HttpClient);
+  private readonly API_URL = `${API_CONFIG.BASE_URL}/catalogos/servicios`;
+
+  // Loading state para UI
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
+
+  // ==========================================
+  // MÉTODOS CRUD PRINCIPALES
+  // ==========================================
+
+  /**
+   * Obtener todos los servicios con filtros
+   */
+  getAll(filters?: ServicioFilters): Observable<ApiResponse<Servicio[]>> {
+    this.setLoading(true);
+
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.search) {
+        params = params.set('buscar', filters.search);
+      }
+      if (filters.nombre) {
+        params = params.set('nombre', filters.nombre);
+      }
+      if (filters.tipo_servicio) {
+        params = params.set('tipo_servicio', filters.tipo_servicio);
+      }
+      if (filters.con_camas_disponibles !== undefined) {
+        params = params.set('con_camas_disponibles', filters.con_camas_disponibles.toString());
+      }
+      if (filters.jefe_servicio) {
+        params = params.set('jefe_servicio', filters.jefe_servicio);
+      }
+      if (filters.activo !== undefined) {
+        params = params.set('activo', filters.activo.toString());
+      }
+      if (filters.page) {
+        params = params.set('page', filters.page.toString());
+      }
+      if (filters.limit) {
+        params = params.set('limit', filters.limit.toString());
+      }
+      if (filters.sort_by) {
+        params = params.set('sort_by', filters.sort_by);
+      }
+      if (filters.sort_order) {
+        params = params.set('sort_order', filters.sort_order);
+      }
+    }
+
+    return this.http.get<ApiResponse<Servicio[]>>(this.API_URL, { params })
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Obtener un servicio por ID
+   */
+  getById(id: number): Observable<ApiResponse<Servicio>> {
+    this.setLoading(true);
+
+    return this.http.get<ApiResponse<Servicio>>(`${this.API_URL}/${id}`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Crear un nuevo servicio
+   */
+  create(servicio: CreateServicioDto): Observable<ApiResponse<Servicio>> {
+    this.setLoading(true);
+
+    // Validar datos antes de enviar
+    const servicioValidado = this.validarDatosCreacion(servicio);
+
+    return this.http.post<ApiResponse<Servicio>>(this.API_URL, servicioValidado)
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Actualizar un servicio existente
+   */
+  update(id: number, servicio: UpdateServicioDto): Observable<ApiResponse<Servicio>> {
+    this.setLoading(true);
+
+    // Validar datos antes de enviar
+    const servicioValidado = this.validarDatosActualizacion(servicio);
+
+    return this.http.put<ApiResponse<Servicio>>(`${this.API_URL}/${id}`, servicioValidado)
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Eliminar un servicio
+   */
+  delete(id: number): Observable<ApiResponse<void>> {
+    this.setLoading(true);
+
+    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/${id}`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Cambiar estado activo/inactivo de un servicio
+   */
+  toggleActivo(id: number): Observable<ApiResponse<Servicio>> {
+    this.setLoading(true);
+
+    return this.http.patch<ApiResponse<Servicio>>(`${this.API_URL}/${id}/toggle-activo`, {})
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  // ==========================================
+  // MÉTODOS ADICIONALES
+  // ==========================================
+
+  /**
+   * Obtener servicios activos únicamente
+   */
+  getServiciosActivos(): Observable<ApiResponse<Servicio[]>> {
+    return this.getAll({ activo: true });
+  }
+
+  /**
+   * Buscar servicios por nombre
+   */
+  buscarPorNombre(nombre: string): Observable<ApiResponse<Servicio[]>> {
+    return this.getAll({ search: nombre });
+  }
+
+  /**
+   * Obtener servicios por tipo
+   */
+  getServiciosPorTipo(tipo: string): Observable<ApiResponse<Servicio[]>> {
+    return this.getAll({ tipo_servicio: tipo });
+  }
+
+  /**
+   * Obtener estadísticas de servicios
+   */
+  getEstadisticas(): Observable<ApiResponse<any>> {
+    this.setLoading(true);
+
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/estadisticas`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError.bind(this)),
+        finalize(() => this.setLoading(false))
+      );
+  }
+
+  // ==========================================
+  // MÉTODOS DE VALIDACIÓN
+  // ==========================================
+
+  /**
+   * Validar datos para creación
+   */
+  private validarDatosCreacion(servicio: CreateServicioDto): CreateServicioDto {
+    const servicioLimpio: CreateServicioDto = {
+      nombre: servicio.nombre?.trim() || '',
+      descripcion: servicio.descripcion?.trim() || undefined,
+      activo: servicio.activo !== undefined ? servicio.activo : true,
+      jefe_servicio: servicio.jefe_servicio?.trim() || undefined,
+      ubicacion: servicio.ubicacion?.trim() || undefined,
+      telefono_interno: servicio.telefono_interno?.trim() || undefined,
+      capacidad_camas: servicio.capacidad_camas || undefined,
+      tipo_servicio: servicio.tipo_servicio?.trim() || undefined
+    };
+
+    // Validaciones básicas
+    if (!servicioLimpio.nombre) {
+      throw new Error('El nombre del servicio es obligatorio');
+    }
+
+    if (servicioLimpio.nombre.length < 2) {
+      throw new Error('El nombre debe tener al menos 2 caracteres');
+    }
+
+    if (servicioLimpio.capacidad_camas !== undefined && servicioLimpio.capacidad_camas < 0) {
+      throw new Error('La capacidad de camas no puede ser negativa');
+    }
+
+    if (servicioLimpio.telefono_interno && !/^\d{3,4}$/.test(servicioLimpio.telefono_interno)) {
+      throw new Error('El teléfono interno debe tener 3 o 4 dígitos');
+    }
+
+    return servicioLimpio;
+  }
+
+  /**
+   * Validar datos para actualización
+   */
+  private validarDatosActualizacion(servicio: UpdateServicioDto): UpdateServicioDto {
+    const servicioLimpio: UpdateServicioDto = {
+      id_servicio: servicio.id_servicio,
+      nombre: servicio.nombre?.trim() || undefined,
+      descripcion: servicio.descripcion?.trim() || undefined,
+      activo: servicio.activo,
+      jefe_servicio: servicio.jefe_servicio?.trim() || undefined,
+      ubicacion: servicio.ubicacion?.trim() || undefined,
+      telefono_interno: servicio.telefono_interno?.trim() || undefined,
+      capacidad_camas: servicio.capacidad_camas,
+      tipo_servicio: servicio.tipo_servicio?.trim() || undefined
+    };
+
+    // Validaciones básicas
+    if (servicioLimpio.nombre !== undefined && servicioLimpio.nombre.length < 2) {
+      throw new Error('El nombre debe tener al menos 2 caracteres');
+    }
+
+    if (servicioLimpio.capacidad_camas !== undefined && servicioLimpio.capacidad_camas < 0) {
+      throw new Error('La capacidad de camas no puede ser negativa');
+    }
+
+    if (servicioLimpio.telefono_interno && !/^\d{3,4}$/.test(servicioLimpio.telefono_interno)) {
+      throw new Error('El teléfono interno debe tener 3 o 4 dígitos');
+    }
+
+    return servicioLimpio;
+  }
+
+  // ==========================================
+  // MÉTODOS PRIVADOS
+  // ==========================================
+
+  /**
+   * Manejar errores HTTP
+   */
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Error desconocido';
+
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado cliente
+      errorMessage = `Error de cliente: ${error.error.message}`;
+    } else {
+      // Error del lado servidor
+      if (error.status === 0) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifique su conexión a internet.';
+      } else if (error.status === 400) {
+        errorMessage = error.error?.message || 'Datos inválidos';
+      } else if (error.status === 401) {
+        errorMessage = 'No autorizado. Inicie sesión nuevamente.';
+      } else if (error.status === 403) {
+        errorMessage = 'No tiene permisos para realizar esta operación';
+      } else if (error.status === 404) {
+        errorMessage = 'Servicio no encontrado';
+      } else if (error.status === 409) {
+        errorMessage = error.error?.message || 'Ya existe un servicio con ese nombre';
+      } else if (error.status >= 500) {
+        errorMessage = 'Error interno del servidor. Intente más tarde.';
+      } else {
+        errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
+      }
+    }
+
+    console.error('Error en ServiciosService:', error);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Establecer estado de carga
+   */
+  private setLoading(loading: boolean): void {
+    this.loadingSubject.next(loading);
+  }
+
+  // ==========================================
+  // GETTERS PARA ACCESO RÁPIDO
+  // ==========================================
+
+  get isLoading(): boolean {
+    return this.loadingSubject.value;
+  }
+}
