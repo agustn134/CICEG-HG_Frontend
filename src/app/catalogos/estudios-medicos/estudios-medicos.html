@@ -1,1 +1,280 @@
-<p>estudios-medicos works!</p>
+<!-- estudios-medicos.html -->
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <!-- Encabezado -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Catálogo de Estudios Médicos</h1>
+    <p class="text-gray-600 mt-2">Gestión de estudios de laboratorio, imagen y gabinete</p>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div class="mb-6">
+    <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+      {{ error }}
+    </div>
+    <div *ngIf="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+      {{ success }}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Formulario -->
+    <div class="lg:col-span-1">
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">
+          {{ editingId ? 'Editar Estudio' : 'Nuevo Estudio' }}
+        </h2>
+
+        <form [formGroup]="estudiosForm" (ngSubmit)="onSubmit()">
+
+          <!-- Clave -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Clave <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="clave"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-500]="isFieldInvalid('clave')"
+              placeholder="Ej: 19101, LAB001"
+            >
+            <div *ngIf="getFieldError('clave')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('clave') }}
+            </div>
+          </div>
+
+          <!-- Nombre -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="nombre"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-500]="isFieldInvalid('nombre')"
+              placeholder="Nombre del estudio"
+            >
+            <div *ngIf="getFieldError('nombre')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('nombre') }}
+            </div>
+          </div>
+
+          <!-- Tipo -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Tipo <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="tipo"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-500]="isFieldInvalid('tipo')"
+            >
+              <option value="">Seleccionar tipo</option>
+              <option *ngFor="let tipo of tiposEstudio" [value]="tipo.value">
+                {{ tipo.label }}
+              </option>
+            </select>
+            <div *ngIf="getFieldError('tipo')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('tipo') }}
+            </div>
+          </div>
+
+          <!-- Tiempo de resultado -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Tiempo de resultado (horas) <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              formControlName="tiempo_resultado"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [class.border-red-500]="isFieldInvalid('tiempo_resultado')"
+              min="1"
+            >
+            <div *ngIf="getFieldError('tiempo_resultado')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('tiempo_resultado') }}
+            </div>
+          </div>
+
+          <!-- Costo -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Costo ($)
+            </label>
+            <input
+              type="number"
+              formControlName="costo"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              min="0"
+              step="0.01"
+            >
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Descripción
+            </label>
+            <textarea
+              formControlName="descripcion"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Descripción del estudio"
+            ></textarea>
+          </div>
+
+          <!-- Preparación del paciente -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Preparación del paciente
+            </label>
+            <textarea
+              formControlName="preparacion_paciente"
+              rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Instrucciones de preparación"
+            ></textarea>
+          </div>
+
+          <!-- Contraindicaciones -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Contraindicaciones
+            </label>
+            <textarea
+              formControlName="contraindicaciones"
+              rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Contraindicaciones del estudio"
+            ></textarea>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Observaciones
+            </label>
+            <textarea
+              formControlName="observaciones"
+              rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Observaciones adicionales"
+            ></textarea>
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="mb-6 space-y-3">
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                formControlName="requiere_ayuno"
+                id="requiere_ayuno"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              >
+              <label for="requiere_ayuno" class="ml-2 text-sm text-gray-700">
+                Requiere ayuno
+              </label>
+            </div>
+
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                formControlName="activo"
+                id="activo"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              >
+              <label for="activo" class="ml-2 text-sm text-gray-700">
+                Activo
+              </label>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex space-x-3">
+            <button
+              type="submit"
+              [disabled]="isLoading"
+              class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              <span *ngIf="!isLoading">{{ editingId ? 'Actualizar' : 'Guardar' }}</span>
+              <span *ngIf="isLoading">Guardando...</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de estudios -->
+    <div class="lg:col-span-2">
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Estudios Registrados</h3>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="isLoading && estudios.length === 0" class="text-center py-8">
+            <div class="text-gray-500">Cargando estudios...</div>
+          </div>
+
+          <div *ngIf="!isLoading && estudios.length === 0" class="text-center py-8">
+            <div class="text-gray-500">No hay estudios registrados</div>
+          </div>
+
+          <div *ngIf="estudios.length > 0" class="space-y-4">
+            <div *ngFor="let estudio of estudios" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h4 class="text-lg font-medium text-gray-900">{{ estudio.nombre }}</h4>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full"
+                          [class]="estudio.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                      {{ estudio.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div><strong>Clave:</strong> {{ estudio.clave }}</div>
+                    <div><strong>Tipo:</strong> {{ estudio.tipo }}</div>
+                    <div><strong>Tiempo resultado:</strong> {{ estudio.tiempo_resultado }}h</div>
+                    <div><strong>Ayuno:</strong> {{ estudio.requiere_ayuno ? 'Sí' : 'No' }}</div>
+                    <div *ngIf="estudio.costo"><strong>Costo:</strong> ${{ estudio.costo }}</div>
+                  </div>
+
+                  <div *ngIf="estudio.descripcion" class="mt-2 text-sm text-gray-600">
+                    <strong>Descripción:</strong> {{ estudio.descripcion }}
+                  </div>
+                </div>
+
+                <div class="flex space-x-2 ml-4">
+                  <button
+                    (click)="editEstudio(estudio)"
+                    class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    (click)="deleteEstudio(estudio.id_estudio)"
+                    class="text-red-600 hover:text-red-800 text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

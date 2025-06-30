@@ -18,7 +18,7 @@ import { Dashboard } from './home/dashboard/dashboard';
 // ===== Catálogos =====
 import { Servicios } from './catalogos/servicios/servicios';
 import { AreasInterconsulta } from './catalogos/areas-interconsulta/areas-interconsulta';
-import { EstudiosMedicos } from './catalogos/estudios-medicos/estudios-medicos';
+import { EstudiosMedicosComponent } from './catalogos/estudios-medicos/estudios-medicos';
 import { GuiasClinicas } from './catalogos/guias-clinicas/guias-clinicas';
 import { Medicamentos } from './catalogos/medicamentos/medicamentos';
 import { TiposSangre } from './catalogos/tipos-sangre/tipos-sangre';
@@ -85,7 +85,7 @@ export const routes: Routes = [
           { path: 'servicios', component: Servicios },
           { path: 'areas-interconsulta', component: AreasInterconsulta },
           { path: 'guias-clinicas', component: GuiasClinicas },
-          { path: 'estudios-medicos', component: EstudiosMedicos },
+          { path: 'estudios-medicos', component: EstudiosMedicosComponent },
           { path: 'medicamentos', component: Medicamentos },
           { path: 'tipos-sangre', component: TiposSangre },
           { path: 'tipos-documento', component: TiposDocumento },
