@@ -17,10 +17,10 @@ import { Dashboard } from './home/dashboard/dashboard';
 
 // ===== Catálogos =====
 import { Servicios } from './catalogos/servicios/servicios';
-import { AreasInterconsulta } from './catalogos/areas-interconsulta/areas-interconsulta';
+import { AreasInterconsultaComponent } from './catalogos/areas-interconsulta/areas-interconsulta';
 import { EstudiosMedicosComponent } from './catalogos/estudios-medicos/estudios-medicos';
-import { GuiasClinicas } from './catalogos/guias-clinicas/guias-clinicas';
-import { Medicamentos } from './catalogos/medicamentos/medicamentos';
+import { GuiasClinicasComponent } from './catalogos/guias-clinicas/guias-clinicas';
+import { MedicamentosComponent } from './catalogos/medicamentos/medicamentos';
 import { TiposSangre } from './catalogos/tipos-sangre/tipos-sangre';
 import { TiposDocumento } from './catalogos/tipos-documento/tipos-documento';
 
@@ -83,10 +83,10 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'servicios', pathMatch: 'full' },
           { path: 'servicios', component: Servicios },
-          { path: 'areas-interconsulta', component: AreasInterconsulta },
-          { path: 'guias-clinicas', component: GuiasClinicas },
+          { path: 'areas-interconsulta', component: AreasInterconsultaComponent },
+          { path: 'guias-clinicas', component: GuiasClinicasComponent },
           { path: 'estudios-medicos', component: EstudiosMedicosComponent },
-          { path: 'medicamentos', component: Medicamentos },
+          { path: 'medicamentos', component: MedicamentosComponent },
           { path: 'tipos-sangre', component: TiposSangre },
           { path: 'tipos-documento', component: TiposDocumento },
         ]

@@ -10,6 +10,9 @@ export interface AreaInterconsulta extends BaseEntity, AuditInfo {
   total_interconsultas?: number;
   interconsultas_pendientes?: number;
   tiempo_promedio_respuesta?: number;
+  interconsultas_mes?: number; // Esta propiedad faltaba
+  interconsultas_semana?: number; // Agregamos también esta que usa el backend
+  interconsultas_ano?: number; // Y esta para estadísticas anuales
 }
 
 export interface AreaInterconsultaFilters extends BaseFilters {
