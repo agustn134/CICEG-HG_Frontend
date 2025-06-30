@@ -27,7 +27,7 @@ import { TiposDocumento } from './catalogos/tipos-documento/tipos-documento';
 // ===== Personas =====
 import { Administradores } from './personas/administradores/administradores';
 import { Pacientes } from './personas/pacientes/pacientes';
-import { PersonalMedico } from './personas/personal-medico/personal-medico';
+import { PersonalMedicoComponent } from './personas/personal-medico/personal-medico';
 import { PersonasComponent } from './personas/personas/personas';
 
 // ===== Gestión de Expedientes =====
@@ -100,7 +100,7 @@ export const routes: Routes = [
           { path: 'administradores', component: Administradores },
           { path: 'pacientes', component: Pacientes },
           { path: 'pacientes-list', component: Pacientes }, // Mismo componente por ahora
-          { path: 'personal-medico', component: PersonalMedico },
+          { path: 'personal-medico', component: PersonalMedicoComponent },
         ]
       },
 

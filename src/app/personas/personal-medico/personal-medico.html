@@ -1,0 +1,441 @@
+<!-- src/app/personas/personal-medico/personal-medico.html -->
+<div class="min-h-screen bg-gray-50 p-4 space-y-6">
+
+  <!-- Header -->
+  <header class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="space-y-2">
+        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <span class="text-2xl">👨‍⚕️</span>
+          Personal Médico
+        </h1>
+        <p class="text-gray-600 text-sm">
+          Total: {{ totalPersonalMedico }} |
+          Activos: {{ personalActivo.length }} |
+          Inactivos: {{ personalInactivo.length }}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+          (click)="crearNuevoPersonal()">
+          <span>➕</span>
+          Nuevo Personal
+        </button>
+
+        <button
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+          (click)="toggleEstadisticas()">
+          <span>📊</span>
+          {{ mostrarEstadisticas ? 'Ocultar' : 'Ver' }} Estadísticas
+        </button>
+
+        <button
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+          (click)="recargarDatos()"
+          [disabled]="loading">
+          <span [class.animate-spin]="loading">🔄</span>
+          Actualizar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Panel de estadísticas -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" *ngIf="mostrarEstadisticas && estadisticas">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-gray-50 rounded-lg p-4 flex items-center gap-3 hover:bg-gray-100 transition-colors">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-blue-500">
+          <span>👨‍⚕️</span>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ estadisticas.resumen.total_personal_registrado }}</h3>
+          <p class="text-sm text-gray-600">Total Personal</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-4 flex items-center gap-3 hover:bg-gray-100 transition-colors">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-green-500">
+          <span>✅</span>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ estadisticas.resumen.total_personal_activo }}</h3>
+          <p class="text-sm text-gray-600">Activos</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-4 flex items-center gap-3 hover:bg-gray-100 transition-colors">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-purple-500">
+          <span>🏥</span>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ estadisticas.resumen.total_especialidades }}</h3>
+          <p class="text-sm text-gray-600">Especialidades</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-4 flex items-center gap-3 hover:bg-gray-100 transition-colors">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-orange-500">
+          <span>🏢</span>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ estadisticas.resumen.total_departamentos }}</h3>
+          <p class="text-sm text-gray-600">Departamentos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtros y búsqueda -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-4" [formGroup]="filtrosForm">
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex-1 relative">
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <span>🔍</span>
+        </div>
+        <input
+          type="text"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Buscar por nombre, cédula, especialidad..."
+          formControlName="buscar">
+      </div>
+
+      <button
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 relative"
+        (click)="toggleFiltros()">
+        <span>🔍</span>
+        Filtros
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" *ngIf="hayFiltrosAplicados">!</span>
+      </button>
+    </div>
+
+    <!-- Panel de filtros expandible -->
+    <div class="border-t border-gray-200 pt-4 space-y-4" *ngIf="mostrarFiltros">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Estado</label>
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="activo">
+            <option *ngFor="let opcion of opcionesActivo" [value]="opcion.valor">
+              {{ opcion.etiqueta }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Especialidad</label>
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="especialidad">
+            <option value="">Todas</option>
+            <option *ngFor="let especialidad of especialidadesMedicas" [value]="especialidad">
+              {{ especialidad }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Cargo</label>
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="cargo">
+            <option value="">Todos</option>
+            <option *ngFor="let cargo of cargosMedicos" [value]="cargo">
+              {{ cargo }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Departamento</label>
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="departamento">
+            <option value="">Todos</option>
+            <option *ngFor="let departamento of departamentosHospitalarios" [value]="departamento">
+              {{ departamento }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+          (click)="aplicarFiltros()">
+          Aplicar Filtros
+        </button>
+        <button
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+          (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controles de vista -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex gap-2">
+        <button
+          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          [class.bg-blue-600]="vistaActual === 'tabla'"
+          [class.text-white]="vistaActual === 'tabla'"
+          [class.border-blue-600]="vistaActual === 'tabla'"
+          (click)="cambiarVista('tabla')">
+          <span>📋</span>
+          Tabla
+        </button>
+        <button
+          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          [class.bg-blue-600]="vistaActual === 'tarjetas'"
+          [class.text-white]="vistaActual === 'tarjetas'"
+          [class.border-blue-600]="vistaActual === 'tarjetas'"
+          (click)="cambiarVista('tarjetas')">
+          <span>⊞</span>
+          Tarjetas
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error">
+    <div class="p-4 rounded-lg border flex items-center gap-3 bg-red-50 border-red-200 text-red-800">
+      <span>⚠️</span>
+      <span>{{ error }}</span>
+      <button class="ml-auto text-red-600 hover:text-red-800 font-bold text-lg" (click)="limpiarError()">×</button>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div class="flex flex-col items-center justify-center py-12 space-y-4" *ngIf="loading">
+    <div class="text-center">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+      <p class="mt-4">Cargando personal médico...</p>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main *ngIf="!loading">
+
+    <!-- Vista de tabla -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" *ngIf="vistaActual === 'tabla' && hayPersonalMedico">
+      <div class="overflow-x-auto">
+        <table class="w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personal</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especialidad</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documentos</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let personal of personalMedico" class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-10 h-10">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span class="text-blue-600 font-semibold text-sm">
+                        {{ obtenerIconoPorGenero(personal.sexo!) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ obtenerTituloProfesional(personal.especialidad!) }} {{ personal.nombre_completo }}
+                    </div>
+                    <div class="text-sm text-gray-500">ID: {{ personal.id_personal_medico }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <code class="bg-gray-100 px-2 py-1 rounded text-xs">{{ personal.numero_cedula }}</code>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ personal.especialidad }}</div>
+                <div class="text-xs text-gray-500" *ngIf="esEspecialista(personal)">Especialista</div>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-sm text-gray-900">{{ personal.cargo || 'No asignado' }}</span>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-sm text-gray-900">{{ personal.departamento || 'No asignado' }}</span>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class.bg-green-100]="personal.activo"
+                      [class.text-green-800]="personal.activo"
+                      [class.bg-red-100]="!personal.activo"
+                      [class.text-red-800]="!personal.activo">
+                  {{ obtenerTextoEstado(personal.activo) }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="text-sm font-semibold text-gray-900">{{ personal.total_documentos_creados || 0 }}</div>
+                <div class="text-xs" [class]="obtenerColorProductividad(personal.total_documentos_creados || 0)">
+                  {{ obtenerNivelProductividad(personal.total_documentos_creados || 0) }}
+                </div>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center space-x-2">
+                  <button
+                    class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                    (click)="verDetallePersonal(personal)"
+                    title="Ver detalles">
+                    <span>👁</span>
+                  </button>
+
+                  <button
+                    class="text-green-600 hover:text-green-800 p-1 rounded transition-colors"
+                    (click)="editarPersonal(personal)"
+                    title="Editar">
+                    <span>✏️</span>
+                  </button>
+
+                  <button
+                    class="text-purple-600 hover:text-purple-800 p-1 rounded transition-colors"
+                    (click)="verDocumentosCreados(personal)"
+                    title="Ver documentos creados">
+                    <span>📄</span>
+                  </button>
+
+                  <button
+                    class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                    (click)="eliminarPersonal(personal)"
+                    title="Eliminar">
+                    <span>🗑️</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Vista de tarjetas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" *ngIf="vistaActual === 'tarjetas' && hayPersonalMedico">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow" *ngFor="let personal of personalMedico">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg">
+            {{ obtenerIconoPorGenero(personal.sexo!) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 truncate">
+              {{ obtenerTituloProfesional(personal.especialidad!) }} {{ personal.nombre_completo }}
+            </h3>
+            <p class="text-sm text-gray-600">{{ personal.especialidad }}</p>
+            <div class="mt-1">
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                    [class.bg-green-100]="personal.activo"
+                    [class.text-green-800]="personal.activo"
+                    [class.bg-red-100]="!personal.activo"
+                    [class.text-red-800]="!personal.activo">
+                {{ obtenerTextoEstado(personal.activo) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-700">Cédula:</span>
+            <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ personal.numero_cedula }}</code>
+          </div>
+
+          <div class="flex justify-between items-center" *ngIf="personal.cargo">
+            <span class="text-sm font-medium text-gray-700">Cargo:</span>
+            <span class="text-sm text-gray-900">{{ personal.cargo }}</span>
+          </div>
+
+          <div class="flex justify-between items-center" *ngIf="personal.departamento">
+            <span class="text-sm font-medium text-gray-700">Departamento:</span>
+            <span class="text-sm text-gray-900">{{ personal.departamento }}</span>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-700">Documentos:</span>
+            <div class="text-right">
+              <div class="text-sm font-semibold text-gray-900">{{ personal.total_documentos_creados || 0 }}</div>
+              <div class="text-xs" [class]="obtenerColorProductividad(personal.total_documentos_creados || 0)">
+                {{ obtenerNivelProductividad(personal.total_documentos_creados || 0) }}
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="personal.telefono" class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+            <span class="text-sm text-gray-900">{{ personal.telefono }}</span>
+          </div>
+
+          <div *ngIf="esEspecialista(personal)" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div class="flex items-center gap-2">
+              <span class="text-blue-600">🎓</span>
+              <p class="text-sm font-medium text-blue-800">Médico Especialista</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-2">
+          <button
+            class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            (click)="verDetallePersonal(personal)">
+            Ver Detalles
+          </button>
+
+          <button
+            class="px-3 py-1.5 text-xs bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            (click)="editarPersonal(personal)">
+            Editar
+          </button>
+
+          <button
+            class="px-3 py-1.5 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            (click)="verDocumentosCreados(personal)">
+            Documentos
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay personal médico -->
+    <div class="text-center py-12" *ngIf="!hayPersonalMedico && !loading">
+      <div class="max-w-md mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <div class="text-6xl mb-4 text-gray-300">👨‍⚕️</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No se encontró personal médico</h3>
+        <p class="text-gray-600 mb-6" *ngIf="hayFiltrosAplicados; else noPersonal">
+          No hay personal que coincida con los filtros aplicados.
+        </p>
+        <ng-template #noPersonal>
+          <p class="text-gray-600 mb-6">Aún no hay personal médico registrado en el sistema.</p>
+        </ng-template>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+            (click)="crearNuevoPersonal()"
+            *ngIf="!hayFiltrosAplicados">
+            <span>➕</span>
+            Registrar Primer Personal
+          </button>
+
+          <button
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+            (click)="limpiarFiltros()"
+            *ngIf="hayFiltrosAplicados">
+            <span>✖️</span>
+            Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
