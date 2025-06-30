@@ -16,64 +16,7 @@ import {
 // ==========================================
 // INTERFACES ESPECÍFICAS PARA EL SERVICIO
 // ==========================================
-// export interface ExpedienteCompleto {
-//   id_expediente: number;
-//   numero_expediente: string;
-//   fecha_apertura: string;
-//   estado: 'Activo' | 'Cerrado' | 'Archivado' | 'Suspendido' | 'Eliminado';
-//   notas_administrativas?: string;
 
-//   // Datos del paciente
-//   id_paciente: number;
-//   alergias?: string;
-//   transfusiones?: string;
-//   detalles_transfusiones?: string;
-//   familiar_responsable?: string;
-//   parentesco_familiar?: string;
-//   telefono_familiar?: string;
-//   ocupacion?: string;
-//   escolaridad?: string;
-//   lugar_nacimiento?: string;
-
-//   // Datos de la persona
-//   id_persona: number;
-//   nombre: string;
-//   apellido_paterno: string;
-//   apellido_materno: string;
-//   fecha_nacimiento: string;
-//   sexo: Genero;
-//   curp?: string;
-//   telefono?: string;
-//   correo_electronico?: string;
-//   domicilio?: string;
-//   estado_civil?: string;
-//   religion?: string;
-//   tipo_sangre?: string;
-//   edad: number;
-
-//   // Estadísticas del expediente
-//   total_documentos: number;
-//   documentos_activos: number;
-//   total_internamientos: number;
-//   internamientos_activos: number;
-//   requiere_validacion_reingreso?: boolean;
-
-//   // Información relacionada
-//   documentos_clinicos?: DocumentoClinico[];
-//   internamientos?: Internamiento[];
-//   ultimos_signos_vitales?: SignosVitales[];
-// }
-
-// export interface DocumentoClinico {
-//   id_documento: number;
-//   fecha_elaboracion: string;
-//   estado: string;
-//   tipo_documento: string;
-//   descripcion_tipo_documento?: string;
-//   medico_creador?: string;
-//   especialidad_medico?: string;
-//   subtipo_documento: string;
-// }
 
 export interface Internamiento {
   id_internamiento: number;
@@ -93,21 +36,6 @@ export interface Internamiento {
   dias_estancia: number;
 }
 
-// export interface SignosVitales {
-//   id_signos_vitales: number;
-//   fecha_toma: string;
-//   temperatura?: number;
-//   presion_arterial_sistolica?: number;
-//   presion_arterial_diastolica?: number;
-//   frecuencia_cardiaca?: number;
-//   frecuencia_respiratoria?: number;
-//   saturacion_oxigeno?: number;
-//   glucosa?: number;
-//   peso?: number;
-//   talla?: number;
-//   imc?: number;
-//   observaciones?: string;
-// }
 
 export interface ExpedienteBusqueda {
   id_expediente: number;
