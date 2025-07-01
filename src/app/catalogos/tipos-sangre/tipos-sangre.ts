@@ -1,16 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-tipos-sangre',
-//   imports: [],
-//   templateUrl: './tipos-sangre.html',
-//   styleUrl: './tipos-sangre.css'
-// })
-// export class TiposSangre {
-
-// }
-
-
 // src/app/catalogos/tipos-sangre/tipos-sangre.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';

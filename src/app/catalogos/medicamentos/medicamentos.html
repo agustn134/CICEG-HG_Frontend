@@ -1,252 +1,343 @@
-<!-- <p>medicamentos works!</p>
-<div class="min-h-screen bg-gray-50 p-6">
-
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Catálogo de Medicamentos</h1>
-    <p class="text-gray-600 mt-2">Gestión del formulario de medicamentos hospitalarios</p>
+<div class="container mx-auto px-4 py-8">
+  <!-- Encabezado y botón de nuevo medicamento -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-hospital-primary-dark">Catálogo de Medicamentos</h1>
+      <p class="text-hospital-gray-600 mt-2">Gestión completa de medicamentos hospitalarios</p>
+    </div>
+    <button
+      (click)="resetForm()"
+      class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Nuevo Medicamento
+    </button>
   </div>
 
-  <div class="mb-6">
-    <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-      {{ error }}
-    </div>
-    <div *ngIf="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-      {{ success }}
-    </div>
+  <!-- Mensajes de estado -->
+  <div *ngIf="error" class="mb-6 p-4 bg-hospital-emergency-light text-hospital-emergency-dark rounded-card">
+    {{ error }}
+  </div>
+  <div *ngIf="success" class="mb-6 p-4 bg-hospital-success-light text-hospital-success-dark rounded-card">
+    {{ success }}
   </div>
 
-  <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+  <!-- Formulario de edición/creación -->
+  <div *ngIf="editingId !== null || medicamentosForm.dirty" class="card-hospital mb-8">
+    <h2 class="text-xl font-semibold mb-4 text-hospital-primary">
+      {{ editingId ? 'Editar Medicamento' : 'Nuevo Medicamento' }}
+    </h2>
 
-    <div class="xl:col-span-1">
-      <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">
-          {{ editingId ? 'Editar Medicamento' : 'Nuevo Medicamento' }}
-        </h2>
+    <form [formGroup]="medicamentosForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Columna 1 -->
+      <div class="space-y-4">
+        <!-- Código -->
+        <div>
+          <label for="codigo" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Código
+          </label>
+          <input
+            type="text"
+            id="codigo"
+            formControlName="codigo"
+            class="form-field"
+            placeholder="Código interno"
+          >
+        </div>
 
-        <form [formGroup]="medicamentosForm" (ngSubmit)="onSubmit()">
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Código
-            </label>
-            <input
-              type="text"
-              formControlName="codigo"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Código del medicamento"
-            >
+        <!-- Nombre genérico -->
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Nombre genérico <span class="text-hospital-emergency">*</span>
+          </label>
+          <input
+            type="text"
+            id="nombre"
+            formControlName="nombre"
+            class="form-field"
+            [class.error]="isFieldInvalid('nombre')"
+            placeholder="Nombre genérico"
+          >
+          <div *ngIf="isFieldInvalid('nombre')" class="mt-1 text-sm text-hospital-emergency">
+            {{ getFieldError('nombre') || 'Nombre genérico es requerido' }}
           </div>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Nombre genérico <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              formControlName="nombre"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              [class.border-red-500]="isFieldInvalid('nombre')"
-              placeholder="Nombre genérico del medicamento"
-            >
-            <div *ngIf="getFieldError('nombre')" class="text-red-500 text-sm mt-1">
-              {{ getFieldError('nombre') }}
-            </div>
-          </div>
+        <!-- Nombre comercial -->
+        <div>
+          <label for="nombre_comercial" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Nombre comercial
+          </label>
+          <input
+            type="text"
+            id="nombre_comercial"
+            formControlName="nombre_comercial"
+            class="form-field"
+            placeholder="Nombre comercial"
+          >
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Nombre comercial
-            </label>
-            <input
-              type="text"
-              formControlName="nombre_comercial"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Nombre comercial"
-            >
-          </div>
+        <!-- Presentación -->
+        <div>
+          <label for="presentacion" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Presentación
+          </label>
+          <select
+            id="presentacion"
+            formControlName="presentacion"
+            class="form-field"
+          >
+            <option value="">Seleccione presentación</option>
+            <option *ngFor="let presentacion of presentaciones" [value]="presentacion">
+              {{ presentacion }}
+            </option>
+          </select>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Presentación
-            </label>
-            <select
-              formControlName="presentacion"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccionar presentación</option>
-              <option *ngFor="let presentacion of presentaciones" [value]="presentacion">
-                {{ presentacion }}
-              </option>
-            </select>
-          </div>
+        <!-- Concentración -->
+        <div>
+          <label for="concentracion" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Concentración
+          </label>
+          <input
+            type="text"
+            id="concentracion"
+            formControlName="concentracion"
+            class="form-field"
+            placeholder="Ej: 500mg, 250mg/5ml"
+          >
+        </div>
+      </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Concentración
-            </label>
-            <input
-              type="text"
-              formControlName="concentracion"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: 500 mg, 250 mg/5ml"
-            >
-          </div>
+      <!-- Columna 2 -->
+      <div class="space-y-4">
+        <!-- Grupo terapéutico -->
+        <div>
+          <label for="grupo_terapeutico" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Grupo terapéutico
+          </label>
+          <select
+            id="grupo_terapeutico"
+            formControlName="grupo_terapeutico"
+            class="form-field"
+          >
+            <option value="">Seleccione grupo</option>
+            <option *ngFor="let grupo of gruposTerapeuticos" [value]="grupo">
+              {{ grupo }}
+            </option>
+          </select>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Grupo terapéutico
-            </label>
-            <select
-              formControlName="grupo_terapeutico"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccionar grupo</option>
-              <option *ngFor="let grupo of gruposTerapeuticos" [value]="grupo">
-                {{ grupo }}
-              </option>
-            </select>
-          </div>
+        <!-- Laboratorio -->
+        <div>
+          <label for="laboratorio" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Laboratorio
+          </label>
+          <input
+            type="text"
+            id="laboratorio"
+            formControlName="laboratorio"
+            class="form-field"
+            placeholder="Laboratorio fabricante"
+          >
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Laboratorio
-            </label>
-            <input
-              type="text"
-              formControlName="laboratorio"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Laboratorio fabricante"
-            >
-          </div>
+        <!-- Vía de administración -->
+        <div>
+          <label for="via_administracion" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Vía de administración
+          </label>
+          <select
+            id="via_administracion"
+            formControlName="via_administracion"
+            class="form-field"
+          >
+            <option value="">Seleccione vía</option>
+            <option *ngFor="let via of viasAdministracion" [value]="via">
+              {{ via }}
+            </option>
+          </select>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Vía de administración
-            </label>
-            <select
-              formControlName="via_administracion"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccionar vía</option>
-              <option *ngFor="let via of viasAdministracion" [value]="via">
-                {{ via }}
-              </option>
-            </select>
-          </div>
+        <!-- Estado activo -->
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="activo"
+            formControlName="activo"
+            class="h-4 w-4 text-hospital-primary focus:ring-hospital-primary border-hospital-gray-300 rounded"
+          >
+          <label for="activo" class="ml-2 block text-sm text-hospital-gray-700">
+            Medicamento activo
+          </label>
+        </div>
+      </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Dosis adulto
-            </label>
-            <textarea
-              formControlName="dosis_adulto"
-              rows="2"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Dosis recomendada para adultos"
-            ></textarea>
-          </div>
+      <!-- Campos de texto largos (ancho completo) -->
+      <div class="md:col-span-2 space-y-4">
+        <!-- Dosis adulto -->
+        <div>
+          <label for="dosis_adulto" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Dosis para adultos
+          </label>
+          <textarea
+            id="dosis_adulto"
+            formControlName="dosis_adulto"
+            rows="2"
+            class="form-field"
+            placeholder="Dosis recomendada para adultos"
+          ></textarea>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Dosis pediátrica
-            </label>
-            <textarea
-              formControlName="dosis_pediatrica"
-              rows="2"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Dosis recomendada para niños"
-            ></textarea>
-          </div>
+        <!-- Dosis pediátrica -->
+        <div>
+          <label for="dosis_pediatrica" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Dosis pediátrica
+          </label>
+          <textarea
+            id="dosis_pediatrica"
+            formControlName="dosis_pediatrica"
+            rows="2"
+            class="form-field"
+            placeholder="Dosis recomendada para niños"
+          ></textarea>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Contraindicaciones
-            </label>
-            <textarea
-              formControlName="contraindicaciones"
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Contraindicaciones del medicamento"
-            ></textarea>
-          </div>
+        <!-- Contraindicaciones -->
+        <div>
+          <label for="contraindicaciones" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Contraindicaciones
+          </label>
+          <textarea
+            id="contraindicaciones"
+            formControlName="contraindicaciones"
+            rows="3"
+            class="form-field"
+            placeholder="Contraindicaciones importantes"
+          ></textarea>
+        </div>
 
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Efectos secundarios
-            </label>
-            <textarea
-              formControlName="efectos_secundarios"
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Efectos secundarios conocidos"
-            ></textarea>
-          </div>
+        <!-- Efectos secundarios -->
+        <div>
+          <label for="efectos_secundarios" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Efectos secundarios
+          </label>
+          <textarea
+            id="efectos_secundarios"
+            formControlName="efectos_secundarios"
+            rows="3"
+            class="form-field"
+            placeholder="Efectos secundarios comunes"
+          ></textarea>
+        </div>
+      </div>
 
-          <div class="mb-6">
-            <div class="flex items-center">
-              <input
-                type="checkbox"
-                formControlName="activo"
-                id="activo"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              >
-              <label for="activo" class="ml-2 text-sm text-gray-700">
-                Medicamento activo
-              </label>
-            </div>
-          </div>
+      <!-- Botones del formulario -->
+      <div class="md:col-span-2 flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          (click)="resetForm()"
+          class="btn-hospital bg-hospital-gray-300 text-hospital-gray-800 hover:bg-hospital-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="isLoading" class="loading"></span>
+          {{ editingId ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
 
-          <div class="flex space-x-3">
-            <button
-              type="submit"
-              [disabled]="isLoading"
-              class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <span *ngIf="!isLoading">{{ editingId ? 'Actualizar' : 'Guardar' }}</span>
-              <span *ngIf="isLoading">Guardando...</span>
-            </button>
-
-            <button
-              type="button"
-              (click)="resetForm()"
-              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
+  <!-- Listado de medicamentos -->
+  <div>
+    <!-- Filtros -->
+    <div class="card-hospital mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="w-full md:w-64">
+          <select
+            (change)="filterByGrupo($any($event.target).value)"
+            class="form-field"
+          >
+            <option value="">Todos los grupos</option>
+            <option *ngFor="let grupo of gruposTerapeuticos" [value]="grupo">
+              {{ grupo }}
+            </option>
+          </select>
+        </div>
+        <div class="text-sm text-hospital-gray-500">
+          {{ medicamentos.length }} medicamentos registrados
+        </div>
       </div>
     </div>
 
-    <div class="xl:col-span-3">
-      <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">Medicamentos Registrados</h3>
+    <!-- Loading state -->
+    <div *ngIf="isLoading && medicamentos.length === 0" class="text-center py-8">
+      <p class="text-hospital-gray-600">Cargando medicamentos...</p>
+    </div>
 
-            <div class="w-64">
-              <select
-                (change)="filterByGrupo($event.target.value)"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Todos los grupos</option>
-                <option *ngFor="let grupo of gruposTerapeuticos" [value]="grupo">
-                  {{ grupo }}
-                </option>
-              </select>
-            </div>
+    <!-- Mensaje cuando no hay medicamentos -->
+    <div *ngIf="medicamentos.length === 0 && !isLoading" class="text-center py-8">
+      <p class="text-hospital-gray-600">No hay medicamentos registrados</p>
+    </div>
+
+    <!-- Grid de medicamentos -->
+    <div *ngIf="medicamentos.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let med of medicamentos" class="card-hospital hover:shadow-lg transition-shadow">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-bold text-hospital-primary-dark">{{ med.nombre }}</h3>
+            <p *ngIf="med.nombre_comercial" class="text-hospital-gray-600 text-sm">{{ med.nombre_comercial }}</p>
+          </div>
+          <span class="px-2 py-1 text-xs rounded-full"
+            [ngClass]="{
+              'bg-hospital-success-light text-hospital-success-dark': med.activo,
+              'bg-hospital-gray-200 text-hospital-gray-700': !med.activo
+            }">
+            {{ med.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+
+        <div class="mt-4 space-y-2">
+          <div *ngIf="med.codigo" class="flex items-center text-sm">
+            <span class="text-hospital-gray-500 w-24">Código:</span>
+            <span class="font-medium">{{ med.codigo }}</span>
+          </div>
+          <div *ngIf="med.presentacion" class="flex items-center text-sm">
+            <span class="text-hospital-gray-500 w-24">Presentación:</span>
+            <span>{{ med.presentacion }}</span>
+          </div>
+          <div *ngIf="med.concentracion" class="flex items-center text-sm">
+            <span class="text-hospital-gray-500 w-24">Concentración:</span>
+            <span>{{ med.concentracion }}</span>
+          </div>
+          <div *ngIf="med.grupo_terapeutico" class="flex items-center text-sm">
+            <span class="text-hospital-gray-500 w-24">Grupo:</span>
+            <span>{{ med.grupo_terapeutico }}</span>
           </div>
         </div>
 
-        <div class="p-6">
-          <div *ngIf="isLoading && medicamentos.length === 0" class="text-center py-8">
-            <div class="text-gray-500">Cargando medicamentos...</div>
-          </div>
-
-          <div *ngIf="!isLoading && medicamentos.length === 0" class="text-center py-8">
-            <div class="text-gray-500">No hay medicamentos registrados</div>
-          </div>
-
+        <div class="mt-6 pt-4 border-t border-hospital-gray-200 flex justify-end space-x-2">
+          <button
+            (click)="editMedicamento(med)"
+            class="btn-hospital bg-hospital-info-light text-white hover:bg-hospital-info-dark text-sm"
+          >
+            Editar
+          </button>
+          <button
+            (click)="deleteMedicamento(med.id_medicamento)"
+            class="btn-hospital bg-hospital-emergency-light text-white hover:bg-hospital-emergency-dark text-sm"
+          >
+            Eliminar
+          </button>
         </div>
-        </div>
-        </div> -->
+      </div>
+    </div>
+  </div>
+</div>

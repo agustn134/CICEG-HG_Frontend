@@ -8,6 +8,7 @@ import {
   UpdatePrescripcionMedicamentoDto
 } from '../../models/prescripcion-medicamento.model';
 import { ApiResponse } from '../../models/base.models';
+import { ExpedienteResumen } from '../../models/expediente.model';
 
 // Interfaz para respuesta paginada
 export interface PaginatedResponse<T> {
@@ -40,7 +41,7 @@ export class PrescripcionesMedicamentoService {
   /**
    * Obtener todas las prescripciones con filtros y paginación
    */
-  getPrescripciones(filters: PrescripcionMedicamentoFilters = {}): Observable<PaginatedResponse<PrescripcionMedicamento>> {
+    getPrescripciones(filters: PrescripcionMedicamentoFilters = {}): Observable<PaginatedResponse<PrescripcionMedicamento>> {
     let params = new HttpParams();
 
     // Aplicar filtros

@@ -9,7 +9,8 @@ import {
   UpdatePacienteDto,
   ApiResponse,
   TipoSangreEnum,
-  Genero
+  Genero,
+  ExpedienteResumen
 } from '../../models';
 
 // ==========================================
@@ -45,14 +46,14 @@ export interface PacienteCompleto {
   expedientes?: ExpedienteResumen[];
 }
 
-export interface ExpedienteResumen {
-  id_expediente: number;
-  numero_expediente: string;
-  estado: string;
-  fecha_creacion: string;
-  total_documentos: number;
-  internamientos_activos: number;
-}
+// export interface ExpedienteResumen {
+//   id_expediente: number;
+//   numero_expediente: string;
+//   estado: string;
+//   fecha_creacion: string;
+//   total_documentos: number;
+//   internamientos_activos: number;
+// }
 
 export interface PacienteBusqueda {
   id_paciente: number;
@@ -74,6 +75,8 @@ export interface EstadisticasPacientes {
     con_transfusiones: number;
     con_alergias: number;
     edad_promedio: number;
+    consultas_mes_actual: number;     // ← Agrega esta línea
+    pacientes_activos: number;
   };
   distribucion_por_edad: {
     grupo_edad: string;

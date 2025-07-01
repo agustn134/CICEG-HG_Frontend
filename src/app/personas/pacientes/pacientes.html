@@ -1,0 +1,599 @@
+<!-- src/app/personas/pacientes/pacientes.html -->
+<div class="min-h-screen bg-hospital-gray-50">
+  <!-- HEADER CON TÍTULO Y ACCIONES PRINCIPALES -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div>
+          <h1 class="text-3xl font-bold text-hospital-gray-900">Gestión de Pacientes</h1>
+          <p class="mt-1 text-sm text-hospital-gray-600">
+            Administra la información de los pacientes del hospital
+          </p>
+        </div>
+
+        <div class="flex space-x-3">
+          <!-- Botón para crear nuevo paciente -->
+          <button
+            (click)="crearNuevoPaciente()"
+            class="btn-hospital bg-hospital-primary hover:bg-hospital-primary-dark text-white">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Nuevo Paciente
+          </button>
+
+          <!-- Botón para recargar datos -->
+          <button
+            (click)="recargarDatos()"
+            [disabled]="loading"
+            class="btn-hospital bg-hospital-gray-600 hover:bg-hospital-gray-700 text-white"
+            [class.loading]="loading">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Recargar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="card-hospital mb-6">
+      <form [formGroup]="filtrosForm" class="space-y-4">
+        <!-- Búsqueda principal -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1">
+            <label for="buscar" class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Buscar paciente
+            </label>
+            <div class="relative">
+              <input
+                id="buscar"
+                type="text"
+                formControlName="buscar"
+                placeholder="Buscar por nombre, CURP, teléfono..."
+                class="form-field pl-10">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-hospital-gray-400"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Botones de filtros y vista -->
+          <div class="flex items-end space-x-2">
+            <button
+              type="button"
+              (click)="toggleFiltros()"
+              class="btn-hospital"
+              [ngClass]="mostrarFiltros ? 'bg-hospital-primary text-white' : 'bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300'">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+              </svg>
+              Filtros
+            </button>
+
+            <button
+              type="button"
+              (click)="toggleEstadisticas()"
+              class="btn-hospital"
+              [ngClass]="mostrarEstadisticas ? 'bg-hospital-info text-white' : 'bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300'">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Estadísticas
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros avanzados (mostrar/ocultar) -->
+        <div *ngIf="mostrarFiltros" class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-hospital-gray-200 animate-slide-down">
+          <!-- Filtro por género -->
+          <div>
+            <label for="sexo" class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Género
+            </label>
+            <select id="sexo" formControlName="sexo" class="form-field">
+              <option *ngFor="let opcion of opcionesGenero" [value]="opcion.valor">
+                {{opcion.etiqueta}}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtro por edad mínima -->
+          <div>
+            <label for="edad_min" class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Edad mínima
+            </label>
+            <input
+              id="edad_min"
+              type="number"
+              formControlName="edad_min"
+              min="0"
+              max="120"
+              placeholder="Ej: 18"
+              class="form-field">
+          </div>
+
+          <!-- Filtro por edad máxima -->
+          <div>
+            <label for="edad_max" class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Edad máxima
+            </label>
+            <input
+              id="edad_max"
+              type="number"
+              formControlName="edad_max"
+              min="0"
+              max="120"
+              placeholder="Ej: 65"
+              class="form-field">
+          </div>
+
+          <!-- Filtro por alergias -->
+          <div>
+            <label for="tiene_alergias" class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Alergias
+            </label>
+            <select id="tiene_alergias" formControlName="tiene_alergias" class="form-field">
+              <option value="">Todos</option>
+              <option value="true">Con alergias</option>
+              <option value="false">Sin alergias</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botones de acción para filtros -->
+        <div *ngIf="mostrarFiltros" class="flex justify-end space-x-3 pt-4 border-t border-hospital-gray-200">
+          <button
+            type="button"
+            (click)="limpiarFiltros()"
+            class="btn-hospital bg-hospital-gray-300 hover:bg-hospital-gray-400 text-hospital-gray-700">
+            Limpiar filtros
+          </button>
+          <button
+            type="button"
+            (click)="aplicarFiltros()"
+            class="btn-hospital bg-hospital-primary hover:bg-hospital-primary-dark text-white">
+            Aplicar filtros
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ESTADÍSTICAS (si están habilitadas) -->
+    <div *ngIf="mostrarEstadisticas && estadisticas" class="mb-6 animate-slide-down">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="card-hospital bg-gradient-to-r from-hospital-primary to-hospital-primary-light text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium">Total Pacientes</p>
+              <p class="text-2xl font-bold">{{estadisticas.resumen.total_pacientes}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-hospital bg-gradient-to-r from-hospital-success to-hospital-success-light text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium">Activos</p>
+              <p class="text-2xl font-bold">{{estadisticas.resumen.pacientes_activos}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-hospital bg-gradient-to-r from-hospital-info to-hospital-info-light text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium">Consultas (Mes)</p>
+              <p class="text-2xl font-bold">{{estadisticas.resumen.consultas_mes_actual}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-hospital bg-gradient-to-r from-hospital-warning to-hospital-warning-light text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium">Con Alergias</p>
+              <p class="text-2xl font-bold">{{estadisticas.resumen.con_alergias}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLES DE VISTA -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center space-x-4">
+        <!-- Selector de vista -->
+        <div class="flex bg-hospital-gray-200 rounded-lg p-1">
+          <button
+            type="button"
+            (click)="cambiarVista('tabla')"
+            class="px-3 py-1 text-sm font-medium rounded-md transition-colors"
+            [ngClass]="vistaActual === 'tabla' ? 'bg-white text-hospital-primary shadow-sm' : 'text-hospital-gray-600 hover:text-hospital-gray-900'">
+            <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9M3 14h18M3 18h18"></path>
+            </svg>
+            Tabla
+          </button>
+          <button
+            type="button"
+            (click)="cambiarVista('tarjetas')"
+            class="px-3 py-1 text-sm font-medium rounded-md transition-colors"
+            [ngClass]="vistaActual === 'tarjetas' ? 'bg-white text-hospital-primary shadow-sm' : 'text-hospital-gray-600 hover:text-hospital-gray-900'">
+            <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+            </svg>
+            Tarjetas
+          </button>
+        </div>
+
+        <!-- Indicador de filtros aplicados -->
+        <div *ngIf="hayFiltrosAplicados" class="bg-hospital-info text-white px-3 py-1 rounded-full text-sm">
+          Filtros aplicados
+        </div>
+      </div>
+
+      <div class="text-sm text-hospital-gray-500">
+        Mostrando {{totalPacientes}} pacientes
+      </div>
+    </div>
+
+    <!-- MENSAJE DE ERROR -->
+    <div *ngIf="error" class="mb-6 bg-hospital-emergency-light border border-hospital-emergency-dark text-hospital-emergency-dark px-4 py-3 rounded-lg animate-slide-down">
+      <div class="flex">
+        <svg class="w-5 h-5 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <h4 class="font-medium">Error al cargar datos</h4>
+          <p class="text-sm mt-1">{{error}}</p>
+          <button
+            (click)="limpiarError()"
+            class="text-sm underline mt-2 hover:no-underline">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDICADOR DE CARGA -->
+    <div *ngIf="loading" class="text-center py-12">
+      <div class="inline-flex items-center px-4 py-2 text-hospital-primary">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Cargando pacientes...
+      </div>
+    </div>
+
+    <!-- VISTA TABLA -->
+    <div *ngIf="vistaActual === 'tabla' && !loading" class="card-hospital overflow-hidden">
+      <div class="overflow-x-auto">
+        <!-- Mensaje si no hay pacientes -->
+        <div *ngIf="!hayPacientes" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-hospital-gray-900">No hay pacientes</h3>
+          <p class="mt-1 text-sm text-hospital-gray-500">No se encontraron pacientes que coincidan con los filtros aplicados.</p>
+        </div>
+
+        <!-- Tabla de pacientes -->
+        <table *ngIf="hayPacientes" class="min-w-full divide-y divide-hospital-gray-200">
+          <thead class="bg-hospital-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Paciente
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Información Personal
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Contacto
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Información Médica
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-hospital-gray-200">
+            <tr *ngFor="let paciente of pacientes" class="hover:bg-hospital-gray-50 transition-colors">
+              <!-- Columna: Paciente -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium text-sm bg-hospital-primary">
+                      {{obtenerIconoPorGenero(paciente.sexo || undefined)}}
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-hospital-gray-900">
+                      {{paciente.nombre_completo}}
+                    </div>
+                    <div class="text-sm text-hospital-gray-500">
+                      ID: {{paciente.id_paciente}}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Columna: Información Personal -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-hospital-gray-900">
+                  {{calcularEdad(paciente.fecha_nacimiento || '')}} años
+                </div>
+                <div class="text-sm text-hospital-gray-500">
+                  {{obtenerTextoGenero(paciente.sexo || undefined)}}
+                </div>
+                <div class="text-sm text-hospital-gray-500">
+                  {{formatearFecha(paciente.fecha_nacimiento || '')}}
+                </div>
+              </td>
+
+              <!-- Columna: Contacto -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-hospital-gray-900">
+                  {{paciente.telefono || 'No disponible'}}
+                </div>
+                <div class="text-sm text-hospital-gray-500">
+                  {{paciente.correo_electronico || 'Sin email'}}
+                </div>
+              </td>
+
+              <!-- Columna: Información Médica -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center space-x-2">
+                  <span *ngIf="tieneAlergias(paciente)"
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-hospital-warning text-white">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    Alergias
+                  </span>
+                  <span *ngIf="tieneFamiliarResponsable(paciente)"
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-hospital-info text-white">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Familiar
+                  </span>
+                </div>
+                <div class="text-sm text-hospital-gray-500 mt-1">
+                  {{paciente.tipo_sangre || 'Sin tipo'}}
+                </div>
+              </td>
+
+              <!-- Columna: Acciones -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <button
+                    (click)="verDetallePaciente(paciente)"
+                    class="text-hospital-primary hover:text-hospital-primary-dark transition-colors"
+                    title="Ver detalles">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    (click)="editarPaciente(paciente)"
+                    class="text-hospital-warning hover:text-hospital-warning-dark transition-colors"
+                    title="Editar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    (click)="verExpedientes(paciente)"
+                    class="text-hospital-success hover:text-hospital-success-dark transition-colors"
+                    title="Ver expedientes">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    (click)="eliminarPaciente(paciente)"
+                    class="text-hospital-emergency hover:text-hospital-emergency-dark transition-colors"
+                    title="Eliminar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VISTA TARJETAS -->
+    <div *ngIf="vistaActual === 'tarjetas' && !loading">
+      <!-- Mensaje si no hay pacientes -->
+      <div *ngIf="!hayPacientes" class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-hospital-gray-900">No hay pacientes</h3>
+        <p class="mt-1 text-sm text-hospital-gray-500">No se encontraron pacientes que coincidan con los filtros aplicados.</p>
+        <button
+          (click)="crearNuevoPaciente()"
+          class="mt-4 btn-hospital bg-hospital-primary hover:bg-hospital-primary-dark text-white">
+          Agregar primer paciente
+        </button>
+      </div>
+
+      <!-- Grid de tarjetas -->
+      <div *ngIf="hayPacientes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let paciente of pacientes" class="card-hospital hover:shadow-card-hover transition-all duration-200 cursor-pointer group">
+          <!-- Header de la tarjeta -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center text-white font-medium bg-hospital-primary">
+                {{obtenerIconoPorGenero(paciente.sexo || undefined)}}
+              </div>
+              <div class="ml-3">
+                <h3 class="text-lg font-medium text-hospital-gray-900 group-hover:text-hospital-primary transition-colors">
+                  {{paciente.nombre_completo}}
+                </h3>
+                <p class="text-sm text-hospital-gray-500">ID: {{paciente.id_paciente}}</p>
+              </div>
+            </div>
+
+            <!-- Indicadores de estado -->
+            <div class="flex flex-col space-y-1">
+              <span *ngIf="tieneAlergias(paciente)"
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-hospital-warning text-white">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                Alergias
+              </span>
+              <span *ngIf="tieneFamiliarResponsable(paciente)"
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-hospital-info text-white">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Familiar
+              </span>
+            </div>
+          </div>
+
+          <!-- Información personal -->
+          <div class="border-t border-hospital-gray-200 pt-4 mb-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-hospital-gray-500 font-medium">Edad</p>
+                <p class="text-hospital-gray-900">{{calcularEdad(paciente.fecha_nacimiento || '')}} años</p>
+              </div>
+              <div>
+                <p class="text-hospital-gray-500 font-medium">Género</p>
+                <p class="text-hospital-gray-900">{{obtenerTextoGenero(paciente.sexo || undefined)}}</p>
+              </div>
+              <div>
+                <p class="text-hospital-gray-500 font-medium">Teléfono</p>
+                <p class="text-hospital-gray-900">{{paciente.telefono || 'No disponible'}}</p>
+              </div>
+              <div>
+                <p class="text-hospital-gray-500 font-medium">Tipo de sangre</p>
+                <p class="text-hospital-gray-900">{{paciente.tipo_sangre || 'Sin determinar'}}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de contacto (si existe) -->
+          <div *ngIf="paciente.correo_electronico" class="border-t border-hospital-gray-200 pt-4 mb-4">
+            <p class="text-hospital-gray-500 font-medium text-sm">Email</p>
+            <p class="text-hospital-gray-900 text-sm truncate">{{paciente.correo_electronico}}</p>
+          </div>
+
+          <!-- Información de alergias (si existe) -->
+          <div *ngIf="tieneAlergias(paciente)" class="border-t border-hospital-gray-200 pt-4 mb-4">
+            <p class="text-hospital-gray-500 font-medium text-sm">Alergias</p>
+            <p class="text-hospital-gray-900 text-sm line-clamp-2">{{paciente.alergias}}</p>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="border-t border-hospital-gray-200 pt-4 flex justify-between">
+            <div class="flex space-x-2">
+              <button
+                (click)="verDetallePaciente(paciente)"
+                class="btn-hospital bg-hospital-primary hover:bg-hospital-primary-dark text-white text-sm px-3 py-2">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                Ver
+              </button>
+
+              <button
+                (click)="editarPaciente(paciente)"
+                class="btn-hospital bg-hospital-warning hover:bg-hospital-warning-dark text-white text-sm px-3 py-2">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Editar
+              </button>
+            </div>
+
+            <!-- Dropdown de más acciones -->
+            <div class="relative">
+              <button
+                type="button"
+                class="btn-hospital bg-hospital-gray-200 hover:bg-hospital-gray-300 text-hospital-gray-700 text-sm px-3 py-2 dropdown-toggle">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                </svg>
+              </button>
+
+              <!-- Menu dropdown (necesitaría lógica adicional para mostrar/ocultar) -->
+              <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-hospital-gray-200 z-10">
+                <div class="py-1">
+                  <button
+                    (click)="verHistorialMedico(paciente)"
+                    class="block w-full text-left px-4 py-2 text-sm text-hospital-gray-700 hover:bg-hospital-gray-100">
+                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Historial médico
+                  </button>
+
+                  <button
+                    (click)="verExpedientes(paciente)"
+                    class="block w-full text-left px-4 py-2 text-sm text-hospital-gray-700 hover:bg-hospital-gray-100">
+                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Ver expedientes
+                  </button>
+
+                  <hr class="border-hospital-gray-200 my-1">
+
+                  <button
+                    (click)="eliminarPaciente(paciente)"
+                    class="block w-full text-left px-4 py-2 text-sm text-hospital-emergency hover:bg-hospital-emergency-light hover:text-white">
+                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

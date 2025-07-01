@@ -1,15 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-servicios',
-//   imports: [],
-//   templateUrl: './servicios.html',
-//   styleUrl: './servicios.css'
-// })
-// export class Servicios {
-
-// }
-// src/app/catalogos/servicios/servicios.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';

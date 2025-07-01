@@ -1,1 +1,265 @@
-<p>servicios works!</p>
+<div class="container mx-auto px-4 py-6">
+  <!-- Encabezado y botón de nuevo servicio -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-hospital-primary-dark">Gestión de Servicios Hospitalarios</h1>
+    <button
+      (click)="abrirModalCrear()"
+      class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Nuevo Servicio
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="error" class="mb-4 p-3 bg-hospital-emergency-light text-hospital-emergency-dark rounded-card">
+    {{ error }}
+  </div>
+
+  <!-- Formulario de edición/creación -->
+  <div *ngIf="mostrarModal" class="card-hospital mb-6">
+    <h2 class="text-xl font-semibold mb-4 text-hospital-primary">
+      {{ isEditMode ? 'Editar Servicio' : 'Nuevo Servicio' }}
+    </h2>
+
+    <form [formGroup]="servicioForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Campos del formulario -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Nombre -->
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Nombre <span class="text-hospital-emergency">*</span>
+          </label>
+          <input
+            type="text"
+            id="nombre"
+            formControlName="nombre"
+            class="form-field"
+            [class.error]="nombreInvalido"
+          >
+          <div *ngIf="nombreInvalido" class="mt-1 text-sm text-hospital-emergency">
+            El nombre es requerido y debe tener entre 2 y 100 caracteres
+          </div>
+        </div>
+
+        <!-- Tipo de Servicio -->
+        <div>
+          <label for="tipo_servicio" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Tipo de Servicio
+          </label>
+          <select
+            id="tipo_servicio"
+            formControlName="tipo_servicio"
+            class="form-field"
+          >
+            <option value="">Seleccione un tipo...</option>
+            <option *ngFor="let tipo of tiposServicio" [value]="tipo.valor">{{tipo.etiqueta}}</option>
+          </select>
+        </div>
+
+        <!-- Descripción -->
+        <div class="md:col-span-2">
+          <label for="descripcion" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Descripción
+          </label>
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            rows="3"
+            class="form-field"
+          ></textarea>
+        </div>
+
+        <!-- Jefe de Servicio -->
+        <div>
+          <label for="jefe_servicio" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Jefe de Servicio
+          </label>
+          <input
+            type="text"
+            id="jefe_servicio"
+            formControlName="jefe_servicio"
+            class="form-field"
+          >
+        </div>
+
+        <!-- Ubicación -->
+        <div>
+          <label for="ubicacion" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Ubicación
+          </label>
+          <input
+            type="text"
+            id="ubicacion"
+            formControlName="ubicacion"
+            class="form-field"
+          >
+        </div>
+
+        <!-- Teléfono Interno -->
+        <div>
+          <label for="telefono_interno" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Teléfono Interno
+          </label>
+          <input
+            type="text"
+            id="telefono_interno"
+            formControlName="telefono_interno"
+            class="form-field"
+          >
+        </div>
+
+        <!-- Capacidad de Camas -->
+        <div>
+          <label for="capacidad_camas" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Capacidad de Camas
+          </label>
+          <input
+            type="number"
+            id="capacidad_camas"
+            formControlName="capacidad_camas"
+            min="0"
+            class="form-field"
+          >
+        </div>
+
+        <!-- Estado Activo -->
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="activo"
+            formControlName="activo"
+            class="h-4 w-4 text-hospital-primary focus:ring-hospital-primary border-hospital-gray-300 rounded"
+          >
+          <label for="activo" class="ml-2 block text-sm text-hospital-gray-700">
+            Servicio Activo
+          </label>
+        </div>
+      </div>
+
+      <!-- Botones del formulario -->
+      <div class="flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          (click)="cerrarModal()"
+          class="btn-hospital bg-hospital-gray-300 text-hospital-gray-800 hover:bg-hospital-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+          [disabled]="loading"
+        >
+          {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal de confirmación para eliminar -->
+  <div *ngIf="mostrarConfirmacion" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="card-hospital max-w-md w-full">
+      <h3 class="text-lg font-medium text-hospital-primary-dark mb-4">Confirmar eliminación</h3>
+      <p class="mb-6">¿Está seguro que desea eliminar el servicio "{{servicioSeleccionado?.nombre}}"?</p>
+      <div class="flex justify-end space-x-3">
+        <button
+          (click)="cerrarConfirmacion()"
+          class="btn-hospital bg-hospital-gray-300 text-hospital-gray-800 hover:bg-hospital-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="eliminarServicio()"
+          class="btn-hospital bg-hospital-emergency-light text-white hover:bg-hospital-emergency-dark"
+          [disabled]="loading"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listado de servicios -->
+  <div *ngIf="!mostrarModal">
+    <!-- Loading state -->
+    <div *ngIf="loading && servicios.length === 0" class="text-center py-8">
+      <p class="text-hospital-gray-600">Cargando servicios...</p>
+    </div>
+
+    <!-- Mensaje cuando no hay servicios -->
+    <div *ngIf="servicios.length === 0 && !loading" class="text-center py-8">
+      <p class="text-hospital-gray-600">No hay servicios registrados</p>
+    </div>
+
+    <!-- Tabla de servicios -->
+    <div *ngIf="servicios.length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-hospital-gray-200">
+        <thead class="bg-hospital-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Nombre
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Tipo
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Jefe
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Camas
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Estado
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-hospital-gray-200">
+          <tr *ngFor="let servicio of servicios">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-hospital-primary-dark">{{ servicio.nombre }}</div>
+              <div class="text-sm text-hospital-gray-500">{{ servicio.descripcion || 'Sin descripción' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-hospital-gray-500">
+              {{ servicio.tipo_servicio || 'No especificado' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-hospital-gray-500">
+              {{ servicio.jefe_servicio || 'No asignado' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-hospital-gray-500">
+              {{ servicio.capacidad_camas || '0' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                [ngClass]="{
+                  'bg-hospital-success-light text-hospital-success-dark': servicio.activo,
+                  'bg-hospital-gray-200 text-hospital-gray-800': !servicio.activo
+                }">
+                {{ servicio.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button
+                (click)="abrirModalEditar(servicio)"
+                class="btn-hospital bg-hospital-info-light text-white hover:bg-hospital-info-dark mr-2"
+              >
+                Editar
+              </button>
+              <button
+                (click)="abrirConfirmacionEliminar(servicio)"
+                class="btn-hospital bg-hospital-emergency-light text-white hover:bg-hospital-emergency-dark"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
