@@ -46,7 +46,7 @@ import { NotasPreoperatoria } from './documentos-clinicos/notas-preoperatoria/no
 import { NotasPreanestesica } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
 import { NotasPostoperatoria } from './documentos-clinicos/notas-postoperatoria/notas-postoperatoria';
 import { NotasPostanestesica } from './documentos-clinicos/notas-postanestesica/notas-postanestesica';
-import { NotasEgreso } from './documentos-clinicos/notas-egreso/notas-egreso';
+import { NotasEgresoComponent } from './documentos-clinicos/notas-egreso/notas-egreso';
 import { ConsentimientosInformados } from './documentos-clinicos/consentimientos-informados/consentimientos-informados';
 import { SolicitudesEstudio } from './documentos-clinicos/solicitudes-estudio/solicitudes-estudio';
 import { ReferenciasTraslado } from './documentos-clinicos/referencias-traslado/referencias-traslado';
@@ -141,7 +141,7 @@ export const routes: Routes = [
           { path: 'notas-preanestesica', component: NotasPreanestesica },
           { path: 'notas-postoperatoria', component: NotasPostoperatoria },
           { path: 'notas-postanestesica', component: NotasPostanestesica },
-          { path: 'notas-egreso', component: NotasEgreso },
+          { path: 'notas-egreso', component: NotasEgresoComponent },
           { path: 'consentimientos-informados', component: ConsentimientosInformados },
           { path: 'solicitudes-estudio', component: SolicitudesEstudio },
           { path: 'referencias-traslado', component: ReferenciasTraslado },

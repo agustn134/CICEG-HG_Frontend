@@ -27,6 +27,8 @@ export interface PrescripcionMedicamento extends BaseEntity, AuditInfo {
 }
 
 export interface PrescripcionMedicamentoFilters extends BaseFilters {
+  id_documento?: number;
+  id_expediente?: number;
   id_medicamento?: number;
   via_administracion?: string;
   activo?: boolean;
@@ -34,6 +36,7 @@ export interface PrescripcionMedicamentoFilters extends BaseFilters {
   fecha_fin?: string;
   medico_prescriptor?: number;
   nombre_medicamento?: string;
+  buscar?: string;
 }
 
 export interface CreatePrescripcionMedicamentoDto {
