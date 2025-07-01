@@ -1,116 +1,215 @@
-<!-- <p>notas-evolucion works!</p>
-    <div class="container mx-auto px-4 py-6 max-w-7xl">
-      <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Notas de Evolución</h1>
-        <p class="text-gray-600">Gestión de notas de evolución médica</p>
+<div class="container mx-auto px-4 py-8">
+  <!-- Encabezado -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-hospital-primary-dark">Notas de Evolución</h1>
+    <button
+      (click)="nuevaNota()"
+      class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Nueva Nota
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="error" class="mb-6 p-4 bg-hospital-emergency-light text-hospital-emergency-dark rounded-card">
+    {{ error }}
+  </div>
+  <div *ngIf="exito" class="mb-6 p-4 bg-hospital-success-light text-hospital-success-dark rounded-card">
+    {{ exito }}
+  </div>
+
+  <!-- Formulario de edición/creación -->
+  <div *ngIf="mostrarFormulario" class="card-hospital mb-8">
+    <h2 class="text-xl font-semibold mb-4 text-hospital-primary">
+      {{ editando ? 'Editar Nota de Evolución' : 'Nueva Nota de Evolución' }}
+    </h2>
+
+    <form [formGroup]="notaForm" (ngSubmit)="guardarNota()" class="space-y-4">
+      <!-- Campo ID Documento -->
+      <div>
+        <label for="id_documento" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+          ID Documento <span class="text-hospital-emergency">*</span>
+        </label>
+        <input
+          type="number"
+          id="id_documento"
+          formControlName="id_documento"
+          class="form-field"
+          [class.error]="mostrarErrorCampo('id_documento')"
+        >
+        <div *ngIf="mostrarErrorCampo('id_documento')" class="mt-1 text-sm text-hospital-emergency">
+          {{ obtenerErrorCampo('id_documento') }}
+        </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div class="flex flex-wrap gap-4 items-center">
-          <div class="flex-1 min-w-64">
-            <input
-              type="text"
-              placeholder="Buscar notas..."
-              [(ngModel)]="filtroTexto"
-              (input)="filtrarNotas()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+      <!-- Selector de plantilla SOAP -->
+      <div>
+        <label for="plantilla" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+          Plantilla SOAP
+        </label>
+        <select
+          id="plantilla"
+          [(ngModel)]="plantillaSeleccionada"
+          [ngModelOptions]="{standalone: true}"
+          (change)="aplicarPlantilla()"
+          class="form-field"
+        >
+          <option value="">Seleccione una plantilla...</option>
+          <option *ngFor="let plantilla of plantillasSOAP" [value]="plantilla.id">
+            {{ plantilla.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Campos SOAP -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Subjetivo -->
+        <div>
+          <label for="subjetivo" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Subjetivo
+          </label>
+          <textarea
+            id="subjetivo"
+            formControlName="subjetivo"
+            rows="4"
+            class="form-field"
+          ></textarea>
+        </div>
+
+        <!-- Objetivo -->
+        <div>
+          <label for="objetivo" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Objetivo
+          </label>
+          <textarea
+            id="objetivo"
+            formControlName="objetivo"
+            rows="4"
+            class="form-field"
+          ></textarea>
+        </div>
+
+        <!-- Análisis -->
+        <div>
+          <label for="analisis" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Análisis
+          </label>
+          <textarea
+            id="analisis"
+            formControlName="analisis"
+            rows="4"
+            class="form-field"
+          ></textarea>
+        </div>
+
+        <!-- Plan -->
+        <div>
+          <label for="plan" class="block text-sm font-medium text-hospital-gray-700 mb-1">
+            Plan
+          </label>
+          <textarea
+            id="plan"
+            formControlName="plan"
+            rows="4"
+            class="form-field"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Botones del formulario -->
+      <div class="flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          (click)="cancelarEdicion()"
+          class="btn-hospital bg-hospital-gray-300 text-hospital-gray-800 hover:bg-hospital-gray-400"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+          [disabled]="cargando"
+        >
+          <span *ngIf="cargando" class="loading"></span>
+          {{ editando ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Listado de notas -->
+  <div *ngIf="!mostrarFormulario">
+    <div *ngIf="cargando && notas.length === 0" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-hospital-primary"></div>
+      <p class="mt-2 text-hospital-gray-600">Cargando notas...</p>
+    </div>
+
+    <div *ngIf="notas.length === 0 && !cargando" class="text-center py-8">
+      <p class="text-hospital-gray-600">No hay notas de evolución registradas</p>
+    </div>
+
+    <div *ngIf="notas.length > 0" class="space-y-4">
+      <div *ngFor="let nota of notas" class="card-hospital">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-semibold text-lg text-hospital-primary-dark">
+              Nota #{{ nota.id_nota_evolucion }} - Documento: {{ nota.id_documento }}
+            </h3>
+            <!-- <p class="text-sm text-hospital-gray-500 mt-1">
+              {{ formatearFecha(nota.fecha_creacion) }}
+            </p> -->
+            <p class="text-sm text-hospital-gray-500 mt-1">
+  Fecha no disponible
+</p>
           </div>
-          <button
-            (click)="abrirModalCrear()"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center gap-2"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Nueva Nota
-          </button>
+
+          <div class="flex space-x-2">
+            <button
+              (click)="editarNota(nota)"
+              *ngIf="puedeEditar(nota)"
+              class="btn-hospital bg-hospital-info-light text-white hover:bg-hospital-info-dark text-sm"
+            >
+              Editar
+            </button>
+            <button
+              (click)="eliminarNota(nota)"
+              class="btn-hospital bg-hospital-emergency-light text-white hover:bg-hospital-emergency-dark text-sm"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="mb-2">
+            <span class="text-sm font-medium text-hospital-gray-700">Completitud:</span>
+            <div class="w-full bg-hospital-gray-200 rounded-full h-2.5 mt-1">
+              <div
+                class="h-2.5 rounded-full"
+                [ngClass]="'bg-' + obtenerColorCompletitud(nota)"
+                [style.width]="calcularCompletitud(nota) + '%'"
+              ></div>
+            </div>
+          </div>
+
+          <div class="prose max-w-none">
+            <h4 class="text-hospital-primary">Subjetivo</h4>
+            <p class="text-hospital-gray-700">{{ nota.subjetivo || 'No especificado' }}</p>
+
+            <h4 class="text-hospital-primary mt-4">Objetivo</h4>
+            <p class="text-hospital-gray-700">{{ nota.objetivo || 'No especificado' }}</p>
+
+            <h4 class="text-hospital-primary mt-4">Análisis</h4>
+            <p class="text-hospital-gray-700">{{ nota.analisis || 'No especificado' }}</p>
+
+            <h4 class="text-hospital-primary mt-4">Plan</h4>
+            <p class="text-hospital-gray-700">{{ nota.plan || 'No especificado' }}</p>
+          </div>
         </div>
       </div>
-
-      <div *ngIf="cargando" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-
-      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
-        <div class="flex">
-          <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-          </svg>
-          <span>{{ error }}</span>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" *ngIf="!cargando && !error">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subjetivo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objetivo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Análisis</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let nota of notasFiltradas; trackBy: trackByFn" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ nota.id_nota_evolucion }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ nota.id_documento }}
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ nota.subjetivo }}
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ nota.objetivo }}
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ nota.analisis }}
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ nota.plan }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div class="flex space-x-2">
-                    <button
-                      (click)="verDetalle(nota)"
-                      class="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                    >
-                      Ver
-                    </button>
-                    <button
-                      (click)="editarNota(nota)"
-                      class="text-green-600 hover:text-green-900 transition-colors duration-200"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      (click)="eliminarNota(nota.id_nota_evolucion)"
-                      class="text-red-600 hover:text-red-900 transition-colors duration-200"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="notasFiltradas.length === 0">
-                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                  No se encontraron notas de evolución
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="mt-6 flex items-center justify-between" *ngIf="notasFiltradas.length > 0">
-        <div class="text-sm text-gray-700">
-          Mostrando {{ notasFiltradas.length }} de {{ notas.length }} notas
-        </div>
-      </div>
-    </div> -->
+    </div>
+  </div>
+</div>
