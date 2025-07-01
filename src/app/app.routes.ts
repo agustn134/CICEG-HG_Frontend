@@ -8,12 +8,24 @@ import { Login } from './auth/login/login';
 
 // === Layout Components ===
 import { DashboardLayoutComponent } from './shared/components/dashboard-layout/dashboard-layout';
+import { WizardLayout } from './shared/components/wizard-layout/wizard-layout';
 
 // === Home/Dashboard ===
 import { Dashboard } from './home/dashboard/dashboard';
 
 // === Guards ===
 // import { AuthGuard } from './guards/auth-guard'; // Comentado temporalmente
+// import { WizardStepGuard } from './guards/wizard-step-guard';
+// import { WizardFormValidGuard } from './guards/wizard-form-valid-guard';
+
+// ===== NUEVOS COMPONENTES WIZARD =====
+import { NuevoPaciente } from './nuevo-paciente/nuevo-paciente';
+import { PasoPersona } from './nuevo-paciente/paso-persona/paso-persona';
+import { PasoPaciente } from './nuevo-paciente/paso-paciente/paso-paciente';
+import { PasoExpediente } from './nuevo-paciente/paso-expediente/paso-expediente';
+import { PasoDocumentoClinico } from './nuevo-paciente/paso-documento-clinico/paso-documento-clinico';
+import { PasoLlenarDocumento } from './nuevo-paciente/paso-llenar-documento/paso-llenar-documento';
+import { PasoResumen } from './nuevo-paciente/paso-resumen/paso-resumen';
 
 // ===== Catálogos =====
 import { Servicios } from './catalogos/servicios/servicios';
@@ -70,12 +82,111 @@ export const routes: Routes = [
   // === Rutas protegidas con Dashboard Layout ===
   {
     path: 'app',
-    component: DashboardLayoutComponent, // 🔥 Layout principal con sidebar
+    component: DashboardLayoutComponent,
     // canActivate: [AuthGuard], // Descomenta cuando tengas el guard
     children: [
       // === Dashboard principal ===
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
+
+      // ===== 🧠 FLUJO WIZARD NUEVO PACIENTE =====
+      {
+        path: 'nuevo-paciente',
+        component: WizardLayout,
+        children: [
+          // Redirección por defecto al inicio
+          { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+
+          // 🎯 Paso 0: Página de bienvenida/inicio
+          {
+            path: 'inicio',
+            component: NuevoPaciente,
+            data: {
+              step: 0,
+              title: 'Nuevo Paciente',
+              description: 'Iniciar registro de nuevo paciente'
+            }
+          },
+
+          // 🏥 Paso 1: Datos de la persona
+          {
+            path: 'persona',
+            component: PasoPersona,
+            // canActivate: [WizardStepGuard],
+            data: {
+              step: 1,
+              title: 'Datos Personales',
+              description: 'Información básica de la persona',
+              requiredFields: ['nombre', 'apellido_paterno', 'fecha_nacimiento', 'sexo']
+            }
+          },
+
+          // 👤 Paso 2: Datos específicos del paciente
+          {
+            path: 'paciente',
+            component: PasoPaciente,
+            // canActivate: [WizardStepGuard, WizardFormValidGuard],
+            data: {
+              step: 2,
+              title: 'Datos del Paciente',
+              description: 'Información médica y de contacto',
+              requiredFields: ['familiar_responsable', 'telefono_familiar']
+            }
+          },
+
+          // 📁 Paso 3: Creación automática del expediente
+          {
+            path: 'expediente',
+            component: PasoExpediente,
+            // canActivate: [WizardStepGuard],
+            data: {
+              step: 3,
+              title: 'Expediente Clínico',
+              description: 'Generación automática del expediente',
+              autoProcess: true
+            }
+          },
+
+          // 📋 Paso 4: Selección del tipo de documento clínico
+          {
+            path: 'documento-clinico',
+            component: PasoDocumentoClinico,
+            // canActivate: [WizardStepGuard],
+            data: {
+              step: 4,
+              title: 'Documento Clínico',
+              description: 'Seleccionar tipo de documento a crear',
+              requiredFields: ['tipo_documento']
+            }
+          },
+
+          // 📝 Paso 5: Llenado del documento específico (dinámico)
+          {
+            path: 'llenar-documento/:tipo',
+            component: PasoLlenarDocumento,
+            // canActivate: [WizardStepGuard],
+            data: {
+              step: 5,
+              title: 'Llenar Documento',
+              description: 'Completar información del documento clínico',
+              dynamicForm: true
+            }
+          },
+
+          // ✅ Paso 6: Resumen y confirmación final
+          {
+            path: 'resumen',
+            component: PasoResumen,
+            // canActivate: [WizardStepGuard],
+            data: {
+              step: 6,
+              title: 'Resumen',
+              description: 'Confirmar y finalizar registro',
+              finalStep: true
+            }
+          },
+        ]
+      },
 
       // ===== Catálogos =====
       {
@@ -99,7 +210,7 @@ export const routes: Routes = [
           { path: '', component: PersonasComponent },
           { path: 'administradores', component: Administradores },
           { path: 'pacientes', component: Pacientes },
-          { path: 'pacientes-list', component: Pacientes }, // Mismo componente por ahora
+          { path: 'pacientes-list', component: Pacientes },
           { path: 'personal-medico', component: PersonalMedicoComponent },
         ]
       },
@@ -112,17 +223,10 @@ export const routes: Routes = [
           { path: 'expedientes', component: Expedientes },
           { path: 'camas', component: CamasComponent },
           { path: 'internamientos', component: InternamientosComponent },
-
-          // 🔥 RUTAS ADICIONALES PARA INTERNAMIENTOS (usando lazy loading)
-          // {
-          //   path: 'internamientos/crear',
-          //   loadComponent: () => import('./gestion-expedientes/internamientos/crear-internamiento.component').then(m => m.CrearInternamientoComponent)
-          // },
           {
             path: 'internamientos/:id',
             loadComponent: () => import('./gestion-expedientes/internamientos/internamientos').then(m => m.InternamientosComponent)
           },
-
           { path: 'signos-vitales', component: SignosVitalesComponent },
         ]
       },
