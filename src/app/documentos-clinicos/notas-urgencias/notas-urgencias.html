@@ -1,1 +1,320 @@
-<p>notas-urgencias works!</p>
+<div class="container mx-auto p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Notas de Urgencias</h1>
+    <button
+      (click)="nuevaNota()"
+      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+      <i class="fas fa-ambulance"></i>
+      Nueva Nota de Urgencias
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+  </div>
+
+  <div *ngIf="exito" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+    <i class="fas fa-check-circle mr-2"></i>{{ exito }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="text-center py-8">
+    <i class="fas fa-spinner fa-spin text-2xl text-red-600"></i>
+    <p class="mt-2 text-gray-600">Cargando...</p>
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="mostrarFormulario" class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-red-700">
+        {{ editando ? 'Editar Nota de Urgencias' : 'Nueva Nota de Urgencias' }}
+      </h2>
+      <button
+        (click)="cancelarEdicion()"
+        class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="notaForm" (ngSubmit)="guardarNota()">
+      <!-- Campo obligatorio: ID Documento -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            ID Documento <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            formControlName="id_documento"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+            [class.border-red-500]="mostrarErrorCampo('id_documento')"
+            placeholder="Ingrese el ID del documento">
+          <div *ngIf="mostrarErrorCampo('id_documento')" class="text-red-500 text-sm mt-1">
+            {{ obtenerErrorCampo('id_documento') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivo de Atención - OBLIGATORIO -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-800 mb-3">Información Principal</h3>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Motivo de Atención <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            formControlName="motivo_atencion"
+            rows="3"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+            [class.border-red-500]="mostrarErrorCampo('motivo_atencion')"
+            placeholder="Describa el motivo principal de la atención en urgencias"></textarea>
+          <div *ngIf="mostrarErrorCampo('motivo_atencion')" class="text-red-500 text-sm mt-1">
+            {{ obtenerErrorCampo('motivo_atencion') }}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Estado de Conciencia</label>
+            <select
+              formControlName="estado_conciencia"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+              <option value="">Seleccione estado de conciencia</option>
+              <option *ngFor="let opcion of opcionesEstadoConciencia" [value]="opcion.value">
+                {{ opcion.label }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pronóstico</label>
+            <select
+              formControlName="pronostico"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+              <option value="">Seleccione pronóstico</option>
+              <option *ngFor="let opcion of opcionesPronostico" [value]="opcion.value">
+                {{ opcion.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evaluación Clínica -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-800 mb-3">Evaluación Clínica</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Resumen de Interrogatorio</label>
+            <textarea
+              formControlName="resumen_interrogatorio"
+              rows="3"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Resumen del interrogatorio realizado al paciente"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Exploración Física</label>
+            <textarea
+              formControlName="exploracion_fisica"
+              rows="4"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Hallazgos de la exploración física"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Estado Mental</label>
+            <textarea
+              formControlName="estado_mental"
+              rows="2"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Evaluación del estado mental del paciente"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Resultados de Estudios</label>
+            <textarea
+              formControlName="resultados_estudios"
+              rows="3"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Resultados de laboratorio, gabinete u otros estudios"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagnóstico y Plan -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-800 mb-3">Diagnóstico y Plan de Manejo</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Diagnóstico de Urgencias</label>
+            <textarea
+              formControlName="diagnostico"
+              rows="2"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Diagnóstico principal de urgencias"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ID Guía Diagnóstico</label>
+              <input
+                type="number"
+                formControlName="id_guia_diagnostico"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="ID de guía clínica (opcional)">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Área de Interconsulta</label>
+              <input
+                type="number"
+                formControlName="area_interconsulta"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="ID área interconsulta (opcional)">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Plan de Tratamiento</label>
+            <textarea
+              formControlName="plan_tratamiento"
+              rows="4"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Plan de tratamiento y manejo del paciente"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end gap-4">
+        <button
+          type="button"
+          (click)="cancelarEdicion()"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="notaForm.invalid || cargando"
+          class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+          <i *ngIf="cargando" class="fas fa-spinner fa-spin"></i>
+          <i *ngIf="!cargando" class="fas fa-save"></i>
+          {{ editando ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Lista de notas de urgencias -->
+  <div *ngIf="!mostrarFormulario" class="bg-white rounded-lg shadow-md">
+    <!-- Header de la tabla -->
+    <div class="p-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-800">Lista de Notas de Urgencias</h3>
+    </div>
+
+    <!-- Tabla -->
+    <div *ngIf="notas.length > 0; else noNotas" class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-red-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Urgencia
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Paciente
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Motivo
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Estado Conciencia
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Fecha
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Médico
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let nota of notas" class="hover:bg-gray-50">
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <i [class]="obtenerIconoUrgencia(nota)"></i>
+                <span class="ml-2 text-sm font-medium"
+                  [ngClass]="{
+                    'text-red-800': obtenerNivelUrgencia(nota) === 'CRÍTICO',
+                    'text-orange-800': obtenerNivelUrgencia(nota) === 'GRAVE',
+                    'text-green-800': obtenerNivelUrgencia(nota) === 'ESTABLE',
+                    'text-blue-800': obtenerNivelUrgencia(nota) === 'POR EVALUAR'
+                  }">
+                  {{ obtenerNivelUrgencia(nota) }}
+                </span>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ nota.paciente_nombre || 'Sin nombre' }}
+              </div>
+              <div class="text-sm text-gray-500">
+                Exp: {{ nota.numero_expediente || 'N/A' }}
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-sm text-gray-900 max-w-xs truncate">
+                {{ nota.motivo_atencion }}
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <span class="text-sm text-gray-900">
+                {{ nota.estado_conciencia || 'No registrado' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ formatearFecha(nota.fecha_documento || '') }}
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                {{ nota.medico_urgenciologo || 'Sin asignar' }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ nota.especialidad || 'N/A' }}
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex gap-2">
+                <button
+                  (click)="editarNota(nota)"
+                  [disabled]="!puedeEditar(nota)"
+                  class="text-blue-600 hover:text-blue-900 disabled:text-gray-400"
+                  [title]="puedeEditar(nota) ? 'Editar' : obtenerRazonNoEditable(nota)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  (click)="eliminarNota(nota)"
+                  class="text-red-600 hover:text-red-900"
+                  title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Template cuando no hay notas -->
+    <ng-template #noNotas>
+      <div class="p-8 text-center">
+        <i class="fas fa-ambulance text-4xl text-gray-400 mb-4"></i>
+        <p class="text-gray-500 text-lg">No hay notas de urgencias registradas</p>
+        <p class="text-gray-400 text-sm mt-2">Haga clic en "Nueva Nota de Urgencias" para crear la primera</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

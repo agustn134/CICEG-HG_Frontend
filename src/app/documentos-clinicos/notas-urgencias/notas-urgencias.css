@@ -1,0 +1,358 @@
+/* Estilos específicos para notas de urgencias */
+
+.container {
+  max-width: 1200px;
+}
+
+/* Animaciones suaves */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos específicos para urgencias */
+.urgencia-critica {
+  border-left: 4px solid #dc2626;
+  background-color: #fef2f2;
+}
+
+.urgencia-grave {
+  border-left: 4px solid #ea580c;
+  background-color: #fff7ed;
+}
+
+.urgencia-estable {
+  border-left: 4px solid #16a34a;
+  background-color: #f0fdf4;
+}
+
+.urgencia-evaluar {
+  border-left: 4px solid #2563eb;
+  background-color: #eff6ff;
+}
+
+/* Estados de validación */
+.is-invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.is-valid {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Estilos para botones de urgencias */
+.btn-urgencia {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-urgencia:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  border-color: #6b7280;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+  border-color: #4b5563;
+}
+
+/* Estilos para indicadores de urgencia */
+.indicador-urgencia {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.indicador-critico {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.indicador-grave {
+  background-color: #fed7aa;
+  color: #9a3412;
+  border: 1px solid #fdba74;
+}
+
+.indicador-estable {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.indicador-evaluar {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* Estilos para la tabla de urgencias */
+.tabla-urgencias {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.tabla-urgencias thead {
+  background-color: #fef2f2;
+}
+
+.tabla-urgencias tbody tr:hover {
+  background-color: #f9fafb;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Estados de formulario específicos para urgencias */
+.form-urgencia .form-section {
+  border-left: 4px solid #dc2626;
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-urgencia .required-field label::after {
+  content: ' *';
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Loading spinner para urgencias */
+.spinner-urgencias {
+  animation: spin 1s linear infinite;
+  color: #dc2626;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mensajes de estado específicos */
+.alert-urgencia {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #dc2626;
+}
+
+.alert-urgencia-success {
+  background-color: #f0fdf4;
+  border-left-color: #16a34a;
+  color: #166534;
+}
+
+.alert-urgencia-error {
+  background-color: #fef2f2;
+  border-left-color: #dc2626;
+  color: #991b1b;
+}
+
+.alert-urgencia-warning {
+  background-color: #fff7ed;
+  border-left-color: #ea580c;
+  color: #9a3412;
+}
+
+/* Estilos para tiempos de espera */
+.tiempo-normal {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.tiempo-prolongado {
+  color: #ea580c;
+  font-weight: 600;
+}
+
+.tiempo-critico {
+  color: #dc2626;
+  font-weight: 700;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Responsive adjustments para urgencias */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .tabla-urgencias {
+    overflow-x: auto;
+  }
+
+  .tabla-urgencias table {
+    min-width: 800px;
+  }
+
+  .form-urgencia .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Focus states para accesibilidad */
+.focus\:ring-red-500:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5);
+}
+
+/* Transiciones suaves */
+.transition-urgencias {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Estilos para campos de texto específicos */
+textarea.urgencias {
+  resize: vertical;
+  min-height: 3rem;
+}
+
+textarea.urgencias:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Estados disabled para urgencias */
+.disabled-urgencias {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+/* Tooltips específicos para urgencias */
+.tooltip-urgencia {
+  position: relative;
+}
+
+.tooltip-urgencia:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 10;
+  border: 1px solid #dc2626;
+}
+
+/* Estilos para separadores visuales */
+.seccion-urgencias {
+  border-bottom: 2px solid #fecaca;
+  margin: 2rem 0;
+  padding-bottom: 1rem;
+}
+
+.seccion-urgencias h3 {
+  color: #991b1b;
+  font-weight: 600;
+}
+
+/* Estilos para badges de estado */
+.badge-urgencia {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-estado-activo {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-estado-anulado {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-estado-borrador {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Print styles para urgencias */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tabla-urgencias {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .btn-urgencia {
+    display: none;
+  }
+}
+
+/* Estilos para formularios móviles */
+@media (max-width: 640px) {
+  .form-urgencia input,
+  .form-urgencia textarea,
+  .form-urgencia select {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+
+  .btn-urgencia {
+    width: 100%;
+    justify-content: center;
+  }
+}

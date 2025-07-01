@@ -1,1 +1,313 @@
-<p>internamientos works!</p>
+<!-- Reemplaza todo el contenido de: C:\CICEG-HG-APP\src\app\gestion-expedientes\internamientos\internamientos.html -->
+
+<div class="max-w-6xl mx-auto p-6">
+
+  <!-- ==========================================
+       HEADER CON BOTONES
+       ========================================== -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Internamientos</h1>
+    <div class="space-x-3">
+      <!-- Botón para mostrar formulario -->
+      <button
+        *ngIf="!mostrarFormulario"
+        (click)="mostrarFormularioCrear()"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+      >
+        Nuevo Internamiento
+      </button>
+
+      <!-- Botón para ocultar formulario -->
+      <button
+        *ngIf="mostrarFormulario"
+        (click)="ocultarFormulario()"
+        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-200"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       FORMULARIO DE CREACIÓN (CONDICIONAL)
+       ========================================== -->
+  <div *ngIf="mostrarFormulario" class="mb-8 bg-white shadow rounded-lg p-6 border-l-4 border-blue-500">
+    <h2 class="text-xl font-bold mb-4 text-blue-700">Crear Nuevo Internamiento</h2>
+
+    <!-- Mostrar errores del formulario -->
+    <div *ngIf="erroresFormulario.length > 0" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <ul class="list-disc list-inside">
+        <li *ngFor="let error of erroresFormulario">{{ error }}</li>
+      </ul>
+    </div>
+
+    <!-- Mostrar mensaje de éxito -->
+    <div *ngIf="mensajeExito" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+      {{ mensajeExito }}
+    </div>
+
+    <form [formGroup]="internamientoForm" (ngSubmit)="onSubmitFormulario()" class="space-y-4">
+
+      <!-- Primera fila: Expediente y Médico -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            ID Expediente *
+          </label>
+          <input
+            type="number"
+            formControlName="id_expediente"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ejemplo: 1"
+          >
+          <div *ngIf="internamientoForm.get('id_expediente')?.invalid && internamientoForm.get('id_expediente')?.touched"
+               class="text-red-600 text-sm mt-1">
+            El expediente es obligatorio
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            ID Médico Responsable *
+          </label>
+          <input
+            type="number"
+            formControlName="id_medico_responsable"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ejemplo: 1"
+          >
+          <div *ngIf="internamientoForm.get('id_medico_responsable')?.invalid && internamientoForm.get('id_medico_responsable')?.touched"
+               class="text-red-600 text-sm mt-1">
+            El médico responsable es obligatorio
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila: Servicio y Cama -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            ID Servicio (opcional)
+          </label>
+          <input
+            type="number"
+            formControlName="id_servicio"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ejemplo: 1"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            ID Cama (opcional)
+          </label>
+          <input
+            type="number"
+            formControlName="id_cama"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ejemplo: 1"
+          >
+        </div>
+      </div>
+
+      <!-- Motivo de Ingreso -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Motivo de Ingreso *
+        </label>
+        <textarea
+          formControlName="motivo_ingreso"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Describa el motivo del ingreso (mínimo 10 caracteres)..."
+        ></textarea>
+        <div *ngIf="internamientoForm.get('motivo_ingreso')?.invalid && internamientoForm.get('motivo_ingreso')?.touched"
+             class="text-red-600 text-sm mt-1">
+          El motivo de ingreso es obligatorio (mínimo 10 caracteres)
+        </div>
+      </div>
+
+      <!-- Diagnóstico y Observaciones -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Diagnóstico de Ingreso (opcional)
+          </label>
+          <textarea
+            formControlName="diagnostico_ingreso"
+            rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Diagnóstico inicial..."
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Observaciones (opcional)
+          </label>
+          <textarea
+            formControlName="observaciones"
+            rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Observaciones adicionales..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Fecha y checkbox -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Fecha de Ingreso (opcional)
+          </label>
+          <input
+            type="datetime-local"
+            formControlName="fecha_ingreso"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+          <small class="text-gray-500">Si no se especifica, se usará la fecha actual</small>
+        </div>
+
+        <div class="flex items-center pb-2">
+          <input
+            type="checkbox"
+            formControlName="crear_nota_ingreso"
+            id="crear_nota_ingreso"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          >
+          <label for="crear_nota_ingreso" class="ml-2 text-sm text-gray-700">
+            Crear nota de ingreso automáticamente
+          </label>
+        </div>
+      </div>
+
+      <!-- Botón de envío -->
+      <div class="flex justify-end pt-4">
+        <button
+          type="submit"
+          [disabled]="internamientoForm.invalid || isLoading"
+          class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="isLoading" class="mr-2">⏳</span>
+          {{ isLoading ? 'Guardando...' : 'Crear Internamiento' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ==========================================
+       LISTADO DE INTERNAMIENTOS
+       ========================================== -->
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading && !mostrarFormulario" class="text-center py-8">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <p class="mt-2 text-gray-600">Cargando internamientos...</p>
+  </div>
+
+  <!-- Mensajes de error -->
+  <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <div class="flex">
+      <div class="py-1">
+        <svg class="fill-current h-4 w-4 text-red-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-bold">Error</p>
+        <p class="text-sm">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de internamientos -->
+  <div *ngIf="!isLoading && internamientos.length > 0" class="bg-white shadow overflow-hidden sm:rounded-md">
+    <ul class="divide-y divide-gray-200">
+      <li *ngFor="let internamiento of internamientos" class="px-6 py-4 hover:bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-900 truncate">
+                  Expediente: {{ internamiento.numero_expediente }}
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ internamiento.nombre_paciente }}
+                </p>
+              </div>
+              <div class="ml-4 flex-shrink-0">
+                <span
+                  [class]="getEstadoClass(internamiento)"
+                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                >
+                  {{ formatearEstado(internamiento) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-500">
+              <div>
+                <span class="font-medium">Ingreso:</span>
+                {{ formatearFecha(internamiento.fecha_ingreso) }}
+              </div>
+              <div *ngIf="internamiento.servicio">
+                <span class="font-medium">Servicio:</span>
+                {{ internamiento.servicio }}
+              </div>
+              <div *ngIf="internamiento.cama">
+                <span class="font-medium">Cama:</span>
+                {{ internamiento.cama }}
+              </div>
+            </div>
+
+            <div class="mt-2 text-sm text-gray-700">
+              <span class="font-medium">Motivo:</span>
+              {{ internamiento.motivo_ingreso }}
+            </div>
+
+            <div *ngIf="internamiento.medico_responsable" class="mt-1 text-sm text-gray-500">
+              <span class="font-medium">Médico:</span>
+              {{ internamiento.medico_responsable }}
+            </div>
+          </div>
+
+          <div class="ml-4 flex space-x-2">
+            <button
+              (click)="verDetalle(internamiento.id_internamiento)"
+              class="text-blue-600 hover:text-blue-900 text-sm font-medium hover:underline"
+            >
+              Ver
+            </button>
+            <button
+              *ngIf="!internamiento.fecha_egreso"
+              (click)="editarInternamiento(internamiento.id_internamiento)"
+              class="text-indigo-600 hover:text-indigo-900 text-sm font-medium hover:underline"
+            >
+              Editar
+            </button>
+            <button
+              *ngIf="!internamiento.fecha_egreso"
+              (click)="egresarPaciente(internamiento.id_internamiento)"
+              class="text-green-600 hover:text-green-900 text-sm font-medium hover:underline"
+            >
+              Egresar
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading && internamientos.length === 0" class="text-center py-12">
+    <div class="text-gray-400 text-6xl mb-4">🏥</div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No hay internamientos registrados</h3>
+    <p class="text-gray-500 mb-4">Comience creando el primer internamiento del sistema.</p>
+    <button
+      (click)="mostrarFormularioCrear()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+    >
+      Crear Primer Internamiento
+    </button>
+  </div>
+</div>

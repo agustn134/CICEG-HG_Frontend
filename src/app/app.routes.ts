@@ -38,9 +38,9 @@ import { SignosVitalesComponent } from './gestion-expedientes/signos-vitales/sig
 
 // ===== Documentos Clínicos =====
 import { Documentos } from './documentos-clinicos/documentos/documentos';
-import { HistoriasClinicas } from './documentos-clinicos/historias-clinicas/historias-clinicas';
-import { NotasUrgencias } from './documentos-clinicos/notas-urgencias/notas-urgencias';
-import { NotasEvolucion } from './documentos-clinicos/notas-evolucion/notas-evolucion';
+import { HistoriasClinicasComponent } from './documentos-clinicos/historias-clinicas/historias-clinicas';
+import { NotasUrgenciasComponent } from './documentos-clinicos/notas-urgencias/notas-urgencias';
+import { NotasEvolucionComponent } from './documentos-clinicos/notas-evolucion/notas-evolucion';
 import { NotasInterconsulta } from './documentos-clinicos/notas-interconsulta/notas-interconsulta';
 import { NotasPreoperatoria } from './documentos-clinicos/notas-preoperatoria/notas-preoperatoria';
 import { NotasPreanestesica } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
@@ -112,6 +112,17 @@ export const routes: Routes = [
           { path: 'expedientes', component: Expedientes },
           { path: 'camas', component: CamasComponent },
           { path: 'internamientos', component: InternamientosComponent },
+
+          // 🔥 RUTAS ADICIONALES PARA INTERNAMIENTOS (usando lazy loading)
+          // {
+          //   path: 'internamientos/crear',
+          //   loadComponent: () => import('./gestion-expedientes/internamientos/crear-internamiento.component').then(m => m.CrearInternamientoComponent)
+          // },
+          {
+            path: 'internamientos/:id',
+            loadComponent: () => import('./gestion-expedientes/internamientos/internamientos').then(m => m.InternamientosComponent)
+          },
+
           { path: 'signos-vitales', component: SignosVitalesComponent },
         ]
       },
@@ -122,9 +133,9 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'documentos', pathMatch: 'full' },
           { path: 'documentos', component: Documentos },
-          { path: 'historias-clinicas', component: HistoriasClinicas },
-          { path: 'notas-urgencias', component: NotasUrgencias },
-          { path: 'notas-evolucion', component: NotasEvolucion },
+          { path: 'historias-clinicas', component: HistoriasClinicasComponent },
+          { path: 'notas-urgencias', component: NotasUrgenciasComponent },
+          { path: 'notas-evolucion', component: NotasEvolucionComponent },
           { path: 'notas-interconsulta', component: NotasInterconsulta },
           { path: 'notas-preoperatoria', component: NotasPreoperatoria },
           { path: 'notas-preanestesica', component: NotasPreanestesica },

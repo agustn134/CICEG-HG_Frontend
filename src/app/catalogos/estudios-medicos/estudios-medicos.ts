@@ -1,15 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-estudios-medicos',
-//   imports: [],
-//   templateUrl: './estudios-medicos.html',
-//   styleUrl: './estudios-medicos.css'
-// })
-// export class EstudiosMedicos {
-
-// }
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -23,7 +11,7 @@ import { EstudioMedico, CreateEstudioMedicoDto, TipoEstudio, TIPOS_ESTUDIO } fro
   templateUrl: './estudios-medicos.html',
   styleUrl: './estudios-medicos.css'
 })
-export class EstudiosMedicosComponent implements OnInit {
+    export class EstudiosMedicosComponent implements OnInit {
 
   estudiosForm: FormGroup;
   estudios: EstudioMedico[] = [];

@@ -1,14 +1,3 @@
-// /** @type {import('tailwindcss').Config} */
-// module.exports = {
-//   content: [
-//     "./src/**/*.{html,ts}",
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// }
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -68,7 +57,7 @@ module.exports = {
         '2xl': '1536px',  // Desktop muy grande
       },
 
-      // 🎨 Sombras personalizadas para tarjetas
+      //  Sombras personalizadas para tarjetas
       boxShadow: {
         'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
@@ -78,7 +67,7 @@ module.exports = {
         'success': '0 0 0 3px rgba(16, 185, 129, 0.1)',
       },
 
-      // 🔤 Fuentes para diferentes tipos de contenido médico
+      //  Fuentes para diferentes tipos de contenido médico
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'medical': ['Inter', 'system-ui', 'sans-serif'],
@@ -86,14 +75,14 @@ module.exports = {
         'display': ['Inter', 'system-ui', 'sans-serif'],
       },
 
-      // 📏 Espaciado personalizado
+      //  Espaciado personalizado
       spacing: {
         '18': '4.5rem',   // Para elementos intermedios
         '88': '22rem',    // Para contenedores grandes
         '128': '32rem',   // Para modales
       },
 
-      // 🎯 Border radius personalizados
+      //  Border radius personalizados
       borderRadius: {
         'card': '0.75rem',      // rounded-card
         'form': '0.5rem',       // rounded-form
@@ -101,13 +90,13 @@ module.exports = {
         'modal': '1rem',        // rounded-modal
       },
 
-      // ⏱️ Animaciones y transiciones
+      // ⏱ Animaciones y transiciones
       transitionDuration: {
         '400': '400ms',
         '600': '600ms',
       },
 
-      // 🎭 Animaciones personalizadas
+      //  Animaciones personalizadas
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
