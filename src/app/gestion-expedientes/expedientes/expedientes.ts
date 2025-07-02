@@ -1,20 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-expedientes',
-//   imports: [],
-//   templateUrl: './expedientes.html',
-//   styleUrl: './expedientes.css'
-// })
-// export class Expedientes {
-
-// }
-
-
-
-
-
-
 // src/app/gestion-expedientes/expedientes/expedientes.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';

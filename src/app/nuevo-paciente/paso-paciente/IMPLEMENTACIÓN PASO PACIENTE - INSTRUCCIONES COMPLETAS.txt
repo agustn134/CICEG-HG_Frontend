@@ -1,0 +1,176 @@
+# 🚀 IMPLEMENTACIÓN PASO PACIENTE - INSTRUCCIONES COMPLETAS
+
+## 📁 ARCHIVOS A CREAR/ACTUALIZAR
+
+### 1. **REEMPLAZAR ARCHIVO PRINCIPAL**
+```bash
+# Archivo: C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-paciente\paso-paciente.ts
+```
+**Acción:** Reemplazar TODO el contenido con el artifact `paso_paciente_component`
+
+### 2. **CREAR/ACTUALIZAR TEMPLATE HTML**
+```bash
+# Archivo: C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-paciente\paso-paciente.html
+```
+**Acción:** Reemplazar TODO el contenido con el artifact `paso_paciente_html`
+
+### 3. **CREAR/ACTUALIZAR ESTILOS CSS**
+```bash
+# Archivo: C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-paciente\paso-paciente.css
+```
+**Acción:** Reemplazar TODO el contenido con el artifact `paso_paciente_css`
+
+## 🔧 FUNCIONALIDADES IMPLEMENTADAS
+
+### ✅ **FORMULARIO REACTIVO COMPLETO**
+- **Campos obligatorios:** Tipo de sangre, transfusiones, familiar responsable, parentesco, teléfono familiar
+- **Campos opcionales:** Alergias, ocupación, escolaridad, lugar de nacimiento
+- **Validaciones específicas:** Teléfonos de 10 dígitos, validaciones condicionales
+- **Campo condicional:** Detalles de transfusiones solo aparece si selecciona "Sí"
+
+### ✅ **INTEGRACIÓN CON WIZARD STATE**
+- **Carga datos anteriores:** Muestra resumen de datos personales del paso anterior
+- **Validación de navegación:** Verifica que el paso anterior esté completado
+- **Auto-guardado:** Cada 30 segundos automáticamente
+- **Navegación inteligente:** Botones anterior/siguiente funcionales
+
+### ✅ **CATÁLOGOS INTEGRADOS**
+- **Tipos de sangre:** A+, A-, B+, B-, AB+, AB-, O+, O-, Desconocido
+- **Parentescos:** Padre, Madre, Esposo(a), Hijo(a), Hermano(a), etc.
+- **Niveles de escolaridad:** Sin estudios hasta Posgrado
+- **Fallback automático:** Si falla la conexión, usa datos estáticos
+
+### ✅ **VALIDACIONES MÉDICAS**
+- **Tipo de sangre:** Obligatorio de catálogo
+- **Transfusiones:** Radio buttons Sí/No obligatorio
+- **Detalles transfusiones:** Obligatorio solo si selecciona "Sí" (mínimo 10 caracteres)
+- **Familiar responsable:** Obligatorio, mínimo 3 caracteres
+- **Teléfono familiar:** Obligatorio, exactamente 10 dígitos mexicanos
+
+### ✅ **UX/UI MODERNA**
+- **Resumen del paciente:** Muestra datos del paso anterior en card azul
+- **Barra de progreso:** 33.3% (paso 2 de 6)
+- **Formulario en secciones:** Información médica, contacto emergencia, datos adicionales
+- **Estados visuales:** Loading, errores, validaciones en tiempo real
+- **Responsive design:** Funciona en móvil y desktop
+
+### ✅ **MANEJO DE ERRORES**
+- **Validación de paso anterior:** Redirige si falta información
+- **Campos requeridos:** Marcados visualmente con *
+- **Mensajes de error:** Específicos por campo y tipo de error
+- **Auto-guardado:** Manejo de errores silencioso
+
+## 🛣️ FLUJO DE NAVEGACIÓN
+
+```
+1. Usuario llega desde: /app/nuevo-paciente/persona
+2. Verifica: ¿Existen datos personales válidos?
+   - ❌ NO → Redirige a paso anterior con alerta
+   - ✅ SÍ → Continúa
+3. Muestra: Resumen de datos personales del paso anterior
+4. Formulario: 3 secciones (médica, emergencia, adicional)
+5. Validación: Campos obligatorios + validaciones específicas
+6. Guardado: Auto-guardado + guardado manual
+7. Navegación: Anterior (vuelve a persona) | Siguiente (va a expediente)
+```
+
+## 🔧 COMANDOS PARA PROBAR
+
+```bash
+# 1. Iniciar servidor
+ng serve
+
+# 2. Navegar a la aplicación
+http://localhost:4200/app/nuevo-paciente/inicio
+
+# 3. Flujo completo:
+# - Hacer clic en "Comenzar Registro"
+# - Llenar formulario de datos personales (paso 1)
+# - Hacer clic en "Siguiente"
+# - ¡Debería aparecer el formulario de información médica!
+
+# 4. Probar navegación:
+# - Botón "Anterior" → Vuelve a datos personales
+# - Llenar campos obligatorios
+# - Botón "Siguiente" → Va al siguiente paso
+```
+
+## 🎯 FUNCIONALIDADES CLAVE A PROBAR
+
+### **1. VALIDACIÓN DE PASO ANTERIOR**
+- Intentar acceder directamente a `/app/nuevo-paciente/paciente`
+- Debería redirigir a datos personales con alerta
+
+### **2. RESUMEN DE DATOS**
+- Completar paso 1 (datos personales)
+- En paso 2 debería mostrar: Nombre completo, CURP, edad, sexo
+
+### **3. VALIDACIONES DE FORMULARIO**
+- **Tipo de sangre:** Probar sin seleccionar → Error
+- **Transfusiones:** Probar sin seleccionar → Error
+- **Detalles transfusiones:** Seleccionar "Sí" → Campo aparece y es obligatorio
+- **Familiar responsable:** Probar vacío → Error
+- **Teléfono familiar:** Probar con menos de 10 dígitos → Error
+
+### **4. AUTO-GUARDADO**
+- Llenar algunos campos
+- Esperar 30 segundos
+- Ver en consola: "Borrador de paciente guardado automáticamente"
+
+### **5. CATÁLOGOS**
+- **Tipo sangre:** Debería mostrar A+, A-, B+, etc.
+- **Parentesco:** Debería mostrar Padre, Madre, etc.
+- **Escolaridad:** Debería mostrar Sin estudios, Primaria, etc.
+
+## 🐛 POSIBLES ERRORES Y SOLUCIONES
+
+### **ERROR: "Cannot find module '@angular/forms'"**
+```bash
+# Solución:
+npm install @angular/forms
+```
+
+### **ERROR: "Cannot find module 'wizard.models'"**
+- Verificar que existe: `src/app/models/wizard.models.ts`
+- Verificar imports en el componente
+
+### **ERROR: "Cannot find service 'CatalogoService'"**
+- Verificar que existe: `src/app/services/catalogo.service.ts`
+- Verificar que está actualizado con el código correcto
+
+### **ERROR: Radio buttons no funcionan**
+- Verificar que se importó ReactiveFormsModule
+- Verificar que el FormBuilder está configurado correctamente
+
+### **ERROR: Catálogos vacíos**
+- Normal si no hay backend
+- Debería usar datos estáticos de fallback automáticamente
+
+## 📊 ESTADO ESPERADO DESPUÉS DE IMPLEMENTAR
+
+### ✅ **LO QUE DEBERÍA FUNCIONAR:**
+1. **Navegación completa:** Inicio → Persona → Paciente
+2. **Formulario funcional:** Todos los campos y validaciones
+3. **Auto-guardado:** Cada 30 segundos en sessionStorage
+4. **Barra de progreso:** 33.3% en paso 2
+5. **Catálogos cargados:** Con datos estáticos de fallback
+6. **Responsive:** Funciona en móvil y desktop
+
+### ⏳ **PRÓXIMO PASO:**
+Después de probar que este paso funciona correctamente:
+- **Siguiente:** Implementar `PasoExpedienteComponent` (creación automática)
+- **Después:** `PasoDocumentoClinicoComponent` (selección tipo documento)
+
+## 🎉 RESULTADO FINAL
+
+Una vez implementado correctamente, tendrás:
+
+- ✅ **Wizard completo de 2 pasos funcionales**
+- ✅ **Formularios reactivos con validaciones médicas**
+- ✅ **Estado persistente entre pasos**
+- ✅ **UI moderna y responsive**
+- ✅ **Catálogos con fallback automático**
+- ✅ **Auto-guardado funcional**
+- ✅ **Navegación inteligente entre pasos**
+
+**¡El sistema ya tiene una base sólida para el registro de pacientes!** 🚀
