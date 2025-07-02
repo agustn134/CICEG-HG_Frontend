@@ -1,0 +1,172 @@
+/* src/app/shared/components/wizard-layout/wizard-layout.css */
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS DEL WIZARD LAYOUT
+   ========================================== */
+
+.wizard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Animaciones suaves para transiciones */
+.step-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efectos hover para los pasos */
+.step-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Animación de la barra de progreso */
+.progress-bar {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animación de carga */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Estados de los pasos */
+.step-active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+.step-completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.step-inactive {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #9ca3af;
+}
+
+/* Líneas conectoras de pasos */
+.step-connector {
+  background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
+}
+
+.step-connector.completed {
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #3b82f6 100%);
+}
+
+/* Overlay de carga */
+.loading-overlay {
+  backdrop-filter: blur(4px);
+  background: rgba(17, 24, 39, 0.7);
+}
+
+/* Efectos de focus para accesibilidad */
+.wizard-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .wizard-header {
+    padding: 1rem;
+  }
+
+  .wizard-steps {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .step-circle {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .step-title {
+    font-size: 0.75rem;
+  }
+}
+
+/* Estados especiales */
+.step-warning {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.step-error {
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wizard-content {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Estado de guardado */
+.save-indicator {
+  transition: all 0.3s ease;
+}
+
+.save-indicator.saving {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Mejoras de contraste para accesibilidad */
+.high-contrast .step-active {
+  background: #1e40af;
+  border: 2px solid #ffffff;
+}
+
+.high-contrast .step-completed {
+  background: #047857;
+  border: 2px solid #ffffff;
+}
+
+/* Print styles (si se necesita imprimir) */
+@media print {
+  .wizard-header,
+  .wizard-footer,
+  .loading-overlay {
+    display: none;
+  }
+
+  .wizard-content {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}
