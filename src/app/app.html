@@ -1,2 +1,43 @@
-<!-- <app-navbar></app-navbar> -->
+<!--
+  🏥 CICEG-HG - Sistema de Expedientes Clínicos
+  Hospital General San Luis de la Paz, Guanajuato
+
+  El layout completo se maneja ahora através del sistema de rutas:
+  - DashboardLayoutComponent: Para rutas /app/*
+  - WizardLayoutComponent: Para rutas /app/nuevo-paciente/*
+  - AuthLayoutComponent: Para rutas de autenticación (futuro)
+-->
+
+<!-- Router Outlet Principal -->
 <router-outlet></router-outlet>
+
+<!--
+  🎯 NOTA TÉCNICA:
+
+  Este componente raíz solo contiene el router-outlet principal.
+  Toda la lógica de layout se maneja en:
+
+  1. DashboardLayoutComponent (/app/*):
+     - Sidebar principal
+     - Header con navegación
+     - Área de contenido
+     - Footer del hospital
+
+  2. WizardLayoutComponent (/app/nuevo-paciente/*):
+     - Layout especializado para el wizard de registro
+     - Barra de progreso
+     - Navegación entre pasos
+     - Validaciones de formulario
+
+  3. Componentes individuales:
+     - Cada página maneja su propio contenido
+     - Formularios específicos por sección
+     - Lógica de negocio separada
+
+  🏥 VENTAJAS DE ESTA ARQUITECTURA:
+  - Separación clara de responsabilidades
+  - Layouts especializados por flujo de trabajo
+  - Mantenimiento más sencillo
+  - Reutilización de componentes
+  - Performance optimizado por lazy loading
+-->
