@@ -2,7 +2,12 @@
 import { FormControl, FormGroup } from '@angular/forms';
 
 // ==========================================
-// ENUMS PARA EL WIZARD
+// IMPORTAR ENUMS DEL SISTEMA PRINCIPAL
+// ==========================================
+import { Genero, EstadoCivil } from './base.models';
+
+// ==========================================
+// ENUMS ESPECÍFICOS DEL WIZARD
 // ==========================================
 export enum WizardStep {
   INICIO = 'inicio',
@@ -24,19 +29,27 @@ export enum EstadoWizard {
 }
 
 // ==========================================
+// RE-EXPORTAR ENUMS PRINCIPALES PARA COMPONENTES
+// ==========================================
+export { Genero, EstadoCivil };
+
+// ==========================================
 // DATOS DEL WIZARD POR PASO
 // ==========================================
 export interface DatosPersona {
   nombre: string;
   apellido_paterno: string;
-  apellido_materno: string;
+  apellido_materno?: string;
   fecha_nacimiento: string;
-  sexo: 'Masculino' | 'Femenino' | 'Otro';
+  genero: Genero; // 🔥 FIX: Usar enum Genero del sistema
   curp: string;
   telefono?: string;
-  correo_electronico?: string;
-  domicilio?: string;
-  estado_civil?: string;
+  email?: string; // 🔥 FIX: Frontend usa 'email'
+  direccion?: string; // 🔥 FIX: Frontend usa 'direccion'
+  ciudad?: string;
+  estado?: string;
+  codigo_postal?: string;
+  estado_civil?: EstadoCivil; // 🔥 FIX: Usar enum EstadoCivil del sistema
   religion?: string;
 }
 
@@ -210,3 +223,54 @@ export const STEP_TITLES: { [key in WizardStep]: string } = {
 export type WizardStepData = DatosPersona | DatosPaciente | DatosExpediente | DatosDocumento;
 export type WizardFormData = { [key: string]: any };
 export type ValidationErrors = { [fieldName: string]: string[] };
+
+// ==========================================
+// MAPPER PARA COMPATIBILIDAD CON BACKEND
+// ==========================================
+export class WizardPersonaMapper {
+
+  /**
+   * Convierte DatosPersona del wizard al formato del backend
+   */
+  static toBackendFormat(datosPersona: DatosPersona) {
+    return {
+      nombre: datosPersona.nombre,
+      apellido_paterno: datosPersona.apellido_paterno,
+      apellido_materno: datosPersona.apellido_materno,
+      fecha_nacimiento: datosPersona.fecha_nacimiento,
+      sexo: datosPersona.genero, // 🔥 MAPEO: genero -> sexo para backend
+      estado_civil: datosPersona.estado_civil,
+      telefono: datosPersona.telefono,
+      correo_electronico: datosPersona.email, // 🔥 MAPEO: email -> correo_electronico para backend
+      domicilio: datosPersona.direccion, // 🔥 MAPEO: direccion -> domicilio para backend
+      ciudad: datosPersona.ciudad,
+      estado: datosPersona.estado,
+      codigo_postal: datosPersona.codigo_postal,
+      curp: datosPersona.curp,
+      religion: datosPersona.religion,
+      activo: true
+    };
+  }
+
+  /**
+   * Convierte datos del backend al formato del wizard frontend
+   */
+  static fromBackendFormat(backendData: any): DatosPersona {
+    return {
+      nombre: backendData.nombre,
+      apellido_paterno: backendData.apellido_paterno,
+      apellido_materno: backendData.apellido_materno,
+      fecha_nacimiento: backendData.fecha_nacimiento,
+      genero: backendData.sexo, // 🔥 MAPEO: sexo -> genero para frontend
+      curp: backendData.curp,
+      telefono: backendData.telefono,
+      email: backendData.correo_electronico, // 🔥 MAPEO: correo_electronico -> email para frontend
+      direccion: backendData.domicilio, // 🔥 MAPEO: domicilio -> direccion para frontend
+      ciudad: backendData.ciudad,
+      estado: backendData.estado,
+      codigo_postal: backendData.codigo_postal,
+      estado_civil: backendData.estado_civil,
+      religion: backendData.religion
+    };
+  }
+}

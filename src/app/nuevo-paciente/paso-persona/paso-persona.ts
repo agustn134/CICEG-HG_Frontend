@@ -1,5 +1,5 @@
 // src/app/nuevo-paciente/paso-persona/paso-persona.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,354 +7,73 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { WizardStateService } from '../../services/wizard-state';
 import { CatalogoService, CatalogoItem } from '../../services/catalogo';
-import { DatosPersona, WizardStep } from '../../models/wizard.models';
+import { DatosPersona, WizardStep, Genero, EstadoCivil, WizardPersonaMapper } from '../../models/wizard.models';
+import { PersonasService } from '../../services/personas/personas';
+import { CreatePersonaFrontendDto } from '../../models';
 
 @Component({
   selector: 'app-paso-persona',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="min-h-screen bg-gray-50 py-8">
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <!-- Header -->
-        <div class="mb-8">
-          <div class="flex items-center mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mr-4">
-              <span class="text-sm font-bold text-blue-600">1</span>
-            </div>
-            <div>
-              <h1 class="text-2xl font-bold text-gray-900">Datos Personales</h1>
-              <p class="text-sm text-gray-600">Información básica del paciente</p>
-            </div>
-          </div>
-
-          <!-- Barra de progreso -->
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progreso"></div>
-          </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Paso 1 de 6</span>
-            <span>{{ progreso }}% completado</span>
-          </div>
-        </div>
-
-        <!-- Formulario -->
-        <form [formGroup]="personaForm" (ngSubmit)="onSubmit()" class="space-y-6">
-
-          <!-- Tarjeta del formulario -->
-          <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-medium text-gray-900">Información Personal</h2>
-              <p class="mt-1 text-sm text-gray-600">Complete todos los campos obligatorios marcados con *</p>
-            </div>
-
-            <div class="px-6 py-6 space-y-6">
-
-              <!-- Nombre completo -->
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
-
-                <!-- Nombre -->
-                <div>
-                  <label for="nombre" class="block text-sm font-medium text-gray-700">
-                    Nombre *
-                  </label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    formControlName="nombre"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('nombre')"
-                    placeholder="Ej: Juan Carlos"
-                  />
-                  <div *ngIf="isFieldInvalid('nombre')" class="mt-1 text-sm text-red-600">
-                    El nombre es obligatorio
-                  </div>
-                </div>
-
-                <!-- Apellido Paterno -->
-                <div>
-                  <label for="apellido_paterno" class="block text-sm font-medium text-gray-700">
-                    Apellido Paterno *
-                  </label>
-                  <input
-                    type="text"
-                    id="apellido_paterno"
-                    formControlName="apellido_paterno"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('apellido_paterno')"
-                    placeholder="Ej: García"
-                  />
-                  <div *ngIf="isFieldInvalid('apellido_paterno')" class="mt-1 text-sm text-red-600">
-                    El apellido paterno es obligatorio
-                  </div>
-                </div>
-
-                <!-- Apellido Materno -->
-                <div>
-                  <label for="apellido_materno" class="block text-sm font-medium text-gray-700">
-                    Apellido Materno
-                  </label>
-                  <input
-                    type="text"
-                    id="apellido_materno"
-                    formControlName="apellido_materno"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Ej: López"
-                  />
-                </div>
-              </div>
-
-              <!-- Datos básicos -->
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-                <!-- Fecha de nacimiento -->
-                <div>
-                  <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">
-                    Fecha de Nacimiento *
-                  </label>
-                  <input
-                    type="date"
-                    id="fecha_nacimiento"
-                    formControlName="fecha_nacimiento"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('fecha_nacimiento')"
-                    [max]="fechaMaxima"
-                  />
-                  <div *ngIf="isFieldInvalid('fecha_nacimiento')" class="mt-1 text-sm text-red-600">
-                    La fecha de nacimiento es obligatoria
-                  </div>
-                  <div *ngIf="edadCalculada > 0" class="mt-1 text-sm text-gray-500">
-                    Edad: {{ edadCalculada }} años
-                  </div>
-                </div>
-
-                <!-- Sexo -->
-                <div>
-                  <label for="sexo" class="block text-sm font-medium text-gray-700">
-                    Sexo *
-                  </label>
-                  <select
-                    id="sexo"
-                    formControlName="sexo"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('sexo')"
-                  >
-                    <option value="">Seleccione...</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  <div *ngIf="isFieldInvalid('sexo')" class="mt-1 text-sm text-red-600">
-                    El sexo es obligatorio
-                  </div>
-                </div>
-              </div>
-
-              <!-- CURP -->
-              <div>
-                <label for="curp" class="block text-sm font-medium text-gray-700">
-                  CURP (Clave Única de Registro de Población) *
-                </label>
-                <input
-                  type="text"
-                  id="curp"
-                  formControlName="curp"
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  [class.border-red-300]="isFieldInvalid('curp')"
-                  [class.border-green-300]="personaForm.get('curp')?.valid && personaForm.get('curp')?.value"
-                  placeholder="Ej: GABC800312HGTLPN01"
-                  maxlength="18"
-                  style="text-transform: uppercase"
-                />
-                <div *ngIf="isFieldInvalid('curp')" class="mt-1 text-sm text-red-600">
-                  <span *ngIf="personaForm.get('curp')?.errors?.['required']">La CURP es obligatoria</span>
-                  <span *ngIf="personaForm.get('curp')?.errors?.['pattern']">La CURP debe tener el formato correcto (18 caracteres)</span>
-                </div>
-                <div *ngIf="personaForm.get('curp')?.valid && personaForm.get('curp')?.value" class="mt-1 text-sm text-green-600">
-                  ✓ CURP válida
-                </div>
-                <p class="mt-1 text-xs text-gray-500">
-                  La CURP debe tener 18 caracteres. Ejemplo: GABC800312HGTLPN01
-                </p>
-              </div>
-
-              <!-- Contacto -->
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-                <!-- Teléfono -->
-                <div>
-                  <label for="telefono" class="block text-sm font-medium text-gray-700">
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    id="telefono"
-                    formControlName="telefono"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('telefono')"
-                    placeholder="Ej: 4421234567"
-                    maxlength="10"
-                  />
-                  <div *ngIf="isFieldInvalid('telefono')" class="mt-1 text-sm text-red-600">
-                    El teléfono debe tener 10 dígitos
-                  </div>
-                </div>
-
-                <!-- Correo electrónico -->
-                <div>
-                  <label for="correo_electronico" class="block text-sm font-medium text-gray-700">
-                    Correo Electrónico
-                  </label>
-                  <input
-                    type="email"
-                    id="correo_electronico"
-                    formControlName="correo_electronico"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    [class.border-red-300]="isFieldInvalid('correo_electronico')"
-                    placeholder="Ej: ejemplo@correo.com"
-                  />
-                  <div *ngIf="isFieldInvalid('correo_electronico')" class="mt-1 text-sm text-red-600">
-                    Ingrese un correo electrónico válido
-                  </div>
-                </div>
-              </div>
-
-              <!-- Domicilio -->
-              <div>
-                <label for="domicilio" class="block text-sm font-medium text-gray-700">
-                  Domicilio
-                </label>
-                <textarea
-                  id="domicilio"
-                  formControlName="domicilio"
-                  rows="2"
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Ej: Calle 5 de Mayo #123, Col. Centro, San Luis de la Paz, Guanajuato"
-                ></textarea>
-              </div>
-
-              <!-- Estado civil y religión -->
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-                <!-- Estado civil -->
-                <div>
-                  <label for="estado_civil" class="block text-sm font-medium text-gray-700">
-                    Estado Civil
-                  </label>
-                  <select
-                    id="estado_civil"
-                    formControlName="estado_civil"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Seleccione...</option>
-                    <option *ngFor="let estado of estadosCiviles" [value]="estado.value">
-                      {{ estado.label }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Religión -->
-                <div>
-                  <label for="religion" class="block text-sm font-medium text-gray-700">
-                    Religión
-                  </label>
-                  <select
-                    id="religion"
-                    formControlName="religion"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Seleccione...</option>
-                    <option *ngFor="let religion of religiones" [value]="religion.value">
-                      {{ religion.label }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Botones de navegación -->
-          <div class="flex justify-between">
-            <button
-              type="button"
-              (click)="goBack()"
-              class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-              </svg>
-              Anterior
-            </button>
-
-            <div class="flex space-x-3">
-              <button
-                type="button"
-                (click)="guardarBorrador()"
-                [disabled]="isLoading"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"/>
-                </svg>
-                Guardar Borrador
-              </button>
-
-              <button
-                type="submit"
-                [disabled]="!personaForm.valid || isLoading"
-                class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
-                {{ isLoading ? 'Guardando...' : 'Siguiente' }}
-                <svg *ngIf="!isLoading" class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-        </form>
-
-        <!-- Debug info (solo desarrollo) -->
-        <div *ngIf="showDebugInfo" class="mt-8 bg-gray-100 rounded-lg p-4">
-          <h3 class="text-sm font-medium text-gray-900 mb-2">Debug Info</h3>
-          <div class="text-xs text-gray-600 space-y-2">
-            <div><strong>Form Valid:</strong> {{ personaForm.valid }}</div>
-            <div><strong>Form Value:</strong></div>
-            <pre>{{ personaForm.value | json }}</pre>
-            <div><strong>Form Errors:</strong></div>
-            <pre>{{ getFormErrors() | json }}</pre>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  `
+  templateUrl: './paso-persona.html',
+  styleUrl: './paso-persona.css'
 })
 export class PasoPersona implements OnInit, OnDestroy {
+
+  // ==========================================
+  // SIGNALS Y PROPIEDADES REACTIVAS
+  // ==========================================
 
   private destroy$ = new Subject<void>();
 
   // Form
   personaForm!: FormGroup;
 
-  // Estados
-  isLoading = false;
-  progreso = 16.7; // 1/6 * 100
-  edadCalculada = 0;
+  // Estados reactivos usando signals
+  isLoading = signal(false);
+  progreso = signal(16.7); // 1/6 * 100
+  edadCalculada = signal(0);
+  autoGuardadoStatus = signal('');
+
+  // Configuración
   fechaMaxima = '';
-  showDebugInfo = false; // true para desarrollo
+  totalCamposObligatorios = 5; // nombre, apellido_paterno, fecha_nacimiento, genero, curp
+  showDebugInfo = false; // Cambiar a true para desarrollo
 
   // Catálogos
   estadosCiviles: CatalogoItem[] = [];
   religiones: CatalogoItem[] = [];
 
+  // Opciones para selects
+  generoOptions = [
+    { value: Genero.MASCULINO, label: 'Masculino' },
+    { value: Genero.FEMENINO, label: 'Femenino' },
+    { value: Genero.OTRO, label: 'Otro' }
+  ];
+
+  // ==========================================
+  // COMPUTED PROPERTIES
+  // ==========================================
+
+  camposObligatoriosCompletados = computed(() => {
+    const form = this.personaForm;
+    if (!form) return 0;
+
+    let completados = 0;
+    if (form.get('nombre')?.valid) completados++;
+    if (form.get('apellido_paterno')?.valid) completados++;
+    if (form.get('fecha_nacimiento')?.valid) completados++;
+    if (form.get('genero')?.valid) completados++;
+    if (form.get('curp')?.valid) completados++;
+
+    return completados;
+  });
+
   constructor(
     private fb: FormBuilder,
     private wizardStateService: WizardStateService,
     private catalogoService: CatalogoService,
+    private personasService: PersonasService,
     private router: Router
   ) {
     this.fechaMaxima = new Date().toISOString().split('T')[0];
@@ -378,16 +97,19 @@ export class PasoPersona implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     this.personaForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      apellido_paterno: ['', [Validators.required, Validators.minLength(2)]],
-      apellido_materno: [''],
-      fecha_nacimiento: ['', Validators.required],
-      sexo: ['', Validators.required],
-      curp: ['', [Validators.required, Validators.pattern(/^[A-Z]{1}[AEIOU]{1}[A-Z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[HM]{1}(AS|BC|BS|CC|CS|CH|CL|CM|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]{1}[0-9]{1}$/)]],
-      telefono: ['', [Validators.pattern(/^[0-9]{10}$/)]],
-      correo_electronico: ['', [Validators.email]],
-      domicilio: [''],
+      nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      apellido_paterno: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      apellido_materno: ['', [Validators.maxLength(50)]],
+      fecha_nacimiento: ['', [Validators.required]],
+      genero: ['', [Validators.required]],
       estado_civil: [''],
+      telefono: ['', [Validators.pattern(/^\d{10}$/)]],
+      email: ['', [Validators.email]],
+      direccion: ['', [Validators.maxLength(200)]],
+      ciudad: ['', [Validators.maxLength(50)]],
+      estado: ['', [Validators.maxLength(50)]],
+      codigo_postal: ['', [Validators.pattern(/^\d{5}$/)]],
+      curp: ['', [Validators.required, Validators.pattern(/^[A-Z]{1}[AEIOU]{1}[A-Z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[HM]{1}(AS|BC|BS|CC|CS|CH|CL|CM|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]{1}[0-9]{1}$/)]],
       religion: ['']
     });
   }
@@ -396,18 +118,40 @@ export class PasoPersona implements OnInit, OnDestroy {
     // Cargar estados civiles
     this.catalogoService.getEstadosCiviles()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(estados => this.estadosCiviles = estados);
+      .subscribe({
+        next: (estados) => {
+          this.estadosCiviles = estados;
+          console.log('Estados civiles cargados:', estados.length);
+        },
+        error: (error) => {
+          console.error('Error al cargar estados civiles:', error);
+        }
+      });
 
     // Cargar religiones
     this.catalogoService.getReligiones()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(religiones => this.religiones = religiones);
+      .subscribe({
+        next: (religiones) => {
+          this.religiones = religiones;
+          console.log('Religiones cargadas:', religiones.length);
+        },
+        error: (error) => {
+          console.error('Error al cargar religiones:', error);
+        }
+      });
   }
 
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
     if (currentState.datosPersona && Object.keys(currentState.datosPersona).length > 0) {
+      console.log('Cargando datos existentes:', currentState.datosPersona);
       this.personaForm.patchValue(currentState.datosPersona);
+
+      // Calcular edad si hay fecha de nacimiento
+      if (currentState.datosPersona.fecha_nacimiento) {
+        this.edadCalculada.set(this.calculateAge(new Date(currentState.datosPersona.fecha_nacimiento)));
+      }
     }
   }
 
@@ -417,11 +161,13 @@ export class PasoPersona implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(fecha => {
         if (fecha) {
-          this.edadCalculada = this.calculateAge(new Date(fecha));
+          this.edadCalculada.set(this.calculateAge(new Date(fecha)));
+        } else {
+          this.edadCalculada.set(0);
         }
       });
 
-    // Convertir CURP a mayúsculas
+    // Convertir CURP a mayúsculas automáticamente
     this.personaForm.get('curp')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(curp => {
@@ -437,23 +183,72 @@ export class PasoPersona implements OnInit, OnDestroy {
     this.personaForm.valueChanges
       .pipe(
         takeUntil(this.destroy$),
-        debounceTime(30000),
+        debounceTime(30000), // 30 segundos
         distinctUntilChanged()
       )
       .subscribe(() => {
-        if (this.personaForm.valid) {
+        if (this.personaForm.dirty && !this.isLoading()) {
+          console.log('Auto-guardando borrador...');
           this.guardarBorrador();
         }
       });
+
+    // Log de cambios para debugging
+    if (this.showDebugInfo) {
+      this.personaForm.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(value => {
+          console.log('Form changed:', value);
+        });
+    }
   }
 
   // ==========================================
-  // VALIDACIONES
+  // VALIDACIONES Y UTILIDADES
   // ==========================================
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.personaForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.personaForm.get(fieldName);
+    if (field?.errors && field.touched) {
+      if (field.errors['required']) return `${this.getFieldLabel(fieldName)} es requerido`;
+      if (field.errors['minlength']) return `${this.getFieldLabel(fieldName)} es muy corto (mínimo ${field.errors['minlength'].requiredLength} caracteres)`;
+      if (field.errors['maxlength']) return `${this.getFieldLabel(fieldName)} es muy largo (máximo ${field.errors['maxlength'].requiredLength} caracteres)`;
+      if (field.errors['email']) return 'Formato de email inválido';
+      if (field.errors['pattern']) {
+        if (fieldName === 'curp') return 'CURP inválida (debe tener 18 caracteres con formato correcto)';
+        if (fieldName === 'telefono') return 'Teléfono debe tener exactamente 10 dígitos';
+        if (fieldName === 'codigo_postal') return 'Código postal debe tener exactamente 5 dígitos';
+        return `Formato de ${this.getFieldLabel(fieldName)} inválido`;
+      }
+    }
+    return null;
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'nombre': 'Nombre',
+      'apellido_paterno': 'Apellido paterno',
+      'apellido_materno': 'Apellido materno',
+      'fecha_nacimiento': 'Fecha de nacimiento',
+      'genero': 'Género',
+      'telefono': 'Teléfono',
+      'email': 'Email',
+      'curp': 'CURP',
+      'codigo_postal': 'Código postal'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  getFormStatusText(): string {
+    if (this.personaForm.pristine) return 'Sin cambios';
+    if (this.personaForm.valid) return 'Formulario válido';
+    if (this.personaForm.invalid && (this.personaForm.dirty || this.personaForm.touched)) return 'Formulario incompleto';
+    return 'Esperando datos';
   }
 
   getFormErrors(): any {
@@ -476,49 +271,346 @@ export class PasoPersona implements OnInit, OnDestroy {
       age--;
     }
 
-    return age;
+    return Math.max(0, age);
   }
 
   // ==========================================
-  // ACCIONES
+  // ACCIONES DEL FORMULARIO
   // ==========================================
 
   onSubmit(): void {
-    if (this.personaForm.valid && !this.isLoading) {
+    console.log('Form submitted. Valid:', this.personaForm.valid);
+
+    if (this.personaForm.valid && !this.isLoading()) {
       this.saveAndContinue();
     } else {
+      console.log('Form invalid, marking all fields as touched');
       this.markAllFieldsAsTouched();
+
+      // Scroll al primer campo con error
+      this.scrollToFirstError();
     }
   }
 
-  private saveAndContinue(): void {
-    this.isLoading = true;
+  // private saveAndContinue(): void {
+  //   this.isLoading.set(true);
+  //   this.autoGuardadoStatus.set('Guardando datos del paciente...');
 
-    // Actualizar datos en el wizard state
+  //   try {
+  //     // Preparar datos del formulario
+  //     const formData = this.personaForm.value as DatosPersona;
+
+  //     console.log('Guardando datos de persona:', formData);
+
+  //     // Actualizar datos en el wizard state
+  //     this.wizardStateService.updatePersonaData(formData);
+
+  //     // Marcar paso como completado
+  //     this.wizardStateService.markStepAsCompleted(WizardStep.PERSONA);
+
+  //     // Simular guardado en backend (aquí iría la llamada real al API)
+  //     // TODO: Reemplazar con llamada real al PersonasService
+  //     setTimeout(() => {
+  //       this.isLoading.set(false);
+  //       this.autoGuardadoStatus.set('✓ Datos guardados exitosamente');
+
+  //       console.log('Datos guardados, navegando al siguiente paso');
+
+  //       // Navegar al siguiente paso
+  //       this.wizardStateService.goToNextStep();
+
+  //       // Limpiar mensaje después de 3 segundos
+  //       setTimeout(() => {
+  //         this.autoGuardadoStatus.set('');
+  //       }, 3000);
+  //     }, 1500);
+
+  //   } catch (error) {
+  //     console.error('Error al guardar datos de persona:', error);
+  //     this.isLoading.set(false);
+  //     this.autoGuardadoStatus.set('❌ Error al guardar datos');
+
+  //     // Limpiar mensaje de error después de 5 segundos
+  //     setTimeout(() => {
+  //       this.autoGuardadoStatus.set('');
+  //     }, 5000);
+  //   }
+  // }
+
+  // guardarBorrador(): void {
+  //   if (!this.isLoading() && this.personaForm.dirty) {
+  //     this.autoGuardadoStatus.set('Guardando borrador...');
+
+  //     try {
+  //       const formData = this.personaForm.value as Partial<DatosPersona>;
+  //       console.log('Guardando borrador:', formData);
+
+  //       this.wizardStateService.updatePersonaData(formData);
+
+  //       // Simular guardado de borrador
+  //       setTimeout(() => {
+  //         this.autoGuardadoStatus.set('✓ Borrador guardado');
+
+  //         // Limpiar mensaje después de 3 segundos
+  //         setTimeout(() => {
+  //           this.autoGuardadoStatus.set('');
+  //         }, 3000);
+  //       }, 800);
+
+  //     } catch (error) {
+  //       console.error('Error al guardar borrador:', error);
+  //       this.autoGuardadoStatus.set('❌ Error al guardar borrador');
+
+  //       setTimeout(() => {
+  //         this.autoGuardadoStatus.set('');
+  //       }, 5000);
+  //     }
+  //   }
+  // }
+
+
+
+
+  // ==========================================
+// MÉTODO saveAndContinue() CON BACKEND REAL
+// ==========================================
+
+private saveAndContinue(): void {
+  this.isLoading.set(true);
+  this.autoGuardadoStatus.set('Guardando datos del paciente...');
+
+  try {
+    // Preparar datos del formulario
     const formData = this.personaForm.value as DatosPersona;
-    this.wizardStateService.updatePersonaData(formData);
 
-    // Marcar paso como completado
-    this.wizardStateService.markStepAsCompleted(WizardStep.PERSONA);
+    console.log('🔄 Datos del wizard:', formData);
 
-    // Simular guardado (aquí iría la llamada al backend)
+    // Convertir datos del wizard al formato del frontend service
+    const personaFrontendDto: CreatePersonaFrontendDto = {
+      nombre: formData.nombre,
+      apellido_paterno: formData.apellido_paterno,
+      apellido_materno: formData.apellido_materno || undefined,
+      fecha_nacimiento: formData.fecha_nacimiento,
+      genero: formData.genero,
+      estado_civil: formData.estado_civil || undefined,
+      telefono: formData.telefono || undefined,
+      email: formData.email || undefined,
+      direccion: formData.direccion || undefined,
+      ciudad: formData.ciudad || undefined,
+      estado: formData.estado || undefined,
+      codigo_postal: formData.codigo_postal || undefined,
+      curp: formData.curp,
+      religion: formData.religion || undefined,
+      activo: true
+    };
+
+    console.log('🚀 Enviando al backend:', personaFrontendDto);
+
+    // Llamada real al backend a través del PersonasService
+    this.personasService.createPersona(personaFrontendDto).subscribe({
+      next: (response) => {
+        console.log('✅ Respuesta del backend:', response);
+
+        if (response.success && response.data) {
+          // Actualizar estado del wizard con datos guardados
+          this.wizardStateService.updatePersonaData(formData);
+
+          // Guardar ID de la persona creada
+          this.wizardStateService.updateIds({
+            id_persona: response.data.id_persona!
+          });
+
+          // Marcar paso como completado
+          this.wizardStateService.markStepAsCompleted(WizardStep.PERSONA);
+
+          // Actualizar UI
+          this.isLoading.set(false);
+          this.autoGuardadoStatus.set('✅ Persona registrada exitosamente');
+
+          console.log('✅ Persona creada con ID:', response.data.id_persona);
+          console.log('➡️ Navegando al siguiente paso...');
+
+          // Navegar al siguiente paso después de una breve pausa
+          setTimeout(() => {
+            this.wizardStateService.goToNextStep();
+          }, 1000);
+
+        } else {
+          throw new Error(response.message || 'Error desconocido al crear persona');
+        }
+      },
+
+      error: (error) => {
+        console.error('❌ Error al crear persona:', error);
+
+        this.isLoading.set(false);
+
+        // Determinar mensaje de error apropiado
+        let errorMessage = '❌ Error al guardar datos';
+
+        if (error.error?.message) {
+          errorMessage = `❌ ${error.error.message}`;
+        } else if (error.message) {
+          errorMessage = `❌ ${error.message}`;
+        } else if (error.status === 0) {
+          errorMessage = '❌ Sin conexión al servidor';
+        } else if (error.status >= 400 && error.status < 500) {
+          errorMessage = '❌ Error en los datos enviados';
+        } else if (error.status >= 500) {
+          errorMessage = '❌ Error del servidor';
+        }
+
+        this.autoGuardadoStatus.set(errorMessage);
+
+        // Limpiar mensaje de error después de 8 segundos
+        setTimeout(() => {
+          this.autoGuardadoStatus.set('');
+        }, 8000);
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error al preparar datos:', error);
+    this.isLoading.set(false);
+    this.autoGuardadoStatus.set('❌ Error al procesar datos del formulario');
+
     setTimeout(() => {
-      this.isLoading = false;
-      this.wizardStateService.goToNextStep();
-    }, 1000);
+      this.autoGuardadoStatus.set('');
+    }, 5000);
   }
+}
 
-  guardarBorrador(): void {
-    if (!this.isLoading) {
-      const formData = this.personaForm.value as Partial<DatosPersona>;
+// ==========================================
+// MÉTODO ALTERNATIVO CON MAPPER DEL WIZARD
+// ==========================================
+
+private saveAndContinueAlternative(): void {
+  this.isLoading.set(true);
+  this.autoGuardadoStatus.set('Guardando datos del paciente...');
+
+  try {
+    // Preparar datos del formulario
+    const formData = this.personaForm.value as DatosPersona;
+
+    console.log('🔄 Datos del wizard:', formData);
+
+    // Usar el mapper del wizard para convertir al formato backend
+    const backendData = WizardPersonaMapper.toBackendFormat(formData);
+
+    console.log('🚀 Datos convertidos para backend:', backendData);
+
+    // Crear DTO frontend compatible
+    const frontendDto: CreatePersonaFrontendDto = {
+      ...formData,
+      // Asegurar campos opcionales
+      apellido_materno: formData.apellido_materno || undefined,
+      estado_civil: formData.estado_civil || undefined,
+      telefono: formData.telefono || undefined,
+      email: formData.email || undefined,
+      direccion: formData.direccion || undefined,
+      ciudad: formData.ciudad || undefined,
+      estado: formData.estado || undefined,
+      codigo_postal: formData.codigo_postal || undefined,
+      religion: formData.religion || undefined,
+      activo: true
+    };
+
+    // Llamada al PersonasService
+    this.personasService.createPersona(frontendDto).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          // Actualizar wizard state
+          this.wizardStateService.updatePersonaData(formData);
+          this.wizardStateService.updateIds({
+            id_persona: response.data.id_persona!
+          });
+          this.wizardStateService.markStepAsCompleted(WizardStep.PERSONA);
+
+          // UI updates
+          this.isLoading.set(false);
+          this.autoGuardadoStatus.set('✅ Persona registrada exitosamente');
+
+          // Navigate to next step
+          setTimeout(() => {
+            this.wizardStateService.goToNextStep();
+          }, 1000);
+        } else {
+          throw new Error(response.message || 'Error al crear persona');
+        }
+      },
+
+      error: (error) => {
+        console.error('❌ Error:', error);
+        this.isLoading.set(false);
+        this.autoGuardadoStatus.set('❌ Error al guardar datos');
+
+        setTimeout(() => {
+          this.autoGuardadoStatus.set('');
+        }, 8000);
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error al preparar datos:', error);
+    this.isLoading.set(false);
+    this.autoGuardadoStatus.set('❌ Error al procesar datos');
+
+    setTimeout(() => {
+      this.autoGuardadoStatus.set('');
+    }, 5000);
+  }
+}
+
+// ==========================================
+// MÉTODO guardarBorrador() TAMBIÉN CON BACKEND
+// ==========================================
+
+guardarBorrador(): void {
+  if (!this.isLoading() && this.personaForm.dirty) {
+    console.log('💾 Guardando borrador...');
+
+    // Para borrador, solo actualizar el wizard state sin enviar al backend
+    const formData = this.personaForm.value as Partial<DatosPersona>;
+
+    this.autoGuardadoStatus.set('Guardando borrador...');
+
+    try {
       this.wizardStateService.updatePersonaData(formData);
 
-      // Mostrar feedback visual
-      console.log('Borrador guardado automáticamente');
+      setTimeout(() => {
+        this.autoGuardadoStatus.set('💾 Borrador guardado localmente');
+
+        setTimeout(() => {
+          this.autoGuardadoStatus.set('');
+        }, 3000);
+      }, 500);
+
+    } catch (error) {
+      console.error('Error al guardar borrador:', error);
+      this.autoGuardadoStatus.set('❌ Error al guardar borrador');
+
+      setTimeout(() => {
+        this.autoGuardadoStatus.set('');
+      }, 3000);
     }
   }
+}
+
+
+
+
+
 
   goBack(): void {
+    console.log('Navegando hacia atrás');
+
+    // Guardar borrador antes de salir si hay cambios
+    if (this.personaForm.dirty) {
+      console.log('Guardando borrador antes de salir');
+      this.guardarBorrador();
+    }
+
+    // Navegar al paso anterior
     this.router.navigate(['/app/nuevo-paciente']);
   }
 
@@ -526,5 +618,84 @@ export class PasoPersona implements OnInit, OnDestroy {
     Object.keys(this.personaForm.controls).forEach(key => {
       this.personaForm.get(key)?.markAsTouched();
     });
+  }
+
+  private scrollToFirstError(): void {
+    const firstErrorField = document.querySelector('.form-field.error');
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      (firstErrorField as HTMLElement).focus();
+    }
+  }
+
+  // ==========================================
+  // MÉTODOS PARA DEBUGGING Y TESTING
+  // ==========================================
+
+  /** Método para testing - mostrar/ocultar debug info */
+  toggleDebugInfo(): void {
+    this.showDebugInfo = !this.showDebugInfo;
+    console.log('Debug mode:', this.showDebugInfo ? 'ON' : 'OFF');
+  }
+
+  /** Método para testing - llenar formulario con datos de prueba */
+  fillTestData(): void {
+    if (this.showDebugInfo) {
+      console.log('Llenando datos de prueba...');
+      this.personaForm.patchValue({
+        nombre: 'Juan Carlos',
+        apellido_paterno: 'García',
+        apellido_materno: 'López',
+        fecha_nacimiento: '1990-03-15',
+        genero: Genero.MASCULINO,
+        estado_civil: EstadoCivil.SOLTERO,
+        telefono: '4421234567',
+        email: 'juan.garcia@email.com',
+        direccion: 'Calle 5 de Mayo #123, Col. Centro',
+        ciudad: 'San Luis de la Paz',
+        estado: 'Guanajuato',
+        codigo_postal: '37900',
+        curp: 'GALJ900315HGTLPN01',
+        religion: 'Católica'
+      });
+    }
+  }
+
+  /** Método para testing - limpiar formulario */
+  clearForm(): void {
+    if (this.showDebugInfo) {
+      console.log('Limpiando formulario...');
+      this.personaForm.reset();
+      this.edadCalculada.set(0);
+      this.autoGuardadoStatus.set('');
+    }
+  }
+
+  /** Método para testing - validar CURP específica */
+  testCurpValidation(curp: string): boolean {
+    const curpRegex = /^[A-Z]{1}[AEIOU]{1}[A-Z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[HM]{1}(AS|BC|BS|CC|CS|CH|CL|CM|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]{1}[0-9]{1}$/;
+    return curpRegex.test(curp);
+  }
+
+  // ==========================================
+  // GETTERS PARA EL TEMPLATE
+  // ==========================================
+
+  /** Obtener el estado actual del wizard para debugging */
+  get currentWizardState() {
+    return this.showDebugInfo ? this.wizardStateService.getCurrentState() : null;
+  }
+
+  /** Verificar si el formulario está listo para enviar */
+  get canSubmit(): boolean {
+    return this.personaForm.valid && !this.isLoading();
+  }
+
+  /** Verificar si se puede guardar borrador */
+  get canSaveDraft(): boolean {
+    return this.personaForm.dirty && !this.isLoading();
   }
 }

@@ -1,0 +1,448 @@
+/* src/app/nuevo-paciente/paso-persona/paso-persona.component.css */
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS PARA PASO PERSONA
+   ========================================== */
+
+/* Contenedor principal */
+.paso-persona-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* Header del paso */
+.paso-header {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+
+.paso-number {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Barra de progreso mejorada */
+.progress-bar {
+  width: 100%;
+  height: 0.75rem;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.06);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  border-radius: 9999px;
+  transition: width 0.5s ease-in-out;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Tarjetas del formulario */
+.form-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.1),
+    0 1px 2px 0 rgb(0 0 0 / 0.06);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.form-card:hover {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -1px rgb(0 0 0 / 0.06);
+}
+
+.form-card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.5rem;
+}
+
+.form-card-content {
+  padding: 1.5rem;
+}
+
+/* Campos del formulario */
+.form-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease-in-out;
+  background-color: white;
+}
+
+.form-field:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow:
+    0 0 0 3px rgb(59 130 246 / 0.1),
+    0 1px 2px 0 rgb(0 0 0 / 0.05);
+  background-color: #fefefe;
+}
+
+.form-field:hover:not(:focus) {
+  border-color: #9ca3af;
+}
+
+/* Estados de validación */
+.form-field.error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.form-field.error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+}
+
+.form-field.success {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+.form-field.success:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.1);
+}
+
+/* Mensajes de error */
+.field-error {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.field-error::before {
+  content: '⚠';
+  margin-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Labels */
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #dc2626;
+}
+
+/* Campos especiales */
+.curp-field {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.phone-field {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Indicadores de estado */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.status-indicator.valid {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.status-indicator.invalid {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-indicator.neutral {
+  background-color: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* Botones mejorados */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #f8fafc;
+  color: #475569;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Área de navegación */
+.navigation-area {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border-top: 3px solid #3b82f6;
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Debug panel */
+.debug-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 2rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.debug-panel pre {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .form-card-content {
+    padding: 1rem;
+  }
+
+  .paso-header {
+    padding: 1rem;
+  }
+
+  .navigation-area {
+    padding: 1rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Animaciones de entrada */
+.form-card {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efectos de hover para iconos */
+.icon-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+.icon-hover:hover {
+  transform: scale(1.1);
+}
+
+/* Mejoras para accesibilidad */
+.form-field:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Estados de conexión */
+.connection-status {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 1000;
+  transition: all 0.3s ease-in-out;
+}
+
+.connection-status.online {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.connection-status.offline {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Indicador de campos requeridos */
+.required-indicator {
+  color: #dc2626;
+  font-weight: bold;
+  margin-left: 0.125rem;
+}
+
+/* Tooltip personalizado */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #1f2937;
+  color: white;
+  text-align: center;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Estilo para campos de solo lectura */
+.form-field:read-only {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Estilo para el conteo de campos completados */
+.completion-counter {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0284c7;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: #0c4a6e;
+}

@@ -204,6 +204,10 @@ export class WizardStateService {
     this.updateState(newState);
   }
 
+  // ==========================================
+  // 🔥 FIX: MÉTODOS PARA IDs GENERADOS
+  // ==========================================
+
   /** Establecer IDs generados durante el proceso */
   setGeneratedIds(ids: {
     id_persona?: number;
@@ -213,10 +217,23 @@ export class WizardStateService {
   }): void {
     const newState = {
       ...this.getCurrentState(),
-      ...ids,
+      id_persona_creada: ids.id_persona || this.getCurrentState().id_persona_creada,
+      id_paciente_creado: ids.id_paciente || this.getCurrentState().id_paciente_creado,
+      id_expediente_creado: ids.id_expediente || this.getCurrentState().id_expediente_creado,
+      id_documento_creado: ids.id_documento || this.getCurrentState().id_documento_creado,
       ultimaActualizacion: new Date().toISOString()
     };
     this.updateState(newState);
+  }
+
+  /** 🔥 ALIAS para compatibilidad - ahora usa setGeneratedIds */
+  updateIds(ids: {
+    id_persona?: number;
+    id_paciente?: number;
+    id_expediente?: number;
+    id_documento?: number;
+  }): void {
+    this.setGeneratedIds(ids);
   }
 
   // ==========================================
@@ -325,13 +342,17 @@ export class WizardStateService {
     return Math.round((completedSteps.length / WIZARD_STEPS_ORDER.length) * 100);
   }
 
+  // ==========================================
+  // 🔥 FIX: VALIDACIONES CORREGIDAS
+  // ==========================================
+
   private validatePersonaStep(data: Partial<DatosPersona>): StepValidationResult {
     const errors: string[] = [];
 
     if (!data.nombre?.trim()) errors.push('El nombre es obligatorio');
     if (!data.apellido_paterno?.trim()) errors.push('El apellido paterno es obligatorio');
     if (!data.fecha_nacimiento) errors.push('La fecha de nacimiento es obligatoria');
-    if (!data.sexo) errors.push('El sexo es obligatorio');
+    if (!data.genero) errors.push('El género es obligatorio'); // 🔥 FIX: data.genero en lugar de data.sexo
     if (!data.curp?.trim()) errors.push('La CURP es obligatoria');
     else if (!this.validateCURP(data.curp)) errors.push('La CURP no tiene el formato correcto');
 
