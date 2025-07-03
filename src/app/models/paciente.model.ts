@@ -1,5 +1,5 @@
 // src/app/models/paciente.model.ts
-import { BaseEntity, AuditInfo, BaseFilters, Genero } from './base.models';
+import { BaseEntity, AuditInfo, BaseFilters, Genero, TipoSangreEnum } from './base.models';
 import { ExpedienteResumen } from './expediente.model';
 
 // ==========================================
@@ -87,17 +87,32 @@ export interface PacienteFilters extends BaseFilters {
 // ==========================================
 // DTOS PARA PACIENTE
 // ==========================================
+// export interface CreatePacienteDto {
+//   id_persona: number;
+//   alergias?: string;
+//   transfusiones?: boolean;
+//   detalles_transfusiones?: string;
+//   familiar_responsable?: string;
+//   parentesco_familiar?: string;
+//   telefono_familiar?: string;
+//   ocupacion?: string;
+//   escolaridad?: string;
+//   lugar_nacimiento?: string;
+// }
+
 export interface CreatePacienteDto {
   id_persona: number;
+  tipo_sangre: TipoSangreEnum;
   alergias?: string;
-  transfusiones?: boolean;
+  transfusiones: boolean;
   detalles_transfusiones?: string;
-  familiar_responsable?: string;
-  parentesco_familiar?: string;
-  telefono_familiar?: string;
+  familiar_responsable: string;
+  parentesco_familiar: string;
+  telefono_familiar: string;
   ocupacion?: string;
   escolaridad?: string;
   lugar_nacimiento?: string;
+  activo: boolean;
 }
 
 export interface UpdatePacienteDto {

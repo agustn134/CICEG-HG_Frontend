@@ -42,7 +42,8 @@ export enum TipoSangreEnum {
   AB_POSITIVO = 'AB+',
   AB_NEGATIVO = 'AB-',
   O_POSITIVO = 'O+',
-  O_NEGATIVO = 'O-'
+  O_NEGATIVO = 'O-',
+  DESCONOCIDO = 'Desconocido'
 }
 
 export enum NivelAcceso {
