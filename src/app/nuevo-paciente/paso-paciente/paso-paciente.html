@@ -1,331 +1,352 @@
-<!-- C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-paciente\paso-paciente.html -->
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- src/app/nuevo-paciente/paso-paciente/paso-paciente.html -->
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-  <!-- Header -->
-  <div class="mb-8">
-    <div class="flex items-center mb-4">
-      <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mr-4">
-        <span class="text-sm font-bold text-blue-600">2</span>
-      </div>
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Información Médica</h1>
-        <p class="text-sm text-gray-600">Datos de salud y contacto familiar</p>
-      </div>
-    </div>
-
-    <!-- Barra de progreso -->
-    <div class="w-full bg-gray-200 rounded-full h-2">
-      <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progreso"></div>
-    </div>
-    <div class="flex justify-between text-xs text-gray-500 mt-1">
-      <span>Paso 2 de 6</span>
-      <span>{{ progreso }}% completado</span>
-    </div>
-  </div>
-
-  <!-- Resumen del paciente -->
-  <div *ngIf="resumenPersona" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-    <div class="flex items-start">
-      <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-      </svg>
-      <div>
-        <p class="text-sm text-blue-800">
-          <strong>{{ resumenPersona.nombre }} {{ resumenPersona.apellido_paterno }} {{ resumenPersona.apellido_materno }}</strong>
-          - CURP: {{ resumenPersona.curp }}
-          - Edad: {{ calcularEdad(resumenPersona.fecha_nacimiento) }} años
-          - Sexo: {{ resumenPersona.genero }}
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Formulario -->
-  <form [formGroup]="pacienteForm" (ngSubmit)="onSubmit()" class="space-y-6">
-
-    <!-- Información Médica Básica -->
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-medium text-gray-900">Información Médica</h2>
-        <p class="mt-1 text-sm text-gray-600">Datos de salud y tipo de sangre</p>
-      </div>
-
-      <div class="px-6 py-6 space-y-6">
-
-        <!-- Tipo de sangre -->
-        <div>
-          <label for="tipo_sangre" class="block text-sm font-medium text-gray-700">
-            Tipo de Sangre *
-          </label>
-          <select
-            id="tipo_sangre"
-            formControlName="tipo_sangre"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-300]="isFieldInvalid('tipo_sangre')"
-          >
-            <option value="">Seleccione tipo de sangre...</option>
-            <option *ngFor="let tipo of tiposSangre" [value]="tipo.value">
-              {{ tipo.label }}
-            </option>
-          </select>
-          <div *ngIf="isFieldInvalid('tipo_sangre')" class="mt-1 text-sm text-red-600">
-            El tipo de sangre es obligatorio
-          </div>
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center mb-4">
+        <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mr-4">
+          <span class="text-sm font-bold text-blue-600">2</span>
         </div>
-
-        <!-- Alergias -->
         <div>
-          <label for="alergias" class="block text-sm font-medium text-gray-700">
-            Alergias
-          </label>
-          <textarea
-            id="alergias"
-            formControlName="alergias"
-            rows="3"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Especifique las alergias conocidas (medicamentos, alimentos, etc.) o escriba 'Ninguna'"
-          ></textarea>
-          <p class="mt-1 text-xs text-gray-500">
-            Indique cualquier alergia conocida a medicamentos, alimentos o sustancias
+          <h1 class="text-2xl font-bold text-gray-900">Información Médica</h1>
+          <p class="text-sm text-gray-600">Datos de salud y contacto familiar</p>
+        </div>
+      </div>
+
+      <!-- Barra de progreso -->
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progreso"></div>
+      </div>
+      <div class="flex justify-between text-xs text-gray-500 mt-1">
+        <span>Paso 2 de 6</span>
+        <span>{{ progreso }}% completado</span>
+      </div>
+
+      <!-- Status de guardado -->
+      <div *ngIf="autoGuardadoStatus" class="mt-3 p-3 rounded-md"
+           [ngClass]="{
+             'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('✅'),
+             'bg-blue-50 border border-blue-200 text-blue-800': autoGuardadoStatus.includes('Guardando'),
+             'bg-red-50 border border-red-200 text-red-800': autoGuardadoStatus.includes('❌')
+           }">
+        <div class="flex items-center">
+          <svg *ngIf="autoGuardadoStatus.includes('Guardando')" class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-sm font-medium">{{ autoGuardadoStatus }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen del paciente -->
+    <div *ngIf="resumenPersona" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-blue-900 mb-1">Datos del Paciente</h3>
+          <p class="text-sm text-blue-800">
+            <strong>{{ resumenPersona.nombre }} {{ resumenPersona.apellido_paterno }} {{ resumenPersona.apellido_materno }}</strong>
+            - CURP: {{ resumenPersona.curp }}
+            - Edad: {{ calcularEdad(resumenPersona.fecha_nacimiento) }} años
+            - Sexo: {{ resumenPersona.genero }}
           </p>
         </div>
-
-        <!-- Transfusiones -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-3">
-            ¿Ha recibido transfusiones sanguíneas? *
-          </label>
-          <div class="flex space-x-4">
-            <label class="inline-flex items-center">
-              <input
-                type="radio"
-                formControlName="transfusiones"
-                value="Si"
-                class="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-              />
-              <span class="ml-2 text-sm text-gray-700">Sí</span>
-            </label>
-            <label class="inline-flex items-center">
-              <input
-                type="radio"
-                formControlName="transfusiones"
-                value="No"
-                class="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-              />
-              <span class="ml-2 text-sm text-gray-700">No</span>
-            </label>
-          </div>
-          <div *ngIf="isFieldInvalid('transfusiones')" class="mt-1 text-sm text-red-600">
-            Debe especificar si ha recibido transfusiones
-          </div>
-        </div>
-
-        <!-- Detalles de transfusiones (solo si seleccionó "Sí") -->
-        <div *ngIf="pacienteForm.get('transfusiones')?.value === 'Si'">
-          <label for="detalles_transfusiones" class="block text-sm font-medium text-gray-700">
-            Detalles de las Transfusiones *
-          </label>
-          <textarea
-            id="detalles_transfusiones"
-            formControlName="detalles_transfusiones"
-            rows="2"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-300]="isFieldInvalid('detalles_transfusiones')"
-            placeholder="Describa cuándo, dónde y motivo de las transfusiones"
-          ></textarea>
-          <div *ngIf="isFieldInvalid('detalles_transfusiones')" class="mt-1 text-sm text-red-600">
-            Debe especificar los detalles de las transfusiones
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- Contacto de Emergencia -->
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-medium text-gray-900">Contacto de Emergencia</h2>
-        <p class="mt-1 text-sm text-gray-600">Familiar o persona responsable</p>
-      </div>
+    <!-- Formulario -->
+    <form [formGroup]="pacienteForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-      <div class="px-6 py-6 space-y-6">
-
-        <!-- Familiar responsable -->
-        <div>
-          <label for="familiar_responsable" class="block text-sm font-medium text-gray-700">
-            Nombre del Familiar Responsable *
-          </label>
-          <input
-            type="text"
-            id="familiar_responsable"
-            formControlName="familiar_responsable"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-300]="isFieldInvalid('familiar_responsable')"
-            placeholder="Ej: María García López"
-          />
-          <div *ngIf="isFieldInvalid('familiar_responsable')" class="mt-1 text-sm text-red-600">
-            El nombre del familiar responsable es obligatorio
-          </div>
+      <!-- Información Médica Básica -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Información Médica</h2>
+          <p class="mt-1 text-sm text-gray-600">Datos de salud y tipo de sangre</p>
         </div>
 
-        <!-- Parentesco y teléfono -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div class="px-6 py-6 space-y-6">
 
-          <!-- Parentesco -->
+          <!-- Tipo de sangre -->
           <div>
-            <label for="parentesco_familiar" class="block text-sm font-medium text-gray-700">
-              Parentesco *
+            <label for="tipo_sangre" class="block text-sm font-medium text-gray-700">
+              Tipo de Sangre *
             </label>
             <select
-              id="parentesco_familiar"
-              formControlName="parentesco_familiar"
+              id="tipo_sangre"
+              formControlName="tipo_sangre"
               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              [class.border-red-300]="isFieldInvalid('parentesco_familiar')"
+              [class.border-red-300]="isFieldInvalid('tipo_sangre')"
             >
-              <option value="">Seleccione...</option>
-              <option *ngFor="let parentesco of parentescos" [value]="parentesco.value">
-                {{ parentesco.label }}
+              <option value="">Seleccione tipo de sangre...</option>
+              <option *ngFor="let tipo of tiposSangre" [value]="tipo.value">
+                {{ tipo.label }}
               </option>
             </select>
-            <div *ngIf="isFieldInvalid('parentesco_familiar')" class="mt-1 text-sm text-red-600">
-              El parentesco es obligatorio
+            <div *ngIf="isFieldInvalid('tipo_sangre')" class="mt-1 text-sm text-red-600">
+              El tipo de sangre es obligatorio
             </div>
           </div>
 
-          <!-- Teléfono familiar -->
+          <!-- Alergias -->
           <div>
-            <label for="telefono_familiar" class="block text-sm font-medium text-gray-700">
-              Teléfono del Familiar *
+            <label for="alergias" class="block text-sm font-medium text-gray-700">
+              Alergias
             </label>
-            <input
-              type="tel"
-              id="telefono_familiar"
-              formControlName="telefono_familiar"
+            <textarea
+              id="alergias"
+              formControlName="alergias"
+              rows="3"
               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              [class.border-red-300]="isFieldInvalid('telefono_familiar')"
-              placeholder="Ej: 4421234567"
-              maxlength="10"
-            />
-            <div *ngIf="isFieldInvalid('telefono_familiar')" class="mt-1 text-sm text-red-600">
-              <span *ngIf="pacienteForm.get('telefono_familiar')?.errors?.['required']">El teléfono del familiar es obligatorio</span>
-              <span *ngIf="pacienteForm.get('telefono_familiar')?.errors?.['pattern']">El teléfono debe tener 10 dígitos</span>
+              placeholder="Especifique las alergias conocidas (medicamentos, alimentos, etc.) o escriba 'Ninguna'"
+            ></textarea>
+            <p class="mt-1 text-xs text-gray-500">
+              Indique cualquier alergia conocida a medicamentos, alimentos o sustancias
+            </p>
+          </div>
+
+          <!-- Transfusiones -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              ¿Ha recibido transfusiones sanguíneas? *
+            </label>
+            <div class="flex space-x-4">
+              <label class="inline-flex items-center">
+                <input
+                  type="radio"
+                  formControlName="transfusiones"
+                  value="Si"
+                  class="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                />
+                <span class="ml-2 text-sm text-gray-700">Sí</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input
+                  type="radio"
+                  formControlName="transfusiones"
+                  value="No"
+                  class="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                />
+                <span class="ml-2 text-sm text-gray-700">No</span>
+              </label>
+            </div>
+            <div *ngIf="isFieldInvalid('transfusiones')" class="mt-1 text-sm text-red-600">
+              Debe especificar si ha recibido transfusiones
+            </div>
+          </div>
+
+          <!-- Detalles de transfusiones (solo si seleccionó "Sí") -->
+          <div *ngIf="pacienteForm.get('transfusiones')?.value === 'Si'">
+            <label for="detalles_transfusiones" class="block text-sm font-medium text-gray-700">
+              Detalles de las Transfusiones *
+            </label>
+            <textarea
+              id="detalles_transfusiones"
+              formControlName="detalles_transfusiones"
+              rows="2"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-300]="isFieldInvalid('detalles_transfusiones')"
+              placeholder="Describa cuándo, dónde y motivo de las transfusiones"
+            ></textarea>
+            <div *ngIf="isFieldInvalid('detalles_transfusiones')" class="mt-1 text-sm text-red-600">
+              Debe especificar los detalles de las transfusiones
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Información Adicional -->
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-medium text-gray-900">Información Adicional</h2>
-        <p class="mt-1 text-sm text-gray-600">Datos sociodemográficos (opcional)</p>
-      </div>
+      <!-- Contacto de Emergencia -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Contacto de Emergencia</h2>
+          <p class="mt-1 text-sm text-gray-600">Familiar o persona responsable</p>
+        </div>
 
-      <div class="px-6 py-6 space-y-6">
+        <div class="px-6 py-6 space-y-6">
 
-        <!-- Ocupación y Escolaridad -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-          <!-- Ocupación -->
+          <!-- Familiar responsable -->
           <div>
-            <label for="ocupacion" class="block text-sm font-medium text-gray-700">
-              Ocupación
+            <label for="familiar_responsable" class="block text-sm font-medium text-gray-700">
+              Nombre del Familiar Responsable *
             </label>
             <input
               type="text"
-              id="ocupacion"
-              formControlName="ocupacion"
+              id="familiar_responsable"
+              formControlName="familiar_responsable"
               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Ej: Comerciante, Estudiante, Ama de casa"
+              [class.border-red-300]="isFieldInvalid('familiar_responsable')"
+              placeholder="Ej: María García López"
+            />
+            <div *ngIf="isFieldInvalid('familiar_responsable')" class="mt-1 text-sm text-red-600">
+              El nombre del familiar responsable es obligatorio
+            </div>
+          </div>
+
+          <!-- Parentesco y teléfono -->
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+            <!-- Parentesco -->
+            <div>
+              <label for="parentesco_familiar" class="block text-sm font-medium text-gray-700">
+                Parentesco *
+              </label>
+              <select
+                id="parentesco_familiar"
+                formControlName="parentesco_familiar"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-300]="isFieldInvalid('parentesco_familiar')"
+              >
+                <option value="">Seleccione...</option>
+                <option *ngFor="let parentesco of parentescos" [value]="parentesco.value">
+                  {{ parentesco.label }}
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('parentesco_familiar')" class="mt-1 text-sm text-red-600">
+                El parentesco es obligatorio
+              </div>
+            </div>
+
+            <!-- Teléfono familiar -->
+            <div>
+              <label for="telefono_familiar" class="block text-sm font-medium text-gray-700">
+                Teléfono del Familiar *
+              </label>
+              <input
+                type="tel"
+                id="telefono_familiar"
+                formControlName="telefono_familiar"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-300]="isFieldInvalid('telefono_familiar')"
+                placeholder="Ej: 4421234567"
+                maxlength="10"
+              />
+              <div *ngIf="isFieldInvalid('telefono_familiar')" class="mt-1 text-sm text-red-600">
+                <span *ngIf="pacienteForm.get('telefono_familiar')?.errors?.['required']">El teléfono del familiar es obligatorio</span>
+                <span *ngIf="pacienteForm.get('telefono_familiar')?.errors?.['pattern']">El teléfono debe tener 10 dígitos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información Adicional -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Información Adicional</h2>
+          <p class="mt-1 text-sm text-gray-600">Datos sociodemográficos (opcional)</p>
+        </div>
+
+        <div class="px-6 py-6 space-y-6">
+
+          <!-- Ocupación y Escolaridad -->
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+            <!-- Ocupación -->
+            <div>
+              <label for="ocupacion" class="block text-sm font-medium text-gray-700">
+                Ocupación
+              </label>
+              <input
+                type="text"
+                id="ocupacion"
+                formControlName="ocupacion"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ej: Comerciante, Estudiante, Ama de casa"
+              />
+            </div>
+
+            <!-- Escolaridad -->
+            <div>
+              <label for="escolaridad" class="block text-sm font-medium text-gray-700">
+                Nivel de Escolaridad
+              </label>
+              <select
+                id="escolaridad"
+                formControlName="escolaridad"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Seleccione...</option>
+                <option *ngFor="let nivel of nivelesEscolaridad" [value]="nivel.value">
+                  {{ nivel.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Lugar de nacimiento -->
+          <div>
+            <label for="lugar_nacimiento" class="block text-sm font-medium text-gray-700">
+              Lugar de Nacimiento
+            </label>
+            <input
+              type="text"
+              id="lugar_nacimiento"
+              formControlName="lugar_nacimiento"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Ej: San Luis de la Paz, Guanajuato"
             />
           </div>
-
-          <!-- Escolaridad -->
-          <div>
-            <label for="escolaridad" class="block text-sm font-medium text-gray-700">
-              Nivel de Escolaridad
-            </label>
-            <select
-              id="escolaridad"
-              formControlName="escolaridad"
-              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Seleccione...</option>
-              <option *ngFor="let nivel of nivelesEscolaridad" [value]="nivel.value">
-                {{ nivel.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Lugar de nacimiento -->
-        <div>
-          <label for="lugar_nacimiento" class="block text-sm font-medium text-gray-700">
-            Lugar de Nacimiento
-          </label>
-          <input
-            type="text"
-            id="lugar_nacimiento"
-            formControlName="lugar_nacimiento"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Ej: San Luis de la Paz, Guanajuato"
-          />
         </div>
       </div>
-    </div>
 
-    <!-- Botones de navegación -->
-    <div class="flex justify-between">
-      <button
-        type="button"
-        (click)="goBack()"
-        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        Anterior
-      </button>
-
-      <div class="flex space-x-3">
+      <!-- Botones de navegación -->
+      <div class="flex justify-between">
         <button
           type="button"
-          (click)="guardarBorrador()"
-          [disabled]="isLoading"
-          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          (click)="goBack()"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
           </svg>
-          Guardar Borrador
+          Anterior
         </button>
 
-        <button
-          type="submit"
-          [disabled]="!pacienteForm.valid || isLoading"
-          class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
-          {{ isLoading ? 'Guardando...' : 'Siguiente' }}
-          <svg *ngIf="!isLoading" class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-          </svg>
-        </button>
+        <div class="flex space-x-3">
+          <button
+            type="button"
+            (click)="guardarBorrador()"
+            [disabled]="isLoading || !canSaveDraft"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            Guardar Borrador
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="!canSubmit"
+            class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+            {{ isLoading ? 'Guardando...' : 'Siguiente' }}
+            <svg *ngIf="!isLoading" class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Debug info (solo desarrollo) -->
+    <div *ngIf="showDebugInfo" class="mt-8 bg-gray-100 rounded-lg p-4">
+      <h3 class="text-sm font-medium text-gray-900 mb-2">Debug Info</h3>
+      <div class="text-xs text-gray-600 space-y-2">
+        <div><strong>Form Valid:</strong> {{ pacienteForm.valid }}</div>
+        <div><strong>Can Submit:</strong> {{ canSubmit }}</div>
+        <div><strong>Is Loading:</strong> {{ isLoading }}</div>
+        <div><strong>Form Value:</strong></div>
+        <pre>{{ pacienteForm.value | json }}</pre>
+        <div><strong>Wizard State:</strong></div>
+        <pre>{{ currentWizardState | json }}</pre>
       </div>
     </div>
 
-  </form>
-
-  <!-- Debug info (solo desarrollo) -->
-  <div *ngIf="showDebugInfo" class="mt-8 bg-gray-100 rounded-lg p-4">
-    <h3 class="text-sm font-medium text-gray-900 mb-2">Debug Info</h3>
-    <div class="text-xs text-gray-600 space-y-2">
-      <div><strong>Form Valid:</strong> {{ pacienteForm.valid }}</div>
-      <div><strong>Form Value:</strong></div>
-      <pre>{{ pacienteForm.value | json }}</pre>
-      <div><strong>Wizard State:</strong></div>
-      <pre>{{ resumenPersona | json }}</pre>
-    </div>
   </div>
-
 </div>
