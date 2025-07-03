@@ -67,15 +67,23 @@ export interface DatosPaciente {
   lugar_nacimiento?: string;
 }
 
+// export interface DatosExpediente {
+//   id_paciente: number; // Se obtiene del paso anterior
+//   numero_expediente?: string; // Se genera automáticamente
+//   estado: string;
+//   notas_administrativas?: string;
+//   crear_historia_clinica: boolean;
+//   id_medico_creador?: number;
+// }
 export interface DatosExpediente {
-  id_paciente: number; // Se obtiene del paso anterior
-  numero_expediente?: string; // Se genera automáticamente
+  id_paciente?: number;
+  id_expediente?: number;
+  numero_expediente?: string;
   estado: string;
   notas_administrativas?: string;
   crear_historia_clinica: boolean;
-  id_medico_creador?: number;
+  fecha_apertura?: string;
 }
-
 export interface DatosDocumento {
   id_expediente: number; // Se obtiene del paso anterior
   tipo_documento: string;
