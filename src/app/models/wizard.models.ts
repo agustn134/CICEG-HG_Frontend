@@ -84,15 +84,27 @@ export interface DatosExpediente {
   crear_historia_clinica: boolean;
   fecha_apertura?: string;
 }
+// export interface DatosDocumento {
+//   id_expediente: number; // Se obtiene del paso anterior
+//   tipo_documento: string;
+//   subtipo_documento?: string;
+//   fecha_elaboracion: string;
+//   observaciones?: string;
+//   id_medico_creador?: number;
+// }
+
 export interface DatosDocumento {
-  id_expediente: number; // Se obtiene del paso anterior
-  tipo_documento: string;
+  id_expediente?: number; // Se obtiene del paso anterior
+  tipo_documento?: number; // CAMBIADO: opcional inicialmente, number (ID del tipo)
   subtipo_documento?: string;
-  fecha_elaboracion: string;
+  fecha_elaboracion?: string; // CAMBIADO: opcional inicialmente
   observaciones?: string;
   id_medico_creador?: number;
-}
 
+  // Campos adicionales para el wizard
+  crear_inmediatamente?: boolean;
+  plantilla_utilizada?: string;
+}
 // ==========================================
 // ESTADO COMPLETO DEL WIZARD
 // ==========================================

@@ -369,4 +369,40 @@ export class CatalogoService {
       map(items => items.some(item => item.value === value))
     );
   }
+
+
+  // Agregar este método al CatalogoService existente
+// src/app/services/catalogo.service.ts
+
+/**
+ * Obtener tipos de documento del backend
+ * GET /api/catalogos/tipos-documento
+ */
+getTiposDocumento(): Observable<CatalogoItem[]> {
+  return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/tipos-documento`)
+    .pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data.map(item => ({
+            value: item.id_tipo_documento || item.id,
+            label: item.nombre,
+            descripcion: item.descripcion,
+            activo: item.activo !== false
+          } as CatalogoItem));
+        }
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error al cargar tipos de documento:', error);
+        // Fallback con tipos básicos
+        return of([
+          { value: 1, label: 'Historia Clínica', descripcion: 'Documento principal del paciente', activo: true },
+          { value: 2, label: 'Nota de Urgencias', descripcion: 'Atención de urgencias', activo: true },
+          { value: 3, label: 'Nota de Evolución', descripcion: 'Seguimiento del paciente', activo: true },
+          { value: 9, label: 'Nota de Egreso', descripcion: 'Resumen al alta', activo: true }
+        ]);
+      })
+    );
+}
+
 }
