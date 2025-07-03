@@ -1,1 +1,570 @@
-<p>paso-llenar-documento works!</p>
+<!-- C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-llenar-documento\paso-llenar-documento.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center mb-4">
+      <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mr-4">
+        <span class="text-sm font-bold text-blue-600">5</span>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Completar {{ tituloDocumento }}</h1>
+        <p class="text-sm text-gray-600">Llena el contenido del documento clínico</p>
+      </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progreso"></div>
+    </div>
+    <div class="flex justify-between text-xs text-gray-500 mt-1">
+      <span>Paso 5 de 6</span>
+      <span>{{ progreso }}% completado</span>
+    </div>
+
+    <!-- Status de guardado -->
+    <div *ngIf="autoGuardadoStatus" class="mt-3 p-3 rounded-md"
+         [ngClass]="{
+           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('✅'),
+           'bg-blue-50 border border-blue-200 text-blue-800': autoGuardadoStatus.includes('Guardando') || autoGuardadoStatus.includes('💾'),
+           'bg-red-50 border border-red-200 text-red-800': autoGuardadoStatus.includes('❌')
+         }">
+      <div class="flex items-center">
+        <svg *ngIf="autoGuardadoStatus.includes('Guardando')" class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-medium">{{ autoGuardadoStatus }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información del documento -->
+  <div *ngIf="tipoDocumento" class="bg-white shadow rounded-lg p-6 mb-6">
+    <div class="flex items-center">
+      <div class="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
+           [ngClass]="getColorClase(tipoDocumento.color)">
+        <i [class]="tipoDocumento.icono + ' text-lg'"></i>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-lg font-medium text-gray-900">{{ tipoDocumento.nombre }}</h2>
+        <p class="text-sm text-gray-600">{{ tipoDocumento.descripcion }}</p>
+      </div>
+      <div *ngIf="documentoCreado" class="text-right">
+        <p class="text-xs text-gray-500">Documento ID</p>
+        <p class="text-sm font-medium text-gray-900">#{{ documentoCreado.id_documento }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen del paciente -->
+  <div *ngIf="resumenPersona && resumenPaciente" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div class="flex items-start">
+      <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+      </svg>
+      <div class="flex-1">
+        <h3 class="text-sm font-medium text-blue-900 mb-2">Datos del Paciente</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <p class="text-blue-800">
+              <strong>{{ resumenPersona.nombre }} {{ resumenPersona.apellido_paterno }} {{ resumenPersona.apellido_materno }}</strong>
+            </p>
+            <p class="text-blue-700">{{ calcularEdad(resumenPersona.fecha_nacimiento) }} años • {{ resumenPersona.genero }}</p>
+          </div>
+          <div>
+            <p class="text-blue-700">CURP: {{ resumenPersona.curp }}</p>
+            <p class="text-blue-700">Tipo de sangre: {{ resumenPaciente.tipo_sangre }}</p>
+          </div>
+          <div>
+            <p class="text-blue-700">Exp: {{ resumenExpediente?.numero_expediente }}</p>
+            <p class="text-blue-700">Alergias: {{ resumenPaciente.alergias || 'Ninguna' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario del documento -->
+  <form [formGroup]="documentoForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+    <!-- Campos comunes -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Información General</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="fecha_elaboracion" class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha de Elaboración
+          </label>
+          <input
+            id="fecha_elaboracion"
+            type="date"
+            formControlName="fecha_elaboracion"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="observaciones_generales" class="block text-sm font-medium text-gray-700 mb-2">
+            Observaciones Generales
+          </label>
+          <textarea
+            id="observaciones_generales"
+            formControlName="observaciones_generales"
+            rows="3"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Notas adicionales sobre el documento..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORIA CLÍNICA -->
+    <div *ngIf="esHistoriaClinica" class="space-y-6">
+
+      <!-- Antecedentes -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Antecedentes</h3>
+
+        <div class="space-y-4">
+          <div>
+            <label for="antecedentes_heredofamiliares" class="block text-sm font-medium text-gray-700 mb-2">
+              Antecedentes Heredofamiliares
+            </label>
+            <textarea
+              id="antecedentes_heredofamiliares"
+              formControlName="antecedentes_heredofamiliares"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enfermedades familiares relevantes..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="antecedentes_personales_patologicos" class="block text-sm font-medium text-gray-700 mb-2">
+              Antecedentes Personales Patológicos
+            </label>
+            <textarea
+              id="antecedentes_personales_patologicos"
+              formControlName="antecedentes_personales_patologicos"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enfermedades previas, cirugías, hospitalizaciones..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="antecedentes_personales_no_patologicos" class="block text-sm font-medium text-gray-700 mb-2">
+              Antecedentes Personales No Patológicos
+            </label>
+            <textarea
+              id="antecedentes_personales_no_patologicos"
+              formControlName="antecedentes_personales_no_patologicos"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Hábitos, estilo de vida, ocupación..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Padecimiento Actual -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Padecimiento Actual</h3>
+
+        <div>
+          <label for="padecimiento_actual" class="block text-sm font-medium text-gray-700 mb-2">
+            Descripción del Padecimiento Actual <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="padecimiento_actual"
+            formControlName="padecimiento_actual"
+            rows="4"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Describe el motivo de consulta y evolución del padecimiento..."
+          ></textarea>
+          <div *ngIf="documentoForm.get('padecimiento_actual')?.invalid && documentoForm.get('padecimiento_actual')?.touched"
+               class="mt-1 text-sm text-red-600">
+            El padecimiento actual es obligatorio
+          </div>
+        </div>
+      </div>
+
+      <!-- Signos Vitales y Exploración -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Exploración Física</h3>
+
+        <!-- Signos Vitales -->
+        <div class="mb-6">
+          <h4 class="text-md font-medium text-gray-800 mb-3">Signos Vitales</h4>
+          <div formGroupName="signos_vitales" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">T/A (mmHg)</label>
+              <input
+                type="text"
+                formControlName="tension_arterial"
+                class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="120/80"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">FC (lpm)</label>
+              <input
+                type="number"
+                formControlName="frecuencia_cardiaca"
+                class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="70"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">FR (rpm)</label>
+              <input
+                type="number"
+                formControlName="frecuencia_respiratoria"
+                class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="18"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Temp (°C)</label>
+              <input
+                type="number"
+                step="0.1"
+                formControlName="temperatura"
+                class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="36.5"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">SatO2 (%)</label>
+              <input
+                type="number"
+                formControlName="saturacion_oxigeno"
+                class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="98"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Exploración Física -->
+        <div>
+          <label for="exploracion_fisica" class="block text-sm font-medium text-gray-700 mb-2">
+            Exploración Física <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="exploracion_fisica"
+            formControlName="exploracion_fisica"
+            rows="4"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Hallazgos de la exploración física por sistemas..."
+          ></textarea>
+          <div *ngIf="documentoForm.get('exploracion_fisica')?.invalid && documentoForm.get('exploracion_fisica')?.touched"
+               class="mt-1 text-sm text-red-600">
+            La exploración física es obligatoria
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagnósticos y Plan -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Diagnósticos y Plan</h3>
+
+        <div class="space-y-4">
+          <div>
+            <label for="diagnosticos" class="block text-sm font-medium text-gray-700 mb-2">
+              Diagnósticos <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="diagnosticos"
+              formControlName="diagnosticos"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Diagnósticos principales y diferenciales..."
+            ></textarea>
+            <div *ngIf="documentoForm.get('diagnosticos')?.invalid && documentoForm.get('diagnosticos')?.touched"
+                 class="mt-1 text-sm text-red-600">
+              Los diagnósticos son obligatorios
+            </div>
+          </div>
+
+          <div>
+            <label for="plan_tratamiento" class="block text-sm font-medium text-gray-700 mb-2">
+              Plan de Tratamiento <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="plan_tratamiento"
+              formControlName="plan_tratamiento"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Plan terapéutico, medicamentos, seguimiento..."
+            ></textarea>
+            <div *ngIf="documentoForm.get('plan_tratamiento')?.invalid && documentoForm.get('plan_tratamiento')?.touched"
+                 class="mt-1 text-sm text-red-600">
+              El plan de tratamiento es obligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTA DE URGENCIAS -->
+    <div *ngIf="esNotaUrgencias" class="space-y-6">
+
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Atención de Urgencias</h3>
+
+        <div class="space-y-4">
+          <div>
+            <label for="motivo_consulta" class="block text-sm font-medium text-gray-700 mb-2">
+              Motivo de Consulta <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="motivo_consulta"
+              formControlName="motivo_consulta"
+              rows="2"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Motivo principal de la consulta de urgencias..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="diagnostico_urgencias" class="block text-sm font-medium text-gray-700 mb-2">
+              Diagnóstico de Urgencias <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="diagnostico_urgencias"
+              formControlName="diagnostico_urgencias"
+              rows="2"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Diagnóstico principal de urgencias..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="tratamiento_urgencias" class="block text-sm font-medium text-gray-700 mb-2">
+              Tratamiento Aplicado <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="tratamiento_urgencias"
+              formControlName="tratamiento_urgencias"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Medicamentos, procedimientos, intervenciones..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="destino_paciente" class="block text-sm font-medium text-gray-700 mb-2">
+              Destino del Paciente <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="destino_paciente"
+              formControlName="destino_paciente"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Seleccionar destino...</option>
+              <option value="Alta">Alta médica</option>
+              <option value="Hospitalización">Hospitalización</option>
+              <option value="Referencia">Referencia a otra unidad</option>
+              <option value="Defunción">Defunción</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTA DE EVOLUCIÓN (SOAP) -->
+    <div *ngIf="esNotaEvolucion" class="space-y-6">
+
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Nota de Evolución (SOAP)</h3>
+
+        <div class="space-y-4">
+          <div>
+            <label for="subjetivo" class="block text-sm font-medium text-gray-700 mb-2">
+              Subjetivo (S) <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="subjetivo"
+              formControlName="subjetivo"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Síntomas referidos por el paciente..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="objetivo" class="block text-sm font-medium text-gray-700 mb-2">
+              Objetivo (O) <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="objetivo"
+              formControlName="objetivo"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Hallazgos objetivos de la exploración..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="analisis" class="block text-sm font-medium text-gray-700 mb-2">
+              Análisis (A) <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="analisis"
+              formControlName="analisis"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Análisis e impresión diagnóstica..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="plan" class="block text-sm font-medium text-gray-700 mb-2">
+              Plan (P) <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="plan"
+              formControlName="plan"
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Plan de manejo y seguimiento..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTO GENÉRICO -->
+    <div *ngIf="esDocumentoGenerico" class="space-y-6">
+
+      <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Contenido del Documento</h3>
+
+        <div>
+          <label for="contenido_documento" class="block text-sm font-medium text-gray-700 mb-2">
+            Contenido <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="contenido_documento"
+            formControlName="contenido_documento"
+            rows="8"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Escribe aquí el contenido del documento clínico..."
+          ></textarea>
+          <div *ngIf="documentoForm.get('contenido_documento')?.invalid && documentoForm.get('contenido_documento')?.touched"
+               class="mt-1 text-sm text-red-600">
+            El contenido del documento es obligatorio
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Estado completado -->
+  <div *ngIf="estadoProceso === 'completado'" class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+    <div class="flex items-start">
+      <svg class="w-6 h-6 text-green-600 mt-1 mr-4" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+      </svg>
+      <div class="flex-1">
+        <h3 class="text-lg font-medium text-green-900 mb-2">¡Documento Completado!</h3>
+        <p class="text-sm text-green-800">
+          El {{ tituloDocumento }} se ha guardado exitosamente en el expediente del paciente.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="estadoProceso === 'error'" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <svg class="w-5 h-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <div>
+        <h3 class="text-sm font-medium text-red-800 mb-1">Error al guardar documento</h3>
+        <p class="text-sm text-red-700">{{ autoGuardadoStatus }}</p>
+        <button
+          (click)="onSubmit()"
+          class="mt-3 text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded"
+        >
+          Reintentar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de navegación -->
+  <div class="flex justify-between">
+    <button
+      type="button"
+      (click)="goBack()"
+      [disabled]="estadoProceso === 'guardando'"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+    >
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Anterior
+    </button>
+
+    <div class="flex space-x-3">
+      <!-- Botón guardar borrador -->
+      <button
+        *ngIf="canSaveDraft"
+        type="button"
+        (click)="guardarBorrador()"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+        Guardar Borrador
+      </button>
+
+      <!-- Botón finalizar (solo en llenando) -->
+      <button
+        *ngIf="estadoProceso === 'llenando'"
+        type="submit"
+        [disabled]="!canSubmit"
+        class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Finalizar Documento
+      </button>
+
+      <!-- Botón continuar (solo cuando completado) -->
+      <button
+        *ngIf="estadoProceso === 'completado'"
+        type="button"
+        (click)="continuar()"
+        class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        Ir al Resumen
+        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Indicador de carga flotante -->
+  <div *ngIf="isLoading" class="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 shadow-xl">
+      <div class="flex items-center">
+        <svg class="animate-spin h-6 w-6 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-900">Guardando documento...</span>
+      </div>
+    </div>
+  </div>
+
+</div>

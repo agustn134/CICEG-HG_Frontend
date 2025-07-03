@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, forkJoin } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError, tap, shareReplay } from 'rxjs/operators';
 import { API_CONFIG, ApiResponse } from '../models/base.models';
 
 // ==========================================
@@ -20,6 +20,17 @@ export interface CatalogoResponse {
   success: boolean;
   data: CatalogoItem[];
   mensaje?: string;
+}
+
+export interface TipoDocumentoBackend {
+  id_tipo_documento: number;
+  nombre: string;
+  descripcion?: string;
+  categoria?: string;
+  activo: boolean;
+  requiere_internamiento?: boolean;
+  orden_hospitalario?: number;
+  es_inicial?: boolean;
 }
 
 // ==========================================
@@ -56,6 +67,89 @@ export class CatalogoService {
   constructor(private http: HttpClient) {
     this.initializeCache();
   }
+
+   /**
+   * 🔥 NUEVO: Obtener tipos de documento del backend
+   * GET /api/catalogos/tipos-documento
+   */
+  getTiposDocumento(): Observable<TipoDocumentoBackend[]> {
+    console.log('🔍 Cargando tipos de documento desde:', `${this.baseUrl}/tipos-documento`);
+
+    return this.http.get<any>(`${this.baseUrl}/tipos-documento`)
+      .pipe(
+        map(response => {
+          // Si el response tiene structure de ApiResponse
+          if (response.success && response.data) {
+            console.log('✅ Respuesta del backend (tipos documento):', response.data);
+            return response.data;
+          }
+          // Si el response es directo array
+          else if (Array.isArray(response)) {
+            console.log('✅ Respuesta directa del backend (tipos documento):', response);
+            return response;
+          }
+          // Si no hay datos
+          else {
+            console.warn('⚠️ Respuesta inesperada del backend:', response);
+            return [];
+          }
+        }),
+        catchError(error => {
+          console.error('❌ Error al cargar tipos de documento desde backend:', error);
+          // Fallback con tipos básicos
+          const fallbackTipos: TipoDocumentoBackend[] = [
+            {
+              id_tipo_documento: 1,
+              nombre: 'Historia Clínica',
+              descripcion: 'Documento principal con antecedentes completos del paciente',
+              categoria: 'Ingreso',
+              activo: true,
+              requiere_internamiento: false,
+              orden_hospitalario: 1,
+              es_inicial: true
+            },
+            {
+              id_tipo_documento: 2,
+              nombre: 'Nota de Urgencias',
+              descripcion: 'Atención médica de urgencia con triaje y tratamiento inmediato',
+              categoria: 'Urgencias',
+              activo: true,
+              requiere_internamiento: false,
+              orden_hospitalario: 10,
+              es_inicial: true
+            },
+            {
+              id_tipo_documento: 3,
+              nombre: 'Nota de Evolución',
+              descripcion: 'Seguimiento diario del paciente hospitalizado (SOAP)',
+              categoria: 'Evolución',
+              activo: true,
+              requiere_internamiento: true,
+              orden_hospitalario: 20,
+              es_inicial: false
+            },
+            {
+              id_tipo_documento: 4,
+              nombre: 'Nota de Egreso',
+              descripcion: 'Resumen de alta hospitalaria con indicaciones',
+              categoria: 'Egreso',
+              activo: true,
+              requiere_internamiento: true,
+              orden_hospitalario: 90,
+              es_inicial: false
+            }
+          ];
+
+          console.log('🔄 Usando tipos de fallback:', fallbackTipos);
+          return of(fallbackTipos);
+        }),
+        shareReplay(1) // Cache la respuesta
+      );
+  }
+
+
+
+
 
   // ==========================================
   // MÉTODOS PRINCIPALES
@@ -378,31 +472,31 @@ export class CatalogoService {
  * Obtener tipos de documento del backend
  * GET /api/catalogos/tipos-documento
  */
-getTiposDocumento(): Observable<CatalogoItem[]> {
-  return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/tipos-documento`)
-    .pipe(
-      map(response => {
-        if (response.success && response.data) {
-          return response.data.map(item => ({
-            value: item.id_tipo_documento || item.id,
-            label: item.nombre,
-            descripcion: item.descripcion,
-            activo: item.activo !== false
-          } as CatalogoItem));
-        }
-        return [];
-      }),
-      catchError(error => {
-        console.error('Error al cargar tipos de documento:', error);
-        // Fallback con tipos básicos
-        return of([
-          { value: 1, label: 'Historia Clínica', descripcion: 'Documento principal del paciente', activo: true },
-          { value: 2, label: 'Nota de Urgencias', descripcion: 'Atención de urgencias', activo: true },
-          { value: 3, label: 'Nota de Evolución', descripcion: 'Seguimiento del paciente', activo: true },
-          { value: 9, label: 'Nota de Egreso', descripcion: 'Resumen al alta', activo: true }
-        ]);
-      })
-    );
-}
+// getTiposDocumento(): Observable<CatalogoItem[]> {
+//   return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/tipos-documento`)
+//     .pipe(
+//       map(response => {
+//         if (response.success && response.data) {
+//           return response.data.map(item => ({
+//             value: item.id_tipo_documento || item.id,
+//             label: item.nombre,
+//             descripcion: item.descripcion,
+//             activo: item.activo !== false
+//           } as CatalogoItem));
+//         }
+//         return [];
+//       }),
+//       catchError(error => {
+//         console.error('Error al cargar tipos de documento:', error);
+//         // Fallback con tipos básicos
+//         return of([
+//           { value: 1, label: 'Historia Clínica', descripcion: 'Documento principal del paciente', activo: true },
+//           { value: 2, label: 'Nota de Urgencias', descripcion: 'Atención de urgencias', activo: true },
+//           { value: 3, label: 'Nota de Evolución', descripcion: 'Seguimiento del paciente', activo: true },
+//           { value: 9, label: 'Nota de Egreso', descripcion: 'Resumen al alta', activo: true }
+//         ]);
+//       })
+//     );
+// }
 
 }

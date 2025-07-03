@@ -9,7 +9,7 @@
       </div>
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Seleccionar Documento Clínico</h1>
-        <p class="text-sm text-gray-600">Elige el tipo de documento a crear para el paciente</p>
+        <p class="text-sm text-gray-600">Elige el tipo de documento según el flujo hospitalario</p>
       </div>
     </div>
 
@@ -81,148 +81,283 @@
     </div>
   </div>
 
-  <!-- Tipos populares (solo si está seleccionando) -->
-  <div *ngIf="estadoProceso === 'seleccionando'" class="mb-8">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">Documentos Más Utilizados</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
-        *ngFor="let tipo of tiposPopulares"
-        (click)="seleccionarTipo(tipo)"
-        class="relative border-2 rounded-lg p-4 cursor-pointer transition-all duration-200"
-        [ngClass]="[
-          getColorClase(tipo.color),
-          getColorClaseHover(tipo.color),
-          tipoSeleccionado?.id === tipo.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
-        ]"
-      >
-        <div class="flex items-start">
-          <div class="flex-shrink-0 mr-3">
-            <i [class]="tipo.icono + ' text-xl'"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-sm font-semibold mb-1">{{ tipo.nombre }}</h3>
-            <p class="text-xs opacity-80 line-clamp-2">{{ tipo.descripcion }}</p>
-            <div class="mt-2 flex items-center text-xs">
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white bg-opacity-50">
-                {{ tipo.categoria }}
-              </span>
-              <span *ngIf="tipo.requiere_internamiento" class="ml-2 text-xs opacity-75">
-                <i class="fas fa-bed text-xs mr-1"></i>Internamiento
-              </span>
+  <!-- FLUJO HOSPITALARIO ORGANIZADO (solo si está seleccionando) -->
+  <div *ngIf="estadoProceso === 'seleccionando'">
+
+    <!-- 1. DOCUMENTOS INICIALES / INGRESO -->
+    <div class="mb-8">
+      <div class="flex items-center mb-4">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+          <span class="text-sm font-bold text-blue-600">1</span>
+        </div>
+        <div>
+          <h2 class="text-lg font-medium text-gray-900">Documentos de Ingreso</h2>
+          <p class="text-sm text-gray-600">Documentos iniciales al crear el expediente</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div
+          *ngFor="let tipo of tiposIniciales"
+          (click)="seleccionarTipo(tipo)"
+          class="relative border-2 rounded-lg p-4 cursor-pointer transition-all duration-200"
+          [ngClass]="[
+            getColorClase(tipo.color),
+            getColorClaseHover(tipo.color),
+            tipoSeleccionado?.id === tipo.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+          ]"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-3">
+              <i [class]="tipo.icono + ' text-xl'"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold mb-1">{{ tipo.nombre }}</h3>
+              <p class="text-xs opacity-80 line-clamp-2">{{ tipo.descripcion }}</p>
+              <div class="mt-2 flex items-center text-xs">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white bg-opacity-50">
+                  {{ tipo.categoria }}
+                </span>
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  <i class="fas fa-star text-xs mr-1"></i>Inicial
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Checkmark cuando está seleccionado -->
-        <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-2 right-2">
-          <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filtros y búsqueda (solo si está seleccionando) -->
-  <div *ngIf="estadoProceso === 'seleccionando'" class="mb-6">
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-medium text-gray-900">Todos los Documentos Disponibles</h2>
-        <p class="mt-1 text-sm text-gray-600">Busca o filtra por categoría para encontrar el documento que necesitas</p>
-      </div>
-
-      <div class="px-6 py-4">
-        <!-- Barra de búsqueda -->
-        <div class="mb-4">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          <!-- Checkmark cuando está seleccionado -->
+          <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-2 right-2">
+            <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
               </svg>
             </div>
-            <input
-              type="text"
-              [(ngModel)]="textoBusqueda"
-              class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Buscar documentos clínicos..."
-            />
           </div>
-        </div>
-
-        <!-- Filtros por categoría -->
-        <div class="flex flex-wrap gap-2 mb-4">
-          <button
-            *ngFor="let categoria of categorias"
-            (click)="categoriaSeleccionada = categoria.value"
-            class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200"
-            [ngClass]="{
-              'bg-blue-100 text-blue-800 border border-blue-200': categoriaSeleccionada === categoria.value,
-              'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200': categoriaSeleccionada !== categoria.value
-            }"
-          >
-            <i [class]="categoria.icono + ' text-xs mr-1.5'"></i>
-            {{ categoria.label }}
-          </button>
-        </div>
-
-        <!-- Lista de documentos filtrados -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-            *ngFor="let tipo of tiposFiltrados"
-            (click)="seleccionarTipo(tipo)"
-            class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
-            [ngClass]="{
-              'border-blue-300 bg-blue-50 ring-2 ring-blue-500 ring-offset-2': tipoSeleccionado?.id === tipo.id,
-              'border-gray-200 hover:border-gray-300': tipoSeleccionado?.id !== tipo.id
-            }"
-          >
-            <div class="flex items-start">
-              <div class="flex-shrink-0 mr-3">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center"
-                     [ngClass]="getColorClase(tipo.color)">
-                  <i [class]="tipo.icono"></i>
-                </div>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">{{ tipo.nombre }}</h3>
-                <p class="text-xs text-gray-600 mb-2 line-clamp-2">{{ tipo.descripcion }}</p>
-                <div class="flex items-center text-xs">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                    {{ tipo.categoria }}
-                  </span>
-                  <span *ngIf="tipo.popular" class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                    <i class="fas fa-star text-xs mr-1"></i>Popular
-                  </span>
-                  <span *ngIf="tipo.requiere_internamiento" class="ml-2 text-xs text-gray-500">
-                    <i class="fas fa-bed text-xs mr-1"></i>Internamiento
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Checkmark cuando está seleccionado -->
-            <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-3 right-3">
-              <div class="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mensaje si no hay resultados -->
-        <div *ngIf="tiposFiltrados.length === 0" class="text-center py-8">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron documentos</h3>
-          <p class="mt-1 text-sm text-gray-500">Intenta con otros términos de búsqueda o cambia el filtro de categoría.</p>
         </div>
       </div>
     </div>
+
+    <!-- 2. DOCUMENTOS DE SEGUIMIENTO -->
+    <div class="mb-8" *ngIf="tiposSeguimiento.length > 0">
+      <div class="flex items-center mb-4">
+        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+          <span class="text-sm font-bold text-green-600">2</span>
+        </div>
+        <div>
+          <h2 class="text-lg font-medium text-gray-900">Documentos de Seguimiento</h2>
+          <p class="text-sm text-gray-600">Evolución, interconsultas y documentos durante la hospitalización</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div
+          *ngFor="let tipo of tiposSeguimiento"
+          (click)="seleccionarTipo(tipo)"
+          class="relative border-2 rounded-lg p-4 cursor-pointer transition-all duration-200"
+          [ngClass]="[
+            getColorClase(tipo.color),
+            getColorClaseHover(tipo.color),
+            tipoSeleccionado?.id === tipo.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+          ]"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-3">
+              <i [class]="tipo.icono + ' text-xl'"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold mb-1">{{ tipo.nombre }}</h3>
+              <p class="text-xs opacity-80 line-clamp-2">{{ tipo.descripcion }}</p>
+              <div class="mt-2 flex items-center text-xs">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white bg-opacity-50">
+                  {{ tipo.categoria }}
+                </span>
+                <span *ngIf="tipo.requiere_internamiento" class="ml-2 text-xs opacity-75">
+                  <i class="fas fa-bed text-xs mr-1"></i>Internamiento
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkmark cuando está seleccionado -->
+          <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-2 right-2">
+            <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. DOCUMENTOS DE EGRESO -->
+    <div class="mb-8" *ngIf="tiposEgreso.length > 0">
+      <div class="flex items-center mb-4">
+        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+          <span class="text-sm font-bold text-indigo-600">3</span>
+        </div>
+        <div>
+          <h2 class="text-lg font-medium text-gray-900">Documentos de Egreso</h2>
+          <p class="text-sm text-gray-600">Notas de alta y documentos finales</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div
+          *ngFor="let tipo of tiposEgreso"
+          (click)="seleccionarTipo(tipo)"
+          class="relative border-2 rounded-lg p-4 cursor-pointer transition-all duration-200"
+          [ngClass]="[
+            getColorClase(tipo.color),
+            getColorClaseHover(tipo.color),
+            tipoSeleccionado?.id === tipo.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+          ]"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-3">
+              <i [class]="tipo.icono + ' text-xl'"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold mb-1">{{ tipo.nombre }}</h3>
+              <p class="text-xs opacity-80 line-clamp-2">{{ tipo.descripcion }}</p>
+              <div class="mt-2 flex items-center text-xs">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white bg-opacity-50">
+                  {{ tipo.categoria }}
+                </span>
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                  <i class="fas fa-sign-out-alt text-xs mr-1"></i>Final
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkmark cuando está seleccionado -->
+          <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-2 right-2">
+            <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros y búsqueda (expandible) -->
+    <div class="mb-6">
+      <div class="bg-white shadow rounded-lg">
+        <!-- Botón para expandir la búsqueda -->
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-medium text-gray-900">Buscar Otros Documentos</h2>
+              <p class="mt-1 text-sm text-gray-600">Filtros avanzados y búsqueda de todos los documentos disponibles</p>
+            </div>
+            <button
+              type="button"
+              (click)="showDebugInfo = !showDebugInfo"
+              class="text-gray-400 hover:text-gray-600 flex items-center"
+            >
+              <span class="mr-2 text-sm">{{ showDebugInfo ? 'Ocultar' : 'Mostrar' }}</span>
+              <svg class="w-5 h-5 transition-transform" [class.rotate-180]="showDebugInfo" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="px-6 py-4" [class.hidden]="!showDebugInfo">
+          <!-- Barra de búsqueda -->
+          <div class="mb-4">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <input
+                type="text"
+                [(ngModel)]="textoBusqueda"
+                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Buscar documentos clínicos..."
+              />
+            </div>
+          </div>
+
+          <!-- Filtros por categoría -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button
+              *ngFor="let categoria of categorias"
+              (click)="categoriaSeleccionada = categoria.value"
+              class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200"
+              [ngClass]="{
+                'bg-blue-100 text-blue-800 border border-blue-200': categoriaSeleccionada === categoria.value,
+                'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200': categoriaSeleccionada !== categoria.value
+              }"
+            >
+              <i [class]="categoria.icono + ' text-xs mr-1.5'"></i>
+              {{ categoria.label }}
+            </button>
+          </div>
+
+          <!-- Lista de documentos filtrados -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div
+              *ngFor="let tipo of tiposFiltrados"
+              (click)="seleccionarTipo(tipo)"
+              class="relative border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+              [ngClass]="{
+                'border-blue-300 bg-blue-50 ring-2 ring-blue-500 ring-offset-2': tipoSeleccionado?.id === tipo.id,
+                'border-gray-200 hover:border-gray-300': tipoSeleccionado?.id !== tipo.id
+              }"
+            >
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mr-3">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                       [ngClass]="getColorClase(tipo.color)">
+                    <i [class]="tipo.icono"></i>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-sm font-semibold text-gray-900 mb-1">{{ tipo.nombre }}</h3>
+                  <p class="text-xs text-gray-600 mb-2 line-clamp-2">{{ tipo.descripcion }}</p>
+                  <div class="flex items-center text-xs">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      {{ tipo.categoria }}
+                    </span>
+                    <span *ngIf="tipo.es_inicial" class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      <i class="fas fa-star text-xs mr-1"></i>Inicial
+                    </span>
+                    <span *ngIf="tipo.requiere_internamiento" class="ml-2 text-xs text-gray-500">
+                      <i class="fas fa-bed text-xs mr-1"></i>Internamiento
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checkmark cuando está seleccionado -->
+              <div *ngIf="tipoSeleccionado?.id === tipo.id" class="absolute top-3 right-3">
+                <div class="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje si no hay resultados -->
+          <div *ngIf="tiposFiltrados.length === 0" class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron documentos</h3>
+            <p class="mt-1 text-sm text-gray-500">Intenta con otros términos de búsqueda o cambia el filtro de categoría.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Documento seleccionado (configuración) -->
@@ -415,6 +550,9 @@
       <div><strong>Tipo Seleccionado:</strong> {{ tipoSeleccionado?.nombre || 'Ninguno' }}</div>
       <div><strong>Form Valid:</strong> {{ documentoForm.valid }}</div>
       <div><strong>Can Submit:</strong> {{ canSubmit }}</div>
+      <div><strong>Tipos Iniciales:</strong> {{ tiposIniciales.length }}</div>
+      <div><strong>Tipos Seguimiento:</strong> {{ tiposSeguimiento.length }}</div>
+      <div><strong>Tipos Egreso:</strong> {{ tiposEgreso.length }}</div>
       <div><strong>Wizard State:</strong></div>
       <pre>{{ currentWizardState | json }}</pre>
     </div>

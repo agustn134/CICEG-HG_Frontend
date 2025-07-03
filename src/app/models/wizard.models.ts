@@ -41,15 +41,15 @@ export interface DatosPersona {
   apellido_paterno: string;
   apellido_materno?: string;
   fecha_nacimiento: string;
-  genero: Genero; // 🔥 FIX: Usar enum Genero del sistema
+  genero: Genero;
   curp: string;
   telefono?: string;
-  email?: string; // 🔥 FIX: Frontend usa 'email'
-  direccion?: string; // 🔥 FIX: Frontend usa 'direccion'
+  email?: string;
+  direccion?: string;
   ciudad?: string;
   estado?: string;
   codigo_postal?: string;
-  estado_civil?: EstadoCivil; // 🔥 FIX: Usar enum EstadoCivil del sistema
+  estado_civil?: EstadoCivil;
   religion?: string;
 }
 
@@ -67,14 +67,7 @@ export interface DatosPaciente {
   lugar_nacimiento?: string;
 }
 
-// export interface DatosExpediente {
-//   id_paciente: number; // Se obtiene del paso anterior
-//   numero_expediente?: string; // Se genera automáticamente
-//   estado: string;
-//   notas_administrativas?: string;
-//   crear_historia_clinica: boolean;
-//   id_medico_creador?: number;
-// }
+
 export interface DatosExpediente {
   id_paciente?: number;
   id_expediente?: number;
@@ -84,14 +77,7 @@ export interface DatosExpediente {
   crear_historia_clinica: boolean;
   fecha_apertura?: string;
 }
-// export interface DatosDocumento {
-//   id_expediente: number; // Se obtiene del paso anterior
-//   tipo_documento: string;
-//   subtipo_documento?: string;
-//   fecha_elaboracion: string;
-//   observaciones?: string;
-//   id_medico_creador?: number;
-// }
+
 
 export interface DatosDocumento {
   id_expediente?: number; // Se obtiene del paso anterior
@@ -258,11 +244,11 @@ export class WizardPersonaMapper {
       apellido_paterno: datosPersona.apellido_paterno,
       apellido_materno: datosPersona.apellido_materno,
       fecha_nacimiento: datosPersona.fecha_nacimiento,
-      sexo: datosPersona.genero, // 🔥 MAPEO: genero -> sexo para backend
+      sexo: datosPersona.genero,
       estado_civil: datosPersona.estado_civil,
       telefono: datosPersona.telefono,
-      correo_electronico: datosPersona.email, // 🔥 MAPEO: email -> correo_electronico para backend
-      domicilio: datosPersona.direccion, // 🔥 MAPEO: direccion -> domicilio para backend
+      correo_electronico: datosPersona.email,
+      domicilio: datosPersona.direccion,
       ciudad: datosPersona.ciudad,
       estado: datosPersona.estado,
       codigo_postal: datosPersona.codigo_postal,
@@ -281,11 +267,11 @@ export class WizardPersonaMapper {
       apellido_paterno: backendData.apellido_paterno,
       apellido_materno: backendData.apellido_materno,
       fecha_nacimiento: backendData.fecha_nacimiento,
-      genero: backendData.sexo, // 🔥 MAPEO: sexo -> genero para frontend
+      genero: backendData.sexo,
       curp: backendData.curp,
       telefono: backendData.telefono,
-      email: backendData.correo_electronico, // 🔥 MAPEO: correo_electronico -> email para frontend
-      direccion: backendData.domicilio, // 🔥 MAPEO: domicilio -> direccion para frontend
+      email: backendData.correo_electronico,
+      direccion: backendData.domicilio,
       ciudad: backendData.ciudad,
       estado: backendData.estado,
       codigo_postal: backendData.codigo_postal,

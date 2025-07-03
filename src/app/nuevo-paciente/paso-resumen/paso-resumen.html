@@ -1,1 +1,380 @@
-<p>paso-resumen works!</p>
+<!-- C:\CICEG-HG-APP\src\app\nuevo-paciente\paso-resumen\paso-resumen.html -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mr-4">
+          <span class="text-sm font-bold text-green-600">6</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Resumen del Expediente</h1>
+          <p class="text-sm text-gray-600">Revisa y confirma la información del nuevo expediente</p>
+        </div>
+      </div>
+
+      <!-- Acciones del header -->
+      <div class="flex space-x-3" *ngIf="!isLoading">
+        <button
+          type="button"
+          (click)="imprimirResumen()"
+          [disabled]="!puedeImprimir"
+          class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          Imprimir
+        </button>
+
+        <button
+          type="button"
+          (click)="descargarResumen()"
+          [disabled]="!puedeDescargar"
+          class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Descargar
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="bg-green-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progreso"></div>
+    </div>
+    <div class="flex justify-between text-xs text-gray-500 mt-1">
+      <span>Paso 6 de 6</span>
+      <span>{{ progreso }}% completado</span>
+    </div>
+
+    <!-- Status del proceso -->
+    <div *ngIf="autoGuardadoStatus" class="mt-3 p-3 rounded-md"
+         [ngClass]="{
+           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('🎉') || autoGuardadoStatus.includes('✅'),
+           'bg-blue-50 border border-blue-200 text-blue-800': autoGuardadoStatus.includes('Finalizando'),
+           'bg-red-50 border border-red-200 text-red-800': autoGuardadoStatus.includes('❌')
+         }">
+      <div class="flex items-center">
+        <svg *ngIf="autoGuardadoStatus.includes('Finalizando')" class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-medium">{{ autoGuardadoStatus }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  <div *ngIf="procesoCompletado" class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+    <div class="flex items-center">
+      <svg class="w-8 h-8 text-green-600 mr-4" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+      </svg>
+      <div class="flex-1">
+        <h2 class="text-xl font-semibold text-green-900 mb-2">¡Expediente Creado Exitosamente!</h2>
+        <p class="text-green-800">
+          El expediente del paciente <strong>{{ getNombreCompleto() }}</strong> ha sido registrado correctamente en el sistema.
+        </p>
+        <p class="text-sm text-green-700 mt-2">
+          Redirigiendo al dashboard en unos momentos...
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="mostrarErrores" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div class="flex">
+      <svg class="w-5 h-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <div>
+        <h3 class="text-sm font-medium text-red-800 mb-1">Error en el proceso</h3>
+        <p class="text-sm text-red-700">{{ autoGuardadoStatus }}</p>
+        <div class="mt-3 flex space-x-2">
+          <button
+            (click)="irAlDashboard()"
+            class="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded"
+          >
+            Ir al Dashboard
+          </button>
+          <button
+            (click)="crearNuevoExpediente()"
+            class="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded"
+          >
+            Nuevo Expediente
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal del resumen -->
+  <div *ngIf="resumen && !procesoCompletado" class="space-y-6">
+
+    <!-- Información Principal del Paciente -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center mb-4">
+        <svg class="w-6 h-6 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900">Información del Paciente</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Datos Personales -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Datos Personales</h3>
+          <div class="space-y-2 text-sm">
+            <div>
+              <span class="font-medium text-gray-900">Nombre:</span>
+              <span class="ml-2 text-gray-700">{{ getNombreCompleto() }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">CURP:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.persona.curp }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Fecha de Nacimiento:</span>
+              <span class="ml-2 text-gray-700">{{ formatearFechaCorta(resumen.persona.fecha_nacimiento) }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Edad:</span>
+              <span class="ml-2 text-gray-700">{{ calcularEdad(resumen.persona.fecha_nacimiento) }} años</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Género:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.persona.genero }}</span>
+            </div>
+            <div *ngIf="resumen.persona.telefono">
+              <span class="font-medium text-gray-900">Teléfono:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.persona.telefono }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Médica -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Información Médica</h3>
+          <div class="space-y-2 text-sm">
+            <div>
+              <span class="font-medium text-gray-900">Tipo de Sangre:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.paciente.tipo_sangre }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Alergias:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.paciente.alergias || 'Ninguna conocida' }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Transfusiones:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.paciente.transfusiones }}</span>
+            </div>
+            <div *ngIf="resumen.paciente.familiar_responsable">
+              <span class="font-medium text-gray-900">Contacto de Emergencia:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.paciente.familiar_responsable }}</span>
+            </div>
+            <div *ngIf="resumen.paciente.telefono_familiar">
+              <span class="font-medium text-gray-900">Teléfono de Emergencia:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.paciente.telefono_familiar }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- IDs del Sistema -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Identificadores</h3>
+          <div class="space-y-2 text-sm">
+            <div>
+              <span class="font-medium text-gray-900">ID Persona:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.ids.id_persona }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">ID Paciente:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.ids.id_paciente }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">ID Expediente:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.ids.id_expediente }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Número de Expediente:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.expediente.numero_expediente || 'Generado automáticamente' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Documento -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center mb-4">
+        <svg class="w-6 h-6 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900">Documento Clínico</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div class="space-y-2 text-sm">
+            <div>
+              <span class="font-medium text-gray-900">ID Documento:</span>
+              <span class="ml-2 text-gray-700 font-mono">{{ resumen.ids.id_documento }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Tipo de Documento:</span>
+              <span class="ml-2 text-gray-700">{{ getTipoDocumento() }}</span>
+            </div>
+            <div>
+              <span class="font-medium text-gray-900">Fecha de Elaboración:</span>
+              <span class="ml-2 text-gray-700">{{ formatearFecha(resumen.documento.fecha_elaboracion) }}</span>
+            </div>
+            <div *ngIf="resumen.documento.observaciones">
+              <span class="font-medium text-gray-900">Observaciones:</span>
+              <span class="ml-2 text-gray-700">{{ resumen.documento.observaciones }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Estado del Documento</h4>
+          <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            Creado y Completado
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Proceso -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center mb-4">
+        <svg class="w-6 h-6 text-purple-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900">Información del Proceso</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <span class="font-medium text-gray-900">Fecha de Inicio:</span>
+          <p class="text-gray-700">{{ formatearFecha(resumen.fechas.inicio) }}</p>
+        </div>
+        <div>
+          <span class="font-medium text-gray-900">Fecha de Finalización:</span>
+          <p class="text-gray-700">{{ formatearFecha(resumen.fechas.finalizacion) }}</p>
+        </div>
+        <div>
+          <span class="font-medium text-gray-900">Duración Total:</span>
+          <p class="text-gray-700">{{ resumen.fechas.duracion }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pasos Completados -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center mb-4">
+        <svg class="w-6 h-6 text-indigo-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900">Pasos Completados</h2>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let paso of pasosCompletados" class="flex items-center justify-between p-3 rounded-lg"
+             [ngClass]="paso.completado ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center w-8 h-8 rounded-full mr-3"
+                 [ngClass]="paso.completado ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'">
+              <i [class]="paso.icono + ' text-sm'"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium"
+                  [ngClass]="paso.completado ? 'text-green-900' : 'text-gray-500'">
+                {{ paso.titulo }}
+              </h3>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                  [ngClass]="paso.completado ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'">
+              {{ paso.completado ? 'Completado' : 'Pendiente' }}
+            </span>
+
+            <button
+              *ngIf="paso.completado && puedeEditar"
+              (click)="editarPaso(paso.paso)"
+              class="text-xs text-blue-600 hover:text-blue-800"
+            >
+              Editar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="flex justify-between items-center mt-8" *ngIf="!procesoCompletado">
+    <button
+      type="button"
+      (click)="irAlDashboard()"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Ir al Dashboard
+    </button>
+
+    <div class="flex space-x-3">
+      <button
+        type="button"
+        (click)="crearNuevoExpediente()"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        Nuevo Expediente
+      </button>
+
+      <button
+        type="button"
+        (click)="finalizarProceso()"
+        [disabled]="!puedeFinalizarProceso"
+        class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Finalizar Expediente
+      </button>
+    </div>
+  </div>
+
+  <!-- Indicador de carga flotante -->
+  <div *ngIf="isLoading" class="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full mx-4">
+      <div class="flex items-center mb-4">
+        <svg class="animate-spin h-6 w-6 text-green-600 mr-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-medium text-gray-900">Finalizando expediente...</span>
+      </div>
+      <div class="text-xs text-gray-600">
+        Guardando información final y preparando resumen...
+      </div>
+    </div>
+  </div>
+
+</div>
