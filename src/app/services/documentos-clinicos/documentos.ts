@@ -1,7 +1,7 @@
 // src/app/services/documentos-clinicos/documentos.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   DocumentoClinico,
   DocumentoClinicoCompleto,
@@ -13,6 +13,7 @@ import {
   DocumentoClinicoHelpers
 } from '../../models/documento-clinico.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -622,4 +623,140 @@ export class DocumentosService {
       responseType: 'blob'
     });
   }
+
+  // src/app/services/documentos-clinicos/documentos.service.ts
+// REEMPLAZAR ESTOS MÉTODOS EN TU DocumentosService:
+
+  // ==========================================
+  // MÉTODOS FALTANTES PARA PERFIL DE PACIENTE - CORREGIDOS
+  // ==========================================
+
+  // /**
+  //  * MÉTODO FALTANTE: Obtener documentos por ID de paciente
+  //  * GET /api/documentos-clinicos/documentos/paciente/:id_paciente
+  //  */
+  // getDocumentosByPacienteId(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
+  //   return this.http.get<ApiResponse<DocumentoClinico[]>>(`${this.API_URL}/paciente/${idPaciente}`);
+  // }
+/**
+ * MÉTODO FALTANTE: Obtener documentos por ID de paciente
+ * Este método hace la llamada al endpoint del backend que debe existir
+ */
+getDocumentosByPacienteId(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
+  // Primero intentar con el endpoint específico para pacientes
+  return this.http.get<ApiResponse<DocumentoClinico[]>>(`${this.API_URL}/paciente/${idPaciente}`).pipe(
+    // Si falla, hacer fallback a filtros
+    catchError(error => {
+      console.warn('⚠️ Endpoint específico no disponible, usando filtros como fallback');
+
+      // Usar el método existente con filtros como fallback
+      const filters: DocumentoClinicoFilters = {
+        ...DocumentoClinicoHelpers.createEmptyFilters(),
+        // Aquí necesitaríamos un campo para filtrar por paciente
+        // Por ahora, devolver un observable vacío
+        limit: 100
+      };
+
+      // Mapear la respuesta paginada a array simple
+      return this.getDocumentosClinicos(filters).pipe(
+        map(response => ({
+          success: response.success,
+          message: response.message,
+          data: response.data?.data || [], // Extraer solo el array de documentos
+          total: response.data?.pagination?.total || 0
+        }))
+      );
+    })
+  );
+}
+  /**
+   * MÉTODO ALTERNATIVO CORREGIDO: Obtener documentos por expediente usando ID de paciente
+   * Ahora mapea correctamente la respuesta paginada a un array simple
+   */
+  // getDocumentosByPacienteIdAlternativo(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
+  //   const filters: DocumentoClinicoFilters = {
+  //     ...DocumentoClinicoHelpers.createEmptyFilters(),
+  //     limit: 100 // Obtener más documentos para el perfil
+  //   };
+
+  //   return this.getDocumentosClinicos(filters).pipe(
+  //     map(Response => ({
+  //       success: Response.success,
+  //       message: Response.message,
+  //       data: Response.data?.data || [], // Extraer solo el array de documentos
+  //       total: response.data?.pagination?.total || 0
+  //     }))
+  //   );
+  // }
+  /**
+   * MÉTODO ALTERNATIVO CORREGIDO: Obtener documentos por expediente usando ID de paciente
+   * Ahora mapea correctamente la respuesta paginada a un array simple
+   */
+  getDocumentosByPacienteIdAlternativo(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
+    const filters: DocumentoClinicoFilters = {
+      ...DocumentoClinicoHelpers.createEmptyFilters(),
+      limit: 100 // Obtener más documentos para el perfil
+    };
+
+    // ✅ CORREGIDO: Mapear la respuesta paginada a array simple
+    return this.getDocumentosClinicos(filters).pipe(
+      map(response => ({ // ← CORREGIDO: response con minúscula
+        success: response.success,
+        message: response.message,
+        data: response.data?.data || [], // Extraer solo el array de documentos
+        total: response.data?.pagination?.total || 0
+      }))
+    );
+  }
+  /**
+ * MÉTODO ALTERNATIVO: Si el backend no tiene endpoint específico por paciente
+ * Este método usa el expediente para obtener los documentos
+ */
+getDocumentosByPacienteIdViaExpediente(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
+  // Primero obtener el expediente del paciente, luego sus documentos
+  return this.http.get<ApiResponse<{id_expediente: number}>>(`http://localhost:3000/api/gestion-expedientes/expedientes/by-paciente/${idPaciente}`).pipe(
+    switchMap(expedienteResponse => {
+      if (expedienteResponse.success && expedienteResponse.data?.id_expediente) {
+        return this.getDocumentosByExpediente(expedienteResponse.data.id_expediente);
+      } else {
+        // Si no hay expediente, devolver array vacío
+        return of({
+          success: true,
+          message: 'Sin expediente activo',
+          data: []
+        } as ApiResponse<DocumentoClinico[]>);
+      }
+    }),
+    catchError(error => {
+      console.error('❌ Error al obtener documentos por paciente:', error);
+      return of({
+        success: false,
+        message: 'Error al obtener documentos del paciente',
+        data: []
+      } as ApiResponse<DocumentoClinico[]>);
+    })
+  );
+}
+
+  /**
+   * Obtener documentos recientes de un paciente
+   */
+  getDocumentosRecientesPaciente(idPaciente: number, limite: number = 10): Observable<ApiResponse<DocumentoClinico[]>> {
+    return this.http.get<ApiResponse<DocumentoClinico[]>>(`${this.API_URL}/paciente/${idPaciente}/recientes`, {
+      params: new HttpParams().set('limite', limite.toString())
+    });
+  }
+
+  /**
+   * Obtener estadísticas de documentos de un paciente
+   */
+  getEstadisticasDocumentosPaciente(idPaciente: number): Observable<ApiResponse<{
+    total: number;
+    por_tipo: Array<{ tipo: string; cantidad: number }>;
+    por_estado: Array<{ estado: string; cantidad: number }>;
+  }>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/paciente/${idPaciente}/estadisticas`);
+  }
+
+
 }

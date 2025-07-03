@@ -164,15 +164,23 @@ export interface ExpedienteFilters extends BaseFilters {
   buscar?: string;
 }
 
+// export interface CreateExpedienteDto {
+//   id_paciente: number;
+//   numero_expediente?: string;
+//   estado?: string;
+//   notas_administrativas?: string;
+//   crear_historia_clinica?: boolean;
+//   id_medico_creador?: number;
+// }
 export interface CreateExpedienteDto {
   id_paciente: number;
   numero_expediente?: string;
+  fecha_apertura?: string;  // ← CAMPO FALTANTE
   estado?: string;
   notas_administrativas?: string;
   crear_historia_clinica?: boolean;
   id_medico_creador?: number;
 }
-
 export interface UpdateExpedienteDto {
   estado?: string;
   notas_administrativas?: string;

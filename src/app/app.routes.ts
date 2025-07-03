@@ -41,7 +41,7 @@ import { Administradores } from './personas/administradores/administradores';
 import { Pacientes } from './personas/pacientes/pacientes';
 import { PersonalMedicoComponent } from './personas/personal-medico/personal-medico';
 import { PersonasComponent } from './personas/personas/personas';
-
+import { PerfilPaciente } from './personas/perfil-paciente/perfil-paciente';
 // ===== Gestión de Expedientes =====
 import { Expedientes } from './gestion-expedientes/expedientes/expedientes';
 import { CamasComponent } from './gestion-expedientes/camas/camas';
@@ -212,6 +212,20 @@ export const routes: Routes = [
           { path: 'pacientes', component: Pacientes },
           { path: 'pacientes-list', component: Pacientes },
           { path: 'personal-medico', component: PersonalMedicoComponent },
+
+
+          // ✅ RUTA CORREGIDA: Perfil de Paciente
+          {
+            path: 'perfil-paciente/:id',
+            component: PerfilPaciente,
+            title: 'Perfil de Paciente'
+          },
+
+          // Alias para acceso desde lista de pacientes
+          {
+            path: 'pacientes/:id/perfil',
+            redirectTo: 'perfil-paciente/:id'
+          }
         ]
       },
 
@@ -228,6 +242,12 @@ export const routes: Routes = [
             loadComponent: () => import('./gestion-expedientes/internamientos/internamientos').then(m => m.InternamientosComponent)
           },
           { path: 'signos-vitales', component: SignosVitalesComponent },
+
+          {
+            path: 'expedientes/:expedienteId/paciente/:id',
+            component: PerfilPaciente,
+            title: 'Perfil de Paciente desde Expediente'
+          }
         ]
       },
 
@@ -263,6 +283,7 @@ export const routes: Routes = [
           { path: 'notas-nutricion', component: NotasNutricion },
         ]
       },
+
     ],
   },
 

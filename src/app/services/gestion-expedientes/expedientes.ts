@@ -460,4 +460,42 @@ export class ExpedientesService extends BaseService<Expediente> {
       fecha_fin: fechaFin
     });
   }
+
+// ==========================================
+  // MÉTODOS FALTANTES - AGREGAR AL FINAL DE LA CLASE
+  // ==========================================
+
+  /**
+   * MÉTODO FALTANTE: Crear expediente (método principal)
+   * POST /api/gestion-expedientes/expedientes
+   */
+  createExpediente(data: CreateExpedienteDto): Observable<ApiResponse<Expediente>> {
+    return this.create(data);
+  }
+
+  /**
+   * MÉTODO FALTANTE: Obtener expediente por ID de paciente (principal/activo)
+   * GET /api/gestion-expedientes/expedientes/paciente/:id_paciente/principal
+   */
+  getExpedienteByPacienteId(idPaciente: number): Observable<ApiResponse<Expediente>> {
+    return this.customGet(`/paciente/${idPaciente}/principal`);
+  }
+
+  /**
+   * MÉTODO FALTANTE: Generar número de expediente automático
+   * GET /api/gestion-expedientes/expedientes/generar-numero
+   */
+  generateNumeroExpediente(): Observable<ApiResponse<{ numero_expediente: string }>> {
+    return this.customGet('/generar-numero');
+  }
+
+  // ==========================================
+  // ALIAS PARA COMPATIBILIDAD
+  // ==========================================
+
+  /**
+   * Alias para compatibilidad con código existente
+   */
+  generarNumeroExpediente = this.generateNumeroExpediente;
+
 }

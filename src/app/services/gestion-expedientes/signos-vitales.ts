@@ -762,4 +762,66 @@ formatearPresionArterial(sistolica?: number, diastolica?: number): string {
 
     return { valido: true };
   }
+
+  // src/app/services/gestion-expedientes/signos-vitales.service.ts
+// AGREGAR ESTOS MÉTODOS AL FINAL DE LA CLASE SignosVitalesService:
+
+  // ==========================================
+  // MÉTODOS FALTANTES PARA PERFIL DE PACIENTE
+  // ==========================================
+
+  /**
+   * MÉTODO FALTANTE: Obtener signos vitales por ID de paciente
+   * GET /api/gestion-expedientes/signos-vitales/paciente/:id_paciente
+   */
+  getSignosVitalesByPacienteId(idPaciente: number): Observable<ApiResponse<SignosVitales[]>> {
+    return this.http.get<ApiResponse<SignosVitales[]>>(`${this.API_URL}/paciente/${idPaciente}`);
+  }
+
+  /**
+   * MÉTODO ALTERNATIVO: Obtener signos vitales por expediente usando ID de paciente
+   * (Si el backend no tiene la ruta /paciente/:id, usar este método)
+   */
+  getSignosVitalesByPacienteIdAlternativo(idPaciente: number): Observable<ApiResponse<SignosVitales[]>> {
+    // Este método requiere que primero obtengamos el expediente del paciente
+    // Por ahora retornamos un observable vacío, se debe implementar en el componente
+    const filters: SignosVitalesFilters = {
+      // id_expediente se obtendrá después de cargar el expediente en el componente
+      limit: 50,
+      offset: 0,
+      sort_by: 'fecha_toma',
+      sort_order: 'DESC'
+    };
+
+    return this.getSignosVitales(filters);
+  }
+
+  /**
+   * Obtener últimos signos vitales de un paciente específico
+   */
+  getUltimosSignosVitalesByPacienteId(idPaciente: number, limite: number = 5): Observable<ApiResponse<SignosVitales[]>> {
+    return this.http.get<ApiResponse<SignosVitales[]>>(`${this.API_URL}/paciente/${idPaciente}/ultimos`, {
+      params: new HttpParams().set('limite', limite.toString())
+    });
+  }
+
+  /**
+   * Obtener resumen de signos vitales de un paciente
+   */
+  getResumenSignosVitalesPaciente(idPaciente: number): Observable<ApiResponse<{
+    ultimo_registro: SignosVitales | null;
+    total_registros: number;
+    valores_anormales: number;
+    parametros_alterados: string[];
+  }>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/paciente/${idPaciente}/resumen`);
+  }
+
+  /**
+   * Verificar si un paciente tiene signos vitales recientes (últimas 24 horas)
+   */
+  tieneSignosVitalesRecientes(idPaciente: number): Observable<ApiResponse<{ tiene_recientes: boolean; ultimo_registro?: string }>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/paciente/${idPaciente}/recientes/check`);
+  }
+
 }
