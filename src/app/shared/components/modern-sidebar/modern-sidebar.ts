@@ -101,11 +101,11 @@ export class ModernSidebarComponent implements OnInit {
           path: '/app/personas/pacientes',
           icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
         },
-        {
-          name: 'Lista de Pacientes',
-          path: '/app/personas/pacientes-list',
-          icon: 'M4 6h16M4 10h16M4 14h16M4 18h16'
-        },
+        // {
+        //   name: 'Lista de Pacientes',
+        //   path: '/app/personas/pacientes-list',
+        //   icon: 'M4 6h16M4 10h16M4 14h16M4 18h16'
+        // },
       ]
     },
     {

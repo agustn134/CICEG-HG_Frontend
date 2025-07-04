@@ -1,13 +1,3 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class NotasUrgencias {
-//   private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/notas-urgencias';
-
-//   constructor() { }
-// }
 // src/app/services/documentos-clinicos/notas-urgencias.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
