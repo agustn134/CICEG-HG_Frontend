@@ -119,15 +119,13 @@
     <!-- ==========================================
          NAVEGACIÓN DE FORMULARIOS
          ========================================== -->
-    <div class="bg-white shadow rounded-lg mb-6">
+    <!-- <div class="bg-white shadow rounded-lg mb-6">
       <div class="px-6 py-4">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Creación de Documentos Clínicos</h2>
 
-        <!-- Progreso -->
         <div class="flex items-center justify-between mb-6">
           <div class="flex space-x-4">
 
-            <!-- Paso 1: Signos Vitales -->
             <div class="flex items-center">
               <div
                 [class]="formularioEstado.signosVitales ? 'bg-green-500' : (formularioActivo === 'signosVitales' ? 'bg-blue-500' : 'bg-gray-300')"
@@ -138,10 +136,8 @@
               <span class="ml-2 text-sm font-medium text-gray-700">Signos Vitales</span>
             </div>
 
-            <!-- Separador -->
             <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
 
-            <!-- Paso 2: Historia Clínica -->
             <div class="flex items-center">
               <div
                 [class]="formularioEstado.historiaClinica ? 'bg-green-500' : (formularioActivo === 'historiaClinica' ? 'bg-blue-500' : 'bg-gray-300')"
@@ -152,10 +148,8 @@
               <span class="ml-2 text-sm font-medium text-gray-700">Historia Clínica</span>
             </div>
 
-            <!-- Separador -->
             <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
 
-            <!-- Paso 3: Nota de Urgencias -->
             <div class="flex items-center">
               <div
                 [class]="formularioEstado.notaUrgencias ? 'bg-green-500' : (formularioActivo === 'notaUrgencias' ? 'bg-blue-500' : 'bg-gray-300')"
@@ -166,10 +160,8 @@
               <span class="ml-2 text-sm font-medium text-gray-700">Nota Urgencias</span>
             </div>
 
-            <!-- Separador -->
             <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
 
-            <!-- Paso 4: Nota de Evolución -->
             <div class="flex items-center">
               <div
                 [class]="formularioEstado.notaEvolucion ? 'bg-green-500' : (formularioActivo === 'notaEvolucion' ? 'bg-blue-500' : 'bg-gray-300')"
@@ -183,7 +175,6 @@
           </div>
         </div>
 
-        <!-- Botones de navegación -->
         <div class="flex space-x-2">
           <button
             (click)="cambiarFormulario('signosVitales')"
@@ -216,8 +207,155 @@
           </button>
         </div>
       </div>
+    </div> -->
+
+    <!-- ==========================================
+     NAVEGACIÓN DE FORMULARIOS - ✅ MEJORADA
+     ========================================== -->
+<div class="bg-white shadow rounded-lg mb-6">
+  <div class="px-6 py-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900">Creación de Documentos Clínicos</h2>
+
+      <!-- ✅ INDICADOR DE PROGRESO -->
+      <div class="flex items-center space-x-3">
+        <span class="text-sm text-gray-600">
+          Progreso: {{ progresoFormularios.completados }}/{{ progresoFormularios.total }}
+          ({{ progresoFormularios.porcentaje }}%)
+        </span>
+        <div class="w-32 bg-gray-200 rounded-full h-2">
+          <div
+            class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            [style.width.%]="progresoFormularios.porcentaje">
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Progreso Visual Mejorado -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex space-x-4">
+
+        <!-- Paso 1: Signos Vitales -->
+        <div class="flex items-center">
+          <button
+            (click)="cambiarFormulario('signosVitales')"
+            [class]="formularioEstado.signosVitales ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'signosVitales' ? 'bg-blue-500' : 'bg-gray-300')"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
+            <i *ngIf="formularioEstado.signosVitales" class="fas fa-check"></i>
+            <span *ngIf="!formularioEstado.signosVitales">1</span>
+          </button>
+          <span class="ml-2 text-sm font-medium text-gray-700">Signos Vitales</span>
+          <i *ngIf="formularioEstado.signosVitales" class="fas fa-check-circle text-green-500 ml-1"></i>
+        </div>
+
+        <!-- Separador -->
+        <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
+
+        <!-- Paso 2: Historia Clínica -->
+        <div class="flex items-center">
+          <button
+            (click)="cambiarFormulario('historiaClinica')"
+            [disabled]="!formularioEstado.signosVitales"
+            [class]="formularioEstado.historiaClinica ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'historiaClinica' ? 'bg-blue-500' : (formularioEstado.signosVitales ? 'bg-gray-400 hover:bg-gray-500' : 'bg-gray-300'))"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed">
+            <i *ngIf="formularioEstado.historiaClinica" class="fas fa-check"></i>
+            <span *ngIf="!formularioEstado.historiaClinica">2</span>
+          </button>
+          <span class="ml-2 text-sm font-medium text-gray-700">Historia Clínica</span>
+          <i *ngIf="formularioEstado.historiaClinica" class="fas fa-check-circle text-green-500 ml-1"></i>
+        </div>
+
+        <!-- Separador -->
+        <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
+
+        <!-- Paso 3: Nota de Urgencias -->
+        <div class="flex items-center">
+          <button
+            (click)="cambiarFormulario('notaUrgencias')"
+            [class]="formularioEstado.notaUrgencias ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'notaUrgencias' ? 'bg-red-500' : 'bg-gray-400 hover:bg-gray-500')"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
+            <i *ngIf="formularioEstado.notaUrgencias" class="fas fa-check"></i>
+            <span *ngIf="!formularioEstado.notaUrgencias">3</span>
+          </button>
+          <span class="ml-2 text-sm font-medium text-gray-700">Nota Urgencias</span>
+          <i *ngIf="formularioEstado.notaUrgencias" class="fas fa-check-circle text-green-500 ml-1"></i>
+        </div>
+
+        <!-- Separador -->
+        <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
+
+        <!-- Paso 4: Nota de Evolución -->
+        <div class="flex items-center">
+          <button
+            (click)="cambiarFormulario('notaEvolucion')"
+            [class]="formularioEstado.notaEvolucion ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'notaEvolucion' ? 'bg-green-600' : 'bg-gray-400 hover:bg-gray-500')"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
+            <i *ngIf="formularioEstado.notaEvolucion" class="fas fa-check"></i>
+            <span *ngIf="!formularioEstado.notaEvolucion">4</span>
+          </button>
+          <span class="ml-2 text-sm font-medium text-gray-700">Nota Evolución</span>
+          <i *ngIf="formularioEstado.notaEvolucion" class="fas fa-check-circle text-green-500 ml-1"></i>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Botones de navegación mejorados -->
+    <div class="flex space-x-2 justify-between">
+      <div class="flex space-x-2">
+        <button
+          (click)="cambiarFormulario('signosVitales')"
+          [class]="formularioActivo === 'signosVitales' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <i class="fas fa-heartbeat mr-1"></i>
+          Signos Vitales
+        </button>
+        <button
+          (click)="cambiarFormulario('historiaClinica')"
+          [class]="formularioActivo === 'historiaClinica' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+          [disabled]="!formularioEstado.signosVitales"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-file-medical-alt mr-1"></i>
+          Historia Clínica
+        </button>
+        <button
+          (click)="cambiarFormulario('notaUrgencias')"
+          [class]="formularioActivo === 'notaUrgencias' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <i class="fas fa-ambulance mr-1"></i>
+          Nota Urgencias
+        </button>
+        <button
+          (click)="cambiarFormulario('notaEvolucion')"
+          [class]="formularioActivo === 'notaEvolucion' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <i class="fas fa-chart-line mr-1"></i>
+          Nota Evolución
+        </button>
+      </div>
+
+      <!-- ✅ BOTONES DE ACCIÓN -->
+      <div class="flex space-x-2">
+        <button
+          (click)="resetearFormularioActual()"
+          [disabled]="!formularioEstado[formularioActivo]"
+          class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm disabled:opacity-50">
+          <i class="fas fa-undo mr-1"></i>
+          Resetear
+        </button>
+
+        <button
+          *ngIf="puedeFinalizarProceso"
+          (click)="finalizarProceso()"
+          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium">
+          <i class="fas fa-check-double mr-1"></i>
+          Finalizar Proceso
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
     <!-- ==========================================
          FORMULARIOS
          ========================================== -->

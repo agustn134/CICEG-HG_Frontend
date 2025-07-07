@@ -188,11 +188,7 @@ export class CatalogoService {
   preloadEssentialCatalogos(): Observable<boolean> {
     const essentialTypes: TipoCatalogo[] = [
       'tipos_sangre',
-      'estados_civiles',
-      'religiones',
       'servicios',
-      'parentescos',
-      'niveles_escolaridad',
       'tipos_documentos_clinicos'
     ];
 
