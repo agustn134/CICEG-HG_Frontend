@@ -58,15 +58,15 @@
           class="form-field"
         >
           <option value="">Seleccione una plantilla...</option>
-          <option *ngFor="let plantilla of plantillasSOAP" [value]="plantilla.id">
+          <option *ngFor="let plantilla of plantillasEvolucion" [value]="plantilla.id">
             {{ plantilla.nombre }}
           </option>
         </select>
       </div>
 
       <!-- Campos SOAP -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Subjetivo -->
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
         <div>
           <label for="subjetivo" class="block text-sm font-medium text-hospital-gray-700 mb-1">
             Subjetivo
@@ -79,7 +79,6 @@
           ></textarea>
         </div>
 
-        <!-- Objetivo -->
         <div>
           <label for="objetivo" class="block text-sm font-medium text-hospital-gray-700 mb-1">
             Objetivo
@@ -92,7 +91,6 @@
           ></textarea>
         </div>
 
-        <!-- Análisis -->
         <div>
           <label for="analisis" class="block text-sm font-medium text-hospital-gray-700 mb-1">
             Análisis
@@ -105,7 +103,6 @@
           ></textarea>
         </div>
 
-        <!-- Plan -->
         <div>
           <label for="plan" class="block text-sm font-medium text-hospital-gray-700 mb-1">
             Plan
@@ -117,7 +114,106 @@
             class="form-field"
           ></textarea>
         </div>
-      </div>
+      </div> -->
+
+      <!-- Campos de la BD Real -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Síntomas y Signos -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Síntomas y Signos <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="sintomas_signos"
+      rows="4"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Habitus Exterior -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Habitus Exterior <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="habitus_exterior"
+      rows="4"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Estado Nutricional -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Estado Nutricional <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="estado_nutricional"
+      rows="3"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Estudios Lab y Gabinete -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Estudios Lab y Gabinete <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="estudios_laboratorio_gabinete"
+      rows="3"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Evolución y Análisis -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Evolución y Análisis <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="evolucion_analisis"
+      rows="4"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Diagnósticos -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Diagnósticos <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="diagnosticos"
+      rows="3"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Plan de Estudios y Tratamiento -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Plan de Estudios y Tratamiento <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="plan_estudios_tratamiento"
+      rows="4"
+      class="form-field"
+    ></textarea>
+  </div>
+
+  <!-- Pronóstico -->
+  <div>
+    <label class="block text-sm font-medium text-hospital-gray-700 mb-1">
+      Pronóstico <span class="text-hospital-emergency">*</span>
+    </label>
+    <textarea
+      formControlName="pronostico"
+      rows="2"
+      class="form-field"
+    ></textarea>
+  </div>
+</div>
 
       <!-- Botones del formulario -->
       <div class="flex justify-end space-x-3 pt-4">
@@ -197,16 +293,16 @@
 
           <div class="prose max-w-none">
             <h4 class="text-hospital-primary">Subjetivo</h4>
-            <p class="text-hospital-gray-700">{{ nota.subjetivo || 'No especificado' }}</p>
+<p>{{ nota.sintomas_signos || 'No especificado' }}</p>
 
             <h4 class="text-hospital-primary mt-4">Objetivo</h4>
-            <p class="text-hospital-gray-700">{{ nota.objetivo || 'No especificado' }}</p>
+<p>{{ nota.evolucion_analisis || 'No especificado' }}</p>
 
             <h4 class="text-hospital-primary mt-4">Análisis</h4>
-            <p class="text-hospital-gray-700">{{ nota.analisis || 'No especificado' }}</p>
+<p>{{ nota.diagnosticos || 'No especificado' }}</p>
 
             <h4 class="text-hospital-primary mt-4">Plan</h4>
-            <p class="text-hospital-gray-700">{{ nota.plan || 'No especificado' }}</p>
+<p>{{ nota.plan_estudios_tratamiento || 'No especificado' }}</p>
           </div>
         </div>
       </div>

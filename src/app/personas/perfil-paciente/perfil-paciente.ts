@@ -133,7 +133,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     // Servicios de documentos específicos
     private historiasClinicasService: HistoriasClinicasService,
     private notasUrgenciasService: NotasUrgenciasService,
-    private notasEvolucionService: NotasEvolucionService,
+    private notaEvolucionService: NotasEvolucionService,
     private notasEgresoService: NotasEgresoService,
     // Servicios de catálogos
     private serviciosService: ServiciosService,
@@ -274,14 +274,41 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     });
   }
 
-  private initializeNotaEvolucionForm(): FormGroup {
-    return this.fb.group({
-      subjetivo: ['', Validators.required],
-      objetivo: ['', Validators.required],
-      analisis: ['', Validators.required],
-      plan: ['', Validators.required]
-    });
-  }
+  // private initializeNotaEvolucionForm(): FormGroup {
+  //   return this.fb.group({
+  //     subjetivo: ['', Validators.required],
+  //     objetivo: ['', Validators.required],
+  //     analisis: ['', Validators.required],
+  //     plan: ['', Validators.required]
+  //   });
+  // }
+// private initializeNotaEvolucionForm(): FormGroup {
+//   return this.fb.group({
+//     // 🔥 MANTENER CAMPOS SOAP PARA LA UI (más fácil para el usuario)
+//     subjetivo: ['', Validators.required], // Se mapea a sintomas_signos
+//     objetivo: ['', Validators.required],  // Se mapea a habitus_exterior
+//     analisis: ['', Validators.required],  // Se mapea a evolucion_analisis
+//     plan: ['', Validators.required],      // Se mapea a plan_estudios_tratamiento
+
+//     // 🔥 CAMPOS ADICIONALES OPCIONALES (si quieres mostrarlos en la UI)
+//     estado_nutricional: [''],
+//     estudios_laboratorio: [''],
+//     diagnosticos: [''],
+//     pronostico: ['']
+//   });
+// }
+private initializeNotaEvolucionForm(): FormGroup {
+  return this.fb.group({
+    sintomas_signos: ['', Validators.required],
+    habitus_exterior: ['', Validators.required],
+    estado_nutricional: ['', Validators.required],
+    estudios_laboratorio_gabinete: ['', Validators.required],
+    evolucion_analisis: ['', Validators.required],
+    diagnosticos: ['', Validators.required],
+    plan_estudios_tratamiento: ['', Validators.required],
+    pronostico: ['', Validators.required]
+  });
+}
 
   // ==========================================
   // CARGA DE DATOS - ✅ CORREGIDO: URLs EXACTAS
@@ -779,31 +806,66 @@ private async guardarSignosVitales(): Promise<void> {
   // NOTA DE EVOLUCIÓN - ✅ CORREGIDO
   // ==========================================
 
-  private async guardarNotaEvolucion(): Promise<void> {
-    if (!this.notaEvolucionForm.valid) {
-      throw new Error('Formulario de nota de evolución inválido');
-    }
+  // private async guardarNotaEvolucion(): Promise<void> {
+  //   if (!this.notaEvolucionForm.valid) {
+  //     throw new Error('Formulario de nota de evolución inválido');
+  //   }
+  //   const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(t => t.nombre === 'Nota de Evolución');
+  //   if (!tipoNotaEvolucion) {
+  //     throw new Error('Tipo de documento de evolución no encontrado');
+  //   }
+  //   const documentoEvolucion = await this.crearDocumentoEspecifico(tipoNotaEvolucion.id_tipo_documento);
+  //   const notaData = {
+  //     id_documento: documentoEvolucion.id_documento,
+  //     subjetivo: this.notaEvolucionForm.value.subjetivo,
+  //     objetivo: this.notaEvolucionForm.value.objetivo,
+  //     analisis: this.notaEvolucionForm.value.analisis,
+  //     plan: this.notaEvolucionForm.value.plan
+  //   };
+  //   const response = await firstValueFrom(
+  //     this.notaEvolucionService.createNotaEvolucion(notaData)
+  //   );
+  //   console.log('✅ Nota de evolución guardada:', response);
+  // }
 
-    const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(t => t.nombre === 'Nota de Evolución');
-    if (!tipoNotaEvolucion) {
-      throw new Error('Tipo de documento de evolución no encontrado');
-    }
+// ==========================================
+// NOTA DE EVOLUCIÓN - ✅ CORREGIDO SEGÚN TU BD REAL
+// ==========================================
 
-    const documentoEvolucion = await this.crearDocumentoEspecifico(tipoNotaEvolucion.id_tipo_documento);
-
-    const notaData = {
-      id_documento: documentoEvolucion.id_documento,
-      subjetivo: this.notaEvolucionForm.value.subjetivo,
-      objetivo: this.notaEvolucionForm.value.objetivo,
-      analisis: this.notaEvolucionForm.value.analisis,
-      plan: this.notaEvolucionForm.value.plan
-    };
-
-    const response = await firstValueFrom(
-      this.notasEvolucionService.createNotaEvolucion(notaData)
-    );
-    console.log('✅ Nota de evolución guardada:', response);
+private async guardarNotaEvolucion(): Promise<void> {
+  if (!this.notaEvolucionForm.valid) {
+    throw new Error('Formulario de nota de evolución inválido');
   }
+
+  const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(t => t.nombre === 'Nota de Evolución');
+  if (!tipoNotaEvolucion) {
+    throw new Error('Tipo de documento de evolución no encontrado');
+  }
+
+  const documentoEvolucion = await this.crearDocumentoEspecifico(tipoNotaEvolucion.id_tipo_documento);
+
+  // 🔥 ESTRUCTURA CORREGIDA SEGÚN TU BD REAL
+  const notaData: CreateNotaEvolucionDto = {
+    id_documento: documentoEvolucion.id_documento,
+
+    // 🔥 MAPEAR CAMPOS SOAP A CAMPOS REALES DE TU BD
+    sintomas_signos: this.notaEvolucionForm.value.subjetivo || 'Paciente refiere...',
+    habitus_exterior: this.notaEvolucionForm.value.objetivo || 'Paciente en condiciones generales...',
+    estado_nutricional: 'Adecuado para la edad', // Valor por defecto
+    estudios_laboratorio_gabinete: 'Sin estudios recientes que reportar', // Valor por defecto
+    evolucion_analisis: this.notaEvolucionForm.value.analisis || 'Evolución clínica estable',
+    diagnosticos: 'Por determinar', // Valor por defecto
+    plan_estudios_tratamiento: this.notaEvolucionForm.value.plan || 'Continuar manejo actual',
+    pronostico: 'Favorable para la vida' // Valor por defecto
+  };
+
+  const response = await firstValueFrom(
+    this.notaEvolucionService.createNotaEvolucion(notaData)
+  );
+  console.log('✅ Nota de evolución guardada:', response);
+}
+
+
 private async crearDocumentoClinicoPadre(): Promise<void> {
   if (!this.pacienteCompleto?.expediente.id_expediente) {
     throw new Error('No hay expediente disponible');

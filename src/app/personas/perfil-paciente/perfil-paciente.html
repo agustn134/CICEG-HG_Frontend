@@ -805,7 +805,7 @@
     </div>
 
     <!-- FORMULARIO DE NOTA DE EVOLUCIÓN -->
-    <div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">
+    <!-- <div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">
       <div class="px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900">
           <i class="fas fa-chart-line mr-2 text-green-500"></i>
@@ -875,7 +875,6 @@
 
         </div>
 
-        <!-- Botón Guardar -->
         <div class="mt-6 flex justify-end">
           <button
             type="button"
@@ -888,8 +887,156 @@
           </button>
         </div>
       </form>
+    </div> -->
+<!-- FORMULARIO DE NOTA DE EVOLUCIÓN - CAMPOS REALES DE BD -->
+<div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-chart-line mr-2 text-green-500"></i>
+      Nota de Evolución
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Evolución diaria del paciente</p>
+  </div>
+
+  <form [formGroup]="notaEvolucionForm" class="px-6 py-4">
+    <div class="grid grid-cols-1 gap-6">
+
+      <!-- Síntomas y Signos -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Síntomas y Signos *
+        </label>
+        <textarea
+          formControlName="sintomas_signos"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Describir síntomas y signos del paciente..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('sintomas_signos')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Habitus Exterior -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Habitus Exterior *
+        </label>
+        <textarea
+          formControlName="habitus_exterior"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Descripción del aspecto general del paciente..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('habitus_exterior')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Estado Nutricional -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Estado Nutricional *
+        </label>
+        <textarea
+          formControlName="estado_nutricional"
+          rows="2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Evaluación del estado nutricional..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('estado_nutricional')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Estudios de Laboratorio -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Estudios de Laboratorio y Gabinete *
+        </label>
+        <textarea
+          formControlName="estudios_laboratorio_gabinete"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Resultados de laboratorio y estudios de gabinete..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('estudios_laboratorio_gabinete')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Evolución y Análisis -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Evolución y Análisis *
+        </label>
+        <textarea
+          formControlName="evolucion_analisis"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Análisis de la evolución clínica del paciente..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('evolucion_analisis')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Diagnósticos -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Diagnósticos *
+        </label>
+        <textarea
+          formControlName="diagnosticos"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Diagnósticos actuales del paciente..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('diagnosticos')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Plan de Estudios y Tratamiento -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Plan de Estudios y Tratamiento *
+        </label>
+        <textarea
+          formControlName="plan_estudios_tratamiento"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Plan de manejo, medicamentos, estudios adicionales..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('plan_estudios_tratamiento')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
+      <!-- Pronóstico -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Pronóstico *
+        </label>
+        <textarea
+          formControlName="pronostico"
+          rows="2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Pronóstico del paciente..."></textarea>
+        <div *ngIf="notaEvolucionForm.get('pronostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio
+        </div>
+      </div>
+
     </div>
 
+    <!-- Botón Guardar -->
+    <div class="mt-6 flex justify-end">
+      <button
+        type="button"
+        (click)="guardarFormularioActivo()"
+        [disabled]="!notaEvolucionForm.valid || isCreatingDocument"
+        class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+        <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+        <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+        {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Evolución' }}
+      </button>
+    </div>
+  </form>
+</div>
 
 
 <!-- ==========================================
