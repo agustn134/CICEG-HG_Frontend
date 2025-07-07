@@ -408,76 +408,13 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // ==========================================
-  // GESTIÓN DE FORMULARIOS
-  // ==========================================
-
-  // cambiarFormulario(tipoFormulario: string): void {
-  //   if (this.formularioActivo === tipoFormulario) return;
-
-  //   // Validar si el formulario actual está completado antes de cambiar
-  //   if (!this.formularioEstado[this.formularioActivo] && this.tieneFormularioActivo()) {
-  //     this.error = 'Debe completar el formulario actual antes de continuar';
-  //     return;
-  //   }
-
-  //   this.formularioActivo = tipoFormulario;
-  //   this.error = null;
-  // }
-
   private tieneFormularioActivo(): boolean {
     const formularios = ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion'];
     return formularios.includes(this.formularioActivo);
   }
 
   // ==========================================
-  // GUARDAR DOCUMENTOS
-  // ==========================================
-
-  // async guardarFormularioActivo(): Promise<void> {
-  //   if (this.isCreatingDocument) return;
-
-  //   this.isCreatingDocument = true;
-  //   this.error = null;
-  //   this.success = null;
-
-  //   try {
-  //     switch (this.formularioActivo) {
-  //       case 'signosVitales':
-  //         await this.guardarSignosVitales();
-  //         break;
-  //       case 'historiaClinica':
-  //         await this.guardarHistoriaClinica();
-  //         break;
-  //       case 'notaUrgencias':
-  //         await this.guardarNotaUrgencias();
-  //         break;
-  //       case 'notaEvolucion':
-  //         await this.guardarNotaEvolucion();
-  //         break;
-  //       default:
-  //         throw new Error('Tipo de formulario no válido');
-  //     }
-
-  //     // Marcar formulario como completado
-  //     this.formularioEstado[this.formularioActivo] = true;
-  //     this.success = `${this.formularioActivo} guardado correctamente`;
-
-  //     // Actualizar datos del paciente
-  //     this.cargarDatosPaciente().subscribe(data => {
-  //       this.construirPacienteCompleto(data);
-  //     });
-
-  //   } catch (error) {
-  //     console.error(`❌ Error al guardar ${this.formularioActivo}:`, error);
-  //     this.error = `Error al guardar ${this.formularioActivo}`;
-  //   } finally {
-  //     this.isCreatingDocument = false;
-  //   }
-  // }
-
-  // ==========================================
-// GUARDAR DOCUMENTOS - ✅ MEJORADO CON UX
+// GUARDAR DOCUMENTOS -
 // ==========================================
 
 async guardarFormularioActivo(): Promise<void> {
@@ -907,31 +844,6 @@ private async crearDocumentoClinicoPadre(): Promise<void> {
     throw new Error('Error al crear documento clínico');
   }
 }
-
-  // private async crearDocumentoEspecifico(idTipoDocumento: number): Promise<any> {
-  //   if (!this.pacienteCompleto?.expediente.id_expediente) {
-  //     throw new Error('No hay expediente disponible');
-  //   }
-
-  //   const documentoData = {
-  //     id_expediente: this.pacienteCompleto.expediente.id_expediente,
-  //     id_internamiento: this.pacienteCompleto.ultimoInternamiento?.id_internamiento || null,
-  //     id_tipo_documento: idTipoDocumento,
-  //     id_personal_creador: this.medicoActual!,
-  //     fecha_elaboracion: new Date().toISOString(),
-  //     estado: EstadoDocumento.ACTIVO
-  //   };
-
-  //   const response = await firstValueFrom(
-  //     this.documentosService.createDocumentoClinico(documentoData)
-  //   );
-
-  //   if (response?.data) {
-  //     return response.data;
-  //   } else {
-  //     throw new Error('Error al crear documento específico');
-  //   }
-  // }
 
 
 
