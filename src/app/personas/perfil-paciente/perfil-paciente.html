@@ -1,9 +1,4 @@
 <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
-
-<!-- ==========================================
-     ESTADOS DE CARGA Y ERROR
-     ========================================== -->
-
 <!-- Loading -->
 <div *ngIf="mostrarCargando" class="flex items-center justify-center min-h-screen bg-gray-50">
   <div class="text-center">
@@ -14,7 +9,7 @@
 </div>
 
 <!-- Error -->
-<div *ngIf="mostrarError" class="flex items-center justify-center min-h-screen bg-gray-50">
+<!-- <div *ngIf="mostrarError" class="flex items-center justify-center min-h-screen bg-gray-50">
   <div class="text-center max-w-md mx-auto">
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
       <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -31,7 +26,164 @@
       Volver
     </button>
   </div>
+</div> -->
+
+<!-- Error Toast Flotante - No interrumpe el trabajo -->
+<div *ngIf="mostrarErrores"
+     class="fixed top-4 right-4 z-50 transform transition-all duration-500 ease-in-out"
+     [class.translate-x-0]="mostrarError"
+     [class.translate-x-full]="!mostrarError">
+  <div class="bg-white shadow-2xl rounded-xl border-l-4 border-red-500 p-4 max-w-md">
+    <div class="flex items-start space-x-3">
+      <!-- Icono -->
+      <div class="flex-shrink-0">
+        <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="flex-1 min-w-0">
+        <h4 class="text-sm font-semibold text-gray-900">Error de Conexión</h4>
+        <p class="text-sm text-gray-600 mt-1">{{ error }}</p>
+
+        <!-- Acciones rápidas -->
+        <div class="mt-3 flex space-x-2">
+          <button (click)="intentarDeNuevo()"
+                  class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-200 flex items-center space-x-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>Reintentar</span>
+          </button>
+
+          <button (click)="ocultarError()"
+                  class="bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-200">
+            Seguir trabajando
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón cerrar -->
+      <button (click)="ocultarError()"
+              class="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
+
+<!-- Banner de Error de Conexión Persistente - Sutil y no invasivo -->
+<div *ngIf="hayProblemasConexion && !mostrarError"
+     class="bg-amber-50 border-l-4 border-amber-400 p-3 mb-4 rounded-r-lg">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
+      </svg>
+      <span class="text-sm text-amber-800">
+        <strong>Conexión inestable</strong> - Tus datos se guardan localmente
+      </span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <div class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+      <button (click)="verificarConexion()"
+              class="text-xs text-amber-700 hover:text-amber-900 font-medium">
+        Verificar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Indicador de Estado de Autoguardado - Discreto -->
+<div class="fixed bottom-4 left-4 z-40">
+  <div *ngIf="estadoAutoguardado"
+       class="bg-white shadow-lg rounded-full px-3 py-2 border border-gray-200 flex items-center space-x-2 text-xs transition-all duration-300"
+       [ngClass]="{
+         'border-green-200 bg-green-50': estadoAutoguardado === 'guardado',
+         'border-blue-200 bg-blue-50': estadoAutoguardado === 'guardando',
+         'border-amber-200 bg-amber-50': estadoAutoguardado === 'offline'
+       }">
+
+    <!-- Guardado -->
+    <ng-container *ngIf="estadoAutoguardado === 'guardado'">
+      <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      <span class="text-green-700 font-medium">Guardado</span>
+    </ng-container>
+
+    <!-- Guardando -->
+    <ng-container *ngIf="estadoAutoguardado === 'guardando'">
+      <svg class="w-3 h-3 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+      <span class="text-blue-700 font-medium">Guardando...</span>
+    </ng-container>
+
+    <!-- Offline -->
+    <ng-container *ngIf="estadoAutoguardado === 'offline'">
+      <svg class="w-3 h-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+      </svg>
+      <span class="text-amber-700 font-medium">Sin conexión</span>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Modal de Error Crítico Solo para Casos Extremos -->
+<div *ngIf="errorCritico"
+     class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+    <div class="p-6">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Error Crítico</h3>
+          <p class="text-sm text-gray-600">Se requiere tu atención</p>
+        </div>
+      </div>
+
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+        <p class="text-sm text-red-800">{{ errorCritico }}</p>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+        <h4 class="text-sm font-semibold text-blue-900 mb-2">💾 Tus datos están seguros</h4>
+        <p class="text-sm text-blue-800">
+          Todos los cambios no guardados se mantienen en el navegador.
+          No perderás tu trabajo al recargar.
+        </p>
+      </div>
+
+      <div class="flex space-x-3">
+        <button (click)="recargarPagina()"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+          🔄 Recargar Página
+        </button>
+        <button (click)="cerrarErrorCritico()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+          Continuar Aquí
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ==========================================
      CONTENIDO PRINCIPAL
