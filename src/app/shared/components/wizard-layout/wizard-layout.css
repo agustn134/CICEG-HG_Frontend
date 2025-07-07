@@ -1,121 +1,13 @@
 /* src/app/shared/components/wizard-layout/wizard-layout.css */
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS DEL WIZARD LAYOUT
+   ANIMACIONES PERSONALIZADAS
    ========================================== */
 
-.wizard-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-/* Animaciones suaves para transiciones */
-.step-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Efectos hover para los pasos */
-.step-circle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-}
-
-/* Animación de la barra de progreso */
-.progress-bar {
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Animación de carga */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
-
-/* Estados de los pasos */
-.step-active {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-}
-
-.step-completed {
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-}
-
-.step-inactive {
-  background: #ffffff;
-  border-color: #d1d5db;
-  color: #9ca3af;
-}
-
-/* Líneas conectoras de pasos */
-.step-connector {
-  background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
-}
-
-.step-connector.completed {
-  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #3b82f6 100%);
-}
-
-/* Overlay de carga */
-.loading-overlay {
-  backdrop-filter: blur(4px);
-  background: rgba(17, 24, 39, 0.7);
-}
-
-/* Efectos de focus para accesibilidad */
-.wizard-button:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Responsive design */
-@media (max-width: 640px) {
-  .wizard-header {
-    padding: 1rem;
-  }
-
-  .wizard-steps {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .step-circle {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .step-title {
-    font-size: 0.75rem;
-  }
-}
-
-/* Estados especiales */
-.step-warning {
-  border-color: #f59e0b;
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.step-error {
-  border-color: #ef4444;
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-/* Animaciones de entrada */
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -123,16 +15,69 @@
   }
 }
 
-.wizard-content {
-  animation: fadeInUp 0.5s ease-out;
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
 }
 
-/* Estado de guardado */
-.save-indicator {
-  transition: all 0.3s ease;
+/* ==========================================
+   CLASES PERSONALIZADAS PARA TAILWIND
+   ========================================== */
+
+.border-3 {
+  border-width: 3px;
 }
 
-.save-indicator.saving {
+/* ==========================================
+   MEJORAS DE ACCESIBILIDAD
+   ========================================== */
+
+/* Focus visible para navegación por teclado */
+.wizard-step:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   ANIMACIONES SUAVES PARA INTERACCIONES
+   ========================================== */
+
+/* Hover suave para botones */
+.wizard-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wizard-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Animación para el progreso */
+.progress-smooth {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   RESPONSIVE UTILITIES
+   ========================================== */
+
+/* Scroll horizontal para pasos en móvil (si es necesario) */
+@media (max-width: 640px) {
+  .mobile-scroll {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE */
+  }
+
+  .mobile-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}
+
+/* ==========================================
+   ESTADOS ESPECIALES
+   ========================================== */
+
+/* Indicador de guardado pulsante */
+.saving-pulse {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -145,28 +90,28 @@
   }
 }
 
-/* Mejoras de contraste para accesibilidad */
-.high-contrast .step-active {
-  background: #1e40af;
-  border: 2px solid #ffffff;
-}
+/* ==========================================
+   MEJORAS DE CONTRASTE (ACCESIBILIDAD)
+   ========================================== */
 
-.high-contrast .step-completed {
-  background: #047857;
-  border: 2px solid #ffffff;
-}
-
-/* Print styles (si se necesita imprimir) */
-@media print {
-  .wizard-header,
-  .wizard-footer,
-  .loading-overlay {
-    display: none;
+@media (prefers-contrast: high) {
+  .wizard-step.active {
+    border: 3px solid #1e40af;
   }
 
-  .wizard-content {
-    max-width: none;
-    margin: 0;
-    padding: 0;
+  .wizard-step.completed {
+    border: 3px solid #047857;
+  }
+}
+
+/* ==========================================
+   MODO OSCURO (FUTURO)
+   ========================================== */
+
+@media (prefers-color-scheme: dark) {
+  /* Estilos para modo oscuro si se implementa en el futuro */
+  .dark-mode-step {
+    background-color: #374151;
+    border-color: #6b7280;
   }
 }

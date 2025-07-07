@@ -468,4 +468,91 @@ export class WizardStateService {
 
     return navigation.canGoPrevious;
   }
+
+
+  // AGREGAR ESTE MÉTODO AL WizardStateService (wizard-state.ts)
+
+// ==========================================
+// MÉTODO DE INICIALIZACIÓN SEGURA
+// ==========================================
+
+/** Inicializar wizard de forma segura */
+initializeWizard(): void {
+  console.log('🔄 Inicializando wizard...');
+
+  // Limpiar cualquier estado previo
+  this.clearStorageState();
+
+  // Establecer estado inicial limpio
+  const cleanInitialState: WizardState = {
+    currentStep: WizardStep.INICIO,
+    completedSteps: [], // ✅ Array vacío = ningún paso completado
+    estado: EstadoWizard.INICIANDO,
+
+    datosPersona: {},
+    datosPaciente: {},
+    datosExpediente: {},
+    datosDocumento: {},
+
+    validationErrors: {},
+    isStepValid: {
+      [WizardStep.INICIO]: false,
+      [WizardStep.PERSONA]: false,
+      [WizardStep.PACIENTE]: false,
+      [WizardStep.EXPEDIENTE]: false,
+      [WizardStep.DOCUMENTO_CLINICO]: false,
+      [WizardStep.LLENAR_DOCUMENTO]: false,
+      [WizardStep.RESUMEN]: false
+    },
+
+    fechaInicio: new Date().toISOString(),
+    ultimaActualizacion: new Date().toISOString(),
+    progreso: 0 // ✅ 0% de progreso
+  };
+
+  this.updateState(cleanInitialState);
+
+  console.log('✅ Wizard inicializado con estado limpio:', cleanInitialState);
+}
+
+/** Verificar si el wizard necesita inicialización */
+needsInitialization(): boolean {
+  const currentState = this.getCurrentState();
+
+  return !currentState ||
+         typeof currentState !== 'object' ||
+         !currentState.hasOwnProperty('currentStep') ||
+         !Array.isArray(currentState.completedSteps) ||
+         !currentState.hasOwnProperty('datosPersona');
+}
+
+// ==========================================
+// MÉTODO PARA ACTUALIZAR DATOS DE PASOS
+// ==========================================
+
+/** Método genérico para actualizar datos de cualquier paso */
+updateStepData(stepType: 'persona' | 'paciente' | 'expediente' | 'documento', data: any): void {
+  const currentState = this.getCurrentState();
+
+  const newState = { ...currentState };
+
+  switch (stepType) {
+    case 'persona':
+      newState.datosPersona = { ...currentState.datosPersona, ...data };
+      break;
+    case 'paciente':
+      newState.datosPaciente = { ...currentState.datosPaciente, ...data };
+      break;
+    case 'expediente':
+      newState.datosExpediente = { ...currentState.datosExpediente, ...data };
+      break;
+    case 'documento':
+      newState.datosDocumento = { ...currentState.datosDocumento, ...data };
+      break;
+  }
+
+  newState.ultimaActualizacion = new Date().toISOString();
+  this.updateState(newState);
+}
+
 }

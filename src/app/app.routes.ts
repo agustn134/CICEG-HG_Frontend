@@ -23,9 +23,6 @@ import { NuevoPaciente } from './nuevo-paciente/nuevo-paciente';
 import { PasoPersona } from './nuevo-paciente/paso-persona/paso-persona';
 import { PasoPaciente } from './nuevo-paciente/paso-paciente/paso-paciente';
 import { PasoExpediente } from './nuevo-paciente/paso-expediente/paso-expediente';
-import { PasoDocumentoClinico } from './nuevo-paciente/paso-documento-clinico/paso-documento-clinico';
-import { PasoLlenarDocumento } from './nuevo-paciente/paso-llenar-documento/paso-llenar-documento';
-import { PasoResumen } from './nuevo-paciente/paso-resumen/paso-resumen';
 
 // ===== Catálogos =====
 import { Servicios } from './catalogos/servicios/servicios';
@@ -145,46 +142,7 @@ export const routes: Routes = [
               description: 'Generación automática del expediente',
               autoProcess: true
             }
-          },
-
-          // 📋 Paso 4: Selección del tipo de documento clínico
-          {
-            path: 'documento-clinico',
-            component: PasoDocumentoClinico,
-            // canActivate: [WizardStepGuard],
-            data: {
-              step: 4,
-              title: 'Documento Clínico',
-              description: 'Seleccionar tipo de documento a crear',
-              requiredFields: ['tipo_documento']
-            }
-          },
-
-          // 📝 Paso 5: Llenado del documento específico (dinámico)
-          {
-            path: 'llenar-documento/:tipo',
-            component: PasoLlenarDocumento,
-            // canActivate: [WizardStepGuard],
-            data: {
-              step: 5,
-              title: 'Llenar Documento',
-              description: 'Completar información del documento clínico',
-              dynamicForm: true
-            }
-          },
-
-          // ✅ Paso 6: Resumen y confirmación final
-          {
-            path: 'resumen',
-            component: PasoResumen,
-            // canActivate: [WizardStepGuard],
-            data: {
-              step: 6,
-              title: 'Resumen',
-              description: 'Confirmar y finalizar registro',
-              finalStep: true
-            }
-          },
+          }
         ]
       },
 

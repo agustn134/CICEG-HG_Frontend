@@ -341,6 +341,12 @@ export class PasoExpediente implements OnInit, OnDestroy {
     }
   }
 
+
+
+
+
+
+
   // ✅ NUEVO MÉTODO: Redirigir al perfil del paciente
   private irAPerfilPaciente(idPaciente: number): void {
     console.log('🔄 Redirigiendo al perfil del paciente ID:', idPaciente);
