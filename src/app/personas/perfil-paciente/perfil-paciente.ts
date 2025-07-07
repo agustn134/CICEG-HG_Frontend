@@ -167,6 +167,23 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   // INICIALIZACIÓN
   // ==========================================
 
+
+  // MÉTODO TEMPORAL PARA DEBUG
+debugPacienteCompleto(): void {
+  console.log('🔍 DEBUG pacienteCompleto completo:', this.pacienteCompleto);
+  console.log('🔍 DEBUG persona:', this.pacienteCompleto?.persona);
+  console.log('🔍 DEBUG paciente:', this.pacienteCompleto?.paciente);
+
+  if (this.pacienteCompleto?.persona) {
+    console.log('✅ Persona existe');
+    console.log('📝 Nombre:', this.pacienteCompleto.persona.nombre);
+    console.log('📝 Apellido paterno:', this.pacienteCompleto.persona.apellido_paterno);
+    console.log('📝 Apellido materno:', this.pacienteCompleto.persona.apellido_materno);
+  } else {
+    console.log('❌ Persona no existe o es undefined');
+  }
+}
+
   ngOnInit(): void {
     // Obtener ID del paciente desde la ruta
     this.route.paramMap.subscribe(params => {
@@ -179,6 +196,12 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
+
+    // AGREGAR DESPUÉS DE LA INICIALIZACIÓN
+  setTimeout(() => {
+    this.debugPacienteCompleto();
+  }, 2000);
+
   }
 
   ngOnDestroy(): void {
@@ -274,29 +297,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     });
   }
 
-  // private initializeNotaEvolucionForm(): FormGroup {
-  //   return this.fb.group({
-  //     subjetivo: ['', Validators.required],
-  //     objetivo: ['', Validators.required],
-  //     analisis: ['', Validators.required],
-  //     plan: ['', Validators.required]
-  //   });
-  // }
-// private initializeNotaEvolucionForm(): FormGroup {
-//   return this.fb.group({
-//     // 🔥 MANTENER CAMPOS SOAP PARA LA UI (más fácil para el usuario)
-//     subjetivo: ['', Validators.required], // Se mapea a sintomas_signos
-//     objetivo: ['', Validators.required],  // Se mapea a habitus_exterior
-//     analisis: ['', Validators.required],  // Se mapea a evolucion_analisis
-//     plan: ['', Validators.required],      // Se mapea a plan_estudios_tratamiento
 
-//     // 🔥 CAMPOS ADICIONALES OPCIONALES (si quieres mostrarlos en la UI)
-//     estado_nutricional: [''],
-//     estudios_laboratorio: [''],
-//     diagnosticos: [''],
-//     pronostico: ['']
-//   });
-// }
 private initializeNotaEvolucionForm(): FormGroup {
   return this.fb.group({
     sintomas_signos: ['', Validators.required],
@@ -802,32 +803,6 @@ private async guardarSignosVitales(): Promise<void> {
     console.log('✅ Nota de urgencias guardada:', response);
   }
 
-  // ==========================================
-  // NOTA DE EVOLUCIÓN - ✅ CORREGIDO
-  // ==========================================
-
-  // private async guardarNotaEvolucion(): Promise<void> {
-  //   if (!this.notaEvolucionForm.valid) {
-  //     throw new Error('Formulario de nota de evolución inválido');
-  //   }
-  //   const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(t => t.nombre === 'Nota de Evolución');
-  //   if (!tipoNotaEvolucion) {
-  //     throw new Error('Tipo de documento de evolución no encontrado');
-  //   }
-  //   const documentoEvolucion = await this.crearDocumentoEspecifico(tipoNotaEvolucion.id_tipo_documento);
-  //   const notaData = {
-  //     id_documento: documentoEvolucion.id_documento,
-  //     subjetivo: this.notaEvolucionForm.value.subjetivo,
-  //     objetivo: this.notaEvolucionForm.value.objetivo,
-  //     analisis: this.notaEvolucionForm.value.analisis,
-  //     plan: this.notaEvolucionForm.value.plan
-  //   };
-  //   const response = await firstValueFrom(
-  //     this.notaEvolucionService.createNotaEvolucion(notaData)
-  //   );
-  //   console.log('✅ Nota de evolución guardada:', response);
-  // }
-
 // ==========================================
 // NOTA DE EVOLUCIÓN - ✅ CORREGIDO SEGÚN TU BD REAL
 // ==========================================
@@ -979,20 +954,37 @@ private async crearDocumentoClinicoPadre(): Promise<void> {
   // UTILIDADES
   // ==========================================
 
-  calcularEdad(fechaNacimiento: string): number {
-    if (!fechaNacimiento) return 0;
+  // calcularEdad(fechaNacimiento: string): number {
+  //   if (!fechaNacimiento) return 0;
 
-    const today = new Date();
-    const birthDate = new Date(fechaNacimiento);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+  //   const today = new Date();
+  //   const birthDate = new Date(fechaNacimiento);
+  //   let age = today.getFullYear() - birthDate.getFullYear();
+  //   const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
+  //   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  //     age--;
+  //   }
 
-    return age;
+  //   return age;
+  // }
+
+  calcularEdad(fechaNacimiento?: string): number {
+  // 🔥 ACCEDER A LA FECHA REAL ANIDADA
+  const fecha = fechaNacimiento || this.pacienteCompleto?.persona?.persona?.fecha_nacimiento;
+  if (!fecha) return 0;
+
+  const today = new Date();
+  const birthDate = new Date(fecha);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
   }
+
+  return age;
+}
 
   formatearFecha(fecha: string): string {
     if (!fecha) return 'No disponible';
@@ -1008,12 +1000,20 @@ private async crearDocumentoClinicoPadre(): Promise<void> {
     }
   }
 
-  getNombreCompleto(): string {
-    if (!this.pacienteCompleto?.persona) return 'Cargando...';
 
-    const { nombre, apellido_paterno, apellido_materno } = this.pacienteCompleto.persona;
-    return `${nombre} ${apellido_paterno} ${apellido_materno || ''}`.trim();
-  }
+  getNombreCompleto(): string {
+  // 🔥 ACCEDER A LA PERSONA REAL ANIDADA
+  const personaReal = this.pacienteCompleto?.persona?.persona || this.pacienteCompleto?.paciente?.id_persona;
+
+  if (!personaReal) return 'Cargando...';
+
+  const { nombre, apellido_paterno, apellido_materno } = personaReal;
+  return `${nombre || ''} ${apellido_paterno || ''} ${apellido_materno || ''}`.trim();
+}
+
+get personaInfo() {
+  return this.pacienteCompleto?.persona?.persona || this.pacienteCompleto?.paciente?.id_persona || {};
+}
 
   getColorClase(color: string): string {
     const colores: { [key: string]: string } = {
