@@ -34,7 +34,7 @@ export class PersonasComponent implements OnInit, OnDestroy {
   // Estados del modal
   showModal = signal(false);
   showDeleteModal = signal(false);
-  showViewModal = signal(false); // 🔥 NUEVO: Modal para ver detalles
+  showViewModal = signal(false);
   isEditMode = signal(false);
 
   // Persona seleccionada

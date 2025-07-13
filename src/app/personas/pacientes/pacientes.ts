@@ -214,7 +214,7 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   crearNuevoPaciente(): void {
-    this.router.navigate(['/personas/pacientes/nuevo']);
+    this.router.navigate(['/app/nuevo-paciente/inicio']);
   }
 
   eliminarPaciente(paciente: Paciente): void {
