@@ -5,6 +5,7 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
+  FormsModule,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -41,6 +42,7 @@ import { CreateNotaEvolucionDto } from '../../models/nota-evolucion.model';
 import { TipoDocumento } from '../../models/tipo-documento.model';
 import { Servicio } from '../../models/servicio.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
+
 interface PacienteCompleto {
   persona: any;
   paciente: Paciente;
@@ -49,6 +51,7 @@ interface PacienteCompleto {
   ultimoInternamiento: any;
   signosVitales: SignosVitales[] | null;
 }
+
 interface TipoDocumentoDisponible {
   id_tipo_documento: number;
   nombre: string;
@@ -59,6 +62,7 @@ interface TipoDocumentoDisponible {
   orden: number;
   activo: boolean;
 }
+
 interface FormularioEstado {
   signosVitales: boolean;
   historiaClinica: boolean;
@@ -66,10 +70,11 @@ interface FormularioEstado {
   notaEvolucion: boolean;
   [key: string]: boolean;
 }
+
 @Component({
   selector: 'app-perfil-paciente',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './perfil-paciente.html',
   styleUrl: './perfil-paciente.css',
 })
@@ -106,6 +111,20 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   personalMedico: any[] = [];
   servicios: Servicio[] = [];
   documentoClinicoActual: number | null = null;
+
+  // Para el tab de historial
+  tabActiva: string = 'general';
+  filtroHistorial: any = {
+    tipoDocumento: '',
+    fechaDesde: '',
+    fechaHasta: '',
+  };
+  timelineDocumentos: any[] = [];
+  historialInternamientos: any[] = [];
+
+  // Para el tab de datos clínicos
+  datosClinicosConsolidados: any = {};
+  resumenGeneral: any = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -494,6 +513,132 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       notaEvolucion: 'Nota de Evolución',
     };
     return titulos[formulario] || formulario;
+  }
+
+  // Métodos que faltan
+  cambiarTab(tab: string): void {
+    this.tabActiva = tab;
+
+    // Cargar datos específicos según el tab
+    if (tab === 'historial') {
+      this.cargarHistorialClinico();
+    } else if (tab === 'datos') {
+      this.cargarDatosClinicosConsolidados();
+    } else if (tab === 'general') {
+      this.cargarResumenGeneral();
+    }
+  }
+
+  eliminarBorrador(): void {
+    if (confirm('¿Está seguro de que desea eliminar el borrador guardado?')) {
+      localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+      this.success = 'Borrador eliminado correctamente';
+
+      // Resetear formularios
+      this.signosVitalesForm.reset();
+      this.historiaClinicaForm.reset();
+      this.notaUrgenciasForm.reset();
+      this.notaEvolucionForm.reset();
+
+      // Resetear estados
+      this.formularioEstado = {
+        signosVitales: false,
+        historiaClinica: false,
+        notaUrgencias: false,
+        notaEvolucion: false,
+      };
+
+      setTimeout(() => {
+        this.success = null;
+      }, 3000);
+    }
+  }
+
+  private cargarHistorialClinico(): void {
+    // Cargar timeline de documentos
+    this.timelineDocumentos = this.documentosDisponibles.map((doc) => ({
+      titulo: doc.nombre_tipo_documento || 'Documento Clínico',
+      fecha: doc.fecha_elaboracion,
+      descripcion: `Documento creado por ${
+        doc.medico_responsable || 'Sistema'
+      }`,
+      icono: this.getIconoTipoDocumento(doc.nombre_tipo_documento || ''),
+      color: this.getColorTipoDocumento(doc.nombre_tipo_documento || ''),
+      estado: doc.estado || 'Activo',
+    }));
+
+    // Cargar historial de internamientos (simulado)
+    this.historialInternamientos = [
+      // Aquí irían los datos reales de internamientos
+      // Por ahora dejamos array vacío
+    ];
+  }
+
+  private cargarDatosClinicosConsolidados(): void {
+    // Consolidar datos de todas las historias clínicas
+    this.datosClinicosConsolidados = {
+      alergias: this.extraerAlergias(),
+      medicamentosActuales: this.extraerMedicamentos(),
+      diagnosticosActivos: this.extraerDiagnosticos(),
+      antecedentesRelevantes: this.extraerAntecedentes(),
+    };
+  }
+
+  private cargarResumenGeneral(): void {
+    this.resumenGeneral = {
+      alertasMedicas: this.identificarAlertasMedicas(),
+      ultimoInternamiento: this.pacienteCompleto?.ultimoInternamiento || null,
+      signosVitalesRecientes: this.signosVitalesDisponibles.slice(0, 5),
+      documentosRecientes: this.documentosDisponibles.slice(0, 5),
+    };
+  }
+
+  private extraerAlergias(): string[] {
+    // Extraer alergias de las historias clínicas
+    const alergias: string[] = [];
+    // Lógica para extraer alergias de los documentos
+    return alergias;
+  }
+
+  private extraerMedicamentos(): any[] {
+    // Extraer medicamentos actuales
+    return [];
+  }
+
+  private extraerDiagnosticos(): any[] {
+    // Extraer diagnósticos activos
+    return [];
+  }
+
+  private extraerAntecedentes(): any[] {
+    // Extraer antecedentes relevantes
+    return [];
+  }
+
+  private identificarAlertasMedicas(): string[] {
+    const alertas: string[] = [];
+
+    // Revisar signos vitales críticos
+    const ultimosSignos = this.signosVitalesDisponibles[0];
+    if (ultimosSignos) {
+      if (ultimosSignos.temperatura && ultimosSignos.temperatura > 38.5) {
+        alertas.push('Temperatura elevada');
+      }
+      if (
+        ultimosSignos.presion_arterial_sistolica &&
+        ultimosSignos.presion_arterial_sistolica > 140
+      ) {
+        alertas.push('Presión arterial alta');
+      }
+      if (
+        ultimosSignos.frecuencia_cardiaca &&
+        ultimosSignos.frecuencia_cardiaca > 100
+      ) {
+        alertas.push('Taquicardia');
+      }
+    }
+
+    return alertas;
   }
 
   cambiarFormulario(tipoFormulario: string): void {
@@ -1106,36 +1251,36 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }, 7000);
   }
 
-/**
- * Error de permisos - Manejo específico
- */
-private manejarErrorPermisos(error: any, contexto: string): void {
-  this.guardarLocalmenteFormulario();
+  /**
+   * Error de permisos - Manejo específico
+   */
+  private manejarErrorPermisos(error: any, contexto: string): void {
+    this.guardarLocalmenteFormulario();
 
-  let mensaje = 'No tienes permisos para realizar esta acción.';
+    let mensaje = 'No tienes permisos para realizar esta acción.';
 
-  if (error?.status === 401) {
-    mensaje = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
-  } else if (error?.status === 403) {
-    mensaje = 'No tienes los permisos necesarios para esta operación.';
-  }
+    if (error?.status === 401) {
+      mensaje = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+    } else if (error?.status === 403) {
+      mensaje = 'No tienes los permisos necesarios para esta operación.';
+    }
 
-  this.error = mensaje;
-  this.mostrarError = true;
+    this.error = mensaje;
+    this.mostrarError = true;
 
-  // Para errores de permisos, mostrar más tiempo
-  setTimeout(() => {
-    this.mostrarError = false;
-  }, 10000);
-
-  // Si es error 401, podríamos redirigir al login después de un tiempo
-  if (error?.status === 401) {
+    // Para errores de permisos, mostrar más tiempo
     setTimeout(() => {
-      // Opcional: redirigir al login
-      // this.router.navigate(['/login']);
-    }, 8000);
+      this.mostrarError = false;
+    }, 10000);
+
+    // Si es error 401, podríamos redirigir al login después de un tiempo
+    if (error?.status === 401) {
+      setTimeout(() => {
+        // Opcional: redirigir al login
+        // this.router.navigate(['/login']);
+      }, 8000);
+    }
   }
-}
 
   /**
    * Error crítico - Requiere atención pero preserva trabajo
@@ -1349,5 +1494,4 @@ private manejarErrorPermisos(error: any, contexto: string): void {
     if (error?.message) return error.message;
     return 'Datos inválidos';
   }
-
 }
