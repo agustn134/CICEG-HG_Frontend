@@ -65,9 +65,7 @@
             </p>
           </div>
           <div>
-            <p class="text-blue-800">
-              <strong>Tipo de sangre:</strong> {{ resumenPaciente.tipo_sangre }}
-            </p>
+            <p><span class="font-medium">Tipo de sangre:</span> {{ resumenPaciente?.tipo_sangre_nombre || 'No especificado' }}</p>
             <p class="text-blue-800">
               <strong>Alergias:</strong> {{ resumenPaciente.alergias || 'Ninguna' }}
             </p>
