@@ -175,6 +175,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       console.log('❌ Persona no existe o es undefined');
     }
   }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -208,6 +209,9 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       this.hayProblemasConexion = true;
       this.estadoAutoguardado = 'offline';
     });
+
+     // 🔥 AGREGAR ESTO PARA INICIALIZAR MÉDICO
+  this.medicoActual = 9; // Por ahora hardcodeado, después vendrá del login
   }
 
   ngOnDestroy(): void {
@@ -916,44 +920,113 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     );
     console.log('✅ Nota de urgencias guardada:', response);
   }
+
+
+  // private async guardarNotaEvolucion(): Promise<void> {
+  //   if (!this.notaEvolucionForm.valid) {
+  //     throw new Error('Formulario de nota de evolución inválido');
+  //   }
+
+  //   const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
+  //     (t) => t.nombre === 'Nota de Evolución'
+  //   );
+  //   if (!tipoNotaEvolucion) {
+  //     throw new Error('Tipo de documento de evolución no encontrado');
+  //   }
+
+  //   const documentoEvolucion = await this.crearDocumentoEspecifico(
+  //     tipoNotaEvolucion.id_tipo_documento
+  //   );
+
+  //   const notaData: CreateNotaEvolucionDto = {
+  //     id_documento: documentoEvolucion.id_documento,
+  //     sintomas_signos:
+  //       this.notaEvolucionForm.value.subjetivo || 'Paciente refiere...',
+  //     habitus_exterior:
+  //       this.notaEvolucionForm.value.objetivo ||
+  //       'Paciente en condiciones generales...',
+  //     estado_nutricional: 'Adecuado para la edad',
+  //     estudios_laboratorio_gabinete: 'Sin estudios recientes que reportar',
+  //     evolucion_analisis:
+  //       this.notaEvolucionForm.value.analisis || 'Evolución clínica estable',
+  //     diagnosticos: 'Por determinar',
+  //     plan_estudios_tratamiento:
+  //       this.notaEvolucionForm.value.plan || 'Continuar manejo actual',
+  //     pronostico: 'Favorable para la vida',
+  //   };
+
+  //   const response = await firstValueFrom(
+  //     this.notaEvolucionService.createNotaEvolucion(notaData)
+  //   );
+  //   console.log(' Nota de evolución guardada:', response);
+  // }
+
   private async guardarNotaEvolucion(): Promise<void> {
-    if (!this.notaEvolucionForm.valid) {
-      throw new Error('Formulario de nota de evolución inválido');
-    }
-
-    const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
-      (t) => t.nombre === 'Nota de Evolución'
-    );
-    if (!tipoNotaEvolucion) {
-      throw new Error('Tipo de documento de evolución no encontrado');
-    }
-
-    const documentoEvolucion = await this.crearDocumentoEspecifico(
-      tipoNotaEvolucion.id_tipo_documento
-    );
-
-    const notaData: CreateNotaEvolucionDto = {
-      id_documento: documentoEvolucion.id_documento,
-      sintomas_signos:
-        this.notaEvolucionForm.value.subjetivo || 'Paciente refiere...',
-      habitus_exterior:
-        this.notaEvolucionForm.value.objetivo ||
-        'Paciente en condiciones generales...',
-      estado_nutricional: 'Adecuado para la edad',
-      estudios_laboratorio_gabinete: 'Sin estudios recientes que reportar',
-      evolucion_analisis:
-        this.notaEvolucionForm.value.analisis || 'Evolución clínica estable',
-      diagnosticos: 'Por determinar',
-      plan_estudios_tratamiento:
-        this.notaEvolucionForm.value.plan || 'Continuar manejo actual',
-      pronostico: 'Favorable para la vida',
-    };
-
-    const response = await firstValueFrom(
-      this.notaEvolucionService.createNotaEvolucion(notaData)
-    );
-    console.log(' Nota de evolución guardada:', response);
+  if (!this.notaEvolucionForm.valid) {
+    throw new Error('Formulario de nota de evolución inválido');
   }
+
+  const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Nota de Evolución'
+  );
+  if (!tipoNotaEvolucion) {
+    throw new Error('Tipo de documento de evolución no encontrado');
+  }
+
+  const documentoEvolucion = await this.crearDocumentoEspecifico(
+    tipoNotaEvolucion.id_tipo_documento
+  );
+
+  const notaData: CreateNotaEvolucionDto = {
+    id_documento: documentoEvolucion.id_documento,
+    sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
+    habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
+    estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
+    estudios_laboratorio_gabinete: this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
+    evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
+    diagnosticos: this.notaEvolucionForm.value.diagnosticos,
+    plan_estudios_tratamiento: this.notaEvolucionForm.value.plan_estudios_tratamiento,
+    pronostico: this.notaEvolucionForm.value.pronostico,
+    interconsultas: this.notaEvolucionForm.value.interconsultas || '',
+    indicaciones_medicas: this.notaEvolucionForm.value.indicaciones_medicas || '',
+    // Campos opcionales de exploración física
+    exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
+    exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
+    exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
+    exploracion_abdomen: this.notaEvolucionForm.value.exploracion_abdomen || '',
+    exploracion_extremidades: this.notaEvolucionForm.value.exploracion_extremidades || '',
+    exploracion_neurologico: this.notaEvolucionForm.value.exploracion_neurologico || ''
+  };
+
+  console.log('🔥 Enviando nota de evolución al backend:', notaData);
+
+  const response = await firstValueFrom(
+    this.notaEvolucionService.createNotaEvolucion(notaData)
+  );
+
+  console.log('✅ Nota de evolución guardada:', response);
+}
+
+
+  // 3. AGREGAR FUNCIÓN PARA GENERAR PDF (PLACEHOLDER)
+async generarPDF(tipoDocumento: string): Promise<void> {
+  // 🔥 PLACEHOLDER PARA CUANDO IMPLEMENTEMOS PDFMAKE
+  console.log(`📄 Generando PDF para: ${tipoDocumento}`);
+
+  // Simular generación de PDF
+  this.success = `PDF de ${tipoDocumento} generado correctamente`;
+
+  // TODO: Implementar PDFMake aquí
+  // 1. Obtener datos del documento desde la BD
+  // 2. Crear template con PDFMake
+  // 3. Generar y descargar PDF
+
+  alert(`🚧 PRÓXIMAMENTE: PDF de ${tipoDocumento}\n\nPor ahora los datos se están guardando correctamente en PostgreSQL.`);
+}
+
+
+
+
 
   private async crearDocumentoClinicoPadre(): Promise<void> {
     if (!this.pacienteCompleto?.expediente.id_expediente) {
