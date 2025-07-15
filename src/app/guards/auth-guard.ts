@@ -1,22 +1,16 @@
-import { Injectable } from '@angular/core';
-import { CanActivateFn, CanMatchFn } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+// src/app/guards/auth.guard.ts
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth/auth.service';
 
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class AuthGuard {
-//   constructor(private authService: AuthService) {}
+export const authGuard = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-//   canActivate: CanMatchFn = () => {
-//     return this.authService.isAuthenticated();
-//   };
-// }
+  if (authService.isLoggedIn) {
+    return true;
+  }
 
-@Injectable({ providedIn: 'root' })
-export class AuthGuard {
-  canActivate: CanActivateFn = (route, state) => {
-    // return false; // Original
-    return true; // Bypass temporal
-  };
-}
+  router.navigate(['/login']);
+  return false;
+};

@@ -42,6 +42,7 @@ import { CreateNotaEvolucionDto } from '../../models/nota-evolucion.model';
 import { TipoDocumento } from '../../models/tipo-documento.model';
 import { Servicio } from '../../models/servicio.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
+import { AuthService } from '../../services/auth/auth.service';
 
 interface PacienteCompleto {
   persona: any;
@@ -127,6 +128,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   resumenGeneral: any = {};
 
   constructor(
+    private authService: AuthService, // 🔥 Agregar esto
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
@@ -209,9 +211,25 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       this.hayProblemasConexion = true;
       this.estadoAutoguardado = 'offline';
     });
+    // Obtener médico del servicio de autenticación
+    this.authService.currentUser$.subscribe((user) => {
+      if (user && user.tipo_usuario === 'medico') {
+        this.medicoActual = user.id;
+      }
+    });
+    // 🔥 AGREGAR ESTO PARA INICIALIZAR MÉDICO
+    // this.medicoActual = 9; // Por ahora hardcodeado, después vendrá del login
 
-     // 🔥 AGREGAR ESTO PARA INICIALIZAR MÉDICO
-  this.medicoActual = 9; // Por ahora hardcodeado, después vendrá del login
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.pacienteId = parseInt(id, 10);
+        this.initializeComponent();
+      } else {
+        this.error = 'ID de paciente no válido';
+        this.isLoading = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -921,7 +939,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     console.log('✅ Nota de urgencias guardada:', response);
   }
 
-
   // private async guardarNotaEvolucion(): Promise<void> {
   //   if (!this.notaEvolucionForm.valid) {
   //     throw new Error('Formulario de nota de evolución inválido');
@@ -962,71 +979,74 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   // }
 
   private async guardarNotaEvolucion(): Promise<void> {
-  if (!this.notaEvolucionForm.valid) {
-    throw new Error('Formulario de nota de evolución inválido');
+    if (!this.notaEvolucionForm.valid) {
+      throw new Error('Formulario de nota de evolución inválido');
+    }
+
+    const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Nota de Evolución'
+    );
+    if (!tipoNotaEvolucion) {
+      throw new Error('Tipo de documento de evolución no encontrado');
+    }
+
+    const documentoEvolucion = await this.crearDocumentoEspecifico(
+      tipoNotaEvolucion.id_tipo_documento
+    );
+
+    const notaData: CreateNotaEvolucionDto = {
+      id_documento: documentoEvolucion.id_documento,
+      sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
+      habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
+      estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
+      estudios_laboratorio_gabinete:
+        this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
+      evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
+      diagnosticos: this.notaEvolucionForm.value.diagnosticos,
+      plan_estudios_tratamiento:
+        this.notaEvolucionForm.value.plan_estudios_tratamiento,
+      pronostico: this.notaEvolucionForm.value.pronostico,
+      interconsultas: this.notaEvolucionForm.value.interconsultas || '',
+      indicaciones_medicas:
+        this.notaEvolucionForm.value.indicaciones_medicas || '',
+      // Campos opcionales de exploración física
+      exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
+      exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
+      exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
+      exploracion_abdomen:
+        this.notaEvolucionForm.value.exploracion_abdomen || '',
+      exploracion_extremidades:
+        this.notaEvolucionForm.value.exploracion_extremidades || '',
+      exploracion_neurologico:
+        this.notaEvolucionForm.value.exploracion_neurologico || '',
+    };
+
+    console.log('🔥 Enviando nota de evolución al backend:', notaData);
+
+    const response = await firstValueFrom(
+      this.notaEvolucionService.createNotaEvolucion(notaData)
+    );
+
+    console.log('✅ Nota de evolución guardada:', response);
   }
-
-  const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
-    (t) => t.nombre === 'Nota de Evolución'
-  );
-  if (!tipoNotaEvolucion) {
-    throw new Error('Tipo de documento de evolución no encontrado');
-  }
-
-  const documentoEvolucion = await this.crearDocumentoEspecifico(
-    tipoNotaEvolucion.id_tipo_documento
-  );
-
-  const notaData: CreateNotaEvolucionDto = {
-    id_documento: documentoEvolucion.id_documento,
-    sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
-    habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
-    estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
-    estudios_laboratorio_gabinete: this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
-    evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
-    diagnosticos: this.notaEvolucionForm.value.diagnosticos,
-    plan_estudios_tratamiento: this.notaEvolucionForm.value.plan_estudios_tratamiento,
-    pronostico: this.notaEvolucionForm.value.pronostico,
-    interconsultas: this.notaEvolucionForm.value.interconsultas || '',
-    indicaciones_medicas: this.notaEvolucionForm.value.indicaciones_medicas || '',
-    // Campos opcionales de exploración física
-    exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
-    exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
-    exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
-    exploracion_abdomen: this.notaEvolucionForm.value.exploracion_abdomen || '',
-    exploracion_extremidades: this.notaEvolucionForm.value.exploracion_extremidades || '',
-    exploracion_neurologico: this.notaEvolucionForm.value.exploracion_neurologico || ''
-  };
-
-  console.log('🔥 Enviando nota de evolución al backend:', notaData);
-
-  const response = await firstValueFrom(
-    this.notaEvolucionService.createNotaEvolucion(notaData)
-  );
-
-  console.log('✅ Nota de evolución guardada:', response);
-}
-
 
   // 3. AGREGAR FUNCIÓN PARA GENERAR PDF (PLACEHOLDER)
-async generarPDF(tipoDocumento: string): Promise<void> {
-  // 🔥 PLACEHOLDER PARA CUANDO IMPLEMENTEMOS PDFMAKE
-  console.log(`📄 Generando PDF para: ${tipoDocumento}`);
+  async generarPDF(tipoDocumento: string): Promise<void> {
+    // 🔥 PLACEHOLDER PARA CUANDO IMPLEMENTEMOS PDFMAKE
+    console.log(`📄 Generando PDF para: ${tipoDocumento}`);
 
-  // Simular generación de PDF
-  this.success = `PDF de ${tipoDocumento} generado correctamente`;
+    // Simular generación de PDF
+    this.success = `PDF de ${tipoDocumento} generado correctamente`;
 
-  // TODO: Implementar PDFMake aquí
-  // 1. Obtener datos del documento desde la BD
-  // 2. Crear template con PDFMake
-  // 3. Generar y descargar PDF
+    // TODO: Implementar PDFMake aquí
+    // 1. Obtener datos del documento desde la BD
+    // 2. Crear template con PDFMake
+    // 3. Generar y descargar PDF
 
-  alert(`🚧 PRÓXIMAMENTE: PDF de ${tipoDocumento}\n\nPor ahora los datos se están guardando correctamente en PostgreSQL.`);
-}
-
-
-
-
+    alert(
+      `🚧 PRÓXIMAMENTE: PDF de ${tipoDocumento}\n\nPor ahora los datos se están guardando correctamente en PostgreSQL.`
+    );
+  }
 
   private async crearDocumentoClinicoPadre(): Promise<void> {
     if (!this.pacienteCompleto?.expediente.id_expediente) {

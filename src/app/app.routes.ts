@@ -65,10 +65,11 @@ import { RegistrosTransfusion } from './documentos-clinicos/registros-transfusio
 // ===== Notas Especializadas =====
 import { NotasPsicologia } from './notas-especializadas/notas-psicologia/notas-psicologia';
 import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nutricion';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
-  // { path: 'login', component: Login },
+  { path: 'login', component: Login },
   // { path: 'recuperar-password', component: RecuperarPassword },
   // { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
@@ -80,7 +81,7 @@ export const routes: Routes = [
   {
     path: 'app',
     component: DashboardLayoutComponent,
-    // canActivate: [AuthGuard], // Descomenta cuando tengas el guard
+    canActivate: [authGuard], // Descomenta cuando tengas el guard
     children: [
       // === Dashboard principal ===
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
