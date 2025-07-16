@@ -1,509 +1,838 @@
-import { Component } from '@angular/core';
+// src/app/personas/administradores/administradores.ts
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+
+// Importaciones de modelos y servicios
+import {
+  Administrador,
+  AdministradorFilters,
+  EstadisticasAdministradores,
+  CreateAdministradorDto,
+  UpdateAdministradorDto,
+  NivelAcceso,
+  ApiResponse,
+  Genero,
+  EstadoCivil,
+  ADMINISTRADOR_CONFIG
+} from '../../models';
+import { AdministradorService } from '../../services/personas/administradores';
+import { PersonasService } from '../../services/personas/personas';
+import { CreatePersonaFrontendDto } from '../../models';
 
 @Component({
   selector: 'app-administradores',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './administradores.html',
   styleUrl: './administradores.css'
 })
-export class Administradores {
+export class Administradores implements OnInit, OnDestroy {
 
+  // ==========================================
+  // INYECCIÓN DE DEPENDENCIAS
+  // ==========================================
+  private administradorService = inject(AdministradorService);
+  private personasService = inject(PersonasService); // ← Agregar esta línea
+
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private destroy$ = new Subject<void>();
+
+  // ==========================================
+  // PROPIEDADES DEL COMPONENTE
+  // ==========================================
+
+  // Datos principales
+  administradores: Administrador[] = [];
+  administradorSeleccionado: Administrador | null = null;
+  estadisticas: EstadisticasAdministradores | null = null;
+
+  // Estados de la UI
+  loading = false;
+  error: string | null = null;
+  success: string | null = null;
+  mostrarFiltros = false;
+  mostrarEstadisticas = true;
+  mostrarModal = false;
+  mostrarModalPerfil = false;
+  mostrarModalPassword = false;
+  vistaActual: 'tabla' | 'tarjetas' = 'tarjetas';
+
+  // Formularios
+  textoBusqueda = '';
+  filtrosForm!: FormGroup;
+  administradorForm!: FormGroup;
+  passwordForm!: FormGroup;
+  filtrosAplicados: AdministradorFilters = {};
+
+  // Estados del formulario
+  isEditMode = false;
+  administradorEnEdicion: Administrador | null = null;
+  procesandoFormulario = false;
+
+  // Configuraciones
+  readonly nivelesAcceso = [
+    { valor: NivelAcceso.USUARIO, etiqueta: 'Usuario', descripcion: 'Acceso básico al sistema' },
+    { valor: NivelAcceso.SUPERVISOR, etiqueta: 'Supervisor', descripcion: 'Supervisa operaciones y reportes' },
+    { valor: NivelAcceso.ADMINISTRADOR, etiqueta: 'Administrador', descripcion: 'Control total del sistema' }
+  ];
+
+  readonly opcionesActivo: { valor: boolean | '', etiqueta: string }[] = [
+    { valor: '', etiqueta: 'Todos' },
+    { valor: true, etiqueta: 'Activos' },
+    { valor: false, etiqueta: 'Inactivos' }
+  ];
+
+  readonly opcionesGenero = [
+    { valor: 'M', etiqueta: 'Masculino' },
+    { valor: 'F', etiqueta: 'Femenino' }
+  ];
+
+  readonly estadosCiviles = [
+    { valor: EstadoCivil.SOLTERO, etiqueta: 'Soltero(a)' },
+    { valor: EstadoCivil.CASADO, etiqueta: 'Casado(a)' },
+    { valor: EstadoCivil.DIVORCIADO, etiqueta: 'Divorciado(a)' },
+    { valor: EstadoCivil.VIUDO, etiqueta: 'Viudo(a)' },
+    { valor: EstadoCivil.UNION_LIBRE, etiqueta: 'Unión libre' }
+  ];
+
+  // Exponer enums para el template
+  readonly NivelAcceso = NivelAcceso;
+  readonly CONFIG = ADMINISTRADOR_CONFIG;
+
+ // ==========================================
+// MÉTODOS PARA TRACKING Y TEMPLATE
+// ==========================================
+
+trackByAdministradorId(index: number, administrador: Administrador): number {
+  return administrador.id_administrador;
 }
 
-
-
-
-
-
-
-
-// // src/app/personas/administradores/administradores.ts
-// import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-// import { Subject } from 'rxjs';
-// import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-
-// import {
-//   AdministradoresService,
-//   Administrador,
-//   CreateAdministradorDto,
-//   UpdateAdministradorDto,
-//   AdministradorFilters,
-//   EstadisticasAdministradores
-// } from '../../services/personas/administradores';
-// import { NivelAcceso, PaginationInfo } from '../../models/base.models';
-
-// @Component({
-//   selector: 'app-administradores',
-//   standalone: true,
-//   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-//   templateUrl: './administradores.html',
-//   styleUrl: './administradores.css'
-// })
-// export class AdministradoresComponent implements OnInit, OnDestroy {
-//   // ==========================================
-//   // SIGNALS Y PROPIEDADES REACTIVAS
-//   // ==========================================
-//   administradores = signal<Administrador[]>([]);
-//   loading = signal(false);
-//   error = signal<string | null>(null);
-//   estadisticas = signal<EstadisticasAdministradores | null>(null);
-
-//   // Estados del modal
-//   showModal = signal(false);
-//   showDeleteModal = signal(false);
-//   showPasswordModal = signal(false);
-//   isEditMode = signal(false);
-
-//   // Administrador seleccionado
-//   selectedAdministrador = signal<Administrador | null>(null);
-
-//   // Paginación
-//   currentPage = signal(1);
-//   totalPages = signal(1);
-//   totalItems = signal(0);
-//   pageSize = signal(12);
-
-//   // Filtros
-//   searchTerm = signal('');
-//   filtroNivelAcceso = signal<NivelAcceso | ''>('');
-//   filtroActivo = signal<boolean | ''>('');
-
-//   // ==========================================
-//   // COMPUTED SIGNALS
-//   // ==========================================
-//   filteredAdministradores = computed(() => {
-//     let filtered = this.administradores();
-
-//     // Aplicar filtro de búsqueda
-//     const search = this.searchTerm().toLowerCase().trim();
-//     if (search) {
-//       filtered = filtered.filter(admin =>
-//         admin.usuario.toLowerCase().includes(search) ||
-//         admin.id_administrador.toString().includes(search) ||
-//         admin.id_persona.toString().includes(search) ||
-//         admin.persona?.nombre?.toLowerCase().includes(search) ||
-//         admin.persona?.apellido_paterno?.toLowerCase().includes(search)
-//       );
-//     }
-
-//     // Aplicar filtro de nivel de acceso
-//     if (this.filtroNivelAcceso()) {
-//       filtered = filtered.filter(admin => admin.nivel_acceso === this.filtroNivelAcceso());
-//     }
-
-//     // Aplicar filtro de estado
-//     if (this.filtroActivo() !== '') {
-//       filtered = filtered.filter(admin => admin.activo === this.filtroActivo());
-//     }
-
-//     return filtered;
-//   });
-
-//   paginatedAdministradores = computed(() => {
-//     const filtered = this.filteredAdministradores();
-//     const startIndex = (this.currentPage() - 1) * this.pageSize();
-//     const endIndex = startIndex + this.pageSize();
-
-//     // Actualizar información de paginación
-//     this.totalItems.set(filtered.length);
-//     this.totalPages.set(Math.ceil(filtered.length / this.pageSize()));
-
-//     return filtered.slice(startIndex, endIndex);
-//   });
-
-//   // ==========================================
-//   // FORMULARIOS
-//   // ==========================================
-//   administradorForm!: FormGroup;
-//   passwordForm!: FormGroup;
-
-//   // ==========================================
-//   // PROPIEDADES DE CLASE
-//   // ==========================================
-//   private destroy$ = new Subject<void>();
-//   editingId: number | null = null;
-
-//   // Exponer enums para el template
-//   readonly NivelAcceso = NivelAcceso;
-
-//   // ==========================================
-//   // LIFECYCLE HOOKS
-//   // ==========================================
-//   constructor(
-//     private administradoresService: AdministradoresService,
-//     private fb: FormBuilder
-//   ) {
-//     this.initializeForms();
-//   }
-
-//   ngOnInit(): void {
-//     this.loadAdministradores();
-//     // this.loadEstadisticas();
-//     this.setupSearchSubscription();
-//   }
-
-//   ngOnDestroy(): void {
-//     this.destroy$.next();
-//     this.destroy$.complete();
-//   }
-
-//   // ==========================================
-//   // INICIALIZACIÓN
-//   // ==========================================
-
-//   private initializeForms(): void {
-//     this.administradorForm = this.fb.group({
-//       id_persona: ['', [Validators.required, Validators.min(1)]],
-//       usuario: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-//       password: ['', [Validators.required, Validators.minLength(6)]],
-//       nivel_acceso: [NivelAcceso.USUARIO, Validators.required],
-//       activo: [true, Validators.required],
-//       foto: ['']
-//     });
-
-//     this.passwordForm = this.fb.group({
-//       password_actual: ['', Validators.required],
-//       password_nuevo: ['', [Validators.required, Validators.minLength(6)]],
-//       confirmar_password: ['', Validators.required]
-//     }, {
-//       validators: this.passwordMatchValidator
-//     });
-//   }
-
-//   private setupSearchSubscription(): void {
-//     // Configurar búsqueda con debounce
-//     const searchInput = document.querySelector('input[placeholder*="Usuario"]') as HTMLInputElement;
-//     if (searchInput) {
-//       // En una implementación real, usarías FormControl para esto
-//       // Por simplicidad, mantengo el ngModel del template
-//     }
-//   }
-
-//   // ==========================================
-//   // CARGA DE DATOS
-//   // ==========================================
-
-//   loadAdministradores(): void {
-//     this.loading.set(true);
-//     this.error.set(null);
-
-//     const filters: AdministradorFilters = {
-//       page: this.currentPage(),
-//       limit: 100, // Cargar más para el filtrado local
-//       activo: undefined // Cargar todos inicialmente
-//     };
-
-//     this.administradoresService.getAll(filters)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (response) => {
-//           if (response.success && response.data) {
-//             this.administradores.set(response.data);
-//           }
-//           this.loading.set(false);
-//         },
-//         error: (error) => {
-//           this.error.set('Error al cargar administradores');
-//           console.error('Error loading administradores:', error);
-//           this.loading.set(false);
-//         }
-//       });
-//   }
-
-//   // loadEstadisticas(): void {
-//   //   this.administradoresService.getEstadisticas()
-//   //     .pipe(takeUntil(this.destroy$))
-//   //     .subscribe({
-//   //       next: (stats) => {
-//   //         this.estadisticas.set(stats);
-//   //       },
-//   //       error: (error) => {
-//   //         console.error('Error loading statistics:', error);
-//   //       }
-//   //     });
-//   // }
-
-//   // ==========================================
-//   // GESTIÓN DEL MODAL
-//   // ==========================================
-
-//   openModal(administrador?: Administrador): void {
-//     this.isEditMode.set(!!administrador);
-//     this.selectedAdministrador.set(administrador || null);
-//     this.editingId = administrador?.id_administrador || null;
-
-//     if (administrador) {
-//       // Modo edición
-//       this.administradorForm.patchValue({
-//         id_persona: administrador.id_persona,
-//         usuario: administrador.usuario,
-//         nivel_acceso: administrador.nivel_acceso,
-//         activo: administrador.activo,
-//         foto: administrador.foto || ''
-//       });
-
-//       // En modo edición, la contraseña no es requerida
-//       this.administradorForm.get('password')?.clearValidators();
-//       this.administradorForm.get('password')?.updateValueAndValidity();
-//     } else {
-//       // Modo creación
-//       this.administradorForm.reset({
-//         nivel_acceso: NivelAcceso.USUARIO,
-//         activo: true
-//       });
-
-//       // En modo creación, la contraseña es requerida
-//       this.administradorForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
-//       this.administradorForm.get('password')?.updateValueAndValidity();
-//     }
-
-//     this.showModal.set(true);
-//   }
-
-//   closeModal(): void {
-//     this.showModal.set(false);
-//     this.selectedAdministrador.set(null);
-//     this.editingId = null;
-//     this.administradorForm.reset();
-//   }
-
-//   openPasswordModal(administrador: Administrador): void {
-//     this.selectedAdministrador.set(administrador);
-//     this.passwordForm.reset();
-//     this.showPasswordModal.set(true);
-//   }
-
-//   closePasswordModal(): void {
-//     this.showPasswordModal.set(false);
-//     this.selectedAdministrador.set(null);
-//     this.passwordForm.reset();
-//   }
-
-//   // ==========================================
-//   // OPERACIONES CRUD
-//   // ==========================================
-
-//   onSubmit(): void {
-//     if (this.administradorForm.invalid) {
-//       this.markFormGroupTouched(this.administradorForm);
-//       return;
-//     }
-
-//     const formData = this.administradorForm.value;
-
-//     if (this.isEditMode()) {
-//       this.updateAdministrador(formData);
-//     } else {
-//       this.createAdministrador(formData);
-//     }
-//   }
-
-//   private createAdministrador(data: CreateAdministradorDto): void {
-//     this.loading.set(true);
-
-//     this.administradoresService.create(data)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (response) => {
-//           if (response.success) {
-//             this.loadAdministradores();
-//             this.closeModal();
-//             this.showSuccessMessage('Administrador creado exitosamente');
-//           }
-//           this.loading.set(false);
-//         },
-//         error: (error) => {
-//           this.showErrorMessage('Error al crear administrador');
-//           console.error('Error creating administrador:', error);
-//           this.loading.set(false);
-//         }
-//       });
-//   }
-
-//   private updateAdministrador(data: UpdateAdministradorDto): void {
-//     if (!this.editingId) return;
-
-//     this.loading.set(true);
-
-//     // Remover password del update si está vacío
-//     if (!data.password) {
-//       delete data.password;
-//     }
-
-//     this.administradoresService.update(this.editingId, data)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (response) => {
-//           if (response.success) {
-//             this.loadAdministradores();
-//             this.closeModal();
-//             this.showSuccessMessage('Administrador actualizado exitosamente');
-//           }
-//           this.loading.set(false);
-//         },
-//         error: (error) => {
-//           this.showErrorMessage('Error al actualizar administrador');
-//           console.error('Error updating administrador:', error);
-//           this.loading.set(false);
-//         }
-//       });
-//   }
-
-//   deleteAdministrador(id: number): void {
-//     if (!confirm('¿Está seguro de que desea eliminar este administrador?')) {
-//       return;
-//     }
-
-//     this.loading.set(true);
-
-//     this.administradoresService.delete(id)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (response) => {
-//           if (response.success) {
-//             this.loadAdministradores();
-//             this.showSuccessMessage('Administrador eliminado exitosamente');
-//           }
-//           this.loading.set(false);
-//         },
-//         error: (error) => {
-//           this.showErrorMessage('Error al eliminar administrador');
-//           console.error('Error deleting administrador:', error);
-//           this.loading.set(false);
-//         }
-//       });
-//   }
-
-//   toggleStatus(administrador: Administrador): void {
-//     this.administradoresService.toggle(administrador.id_administrador)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (response) => {
-//           if (response.success) {
-//             this.loadAdministradores();
-//             const status = !administrador.activo ? 'activado' : 'desactivado';
-//             this.showSuccessMessage(`Administrador ${status} exitosamente`);
-//           }
-//         },
-//         error: (error) => {
-//           this.showErrorMessage('Error al cambiar estado del administrador');
-//           console.error('Error toggling administrador:', error);
-//         }
-//       });
-//   }
-
-//   // ==========================================
-//   // GESTIÓN DE CONTRASEÑAS
-//   // ==========================================
-
-//   onPasswordSubmit(): void {
-//     if (this.passwordForm.invalid) {
-//       this.markFormGroupTouched(this.passwordForm);
-//       return;
-//     }
-
-//     const administrador = this.selectedAdministrador();
-//     if (!administrador) return;
-
-//     const passwordData = {
-//       password_actual: this.passwordForm.value.password_actual,
-//       password_nuevo: this.passwordForm.value.password_nuevo
-//     };
-
-//     this.administradoresService.cambiarPassword(administrador.id_administrador, passwordData)
-//       .pipe(takeUntil(this.destroy$))
-//       .subscribe({
-//         next: (success) => {
-//           if (success) {
-//             this.closePasswordModal();
-//             this.showSuccessMessage('Contraseña cambiada exitosamente');
-//           } else {
-//             this.showErrorMessage('Error al cambiar contraseña');
-//           }
-//         },
-//         error: (error) => {
-//           this.showErrorMessage('Error al cambiar contraseña');
-//           console.error('Error changing password:', error);
-//         }
-//       });
-//   }
-
-//   // ==========================================
-//   // PAGINACIÓN
-//   // ==========================================
-
-//   changePage(page: number): void {
-//     if (page >= 1 && page <= this.totalPages()) {
-//       this.currentPage.set(page);
-//     }
-//   }
-
-//   // ==========================================
-//   // FILTROS
-//   // ==========================================
-
-//   clearFilters(): void {
-//     this.searchTerm.set('');
-//     this.filtroNivelAcceso.set('');
-//     this.filtroActivo.set('');
-//     this.currentPage.set(1);
-//   }
-
-//   // ==========================================
-//   // UTILIDADES
-//   // ==========================================
-
-//   getNivelAccesoLabel(nivel: NivelAcceso): string {
-//     return this.administradoresService.getNivelAccesoLabel(nivel);
-//   }
-
-//   getNivelAccesoColor(nivel: NivelAcceso): string {
-//     return this.administradoresService.getNivelAccesoColor(nivel);
-//   }
-
-//   get f() {
-//     return this.administradorForm.controls;
-//   }
-
-//   get pf() {
-//     return this.passwordForm.controls;
-//   }
-
-//   private markFormGroupTouched(formGroup: FormGroup): void {
-//     Object.keys(formGroup.controls).forEach(key => {
-//       const control = formGroup.get(key);
-//       control?.markAsTouched();
-//     });
-//   }
-
-//   private passwordMatchValidator(group: FormGroup) {
-//     const password = group.get('password_nuevo');
-//     const confirmPassword = group.get('confirmar_password');
-
-//     if (!password || !confirmPassword) {
-//       return null;
-//     }
-
-//     return password.value === confirmPassword.value ? null : { passwordMismatch: true };
-//   }
-
-//   private showSuccessMessage(message: string): void {
-//     // Implementar notificación de éxito
-//     console.log('Success:', message);
-//     alert(message); // Temporal - reemplazar con toast/notification
-//   }
-
-//   private showErrorMessage(message: string): void {
-//     // Implementar notificación de error
-//     console.error('Error:', message);
-//     alert(message); // Temporal - reemplazar con toast/notification
-//   }
-
-//   // ==========================================
-//   // MÉTODOS PARA EL TEMPLATE
-//   // ==========================================
-
-//   Math = Math; // Exponer Math para el template
-// }
+// ==========================================
+// GETTERS ADICIONALES PARA VALIDACIONES
+// ==========================================
+
+get formValid(): boolean {
+  return this.administradorForm.valid;
+}
+
+get passwordFormValid(): boolean {
+  return this.passwordForm.valid;
+}
+// También puedes agregar este método auxiliar si no lo tienes
+obtenerNombreCompleto(administrador: Administrador): string {
+  return this.construirNombreCompleto(administrador);
+}
+
+  // ==========================================
+  // CONSTRUCTOR Y CICLO DE VIDA
+  // ==========================================
+
+  constructor() {
+    this.initializeForms();
+  }
+
+  ngOnInit(): void {
+    this.inicializarComponente();
+    this.configurarBusquedaEnTiempoReal();
+    this.suscribirAEstadoDelServicio();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ==========================================
+  // INICIALIZACIÓN DE FORMULARIOS
+  // ==========================================
+
+  // private initializeForms(): void {
+  //   this.filtrosForm = this.fb.group({
+  //     activo: [''],
+  //     nivel_acceso: [''],
+  //     usuario: [''],
+  //     buscar: ['']
+  //   });
+
+  //   this.administradorForm = this.fb.group({
+  //     // Datos de administrador
+  //     usuario: ['', [Validators.required, Validators.minLength(this.CONFIG.USUARIO_MIN_LENGTH)]],
+  //     password: ['', [Validators.required, Validators.minLength(this.CONFIG.PASSWORD_MIN_LENGTH)]],
+  //     password_texto: ['', [Validators.required, Validators.minLength(this.CONFIG.PASSWORD_MIN_LENGTH)]],
+  //     nivel_acceso: [NivelAcceso.USUARIO, [Validators.required]],
+  //     activo: [true],
+  //     // Datos de persona
+  //     nombre: ['', [Validators.required, Validators.minLength(2)]],
+  //     apellido_paterno: ['', [Validators.required, Validators.minLength(2)]],
+  //     apellido_materno: [''],
+  //     fecha_nacimiento: ['', [Validators.required]],
+  //     genero: ['', [Validators.required]],
+  //     telefono: ['', [Validators.pattern(/^\d{10}$/)]],
+  //     email: ['', [Validators.required, Validators.email]],
+  //     estado_civil: ['']
+  //   });
+
+  //   this.passwordForm = this.fb.group({
+  //     password_actual: ['', [Validators.required]],
+  //     password_nuevo: ['', [Validators.required, Validators.minLength(this.CONFIG.PASSWORD_MIN_LENGTH)]],
+  //     confirmar_password: ['', [Validators.required]]
+  //   });
+  // }
+
+  // En src/app/personas/administradores/administradores.ts
+// CAMBIAR initializeForms()
+
+private initializeForms(): void {
+  this.filtrosForm = this.fb.group({
+    activo: [''],
+    nivel_acceso: [''],
+    usuario: [''],
+    buscar: ['']
+  });
+
+  this.administradorForm = this.fb.group({
+    // Datos de administrador
+    usuario: ['', [Validators.required, Validators.minLength(this.CONFIG.USUARIO_MIN_LENGTH)]],
+    // 🔥 CAMBIO: Solo un campo de password
+    password: ['', [Validators.required, Validators.minLength(this.CONFIG.PASSWORD_MIN_LENGTH)]],
+    nivel_acceso: [NivelAcceso.USUARIO, [Validators.required]],
+    activo: [true],
+    // Datos de persona
+    nombre: ['', [Validators.required, Validators.minLength(2)]],
+    apellido_paterno: ['', [Validators.required, Validators.minLength(2)]],
+    apellido_materno: [''],
+    fecha_nacimiento: ['', [Validators.required]],
+    genero: ['', [Validators.required]],
+    telefono: ['', [Validators.pattern(/^\d{10}$/)]],
+    email: ['', [Validators.required, Validators.email]],
+    estado_civil: ['']
+  });
+
+  // 🔥 CAMBIO: Simplificar passwordForm
+  this.passwordForm = this.fb.group({
+    password_actual: ['', [Validators.required]],
+    password_nuevo: ['', [Validators.required, Validators.minLength(this.CONFIG.PASSWORD_MIN_LENGTH)]],
+    confirmar_password: ['', [Validators.required]]
+  });
+}
+
+  // ==========================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ==========================================
+
+  private inicializarComponente(): void {
+    this.cargarAdministradores();
+    this.cargarEstadisticas();
+  }
+
+  private configurarBusquedaEnTiempoReal(): void {
+    this.filtrosForm.get('buscar')?.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(valor => {
+        this.textoBusqueda = valor;
+        this.aplicarFiltros();
+      });
+  }
+
+  private suscribirAEstadoDelServicio(): void {
+    this.administradorService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => this.loading = loading);
+
+    this.administradorService.error$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(error => this.error = error);
+
+    this.administradorService.administradores$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(administradores => {
+        this.administradores = administradores;
+      });
+  }
+
+  // ==========================================
+  // MÉTODOS CRUD
+  // ==========================================
+
+  cargarAdministradores(): void {
+    this.limpiarMensajes();
+    this.administradorService.getAdministradores(this.filtrosAplicados)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.administradores = response.data;
+          } else {
+            this.mostrarError(response.message || 'Error al cargar administradores');
+          }
+        },
+        error: (err) => {
+          this.mostrarError(err.message || 'Error al cargar administradores');
+        }
+      });
+  }
+
+  cargarEstadisticas(): void {
+    this.administradorService.getEstadisticas()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.estadisticas = response.data;
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar estadísticas:', err);
+        }
+      });
+  }
+
+  // ==========================================
+  // MÉTODOS DEL FORMULARIO
+  // ==========================================
+
+  mostrarFormularioCrear(): void {
+    this.isEditMode = false;
+    this.administradorEnEdicion = null;
+    this.administradorForm.reset();
+    this.administradorForm.patchValue({
+      activo: true,
+      nivel_acceso: NivelAcceso.USUARIO,
+      genero: 'M'
+    });
+    this.mostrarModal = true;
+  }
+
+  mostrarFormularioEditar(administrador: Administrador): void {
+    this.isEditMode = true;
+    this.administradorEnEdicion = administrador;
+
+    this.administradorForm.patchValue({
+      usuario: administrador.usuario,
+      nivel_acceso: administrador.nivel_acceso,
+      activo: administrador.activo,
+      nombre: administrador.persona?.nombre || '',
+      apellido_paterno: administrador.persona?.apellido_paterno || '',
+      apellido_materno: administrador.persona?.apellido_materno || '',
+      genero: administrador.persona?.genero || 'M',
+      telefono: administrador.persona?.telefono || '',
+      email: administrador.persona?.email || ''
+    });
+
+    // En modo edición, no requerir contraseña
+    this.administradorForm.get('password')?.clearValidators();
+    this.administradorForm.get('password_texto')?.clearValidators();
+    this.administradorForm.get('password')?.updateValueAndValidity();
+    this.administradorForm.get('password_texto')?.updateValueAndValidity();
+
+    this.mostrarModal = true;
+  }
+
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.isEditMode = false;
+    this.administradorEnEdicion = null;
+    this.administradorForm.reset();
+    this.procesandoFormulario = false;
+    this.limpiarMensajes();
+  }
+
+
+
+  onSubmit(): void {
+    if (this.administradorForm.invalid) {
+      this.marcarCamposComoTocados();
+      this.mostrarError('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    this.procesandoFormulario = true;
+    this.limpiarMensajes();
+
+    const formData = this.administradorForm.value;
+
+    if (this.isEditMode && this.administradorEnEdicion) {
+      this.actualizarAdministrador(formData);
+    } else {
+      this.crearAdministrador(formData);
+    }
+  }
+
+private crearAdministrador(formData: any): void {
+  // 🔥 PRIMERO: Crear la persona
+  const createPersonaDto: CreatePersonaFrontendDto = {
+    nombre: formData.nombre,
+    apellido_paterno: formData.apellido_paterno,
+    apellido_materno: formData.apellido_materno,
+    fecha_nacimiento: formData.fecha_nacimiento,
+    genero: formData.genero, // Frontend usa 'genero'
+    telefono: formData.telefono,
+    email: formData.email, // Frontend usa 'email'
+    estado_civil: formData.estado_civil,
+    activo: true
+  };
+
+  console.log('🔄 Creando persona:', createPersonaDto);
+
+  this.personasService.createPersona(createPersonaDto)
+    .pipe(
+      switchMap(personaResponse => {
+        if (personaResponse.success && personaResponse.data) {
+          console.log('✅ Persona creada con ID:', personaResponse.data.id_persona);
+
+          // 🔥 SEGUNDO: Crear el administrador con el id_persona obtenido
+          const createAdminDto: CreateAdministradorDto = {
+            id_persona: personaResponse.data.id_persona!, // ← Usar el ID de la persona creada
+            usuario: formData.usuario,
+            password: formData.password,
+            nivel_acceso: formData.nivel_acceso,
+            activo: formData.activo
+          };
+
+          console.log('🔄 Creando administrador:', createAdminDto);
+          return this.administradorService.createAdministrador(createAdminDto);
+        } else {
+          throw new Error(personaResponse.message || 'Error al crear la persona');
+        }
+      }),
+      takeUntil(this.destroy$)
+    )
+    .subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.mostrarExito('Administrador creado exitosamente');
+          this.cargarAdministradores();
+          this.cargarEstadisticas();
+          this.cerrarModal();
+        } else {
+          this.mostrarError(response.message || 'Error al crear administrador');
+        }
+        this.procesandoFormulario = false;
+      },
+      error: (err) => {
+        console.error('❌ Error en el proceso:', err);
+        this.mostrarError(err.message || 'Error al crear administrador');
+        this.procesandoFormulario = false;
+      }
+    });
+}
+
+private actualizarAdministrador(formData: any): void {
+  if (!this.administradorEnEdicion) return;
+
+  // 🔥 CORRECCIÓN: Usar id_persona del administrador, no de persona
+  if (this.administradorEnEdicion.id_persona) {
+    const updatePersonaDto: Partial<CreatePersonaFrontendDto> = {
+      nombre: formData.nombre,
+      apellido_paterno: formData.apellido_paterno,
+      apellido_materno: formData.apellido_materno,
+      fecha_nacimiento: formData.fecha_nacimiento,
+      genero: formData.genero,
+      telefono: formData.telefono,
+      email: formData.email,
+      estado_civil: formData.estado_civil
+    };
+
+    console.log('🔄 Actualizando persona con ID:', this.administradorEnEdicion.id_persona);
+    console.log('🔄 Datos a actualizar:', updatePersonaDto);
+
+    // ← CAMBIO: usar this.administradorEnEdicion.id_persona en lugar de this.administradorEnEdicion.persona.id_persona
+    this.personasService.updatePersona(this.administradorEnEdicion.id_persona, updatePersonaDto)
+      .pipe(
+        switchMap(personaResponse => {
+          if (personaResponse.success) {
+            console.log('✅ Persona actualizada');
+
+            // 🔥 SEGUNDO: Actualizar el administrador
+            const updateAdminDto: UpdateAdministradorDto = {
+              usuario: formData.usuario,
+              nivel_acceso: formData.nivel_acceso,
+              activo: formData.activo
+            };
+
+            console.log('🔄 Actualizando administrador:', updateAdminDto);
+            return this.administradorService.updateAdministrador(this.administradorEnEdicion!.id_administrador, updateAdminDto);
+          } else {
+            throw new Error(personaResponse.message || 'Error al actualizar la persona');
+          }
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito('Administrador actualizado exitosamente');
+            this.cargarAdministradores();
+            this.cargarEstadisticas();
+            this.cerrarModal();
+          } else {
+            this.mostrarError(response.message || 'Error al actualizar administrador');
+          }
+          this.procesandoFormulario = false;
+        },
+        error: (err) => {
+          console.error('❌ Error en el proceso:', err);
+          this.mostrarError(err.message || 'Error al actualizar administrador');
+          this.procesandoFormulario = false;
+        }
+      });
+  } else {
+    // Si no tiene id_persona, solo actualizar administrador
+    const updateAdminDto: UpdateAdministradorDto = {
+      usuario: formData.usuario,
+      nivel_acceso: formData.nivel_acceso,
+      activo: formData.activo
+    };
+
+    this.administradorService.updateAdministrador(this.administradorEnEdicion.id_administrador, updateAdminDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito('Administrador actualizado exitosamente');
+            this.cargarAdministradores();
+            this.cargarEstadisticas();
+            this.cerrarModal();
+          } else {
+            this.mostrarError(response.message || 'Error al actualizar administrador');
+          }
+          this.procesandoFormulario = false;
+        },
+        error: (err) => {
+          this.mostrarError(err.message || 'Error al actualizar administrador');
+          this.procesandoFormulario = false;
+        }
+      });
+  }
+}
+
+  private marcarCamposComoTocados(): void {
+    Object.keys(this.administradorForm.controls).forEach(key => {
+      this.administradorForm.get(key)?.markAsTouched();
+    });
+  }
+
+
+
+  // ==========================================
+  // MÉTODOS DE ACCIONES
+  // ==========================================
+
+  verPerfilCompleto(administrador: Administrador): void {
+    this.administradorSeleccionado = administrador;
+    this.mostrarModalPerfil = true;
+  }
+
+  cerrarModalPerfil(): void {
+    this.mostrarModalPerfil = false;
+    this.administradorSeleccionado = null;
+  }
+
+  mostrarCambioPassword(administrador: Administrador): void {
+    this.administradorSeleccionado = administrador;
+    this.passwordForm.reset();
+    this.mostrarModalPassword = true;
+  }
+
+  cerrarModalPassword(): void {
+    this.mostrarModalPassword = false;
+    this.administradorSeleccionado = null;
+    this.passwordForm.reset();
+  }
+
+  onPasswordSubmit(): void {
+    if (this.passwordForm.invalid) {
+      this.mostrarError('Por favor completa todos los campos');
+      return;
+    }
+
+    const { password_nuevo, confirmar_password } = this.passwordForm.value;
+
+    if (password_nuevo !== confirmar_password) {
+      this.mostrarError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (!this.administradorSeleccionado) return;
+
+    const changePasswordDto = {
+      password_actual: this.passwordForm.value.password_actual,
+      password_nuevo: this.passwordForm.value.password_nuevo
+    };
+
+    this.administradorService.changePassword(this.administradorSeleccionado.id_administrador, changePasswordDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito('Contraseña cambiada exitosamente');
+            this.cerrarModalPassword();
+          } else {
+            this.mostrarError(response.message || 'Error al cambiar contraseña');
+          }
+        },
+        error: (err) => {
+          this.mostrarError(err.message || 'Error al cambiar contraseña');
+        }
+      });
+  }
+
+// En src/app/personas/administradores/administradores.ts
+// Cambiar el método cambiarEstado:
+
+cambiarEstado(administrador: Administrador): void {
+  const nuevoEstado = !administrador.activo;
+  const accion = nuevoEstado ? 'activar' : 'desactivar';
+
+  if (confirm(`¿Está seguro de ${accion} al administrador ${administrador.usuario}?`)) {
+    this.administradorService.toggleAdministrador(administrador.id_administrador, nuevoEstado)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito(`Administrador ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`);
+            this.cargarAdministradores();
+            this.cargarEstadisticas();
+          } else {
+            this.mostrarError(response.message || 'Error al cambiar estado');
+          }
+        },
+        error: (err) => {
+          this.mostrarError(err.message || 'Error al cambiar estado');
+        }
+      });
+  }
+}
+
+  eliminarAdministrador(administrador: Administrador): void {
+    if (confirm(`¿Está seguro de eliminar al administrador ${administrador.usuario}?\n\nEsta acción no se puede deshacer.`)) {
+      this.administradorService.deleteAdministrador(administrador.id_administrador)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.mostrarExito('Administrador eliminado correctamente');
+              this.cargarEstadisticas();
+            } else {
+              this.mostrarError(response.message || 'Error al eliminar administrador');
+            }
+          },
+          error: (err) => {
+            this.mostrarError(err.message || 'Error al eliminar administrador');
+          }
+        });
+    }
+  }
+
+  // ==========================================
+  // MÉTODOS DE BÚSQUEDA Y FILTROS
+  // ==========================================
+
+  aplicarFiltros(): void {
+    const valoresFiltros = this.filtrosForm.value;
+
+    this.filtrosAplicados = {
+      activo: valoresFiltros.activo === '' ? undefined : valoresFiltros.activo,
+      nivel_acceso: valoresFiltros.nivel_acceso || undefined,
+      usuario: valoresFiltros.usuario || undefined,
+      search: this.textoBusqueda || undefined
+    };
+
+    this.cargarAdministradores();
+  }
+
+  limpiarFiltros(): void {
+    this.filtrosForm.reset();
+    this.textoBusqueda = '';
+    this.filtrosAplicados = {};
+    this.cargarAdministradores();
+  }
+
+  toggleFiltros(): void {
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  recargarDatos(): void {
+    this.limpiarMensajes();
+    this.cargarAdministradores();
+    this.cargarEstadisticas();
+  }
+
+  // ==========================================
+  // MÉTODOS DE UTILIDAD PARA LA UI
+  // ==========================================
+
+  cambiarVista(nuevaVista: 'tabla' | 'tarjetas'): void {
+    this.vistaActual = nuevaVista;
+  }
+
+  toggleEstadisticas(): void {
+    this.mostrarEstadisticas = !this.mostrarEstadisticas;
+  }
+
+  construirNombreCompleto(administrador: Administrador): string {
+    if (!administrador.persona) return administrador.usuario;
+
+    const partes = [
+      administrador.persona.nombre,
+      administrador.persona.apellido_paterno,
+      administrador.persona.apellido_materno
+    ].filter(Boolean);
+
+    return partes.join(' ') || administrador.usuario;
+  }
+
+  formatearFecha(fecha: string): string {
+    if (!fecha) return 'Nunca';
+    return new Date(fecha).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  obtenerColorPorNivel(nivel: NivelAcceso): string {
+    const colores = {
+      [NivelAcceso.USUARIO]: 'bg-blue-100 text-blue-800 border-blue-200',
+      [NivelAcceso.SUPERVISOR]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      [NivelAcceso.ADMINISTRADOR]: 'bg-red-100 text-red-800 border-red-200'
+    };
+    return colores[nivel] || 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+
+  obtenerIconoPorNivel(nivel: NivelAcceso): string {
+    const iconos = {
+      [NivelAcceso.USUARIO]: 'USR',
+      [NivelAcceso.SUPERVISOR]: 'SUP',
+      [NivelAcceso.ADMINISTRADOR]: 'ADM'
+    };
+    return iconos[nivel] || 'USR';
+  }
+
+  obtenerTextoEstado(activo: boolean): string {
+    return activo ? 'Activo' : 'Inactivo';
+  }
+
+
+
+// En administradores.ts
+getFormErrors(): string[] {
+  const errors: string[] = [];
+  Object.keys(this.administradorForm.controls).forEach(key => {
+    const control = this.administradorForm.get(key);
+    if (control && control.errors) {
+      errors.push(`${key}: ${Object.keys(control.errors).join(', ')}`);
+    }
+  });
+  return errors;
+}
+
+  obtenerClaseEstado(activo: boolean): string {
+    return activo
+      ? 'bg-green-100 text-green-800 border-green-200'
+      : 'bg-red-100 text-red-800 border-red-200';
+  }
+
+  calcularDiasDesdeUltimoAcceso(fechaAcceso: string): number {
+    if (!fechaAcceso) return 999;
+    const hoy = new Date();
+    const ultimo = new Date(fechaAcceso);
+    const diferencia = hoy.getTime() - ultimo.getTime();
+    return Math.floor(diferencia / (1000 * 60 * 60 * 24));
+  }
+
+  // ==========================================
+  // MÉTODOS DE MANEJO DE MENSAJES
+  // ==========================================
+
+  private mostrarError(mensaje: string): void {
+    this.error = mensaje;
+    this.success = null;
+    setTimeout(() => {
+      this.limpiarMensajes();
+    }, 5000);
+  }
+
+  private mostrarExito(mensaje: string): void {
+    this.success = mensaje;
+    this.error = null;
+    setTimeout(() => {
+      this.limpiarMensajes();
+    }, 3000);
+  }
+
+  limpiarMensajes(): void {
+    this.error = null;
+    this.success = null;
+  }
+
+  // ==========================================
+  // GETTERS PARA EL TEMPLATE
+  // ==========================================
+
+  get hayAdministradores(): boolean {
+    return this.administradores.length > 0;
+  }
+
+  get hayFiltrosAplicados(): boolean {
+    return Object.keys(this.filtrosAplicados).some(key =>
+      this.filtrosAplicados[key as keyof AdministradorFilters] !== undefined
+    );
+  }
+
+  get totalAdministradores(): number {
+    return this.administradores.length;
+  }
+
+  get administradoresActivos(): Administrador[] {
+    return this.administradores.filter(a => a.activo);
+  }
+
+  get administradoresInactivos(): Administrador[] {
+    return this.administradores.filter(a => !a.activo);
+  }
+
+  get administradoresPorNivel(): { [key: string]: Administrador[] } {
+    return this.administradores.reduce((acc, admin) => {
+      const nivel = admin.nivel_acceso;
+      if (!acc[nivel]) acc[nivel] = [];
+      acc[nivel].push(admin);
+      return acc;
+    }, {} as { [key: string]: Administrador[] });
+  }
+
+  // Validaciones para el formulario
+  get esUsuarioValido(): boolean {
+    const usuario = this.administradorForm.get('usuario')?.value;
+    return !usuario || (usuario.length >= this.CONFIG.USUARIO_MIN_LENGTH);
+  }
+
+  get esEmailValido(): boolean {
+    const email = this.administradorForm.get('email')?.value;
+    return !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  get esTelefonoValido(): boolean {
+    const telefono = this.administradorForm.get('telefono')?.value;
+    return !telefono || /^\d{10}$/.test(telefono);
+  }
+
+  get esPasswordValida(): boolean {
+    const password = this.administradorForm.get('password')?.value;
+    return !password || password.length >= this.CONFIG.PASSWORD_MIN_LENGTH;
+  }
+}

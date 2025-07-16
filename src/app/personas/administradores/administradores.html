@@ -1,0 +1,971 @@
+<!-- src/app/personas/administradores/administradores.html -->
+<div class="min-h-screen bg-hospital-gray-50">
+  <!-- ==========================================
+       HEADER PRINCIPAL
+       ========================================== -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h1 class="text-2xl font-bold text-hospital-gray-900">Administradores del Sistema</h1>
+            <p class="text-sm text-hospital-gray-600">Gestión de usuarios administrativos</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <button (click)="toggleEstadisticas()"
+            class="btn-hospital bg-hospital-info text-white hover:bg-hospital-info-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            {{ mostrarEstadisticas ? 'Ocultar' : 'Mostrar' }} Estadísticas
+          </button>
+
+          <button (click)="mostrarFormularioCrear()"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo Administrador
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ESTADÍSTICAS (OPCIONAL)
+       ========================================== -->
+  <div *ngIf="mostrarEstadisticas && estadisticas" class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Administradores -->
+        <div class="card-hospital bg-hospital-primary text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium opacity-90">Total Administradores</p>
+              <p class="text-2xl font-bold">{{ estadisticas.total_administradores }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Administradores Activos -->
+        <div class="card-hospital bg-hospital-success text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium opacity-90">Activos</p>
+              <p class="text-2xl font-bold">{{ estadisticas.administradores_activos }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Administradores Inactivos -->
+        <div class="card-hospital bg-hospital-warning text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium opacity-90">Inactivos</p>
+              <p class="text-2xl font-bold">{{ estadisticas.administradores_inactivos }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accesos Último Mes -->
+        <div class="card-hospital bg-hospital-info text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium opacity-90">Accesos Último Mes</p>
+              <p class="text-2xl font-bold">{{ estadisticas.accesos_ultimo_mes }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       FILTROS Y BÚSQUEDA
+       ========================================== -->
+  <!-- FILTROS Y BÚSQUEDA -->
+<div class="bg-white shadow-sm border-b border-hospital-gray-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+
+      <!-- Búsqueda -->
+      <div class="flex-1 max-w-lg">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div [formGroup]="filtrosForm">
+            <input
+              type="text"
+              formControlName="buscar"
+              class="form-field pl-10 pr-4"
+              placeholder="Buscar por nombre, apellido o usuario...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex items-center space-x-4" [formGroup]="filtrosForm">
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-hospital-gray-700">Estado:</label>
+          <select
+            formControlName="activo"
+            class="form-field py-2 px-3 text-sm min-w-0 w-32">
+            <option *ngFor="let opcion of opcionesActivo" [value]="opcion.valor">
+              {{ opcion.etiqueta }}
+            </option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-hospital-gray-700">Nivel:</label>
+          <select
+            formControlName="nivel_acceso"
+            class="form-field py-2 px-3 text-sm min-w-0 w-36">
+            <option value="">Todos</option>
+            <option *ngFor="let nivel of nivelesAcceso" [value]="nivel.valor">
+              {{ nivel.etiqueta }}
+            </option>
+          </select>
+        </div>
+
+        <button
+          (click)="aplicarFiltros()"
+          class="btn-hospital bg-hospital-gray-600 text-white hover:bg-hospital-gray-700">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.121A1 1 0 013 6.414V4z"/>
+          </svg>
+          Filtrar
+        </button>
+
+        <button
+          (click)="limpiarFiltros()"
+          class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ==========================================
+       MENSAJES DE ESTADO
+       ========================================== -->
+  <div *ngIf="error" class="bg-hospital-emergency text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ error }}
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="success" class="bg-hospital-success text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ success }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTROLES DE VISTA
+       ========================================== -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <span class="text-sm font-medium text-hospital-gray-700">
+            {{ totalAdministradores }} administradores encontrados
+          </span>
+          <span *ngIf="hayFiltrosAplicados" class="text-sm text-hospital-info">
+            (Filtros aplicados)
+          </span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-hospital-gray-700">Vista:</span>
+          <div class="flex rounded-md shadow-sm">
+            <button (click)="cambiarVista('tarjetas')"
+              [class]="vistaActual === 'tarjetas' ? 'bg-hospital-primary text-white' : 'bg-white text-hospital-gray-700 hover:bg-hospital-gray-50'"
+              class="px-3 py-2 text-sm font-medium border border-hospital-gray-300 rounded-l-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </button>
+            <button (click)="cambiarVista('tabla')"
+              [class]="vistaActual === 'tabla' ? 'bg-hospital-primary text-white' : 'bg-white text-hospital-gray-700 hover:bg-hospital-gray-50'"
+              class="px-3 py-2 text-sm font-medium border border-hospital-gray-300 rounded-r-md border-l-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+       ========================================== -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="loading w-8 h-8"></div>
+      <span class="ml-3 text-hospital-gray-600">Cargando administradores...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !hayAdministradores" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-hospital-gray-900">No hay administradores</h3>
+      <p class="mt-1 text-sm text-hospital-gray-500">Comience creando un nuevo administrador.</p>
+      <div class="mt-6">
+        <button (click)="mostrarFormularioCrear()"
+          class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+          Crear Primer Administrador
+        </button>
+      </div>
+    </div>
+
+    <!-- VISTA DE TARJETAS -->
+    <div *ngIf="!loading && hayAdministradores && vistaActual === 'tarjetas'"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let admin of administradores; trackBy: trackByAdministradorId" class="card-hospital hover:shadow-lg">
+
+        <!-- Header de la tarjeta -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              [class]="obtenerColorPorNivel(admin.nivel_acceso)">
+              {{ obtenerIconoPorNivel(admin.nivel_acceso) }}
+            </div>
+            <div class="ml-3">
+              <h3 class="text-lg font-semibold text-hospital-gray-900">{{ admin.usuario }}</h3>
+              <p class="text-sm text-hospital-gray-600">{{ construirNombreCompleto(admin) }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+              [class]="obtenerClaseEstado(admin.activo)">
+              {{ obtenerTextoEstado(admin.activo) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Información de la tarjeta -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-hospital-gray-700">Nivel de Acceso:</span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+              [class]="obtenerColorPorNivel(admin.nivel_acceso)">
+              {{ admin.nivel_acceso }}
+            </span>
+          </div>
+
+          <div *ngIf="admin.persona?.email" class="flex items-center justify-between">
+            <span class="text-sm font-medium text-hospital-gray-700">Email:</span>
+            <span class="text-sm text-hospital-gray-600">{{ admin.persona?.email || 'Sin email' }}</span>
+          </div>
+
+          <div *ngIf="admin.persona?.telefono" class="flex items-center justify-between">
+            <span class="text-sm font-medium text-hospital-gray-700">Teléfono:</span>
+            <span class="text-sm text-hospital-gray-600">{{ admin.persona?.telefono || 'Sin teléfono' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-hospital-gray-700">Último Acceso:</span>
+            <span class="text-sm text-hospital-gray-600">{{ formatearFecha(admin.ultimo_acceso || '') }}</span>
+          </div>
+        </div>
+
+        <!-- Cambiar la sección de acciones de tarjeta por esta versión mejorada: -->
+<div class="mt-6 flex flex-col space-y-3">
+  <!-- Primera fila de botones -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <button (click)="verPerfilCompleto(admin)"
+        class="btn-hospital bg-hospital-info text-white hover:bg-hospital-info-dark text-xs px-2 py-1 min-w-0 whitespace-nowrap">
+        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Ver
+      </button>
+
+      <button (click)="mostrarFormularioEditar(admin)"
+        class="btn-hospital bg-hospital-warning text-white hover:bg-hospital-warning-dark text-xs px-2 py-1 min-w-0 whitespace-nowrap">
+        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Editar
+      </button>
+    </div>
+
+    <button (click)="cambiarEstado(admin)"
+      [class]="admin.activo ? 'bg-hospital-warning text-white hover:bg-hospital-warning-dark' : 'bg-hospital-success text-white hover:bg-hospital-success-dark'"
+      class="btn-hospital text-xs px-2 py-1 min-w-0 whitespace-nowrap">
+      {{ admin.activo ? 'Desactivar' : 'Activar' }}
+    </button>
+  </div>
+
+  <!-- Segunda fila de botones -->
+  <div class="flex items-center justify-between">
+    <button (click)="mostrarCambioPassword(admin)"
+      class="btn-hospital bg-hospital-gray-500 text-white hover:bg-hospital-gray-600 text-xs px-2 py-1 min-w-0 whitespace-nowrap">
+      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+      Contraseña
+    </button>
+
+    <button (click)="eliminarAdministrador(admin)"
+      class="btn-hospital bg-hospital-emergency text-white hover:bg-hospital-emergency-dark text-xs px-2 py-1 min-w-0 whitespace-nowrap">
+      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      Eliminar
+    </button>
+  </div>
+</div>
+      </div>
+    </div>
+
+    <!-- VISTA DE TABLA -->
+    <!-- VISTA DE TABLA -->
+    <div *ngIf="!loading && hayAdministradores && vistaActual === 'tabla'" class="card-hospital overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-hospital-gray-200">
+          <thead class="bg-hospital-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Administrador
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Contacto
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Nivel de Acceso
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Último Acceso
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-hospital-gray-200">
+            <tr *ngFor="let admin of administradores; trackBy: trackByAdministradorId"
+              class="hover:bg-hospital-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                    [class]="obtenerColorPorNivel(admin.nivel_acceso)">
+                    {{ obtenerIconoPorNivel(admin.nivel_acceso) }}
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-hospital-gray-900">{{ admin.usuario }}</div>
+                    <div class="text-sm text-hospital-gray-500">{{ construirNombreCompleto(admin) }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-hospital-gray-900">{{ admin.persona?.email || 'Sin email' }}</div>
+                <div class="text-sm text-hospital-gray-500">{{ admin.persona?.telefono || 'Sin teléfono' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="obtenerColorPorNivel(admin.nivel_acceso)">
+                  {{ admin.nivel_acceso }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="obtenerClaseEstado(admin.activo)">
+                  {{ obtenerTextoEstado(admin.activo) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-hospital-gray-500">
+                {{ formatearFecha(admin.ultimo_acceso || '') }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end space-x-2">
+                  <button (click)="verPerfilCompleto(admin)" class="text-hospital-info hover:text-hospital-info-dark">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+
+                  <button (click)="mostrarFormularioEditar(admin)"
+                    class="text-hospital-warning hover:text-hospital-warning-dark">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+
+                  <button (click)="mostrarCambioPassword(admin)"
+                    class="text-hospital-gray-500 hover:text-hospital-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </button>
+
+                  <button (click)="cambiarEstado(admin)"
+                    [class]="admin.activo ? 'text-hospital-warning hover:text-hospital-warning-dark' : 'text-hospital-success hover:text-hospital-success-dark'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                  </button>
+
+                  <button (click)="eliminarAdministrador(admin)"
+                    class="text-hospital-emergency hover:text-hospital-emergency-dark">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+    MODAL PARA CREAR/EDITAR ADMINISTRADOR
+    ========================================== -->
+<div *ngIf="mostrarModal" class="fixed inset-0 z-50 overflow-y-auto">
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" (click)="cerrarModal()"></div>
+
+  <!-- Modal content -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+
+      <!-- Header del modal -->
+      <div class="sticky top-0 bg-white border-b border-hospital-gray-200 px-6 py-4 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-hospital-gray-900">
+            {{ isEditMode ? 'Editar Administrador' : 'Crear Nuevo Administrador' }}
+          </h3>
+          <button (click)="cerrarModal()" class="text-hospital-gray-400 hover:text-hospital-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido del formulario -->
+      <form [formGroup]="administradorForm" (ngSubmit)="onSubmit()" class="p-6">
+
+        <!-- Información del Administrador -->
+        <div class="mb-8">
+          <h4 class="text-md font-semibold text-hospital-gray-900 mb-4 border-b border-hospital-gray-200 pb-2">
+            Información del Administrador
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Usuario -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Usuario <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="text" formControlName="usuario" class="form-field"
+                [class.error]="administradorForm.get('usuario')?.errors && administradorForm.get('usuario')?.touched"
+                placeholder="Ingrese el nombre de usuario">
+              <div
+                *ngIf="administradorForm.get('usuario')?.errors?.['required'] && administradorForm.get('usuario')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El usuario es requerido
+              </div>
+              <div
+                *ngIf="administradorForm.get('usuario')?.errors?.['minlength'] && administradorForm.get('usuario')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El usuario debe tener al menos {{ CONFIG.USUARIO_MIN_LENGTH }} caracteres
+              </div>
+            </div>
+
+            <!-- Contraseña (solo en modo crear) -->
+            <div *ngIf="!isEditMode">
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Contraseña <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="password" formControlName="password" class="form-field"
+                [class.error]="administradorForm.get('password')?.errors && administradorForm.get('password')?.touched"
+                placeholder="Ingrese la contraseña">
+              <div
+                *ngIf="administradorForm.get('password')?.errors?.['required'] && administradorForm.get('password')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                La contraseña es requerida
+              </div>
+              <div
+                *ngIf="administradorForm.get('password')?.errors?.['minlength'] && administradorForm.get('password')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                La contraseña debe tener al menos {{ CONFIG.PASSWORD_MIN_LENGTH }} caracteres
+              </div>
+            </div>
+
+            <!-- Nivel de Acceso -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Nivel de Acceso <span class="text-hospital-emergency">*</span>
+              </label>
+              <select formControlName="nivel_acceso" class="form-field"
+                [class.error]="administradorForm.get('nivel_acceso')?.errors && administradorForm.get('nivel_acceso')?.touched">
+                <option *ngFor="let nivel of nivelesAcceso" [value]="nivel.valor">
+                  {{ nivel.etiqueta }} - {{ nivel.descripcion }}
+                </option>
+              </select>
+              <div
+                *ngIf="administradorForm.get('nivel_acceso')?.errors?.['required'] && administradorForm.get('nivel_acceso')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El nivel de acceso es requerido
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Estado
+              </label>
+              <div class="flex items-center space-x-4">
+                <label class="flex items-center">
+                  <input type="radio" formControlName="activo" [value]="true"
+                    class="form-radio h-4 w-4 text-hospital-primary border-hospital-gray-300 focus:ring-hospital-primary">
+                  <span class="ml-2 text-sm text-hospital-gray-700">Activo</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" formControlName="activo" [value]="false"
+                    class="form-radio h-4 w-4 text-hospital-primary border-hospital-gray-300 focus:ring-hospital-primary">
+                  <span class="ml-2 text-sm text-hospital-gray-700">Inactivo</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Personal -->
+        <div class="mb-8">
+          <h4 class="text-md font-semibold text-hospital-gray-900 mb-4 border-b border-hospital-gray-200 pb-2">
+            Información Personal
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Nombre -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Nombre <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="text" formControlName="nombre" class="form-field"
+                [class.error]="administradorForm.get('nombre')?.errors && administradorForm.get('nombre')?.touched"
+                placeholder="Ingrese el nombre">
+              <div
+                *ngIf="administradorForm.get('nombre')?.errors?.['required'] && administradorForm.get('nombre')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El nombre es requerido
+              </div>
+            </div>
+
+            <!-- Apellido Paterno -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Apellido Paterno <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="text" formControlName="apellido_paterno" class="form-field"
+                [class.error]="administradorForm.get('apellido_paterno')?.errors && administradorForm.get('apellido_paterno')?.touched"
+                placeholder="Ingrese el apellido paterno">
+              <div
+                *ngIf="administradorForm.get('apellido_paterno')?.errors?.['required'] && administradorForm.get('apellido_paterno')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El apellido paterno es requerido
+              </div>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Apellido Materno
+              </label>
+              <input type="text" formControlName="apellido_materno" class="form-field"
+                placeholder="Ingrese el apellido materno">
+            </div>
+
+            <!-- Fecha de Nacimiento -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Fecha de Nacimiento <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="date" formControlName="fecha_nacimiento" class="form-field"
+                [class.error]="administradorForm.get('fecha_nacimiento')?.errors && administradorForm.get('fecha_nacimiento')?.touched">
+              <div
+                *ngIf="administradorForm.get('fecha_nacimiento')?.errors?.['required'] && administradorForm.get('fecha_nacimiento')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                La fecha de nacimiento es requerida
+              </div>
+            </div>
+
+            <!-- Género -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Género <span class="text-hospital-emergency">*</span>
+              </label>
+              <select formControlName="genero" class="form-field"
+                [class.error]="administradorForm.get('genero')?.errors && administradorForm.get('genero')?.touched">
+                <option value="">Seleccione un género</option>
+                <option *ngFor="let genero of opcionesGenero" [value]="genero.valor">
+                  {{ genero.etiqueta }}
+                </option>
+              </select>
+              <div
+                *ngIf="administradorForm.get('genero')?.errors?.['required'] && administradorForm.get('genero')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El género es requerido
+              </div>
+            </div>
+
+            <!-- Estado Civil -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Estado Civil
+              </label>
+              <select formControlName="estado_civil" class="form-field">
+                <option value="">Seleccione un estado civil</option>
+                <option *ngFor="let estado of estadosCiviles" [value]="estado.valor">
+                  {{ estado.etiqueta }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Correo Electrónico <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="email" formControlName="email" class="form-field"
+                [class.error]="administradorForm.get('email')?.errors && administradorForm.get('email')?.touched"
+                placeholder="Ingrese el correo electrónico">
+              <div
+                *ngIf="administradorForm.get('email')?.errors?.['required'] && administradorForm.get('email')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El correo electrónico es requerido
+              </div>
+              <div *ngIf="administradorForm.get('email')?.errors?.['email'] && administradorForm.get('email')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El correo electrónico debe tener un formato válido
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Teléfono
+              </label>
+              <input type="tel" formControlName="telefono" class="form-field"
+                [class.error]="administradorForm.get('telefono')?.errors && administradorForm.get('telefono')?.touched"
+                placeholder="Ingrese el teléfono (10 dígitos)">
+              <div
+                *ngIf="administradorForm.get('telefono')?.errors?.['pattern'] && administradorForm.get('telefono')?.touched"
+                class="mt-1 text-sm text-hospital-emergency">
+                El teléfono debe tener exactamente 10 dígitos
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-hospital-gray-200">
+          <button type="button" (click)="cerrarModal()"
+            class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+            Cancelar
+          </button>
+
+          <button type="submit" [disabled]="procesandoFormulario || administradorForm.invalid"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark disabled:opacity-50 disabled:cursor-not-allowed">
+            <div *ngIf="procesandoFormulario" class="loading w-4 h-4 mr-2"></div>
+            {{ isEditMode ? 'Actualizar' : 'Crear' }} Administrador
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+    MODAL PARA VER PERFIL COMPLETO
+    ========================================== -->
+<div *ngIf="mostrarModalPerfil && administradorSeleccionado" class="fixed inset-0 z-50 overflow-y-auto">
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" (click)="cerrarModalPerfil()"></div>
+
+  <!-- Modal content -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+
+      <!-- Header del modal -->
+      <div class="sticky top-0 bg-white border-b border-hospital-gray-200 px-6 py-4 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-hospital-gray-900">
+            Perfil de {{ administradorSeleccionado.usuario }}
+          </h3>
+          <button (click)="cerrarModalPerfil()"
+            class="text-hospital-gray-400 hover:text-hospital-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido del perfil -->
+      <div class="p-6">
+        <div class="space-y-6">
+          <!-- Información del Administrador -->
+          <div>
+            <h4 class="text-md font-semibold text-hospital-gray-900 mb-4 border-b border-hospital-gray-200 pb-2">
+              Información del Administrador
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700">Usuario</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{ administradorSeleccionado.usuario }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700">Nivel de Acceso</label>
+                <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="obtenerColorPorNivel(administradorSeleccionado.nivel_acceso)">
+                  {{ administradorSeleccionado.nivel_acceso }}
+                </span>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700">Estado</label>
+                <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="obtenerClaseEstado(administradorSeleccionado.activo)">
+                  {{ obtenerTextoEstado(administradorSeleccionado.activo) }}
+                </span>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700">Último Acceso</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{ formatearFecha(administradorSeleccionado.ultimo_acceso
+                  || '') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Personal -->
+          <div *ngIf="administradorSeleccionado.persona">
+            <h4 class="text-md font-semibold text-hospital-gray-900 mb-4 border-b border-hospital-gray-200 pb-2">
+              Información Personal
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700">Nombre Completo</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{ construirNombreCompleto(administradorSeleccionado) }}
+                </p>
+              </div>
+              <div *ngIf="administradorSeleccionado.persona.genero">
+                <label class="block text-sm font-medium text-hospital-gray-700">Género</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">
+                  {{ administradorSeleccionado.persona.genero === 'M' ? 'Masculino' : 'Femenino' }}
+                </p>
+              </div>
+              <div *ngIf="administradorSeleccionado.persona.email">
+                <label class="block text-sm font-medium text-hospital-gray-700">Correo Electrónico</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{ administradorSeleccionado.persona.email }}</p>
+              </div>
+              <div *ngIf="administradorSeleccionado.persona.telefono">
+                <label class="block text-sm font-medium text-hospital-gray-700">Teléfono</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{ administradorSeleccionado.persona.telefono }}</p>
+              </div>
+              <div *ngIf="administradorSeleccionado.persona.fecha_nacimiento">
+                <label class="block text-sm font-medium text-hospital-gray-700">Fecha de Nacimiento</label>
+                <p class="mt-1 text-sm text-hospital-gray-900">{{
+                  formatearFecha(administradorSeleccionado.persona.fecha_nacimiento) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+    MODAL PARA CAMBIAR CONTRASEÑA
+    ========================================== -->
+<div *ngIf="mostrarModalPassword && administradorSeleccionado" class="fixed inset-0 z-50 overflow-y-auto">
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" (click)="cerrarModalPassword()"></div>
+
+  <!-- Modal content -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full">
+
+      <!-- Header del modal -->
+      <div class="sticky top-0 bg-white border-b border-hospital-gray-200 px-6 py-4 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-hospital-gray-900">
+            Cambiar Contraseña
+          </h3>
+          <button (click)="cerrarModalPassword()"
+            class="text-hospital-gray-400 hover:text-hospital-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido del formulario -->
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="p-6">
+        <div class="space-y-4">
+          <!-- Contraseña Actual -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Contraseña Actual <span class="text-hospital-emergency">*</span>
+            </label>
+            <input type="password" formControlName="password_actual" class="form-field"
+              [class.error]="passwordForm.get('password_actual')?.errors && passwordForm.get('password_actual')?.touched"
+              placeholder="Ingrese la contraseña actual">
+            <div
+              *ngIf="passwordForm.get('password_actual')?.errors?.['required'] && passwordForm.get('password_actual')?.touched"
+              class="mt-1 text-sm text-hospital-emergency">
+              La contraseña actual es requerida
+            </div>
+          </div>
+
+          <!-- Nueva Contraseña -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Nueva Contraseña <span class="text-hospital-emergency">*</span>
+            </label>
+            <input type="password" formControlName="password_nuevo" class="form-field"
+              [class.error]="passwordForm.get('password_nuevo')?.errors && passwordForm.get('password_nuevo')?.touched"
+              placeholder="Ingrese la nueva contraseña">
+            <div
+              *ngIf="passwordForm.get('password_nuevo')?.errors?.['required'] && passwordForm.get('password_nuevo')?.touched"
+              class="mt-1 text-sm text-hospital-emergency">
+              La nueva contraseña es requerida
+            </div>
+            <div
+              *ngIf="passwordForm.get('password_nuevo')?.errors?.['minlength'] && passwordForm.get('password_nuevo')?.touched"
+              class="mt-1 text-sm text-hospital-emergency">
+              La nueva contraseña debe tener al menos {{ CONFIG.PASSWORD_MIN_LENGTH }} caracteres
+            </div>
+          </div>
+
+          <!-- Confirmar Contraseña -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Confirmar Nueva Contraseña <span class="text-hospital-emergency">*</span>
+            </label>
+            <input type="password" formControlName="confirmar_password" class="form-field"
+              [class.error]="passwordForm.get('confirmar_password')?.errors && passwordForm.get('confirmar_password')?.touched"
+              placeholder="Confirme la nueva contraseña">
+            <div
+              *ngIf="passwordForm.get('confirmar_password')?.errors?.['required'] && passwordForm.get('confirmar_password')?.touched"
+              class="mt-1 text-sm text-hospital-emergency">
+              La confirmación de contraseña es requerida
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-hospital-gray-200 mt-6">
+          <button type="button" (click)="cerrarModalPassword()"
+            class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+            Cancelar
+          </button>
+
+          <button type="submit" [disabled]="passwordForm.invalid"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark disabled:opacity-50 disabled:cursor-not-allowed">
+            Cambiar Contraseña
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+    UTILIDADES PARA TRACKING
+    ========================================== -->
+<ng-container>
+  <!-- Método para trackBy en ngFor -->
+  <script>
+    // trackByAdministradorId se implementa en el componente TypeScript
+  </script>
+</ng-container>

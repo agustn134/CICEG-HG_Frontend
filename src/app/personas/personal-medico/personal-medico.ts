@@ -1,7 +1,7 @@
 // src/app/personas/personal-medico/personal-medico.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -14,7 +14,9 @@ import {
   ApiResponse,
   ESPECIALIDADES_MEDICAS,
   CARGOS_MEDICOS,
-  DEPARTAMENTOS_HOSPITALARIOS
+  DEPARTAMENTOS_HOSPITALARIOS,
+  CreatePersonalMedicoDto,
+  UpdatePersonalMedicoDto
 } from '../../models';
 import { PersonalMedicoService } from '../../services/personas/personal-medico';
 
@@ -51,16 +53,27 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   // Estados de la UI
   loading = false;
   error: string | null = null;
+  success: string | null = null;
   mostrarFiltros = false;
-  mostrarEstadisticas = false;
-  vistaActual: 'tabla' | 'tarjetas' = 'tabla';
+  mostrarEstadisticas = true;
+  mostrarModal = false;
+  mostrarModalPerfil = false;
+  mostrarModalCredenciales = false;
+  vistaActual: 'tabla' | 'tarjetas' = 'tarjetas';
 
-  // Búsqueda y filtros
+  // Formularios - INICIALIZADOS CORRECTAMENTE
   textoBusqueda = '';
-  filtrosForm: FormGroup;
+  filtrosForm!: FormGroup;
+  personalForm!: FormGroup;
+  credencialesForm!: FormGroup;
   filtrosAplicados: PersonalMedicoFilters = {};
 
-  // Configuraciones - usando las constantes del modelo
+  // Estados del formulario
+  isEditMode = false;
+  personalEnEdicion: PersonalMedico | null = null;
+  procesandoFormulario = false;
+
+  // Configuraciones
   readonly especialidadesMedicas = ESPECIALIDADES_MEDICAS;
   readonly cargosMedicos = CARGOS_MEDICOS;
   readonly departamentosHospitalarios = DEPARTAMENTOS_HOSPITALARIOS;
@@ -71,6 +84,13 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
     { valor: false, etiqueta: 'Inactivos' }
   ];
 
+  readonly opcionesGenero = [
+    { valor: 'M', etiqueta: 'Masculino' },
+    { valor: 'F', etiqueta: 'Femenino' }
+  ];
+
+  readonly tiposSangre = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
   // Exponer enum para el template
   readonly Genero = Genero;
 
@@ -79,13 +99,7 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   // ==========================================
 
   constructor() {
-    this.filtrosForm = this.fb.group({
-      activo: [''],
-      especialidad: [''],
-      cargo: [''],
-      departamento: [''],
-      buscar: ['']
-    });
+    this.initializeForms();
   }
 
   ngOnInit(): void {
@@ -97,6 +111,44 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ==========================================
+  // INICIALIZACIÓN DE FORMULARIOS
+  // ==========================================
+
+  private initializeForms(): void {
+    this.filtrosForm = this.fb.group({
+      activo: [''],
+      especialidad: [''],
+      cargo: [''],
+      departamento: [''],
+      buscar: ['']
+    });
+
+    this.personalForm = this.fb.group({
+      // Datos de personal médico
+      numero_cedula: ['', [Validators.required, Validators.minLength(6)]],
+      especialidad: ['', [Validators.required]],
+      cargo: [''],
+      departamento: [''],
+      activo: [true],
+      // Datos de persona
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellido_paterno: ['', [Validators.required, Validators.minLength(2)]],
+      apellido_materno: [''],
+      fecha_nacimiento: ['', [Validators.required]],
+      sexo: ['', [Validators.required]],
+      telefono: ['', [Validators.pattern(/^\d{10}$/)]],
+      correo_electronico: ['', [Validators.email]],
+      curp: ['', [Validators.pattern(/^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9]{2}$/)]],
+      tipo_sangre: ['']
+    });
+
+    this.credencialesForm = this.fb.group({
+      usuario: ['', [Validators.required, Validators.minLength(3)]],
+      password_texto: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
   // ==========================================
@@ -122,24 +174,21 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   }
 
   private suscribirAEstadoDelServicio(): void {
-    // Suscribirse al estado de loading
     this.personalMedicoService.loading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.loading = loading);
 
-    // Suscribirse a errores
     this.personalMedicoService.error$
       .pipe(takeUntil(this.destroy$))
       .subscribe(error => this.error = error);
 
-    // Suscribirse al personal médico
     this.personalMedicoService.personalMedico$
       .pipe(takeUntil(this.destroy$))
       .subscribe(personal => this.personalMedico = personal);
   }
 
   // ==========================================
-  // MÉTODOS DE CARGA DE DATOS
+  // MÉTODOS CRUD
   // ==========================================
 
   cargarPersonalMedico(): void {
@@ -148,7 +197,11 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: ApiResponse<PersonalMedico[]>) => {
           if (response.success && response.data) {
-            this.personalMedico = response.data;
+            // Procesar datos para mostrar nombre completo
+            this.personalMedico = response.data.map(medico => ({
+              ...medico,
+              nombre_completo: this.construirNombreCompleto(medico)
+            }));
           }
         },
         error: (error) => {
@@ -168,14 +221,277 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.warn('No se pudieron cargar las estadísticas:', error);
+          // Crear estadísticas mock desde los datos actuales
+          this.crearEstadisticasMock();
         }
       });
   }
 
-  recargarDatos(): void {
-    this.limpiarError();
-    this.cargarPersonalMedico();
-    this.cargarEstadisticas();
+  private crearEstadisticasMock(): void {
+    if (this.personalMedico.length === 0) return;
+
+    const especialidades = [...new Set(this.personalMedico.map(p => p.especialidad))];
+    const departamentos = [...new Set(this.personalMedico.map(p => p.departamento).filter(Boolean))];
+
+    this.estadisticas = {
+      resumen: {
+        total_personal_registrado: this.personalMedico.length,
+        total_personal_activo: this.personalMedico.filter(p => p.activo).length,
+        total_especialidades: especialidades.length,
+        total_departamentos: departamentos.length
+      },
+      por_especialidad_departamento: especialidades.map(esp => ({
+        especialidad: esp,
+        total_personal: this.personalMedico.filter(p => p.especialidad === esp).length,
+        personal_activo: this.personalMedico.filter(p => p.especialidad === esp && p.activo).length,
+        total_documentos_creados: this.personalMedico
+          .filter(p => p.especialidad === esp)
+          .reduce((sum, p) => sum + (parseInt(p.total_documentos_creados?.toString() || '0')), 0),
+        documentos_mes_actual: this.personalMedico
+          .filter(p => p.especialidad === esp)
+          .reduce((sum, p) => sum + (parseInt(p.documentos_mes_actual?.toString() || '0')), 0)
+      })),
+      mas_productivos: this.personalMedico
+        .filter(p => p.total_documentos_creados && parseInt(p.total_documentos_creados.toString()) > 0)
+        .sort((a, b) => parseInt(b.total_documentos_creados?.toString() || '0') - parseInt(a.total_documentos_creados?.toString() || '0'))
+        .slice(0, 5)
+        .map(p => ({
+          id_personal_medico: p.id_personal_medico,
+          numero_cedula: p.numero_cedula,
+          especialidad: p.especialidad,
+          nombre_completo: this.construirNombreCompleto(p),
+          total_documentos: parseInt(p.total_documentos_creados?.toString() || '0'),
+          documentos_mes: parseInt(p.documentos_mes_actual?.toString() || '0')
+        }))
+    };
+  }
+
+  // ==========================================
+  // MÉTODOS DEL FORMULARIO
+  // ==========================================
+
+  mostrarFormularioCrear(): void {
+    this.isEditMode = false;
+    this.personalEnEdicion = null;
+    this.personalForm.reset();
+    this.personalForm.patchValue({
+      activo: true,
+      sexo: 'M'
+    });
+    this.mostrarModal = true;
+  }
+
+  mostrarFormularioEditar(personal: PersonalMedico): void {
+    this.isEditMode = true;
+    this.personalEnEdicion = personal;
+
+    this.personalForm.patchValue({
+      numero_cedula: personal.numero_cedula,
+      especialidad: personal.especialidad,
+      cargo: personal.cargo || '',
+      departamento: personal.departamento || '',
+      activo: personal.activo,
+      nombre: personal.nombre || '',
+      apellido_paterno: personal.apellido_paterno || '',
+      apellido_materno: personal.apellido_materno || '',
+      fecha_nacimiento: personal.fecha_nacimiento ? personal.fecha_nacimiento.split('T')[0] : '',
+      sexo: personal.sexo || 'M',
+      telefono: personal.telefono || '',
+      correo_electronico: personal.correo_electronico || '',
+      curp: personal.curp || '',
+      tipo_sangre: personal.tipo_sangre || ''
+    });
+
+    this.mostrarModal = true;
+  }
+
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.isEditMode = false;
+    this.personalEnEdicion = null;
+    this.personalForm.reset();
+    this.procesandoFormulario = false;
+    this.limpiarMensajes();
+  }
+
+  onSubmit(): void {
+    if (this.personalForm.invalid) {
+      this.marcarCamposComoTocados();
+      this.mostrarError('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    this.procesandoFormulario = true;
+    this.limpiarMensajes();
+
+    const formData = this.personalForm.value;
+
+    if (this.isEditMode && this.personalEnEdicion) {
+      this.actualizarPersonal(formData);
+    } else {
+      this.crearPersonal(formData);
+    }
+  }
+
+  private crearPersonal(formData: any): void {
+    // Preparar datos correctamente según la interfaz CreatePersonalMedicoDto
+    const personalData: CreatePersonalMedicoDto = {
+      id_persona: 0, // Se creará automáticamente en el backend
+      numero_cedula: formData.numero_cedula,
+      especialidad: formData.especialidad,
+      cargo: formData.cargo || undefined,
+      departamento: formData.departamento || undefined,
+      activo: formData.activo ?? true,
+      foto: undefined
+    };
+
+    // Agregar datos de persona como propiedades adicionales
+    const requestData = {
+      ...personalData,
+      // Datos de persona que el backend procesará
+      persona: {
+        nombre: formData.nombre,
+        apellido_paterno: formData.apellido_paterno,
+        apellido_materno: formData.apellido_materno || undefined,
+        fecha_nacimiento: formData.fecha_nacimiento,
+        sexo: formData.sexo,
+        telefono: formData.telefono || undefined,
+        correo_electronico: formData.correo_electronico || undefined,
+        curp: formData.curp || undefined,
+        tipo_sangre: formData.tipo_sangre || undefined
+      }
+    };
+
+    this.personalMedicoService.createPersonalMedico(requestData as any)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito('Personal médico creado exitosamente');
+            this.cargarPersonalMedico();
+            this.cargarEstadisticas();
+            this.cerrarModal();
+          } else {
+            this.mostrarError('Error al crear personal médico: ' + response.message);
+          }
+          this.procesandoFormulario = false;
+        },
+        error: (error) => {
+          this.mostrarError('Error al crear personal médico: ' + (error.error?.message || error.message || 'Error desconocido'));
+          this.procesandoFormulario = false;
+        }
+      });
+  }
+
+  private actualizarPersonal(formData: any): void {
+    if (!this.personalEnEdicion) return;
+
+    const personalData: UpdatePersonalMedicoDto = {
+      numero_cedula: formData.numero_cedula,
+      especialidad: formData.especialidad,
+      cargo: formData.cargo || undefined,
+      departamento: formData.departamento || undefined,
+      activo: formData.activo
+    };
+
+    this.personalMedicoService.updatePersonalMedico(this.personalEnEdicion.id_personal_medico, personalData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.mostrarExito('Personal médico actualizado exitosamente');
+            this.cargarPersonalMedico();
+            this.cargarEstadisticas();
+            this.cerrarModal();
+          } else {
+            this.mostrarError('Error al actualizar personal médico: ' + response.message);
+          }
+          this.procesandoFormulario = false;
+        },
+        error: (error) => {
+          this.mostrarError('Error al actualizar personal médico: ' + (error.error?.message || error.message || 'Error desconocido'));
+          this.procesandoFormulario = false;
+        }
+      });
+  }
+
+  private marcarCamposComoTocados(): void {
+    Object.keys(this.personalForm.controls).forEach(key => {
+      this.personalForm.get(key)?.markAsTouched();
+    });
+  }
+
+  // ==========================================
+  // MÉTODOS DE ACCIONES
+  // ==========================================
+
+  verPerfilCompleto(personal: PersonalMedico): void {
+    this.personalSeleccionado = personal;
+    this.mostrarModalPerfil = true;
+  }
+
+  cerrarModalPerfil(): void {
+    this.mostrarModalPerfil = false;
+    this.personalSeleccionado = null;
+  }
+
+  mostrarCredenciales(personal: PersonalMedico): void {
+    this.personalSeleccionado = personal;
+    this.credencialesForm.reset();
+    this.mostrarModalCredenciales = true;
+  }
+
+  cerrarModalCredenciales(): void {
+    this.mostrarModalCredenciales = false;
+    this.personalSeleccionado = null;
+    this.credencialesForm.reset();
+  }
+
+  cambiarEstado(personal: PersonalMedico): void {
+    const nuevoEstado = !personal.activo;
+    const accion = nuevoEstado ? 'activar' : 'desactivar';
+
+    if (confirm(`¿Está seguro de ${accion} al Dr.(a) ${this.construirNombreCompleto(personal)}?`)) {
+      this.personalMedicoService.updatePersonalMedico(personal.id_personal_medico, { activo: nuevoEstado })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.mostrarExito(`Personal médico ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`);
+              this.cargarPersonalMedico();
+              this.cargarEstadisticas();
+            }
+          },
+          error: (error) => {
+            this.mostrarError('Error al cambiar estado: ' + error.message);
+          }
+        });
+    }
+  }
+
+  eliminarPersonal(personal: PersonalMedico): void {
+    if (confirm(`¿Está seguro de eliminar al Dr.(a) ${this.construirNombreCompleto(personal)}?\n\nEsta acción no se puede deshacer.`)) {
+      this.personalMedicoService.deletePersonalMedico(personal.id_personal_medico)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.mostrarExito('Personal médico eliminado correctamente');
+              this.cargarPersonalMedico();
+              this.cargarEstadisticas();
+            }
+          },
+          error: (error) => {
+            this.mostrarError('Error al eliminar personal médico: ' + error.message);
+          }
+        });
+    }
+  }
+
+  verDocumentosCreados(personal: PersonalMedico): void {
+    this.router.navigate(['/app/documentos-clinicos'], {
+      queryParams: { medico: personal.id_personal_medico }
+    });
   }
 
   // ==========================================
@@ -207,45 +523,10 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
 
-  // ==========================================
-  // MÉTODOS DE NAVEGACIÓN Y ACCIONES
-  // ==========================================
-
-  verDetallePersonal(personal: PersonalMedico): void {
-    this.personalSeleccionado = personal;
-    this.router.navigate(['/personas/personal-medico', personal.id_personal_medico]);
-  }
-
-  editarPersonal(personal: PersonalMedico): void {
-    this.router.navigate(['/personas/personal-medico', personal.id_personal_medico, 'editar']);
-  }
-
-  crearNuevoPersonal(): void {
-    this.router.navigate(['/personas/personal-medico/nuevo']);
-  }
-
-  eliminarPersonal(personal: PersonalMedico): void {
-    if (confirm(`¿Está seguro de eliminar al Dr.(a) ${personal.nombre_completo}?`)) {
-      this.personalMedicoService.deletePersonalMedico(personal.id_personal_medico!)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.mostrarMensaje('Personal médico eliminado correctamente');
-              this.cargarPersonalMedico();
-            }
-          },
-          error: (error) => {
-            this.mostrarError('Error al eliminar personal médico: ' + error.message);
-          }
-        });
-    }
-  }
-
-  verDocumentosCreados(personal: PersonalMedico): void {
-    this.router.navigate(['/documentos-clinicos'], {
-      queryParams: { medico: personal.id_personal_medico }
-    });
+  recargarDatos(): void {
+    this.limpiarMensajes();
+    this.cargarPersonalMedico();
+    this.cargarEstadisticas();
   }
 
   // ==========================================
@@ -260,6 +541,15 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
     this.mostrarEstadisticas = !this.mostrarEstadisticas;
   }
 
+  construirNombreCompleto(personal: PersonalMedico): string {
+    const partes = [
+      personal.nombre,
+      personal.apellido_paterno,
+      personal.apellido_materno
+    ].filter(Boolean);
+    return partes.join(' ') || 'Sin nombre';
+  }
+
   formatearFecha(fecha: string): string {
     if (!fecha) return 'No disponible';
     return new Date(fecha).toLocaleDateString('es-MX', {
@@ -269,20 +559,75 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
     });
   }
 
-  obtenerClasePorEstado(activo: boolean): string {
-    return activo ? 'badge-success' : 'badge-danger';
+  calcularEdad(fechaNacimiento: string): number {
+    if (!fechaNacimiento) return 0;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  }
+
+  obtenerColorPorEspecialidad(especialidad: string): string {
+    const colores: { [key: string]: string } = {
+      'Medicina General': 'bg-blue-100 text-blue-800 border-blue-200',
+      'Medicina Interna': 'bg-purple-100 text-purple-800 border-purple-200',
+      'Pediatría': 'bg-pink-100 text-pink-800 border-pink-200',
+      'Ginecología y Obstetricia': 'bg-rose-100 text-rose-800 border-rose-200',
+      'Cirugía General': 'bg-red-100 text-red-800 border-red-200',
+      'Traumatología y Ortopedia': 'bg-orange-100 text-orange-800 border-orange-200',
+      'Anestesiología': 'bg-gray-100 text-gray-800 border-gray-200',
+      'Medicina de Urgencias': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      'Cardiología': 'bg-red-100 text-red-800 border-red-200',
+      'Neurología': 'bg-indigo-100 text-indigo-800 border-indigo-200'
+    };
+    return colores[especialidad] || 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+
+  obtenerIconoPorEspecialidad(especialidad: string): string {
+    // Retornar texto simple en lugar de emojis para ser profesional
+    const iconos: { [key: string]: string } = {
+      'Medicina General': 'MG',
+      'Medicina Interna': 'MI',
+      'Pediatría': 'PED',
+      'Ginecología y Obstetricia': 'GO',
+      'Cirugía General': 'CG',
+      'Traumatología y Ortopedia': 'TO',
+      'Anestesiología': 'ANE',
+      'Medicina de Urgencias': 'URG',
+      'Cardiología': 'CAR',
+      'Neurología': 'NEU'
+    };
+    return iconos[especialidad] || 'ESP';
   }
 
   obtenerTextoEstado(activo: boolean): string {
     return activo ? 'Activo' : 'Inactivo';
   }
 
-  obtenerIconoPorGenero(genero: Genero): string {
-    return genero === Genero.MASCULINO ? '♂' : '♀';
+  obtenerClaseEstado(activo: boolean): string {
+    return activo
+      ? 'bg-green-100 text-green-800 border-green-200'
+      : 'bg-red-100 text-red-800 border-red-200';
   }
 
-  obtenerTextoGenero(genero: Genero): string {
-    return genero === Genero.MASCULINO ? 'Masculino' : 'Femenino';
+  obtenerNivelProductividad(totalDocumentos: number): string {
+    if (totalDocumentos >= 100) return 'Muy Alto';
+    if (totalDocumentos >= 50) return 'Alto';
+    if (totalDocumentos >= 10) return 'Medio';
+    if (totalDocumentos > 0) return 'Básico';
+    return 'Sin actividad';
+  }
+
+  obtenerColorProductividad(totalDocumentos: number): string {
+    if (totalDocumentos >= 100) return 'text-green-600';
+    if (totalDocumentos >= 50) return 'text-blue-600';
+    if (totalDocumentos >= 10) return 'text-yellow-600';
+    if (totalDocumentos > 0) return 'text-orange-600';
+    return 'text-gray-400';
   }
 
   esEspecialista(personal: PersonalMedico): boolean {
@@ -293,54 +638,54 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
     );
   }
 
-  obtenerTituloProfesional(especialidad: string): string {
-    if (!especialidad) return 'Dr.(a)';
+  obtenerTituloProfesional(personal: PersonalMedico): string {
+    if (!personal.especialidad) return 'Dr.(a)';
 
-    if (especialidad.toLowerCase().includes('psicología')) {
+    if (personal.especialidad.toLowerCase().includes('psicología')) {
       return 'Psic.';
     }
 
-    if (especialidad.toLowerCase().includes('nutrición')) {
+    if (personal.especialidad.toLowerCase().includes('nutrición')) {
       return 'Nut.';
     }
 
-    return 'Dr.(a)';
+    return personal.sexo === 'M' ? 'Dr.' : 'Dra.';
   }
 
-  obtenerNivelProductividad(totalDocumentos: number): string {
-    if (totalDocumentos >= 1000) return 'Muy Alto';
-    if (totalDocumentos >= 500) return 'Alto';
-    if (totalDocumentos >= 100) return 'Medio';
-    return 'Bajo';
-  }
-
-  obtenerColorProductividad(totalDocumentos: number): string {
-    if (totalDocumentos >= 1000) return 'text-green-600';
-    if (totalDocumentos >= 500) return 'text-blue-600';
-    if (totalDocumentos >= 100) return 'text-yellow-600';
-    return 'text-gray-600';
+  // Método auxiliar para convertir a number de forma segura
+  convertirANumero(valor: any): number {
+    if (typeof valor === 'number') return valor;
+    if (typeof valor === 'string') return parseInt(valor) || 0;
+    return 0;
   }
 
   // ==========================================
-  // MÉTODOS DE MANEJO DE ERRORES Y MENSAJES
+  // MÉTODOS DE MANEJO DE MENSAJES
   // ==========================================
 
   private mostrarError(mensaje: string): void {
     this.error = mensaje;
-    console.error(mensaje);
+    this.success = null;
+    setTimeout(() => {
+      this.limpiarMensajes();
+    }, 5000);
   }
 
-  private mostrarMensaje(mensaje: string): void {
-    console.log(mensaje);
-    alert(mensaje); // Temporal, reemplazar con un sistema de notificaciones
-  }
-
-  limpiarError(): void {
+  private mostrarExito(mensaje: string): void {
+    this.success = mensaje;
     this.error = null;
+    setTimeout(() => {
+      this.limpiarMensajes();
+    }, 3000);
+  }
+
+  limpiarMensajes(): void {
+    this.error = null;
+    this.success = null;
   }
 
   // ==========================================
-  // GETTERS SIMPLIFICADOS
+  // GETTERS PARA EL TEMPLATE
   // ==========================================
 
   get hayPersonalMedico(): boolean {
@@ -366,18 +711,37 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   }
 
   get especialidadesUnicas(): string[] {
-  const especialidades = this.personalMedico
-    .filter(p => p.especialidad) // Filtrar primero los que tienen especialidad
-    .map(p => p.especialidad!); // Usar ! porque ya sabemos que existe
-  return [...new Set(especialidades)];
-}
+    const especialidades = this.personalMedico
+      .filter(p => p.especialidad)
+      .map(p => p.especialidad);
+    return [...new Set(especialidades)];
+  }
 
   get departamentosUnicos(): string[] {
-  const departamentos = this.personalMedico
-    .filter(p => p.departamento) // Filtrar primero los que tienen departamento
-    .map(p => p.departamento!); // Usar ! porque ya sabemos que existe
-  return [...new Set(departamentos)];
-}
+    const departamentos = this.personalMedico
+      .filter(p => p.departamento)
+      .map(p => p.departamento!);
+    return [...new Set(departamentos)];
+  }
 
+  // Validaciones para el formulario
+  get esCedulaValida(): boolean {
+    const cedula = this.personalForm.get('numero_cedula')?.value;
+    return !cedula || (cedula.length >= 6 && /^\d+$/.test(cedula));
+  }
 
+  get esEmailValido(): boolean {
+    const email = this.personalForm.get('correo_electronico')?.value;
+    return !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  get esTelefonoValido(): boolean {
+    const telefono = this.personalForm.get('telefono')?.value;
+    return !telefono || /^\d{10}$/.test(telefono);
+  }
+
+  get esCurpValida(): boolean {
+    const curp = this.personalForm.get('curp')?.value;
+    return !curp || /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9]{2}$/.test(curp);
+  }
 }

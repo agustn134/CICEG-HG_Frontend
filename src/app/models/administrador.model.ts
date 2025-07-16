@@ -1,15 +1,3 @@
-// export interface Administrador {
-//   id_administrador: number;
-//   id_persona: number;
-//   usuario: string;
-//   contrasena: string;
-//   nivel_acceso: number;
-//   activo: boolean;
-//   foto?: string;
-// }
-
-
-
 // src/app/models/administrador.model.ts
 import { BaseEntity, AuditInfo, BaseFilters, NivelAcceso } from './base.models';
 
