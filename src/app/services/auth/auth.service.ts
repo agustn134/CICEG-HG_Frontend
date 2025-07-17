@@ -8,14 +8,14 @@ import { Router } from '@angular/router';
 export interface LoginRequest {
   usuario: string;
   password: string;
-  tipoUsuario: 'medico' | 'administrador';
+  tipoUsuario: 'medico' | 'administrador' | 'enfermeria' | 'residente';
 }
 
-export interface UserData {
+export interface Usuario {
   id: number;
   usuario: string;
   nombre_completo: string;
-  tipo_usuario: 'medico' | 'administrador';
+  tipo_usuario: 'medico' | 'administrador' | 'enfermeria' | 'residente';
   especialidad?: string;
   cargo?: string;
   departamento?: string;
@@ -27,7 +27,7 @@ export interface LoginResponse {
   message: string;
   data: {
     token: string;
-    usuario: UserData;
+    usuario: Usuario;
   };
 }
 
@@ -36,7 +36,7 @@ export interface LoginResponse {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/api/auth';
-  private currentUserSubject = new BehaviorSubject<UserData | null>(null);
+  private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -80,17 +80,49 @@ export class AuthService {
   // ==========================================
   // LOGOUT
   // ==========================================
-  logout(): void {
-    // Limpiar localStorage
+  // logout(): void {
+  //   // Limpiar localStorage
+  //   localStorage.removeItem('token');
+  //   localStorage.removeItem('currentUser');
+
+  //   // Limpiar subjects
+  //   this.tokenSubject.next(null);
+  //   this.currentUserSubject.next(null);
+
+  //   // Redirigir al login
+  //   this.router.navigate(['/login']);
+  // }
+
+
+
+logout(): void {
+  console.log('🔄 AuthService.logout() iniciado');
+  try {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    console.log('✅ localStorage limpiado');
 
-    // Limpiar subjects
     this.tokenSubject.next(null);
     this.currentUserSubject.next(null);
+    console.log('✅ Subjects limpiados');
 
-    // Redirigir al login
+    // Forzar redirección incluso si hay errores en la navegación
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload(); // Opcional: asegurar limpieza completa
+    });
+    console.log('✅ Redirección completada');
+  } catch (error) {
+    console.error('❌ Error en AuthService.logout():', error);
     this.router.navigate(['/login']);
+  }
+}
+
+  // ==========================================
+  // MÉTODO FALTANTE: setCurrentUser
+  // ==========================================
+  setCurrentUser(user: Usuario): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
   }
 
   // ==========================================
@@ -103,7 +135,7 @@ export class AuthService {
   // ==========================================
   // GETTERS
   // ==========================================
-  get currentUserValue(): UserData | null {
+  get currentUserValue(): Usuario | null {
     return this.currentUserSubject.value;
   }
 
