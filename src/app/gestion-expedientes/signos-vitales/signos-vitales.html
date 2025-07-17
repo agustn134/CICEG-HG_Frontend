@@ -1,1 +1,755 @@
-<p>signos-vitales works!</p>
+<!-- src/app/gestion-expedientes/signos-vitales/signos-vitales.html -->
+<div class="min-h-screen bg-hospital-gray-50">
+  <!-- ==========================================
+       HEADER PRINCIPAL
+       ========================================== -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h1 class="text-2xl font-bold text-hospital-gray-900">Signos Vitales</h1>
+            <p class="text-sm text-hospital-gray-600">Registro y control de signos vitales del paciente</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <button (click)="toggleFilters()"
+            class="btn-hospital bg-hospital-secondary text-white hover:bg-hospital-secondary-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.121A1 1 0 013 6.414V4z" />
+            </svg>
+            {{ showFilters ? 'Ocultar' : 'Mostrar' }} Filtros
+          </button>
+
+          <button (click)="exportarCSV()" [disabled]="signosVitales.length === 0"
+            class="btn-hospital bg-hospital-info text-white hover:bg-hospital-info-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Exportar CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       FILTROS (OPCIONAL)
+       ========================================== -->
+  <div *ngIf="showFilters" class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <form [formGroup]="filtrosForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Fecha Inicio -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Fecha Inicio</label>
+            <input type="date" formControlName="fecha_inicio" class="form-field">
+          </div>
+
+          <!-- Fecha Fin -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Fecha Fin</label>
+            <input type="date" formControlName="fecha_fin" class="form-field">
+          </div>
+
+          <!-- Tipo de Signo -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Tipo de Signo</label>
+            <select formControlName="tipo_signo" class="form-field">
+              <option value="todos">Todos</option>
+              <option *ngFor="let tipo of tiposSignosVitales" [value]="tipo.value">
+                {{ tipo.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Incluir Anormales -->
+          <div class="flex items-center">
+            <input type="checkbox" formControlName="incluir_anormales"
+              class="h-4 w-4 text-hospital-primary border-hospital-gray-300 rounded">
+            <label class="ml-2 block text-sm text-hospital-gray-700">
+              Solo valores anormales
+            </label>
+          </div>
+
+          <!-- Límite de registros -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Registros</label>
+            <select formControlName="limit" class="form-field">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-4">
+          <button type="button" (click)="applyFilters()"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.121A1 1 0 013 6.414V4z" />
+            </svg>
+            Aplicar Filtros
+          </button>
+
+          <button type="button" (click)="clearFilters()"
+            class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MENSAJES DE ESTADO
+       ========================================== -->
+  <div *ngIf="error" class="bg-hospital-emergency text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ error }}
+        <button (click)="clearMessages()" class="ml-4 text-white hover:text-gray-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="success" class="bg-hospital-success text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ success }}
+        <button (click)="clearMessages()" class="ml-4 text-white hover:text-gray-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+       ========================================== -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- ==========================================
+           FORMULARIO DE REGISTRO
+           ========================================== -->
+      <div class="lg:col-span-1">
+        <div class="card-hospital">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-bold text-hospital-gray-900">
+              {{ editingId ? 'Editar' : 'Nuevo' }} Registro
+            </h2>
+            <button *ngIf="editingId" (click)="resetForm()" class="text-hospital-gray-500 hover:text-hospital-gray-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <form [formGroup]="signosVitalesForm" (ngSubmit)="onSubmit()">
+            <!-- Fecha y Hora -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Fecha y Hora de Toma
+              </label>
+              <input type="datetime-local" formControlName="fecha_toma" class="form-field"
+                [class.error]="isFieldInvalid('fecha_toma')">
+              <p *ngIf="getFieldError('fecha_toma')" class="mt-1 text-sm text-hospital-emergency">
+                {{ getFieldError('fecha_toma') }}
+              </p>
+            </div>
+
+            <!-- Grid de Signos Vitales -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+
+              <!-- Temperatura -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Temperatura (°C)
+                </label>
+                <input type="number" step="0.1" min="30" max="45" formControlName="temperatura" class="form-field"
+                  [class.error]="isFieldInvalid('temperatura')" placeholder="36.5">
+                <p *ngIf="getFieldError('temperatura')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('temperatura') }}
+                </p>
+              </div>
+
+              <!-- Frecuencia Cardíaca -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Frecuencia Cardíaca (lpm)
+                </label>
+                <input type="number" min="30" max="250" formControlName="frecuencia_cardiaca" class="form-field"
+                  [class.error]="isFieldInvalid('frecuencia_cardiaca')" placeholder="70">
+                <p *ngIf="getFieldError('frecuencia_cardiaca')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('frecuencia_cardiaca') }}
+                </p>
+              </div>
+
+              <!-- Presión Sistólica -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Presión Sistólica (mmHg)
+                </label>
+                <input type="number" min="50" max="300" formControlName="presion_arterial_sistolica" class="form-field"
+                  [class.error]="isFieldInvalid('presion_arterial_sistolica')" placeholder="120">
+                <p *ngIf="getFieldError('presion_arterial_sistolica')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('presion_arterial_sistolica') }}
+                </p>
+              </div>
+
+              <!-- Presión Diastólica -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Presión Diastólica (mmHg)
+                </label>
+                <input type="number" min="30" max="200" formControlName="presion_arterial_diastolica" class="form-field"
+                  [class.error]="isFieldInvalid('presion_arterial_diastolica')" placeholder="80">
+                <p *ngIf="getFieldError('presion_arterial_diastolica')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('presion_arterial_diastolica') }}
+                </p>
+              </div>
+
+              <!-- Frecuencia Respiratoria -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Frecuencia Respiratoria (rpm)
+                </label>
+                <input type="number" min="8" max="60" formControlName="frecuencia_respiratoria" class="form-field"
+                  [class.error]="isFieldInvalid('frecuencia_respiratoria')" placeholder="18">
+                <p *ngIf="getFieldError('frecuencia_respiratoria')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('frecuencia_respiratoria') }}
+                </p>
+              </div>
+
+              <!-- Saturación de Oxígeno -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Saturación O₂ (%)
+                </label>
+                <input type="number" min="50" max="100" formControlName="saturacion_oxigeno" class="form-field"
+                  [class.error]="isFieldInvalid('saturacion_oxigeno')" placeholder="98">
+                <p *ngIf="getFieldError('saturacion_oxigeno')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('saturacion_oxigeno') }}
+                </p>
+              </div>
+
+              <!-- Glucosa -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Glucosa (mg/dL)
+                </label>
+                <input type="number" min="20" max="500" formControlName="glucosa" class="form-field"
+                  [class.error]="isFieldInvalid('glucosa')" placeholder="100">
+                <p *ngIf="getFieldError('glucosa')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('glucosa') }}
+                </p>
+              </div>
+
+              <!-- Peso -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Peso (kg)
+                </label>
+                <input type="number" step="0.1" min="0.5" max="300" formControlName="peso" class="form-field"
+                  [class.error]="isFieldInvalid('peso')" placeholder="70.0">
+                <p *ngIf="getFieldError('peso')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('peso') }}
+                </p>
+              </div>
+
+              <!-- Talla -->
+              <div>
+                <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                  Talla (cm)
+                </label>
+                <input type="number" min="30" max="250" formControlName="talla" class="form-field"
+                  [class.error]="isFieldInvalid('talla')" placeholder="170">
+                <p *ngIf="getFieldError('talla')" class="mt-1 text-sm text-hospital-emergency">
+                  {{ getFieldError('talla') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- IMC Calculado -->
+            <div *ngIf="calcularIMC()" class="mb-4 p-3 bg-hospital-info bg-opacity-10 rounded-lg">
+              <div class="flex items-center">
+                <svg class="w-5 h-5 text-hospital-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-hospital-info">
+                    IMC: {{ calcularIMC() | number:'1.1-1' }}
+                  </p>
+                  <p class="text-xs text-hospital-gray-600">{{ interpretarIMC() }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Observaciones
+              </label>
+              <textarea formControlName="observaciones" rows="3" class="form-field"
+                placeholder="Observaciones adicionales sobre los signos vitales..."></textarea>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center justify-between space-x-4">
+              <button type="button" (click)="resetForm()"
+                class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Limpiar
+              </button>
+
+              <button type="submit" [disabled]="!hasAtLeastOneVitalSign() || isLoading"
+                class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+                [class.loading]="isLoading">
+                <svg *ngIf="!isLoading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ editingId ? 'Actualizar' : 'Registrar' }} Signos Vitales
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           HISTORIAL DE SIGNOS VITALES
+           ========================================== -->
+      <div class="lg:col-span-2">
+        <div class="card-hospital">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-bold text-hospital-gray-900">Historial de Signos Vitales</h2>
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-hospital-gray-600">
+                {{ signosVitales.length }} registros
+              </span>
+              <button (click)="loadSignosVitales()" class="text-hospital-primary hover:text-hospital-primary-dark">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+            <div class="loading w-8 h-8"></div>
+            <span class="ml-3 text-hospital-gray-600">Cargando signos vitales...</span>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!isLoading && signosVitales.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-hospital-gray-900">No hay signos vitales registrados</h3>
+            <p class="mt-1 text-sm text-hospital-gray-500">Registre los primeros signos vitales del paciente.</p>
+          </div>
+
+          <!-- Tabla de Signos Vitales -->
+          <div *ngIf="!isLoading && signosVitales.length > 0" class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-hospital-gray-200">
+              <thead class="bg-hospital-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    Fecha/Hora
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    Temp
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    Presión
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    FC/FR
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    SatO₂
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    Glucosa
+                  </th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-hospital-gray-200">
+                <tr *ngFor="let signo of signosVitales" class="hover:bg-hospital-gray-50">
+                  <!-- Fecha -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-hospital-gray-900">
+                      {{ formatearFecha(signo.fecha_toma) }}
+                    </div>
+                    <div class="text-sm text-hospital-gray-500">
+  <span>{{ signo.registrado_por || 'Médico no disponible' }}</span>
+  <span *ngIf="signo.especialidad_medico" class="text-xs text-hospital-gray-400">
+    - {{ signo.especialidad_medico }}
+  </span>
+</div>
+                  </td>
+
+                  <!-- Temperatura -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span *ngIf="signo.temperatura"
+                      [class]="'text-sm px-2 py-1 rounded-full ' + getColorValor(signo.temperatura, 'temperatura')">
+                      {{ formatearValor(signo.temperatura, 'temperatura') }}
+                    </span>
+                    <span *ngIf="!signo.temperatura" class="text-sm text-hospital-gray-400">--</span>
+                  </td>
+
+                  <!-- Presión Arterial -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span *ngIf="signo.presion_arterial_sistolica || signo.presion_arterial_diastolica" class="text-sm">
+                      {{ formatearPresion(signo.presion_arterial_sistolica, signo.presion_arterial_diastolica) }}
+                    </span>
+                    <span *ngIf="!signo.presion_arterial_sistolica && !signo.presion_arterial_diastolica"
+                      class="text-sm text-hospital-gray-400">--</span>
+                  </td>
+
+                  <!-- FC / FR -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm">
+                      <span *ngIf="signo.frecuencia_cardiaca"
+                        [class]="getColorValor(signo.frecuencia_cardiaca, 'frecuencia_cardiaca')">
+                        {{ formatearValor(signo.frecuencia_cardiaca, 'frecuencia_cardiaca') }}
+                      </span>
+                      <span *ngIf="!signo.frecuencia_cardiaca" class="text-hospital-gray-400">--</span>
+                      /
+                      <span *ngIf="signo.frecuencia_respiratoria"
+                        [class]="getColorValor(signo.frecuencia_respiratoria, 'frecuencia_respiratoria')">
+                        {{ formatearValor(signo.frecuencia_respiratoria, 'frecuencia_respiratoria') }}
+                      </span>
+                      <span *ngIf="!signo.frecuencia_respiratoria" class="text-hospital-gray-400">--</span>
+                    </div>
+                  </td>
+
+                  <!-- Saturación de Oxígeno -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span *ngIf="signo.saturacion_oxigeno"
+                      [class]="'text-sm px-2 py-1 rounded-full ' + getColorValor(signo.saturacion_oxigeno, 'saturacion_oxigeno')">
+                      {{ formatearValor(signo.saturacion_oxigeno, 'saturacion_oxigeno') }}
+                    </span>
+                    <span *ngIf="!signo.saturacion_oxigeno" class="text-sm text-hospital-gray-400">--</span>
+                  </td>
+
+                  <!-- Glucosa -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span *ngIf="signo.glucosa"
+                      [class]="'text-sm px-2 py-1 rounded-full ' + getColorValor(signo.glucosa, 'glucosa')">
+                      {{ formatearValor(signo.glucosa, 'glucosa') }}
+                    </span>
+                    <span *ngIf="!signo.glucosa" class="text-sm text-hospital-gray-400">--</span>
+                  </td>
+
+                  <!-- Acciones -->
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex items-center justify-end space-x-2">
+                      <!-- Ver Detalles -->
+                      <button (click)="editSignosVitales(signo)"
+                        class="text-hospital-info hover:text-hospital-info-dark" title="Editar registro">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+
+                      <!-- Eliminar -->
+                      <button (click)="deleteSignosVitales(signo.id_signos_vitales)"
+                        class="text-hospital-emergency hover:text-hospital-emergency-dark" title="Eliminar registro">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==========================================
+            TARJETAS DE SIGNOS VITALES (Vista alternativa)
+            ========================================== -->
+        <div *ngIf="signosVitales.length > 0" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngFor="let signo of signosVitales.slice(0, 4)" class="card-hospital">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center">
+                <div
+                  class="w-10 h-10 rounded-full bg-hospital-primary text-white flex items-center justify-center font-bold text-sm">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-semibold text-hospital-gray-900">
+                    {{ formatearFecha(signo.fecha_toma) }}
+                  </h3>
+                  <div class="text-sm text-hospital-gray-500">
+  <span>{{ signo.registrado_por || 'Médico no disponible' }}</span>
+  <span *ngIf="signo.especialidad_medico" class="text-xs text-hospital-gray-400">
+    - {{ signo.especialidad_medico }}
+  </span>
+</div>
+                </div>
+              </div>
+              <div class="flex space-x-1">
+                <button (click)="editSignosVitales(signo)" class="text-hospital-info hover:text-hospital-info-dark">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid de Valores -->
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div *ngIf="signo.temperatura" class="flex justify-between">
+                <span class="text-hospital-gray-600">Temp:</span>
+                <span [class]="getColorValor(signo.temperatura, 'temperatura')">
+                  {{ formatearValor(signo.temperatura, 'temperatura') }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.frecuencia_cardiaca" class="flex justify-between">
+                <span class="text-hospital-gray-600">FC:</span>
+                <span [class]="getColorValor(signo.frecuencia_cardiaca, 'frecuencia_cardiaca')">
+                  {{ formatearValor(signo.frecuencia_cardiaca, 'frecuencia_cardiaca') }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.presion_arterial_sistolica || signo.presion_arterial_diastolica"
+                class="flex justify-between">
+                <span class="text-hospital-gray-600">PA:</span>
+                <span class="font-medium">
+                  {{ formatearPresion(signo.presion_arterial_sistolica, signo.presion_arterial_diastolica) }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.saturacion_oxigeno" class="flex justify-between">
+                <span class="text-hospital-gray-600">SatO₂:</span>
+                <span [class]="getColorValor(signo.saturacion_oxigeno, 'saturacion_oxigeno')">
+                  {{ formatearValor(signo.saturacion_oxigeno, 'saturacion_oxigeno') }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.frecuencia_respiratoria" class="flex justify-between">
+                <span class="text-hospital-gray-600">FR:</span>
+                <span [class]="getColorValor(signo.frecuencia_respiratoria, 'frecuencia_respiratoria')">
+                  {{ formatearValor(signo.frecuencia_respiratoria, 'frecuencia_respiratoria') }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.glucosa" class="flex justify-between">
+                <span class="text-hospital-gray-600">Glucosa:</span>
+                <span [class]="getColorValor(signo.glucosa, 'glucosa')">
+                  {{ formatearValor(signo.glucosa, 'glucosa') }}
+                </span>
+              </div>
+
+              <div *ngIf="signo.peso" class="flex justify-between">
+                <span class="text-hospital-gray-600">Peso:</span>
+                <span class="font-medium">{{ formatearValor(signo.peso, 'peso') }}</span>
+              </div>
+
+              <div *ngIf="signo.talla" class="flex justify-between">
+                <span class="text-hospital-gray-600">Talla:</span>
+                <span class="font-medium">{{ formatearValor(signo.talla, 'talla') }}</span>
+              </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div *ngIf="signo.observaciones" class="mt-3 pt-3 border-t border-hospital-gray-200">
+              <p class="text-xs text-hospital-gray-600">
+                <span class="font-medium">Obs:</span> {{ signo.observaciones }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+      MODAL DE VALIDACIÓN
+      ========================================== -->
+<!-- ==========================================
+     MODAL DE VALIDACIÓN CORREGIDO
+     ========================================== -->
+<div *ngIf="showValidation && currentValidation"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-modal">
+  <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center">
+          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full"
+            [class]="currentValidation.valido ? 'bg-hospital-warning bg-opacity-20' : 'bg-hospital-emergency bg-opacity-20'">
+            <svg class="w-6 h-6"
+              [class]="currentValidation.valido ? 'text-hospital-warning' : 'text-hospital-emergency'"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-hospital-gray-900">
+              {{ currentValidation.valido ? 'Advertencia en Signos Vitales' : 'Error en Signos Vitales' }}
+            </h3>
+            <p class="text-sm text-hospital-gray-500">
+              {{ currentValidation.valido
+                ? 'Se encontraron valores anormales que requieren atención.'
+                : 'Los datos ingresados contienen errores que deben corregirse.' }}
+            </p>
+          </div>
+        </div>
+        <button (click)="hideValidation()"
+          class="text-hospital-gray-400 hover:text-hospital-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Errores -->
+      <div *ngIf="currentValidation.errores.length > 0" class="mb-4">
+        <h4 class="text-sm font-medium text-hospital-emergency mb-2">Errores encontrados:</h4>
+        <ul class="text-sm text-hospital-gray-700 space-y-1">
+          <li *ngFor="let error of currentValidation.errores" class="flex items-center">
+            <svg class="w-4 h-4 text-hospital-emergency mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Advertencias -->
+      <div *ngIf="currentValidation.advertencias.length > 0" class="mb-4">
+        <h4 class="text-sm font-medium text-hospital-warning mb-2">Advertencias:</h4>
+        <ul class="text-sm text-hospital-gray-700 space-y-1">
+          <li *ngFor="let advertencia of currentValidation.advertencias" class="flex items-center">
+            <svg class="w-4 h-4 text-hospital-warning mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ advertencia }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Valores Anormales -->
+      <div *ngIf="currentValidation.valores_anormales.length > 0" class="mb-4">
+        <h4 class="text-sm font-medium text-hospital-warning mb-2">Valores fuera de rango normal:</h4>
+        <ul class="text-sm text-hospital-gray-700 space-y-2">
+          <li *ngFor="let valor of currentValidation.valores_anormales" class="flex items-start">
+            <svg class="w-4 h-4 text-hospital-warning mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <span class="font-medium">{{ valor.parametro }}:</span>
+              <span class="text-hospital-emergency">{{ valor.valor }}</span>
+              <div class="text-xs text-hospital-gray-500">
+                Rango normal: {{ valor.rango_normal.min }} - {{ valor.rango_normal.max }}
+                <span class="ml-2 px-1 py-0.5 rounded text-xs"
+                  [class]="valor.nivel === 'severo' ? 'bg-hospital-emergency text-white' :
+                           valor.nivel === 'moderado' ? 'bg-hospital-warning text-white' :
+                           'bg-hospital-info text-white'">
+                  {{ valor.nivel }}
+                </span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex items-center justify-end space-x-4 mt-6">
+        <button (click)="hideValidation()"
+          class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+          Cancelar
+        </button>
+        <button *ngIf="currentValidation.valido" (click)="confirmSaveWithWarnings()"
+          class="btn-hospital bg-hospital-warning text-white hover:bg-hospital-warning-dark">
+          Guardar de todas formas
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- ==========================================
+      INFORMACIÓN ADICIONAL (Sticky)
+      ========================================== -->
+  <div class="fixed bottom-4 right-4 max-w-sm">
+    <div *ngIf="!hasAtLeastOneVitalSign() && signosVitalesForm.dirty"
+      class="card-hospital bg-hospital-warning bg-opacity-20 border-l-4 border-hospital-warning">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-hospital-warning mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm text-hospital-warning">
+          Debe registrar al menos un signo vital
+        </p>
+      </div>
+    </div>
+
+    <!-- Resumen rápido de valores normales -->
+    <div *ngIf="expedienteSeleccionado"
+      class="mt-2 card-hospital bg-hospital-info bg-opacity-10 border-l-4 border-hospital-info">
+      <h4 class="text-sm font-medium text-hospital-info mb-2">Valores de referencia (adulto):</h4>
+      <div class="text-xs text-hospital-gray-600 space-y-1">
+        <div>• Temperatura: 36.1 - 37.2°C</div>
+        <div>• Presión arterial: 90-120 / 60-80 mmHg</div>
+        <div>• Frecuencia cardíaca: 60-100 lpm</div>
+        <div>• Frecuencia respiratoria: 12-20 rpm</div>
+        <div>• Saturación O₂: ≥95%</div>
+        <div>• Glucosa: 70-100 mg/dL</div>
+      </div>
+    </div>
+  </div>
+</div>

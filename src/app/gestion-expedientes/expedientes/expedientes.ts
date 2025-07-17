@@ -198,6 +198,16 @@ export class Expedientes implements OnInit, OnDestroy {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
 
+  calcularEdadSegura(fechaNacimiento?: string): string {
+  if (!fechaNacimiento) return 'N/A';
+  return this.calcularEdad(fechaNacimiento).toString();
+}
+
+obtenerTextoGeneroSeguro(sexo?: Genero): string {
+  if (!sexo) return 'N/A';
+  return this.obtenerTextoGenero(sexo);
+}
+
   buscarExpedientes(query: string): void {
     if (query.length >= 2) {
       this.expedientesService.buscarExpedientes(query)
@@ -346,9 +356,12 @@ export class Expedientes implements OnInit, OnDestroy {
     }
   }
 
-  obtenerTextoGenero(genero: Genero): string {
-    return genero === Genero.MASCULINO ? 'Masculino' : 'Femenino';
-  }
+  // obtenerTextoGenero(genero: Genero): string {
+  //   return genero === Genero.MASCULINO ? 'Masculino' : 'Femenino';
+  // }
+  obtenerTextoGenero(sexo: Genero): string {
+  return sexo === Genero.MASCULINO ? 'Masculino' : 'Femenino';
+}
 
   tieneInternamientoActivo(expediente: Expediente): boolean {
     return (expediente.internamientos_activos || 0) > 0;
@@ -357,6 +370,17 @@ export class Expedientes implements OnInit, OnDestroy {
   esExpedienteActivo(expediente: Expediente): boolean {
     return expediente.estado === ESTADOS_EXPEDIENTE_VALUES.ACTIVO;
   }
+
+  // Agregar este método al archivo expedientes.ts
+onBusquedaChange(event: any): void {
+  const valor = event.target.value;
+  this.textoBusqueda = valor;
+
+  // Aplicar filtros automáticamente después de un delay
+  setTimeout(() => {
+    this.aplicarFiltros();
+  }, 300);
+}
 
   calcularEdad(fechaNacimiento: string): number {
     if (!fechaNacimiento) return 0;
