@@ -65,13 +65,12 @@ import { RegistrosTransfusion } from './documentos-clinicos/registros-transfusio
 // ===== Notas Especializadas =====
 import { NotasPsicologia } from './notas-especializadas/notas-psicologia/notas-psicologia';
 import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nutricion';
-import { authGuard } from './guards/auth-guard';
+import { AuthGuard } from './guards/auth-guard';
 import { ConfiguracionComponent } from './admin/configuracion/configuracion';
 
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
   { path: 'login', component: Login },
-
   // { path: 'recuperar-password', component: RecuperarPassword },
   // { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
@@ -83,7 +82,7 @@ export const routes: Routes = [
   {
     path: 'app',
     component: DashboardLayoutComponent,
-    canActivate: [authGuard], // Descomenta cuando tengas el guard
+    canActivate: [AuthGuard],
     children: [
       // === Dashboard principal ===
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -104,8 +103,8 @@ export const routes: Routes = [
             data: {
               step: 0,
               title: 'Nuevo Paciente',
-              description: 'Iniciar registro de nuevo paciente'
-            }
+              description: 'Iniciar registro de nuevo paciente',
+            },
           },
 
           // 🏥 Paso 1: Datos de la persona
@@ -117,8 +116,13 @@ export const routes: Routes = [
               step: 1,
               title: 'Datos Personales',
               description: 'Información básica de la persona',
-              requiredFields: ['nombre', 'apellido_paterno', 'fecha_nacimiento', 'sexo']
-            }
+              requiredFields: [
+                'nombre',
+                'apellido_paterno',
+                'fecha_nacimiento',
+                'sexo',
+              ],
+            },
           },
 
           // 👤 Paso 2: Datos específicos del paciente
@@ -130,8 +134,8 @@ export const routes: Routes = [
               step: 2,
               title: 'Datos del Paciente',
               description: 'Información médica y de contacto',
-              requiredFields: ['familiar_responsable', 'telefono_familiar']
-            }
+              requiredFields: ['familiar_responsable', 'telefono_familiar'],
+            },
           },
 
           // 📁 Paso 3: Creación automática del expediente
@@ -143,10 +147,10 @@ export const routes: Routes = [
               step: 3,
               title: 'Expediente Clínico',
               description: 'Generación automática del expediente',
-              autoProcess: true
-            }
-          }
-        ]
+              autoProcess: true,
+            },
+          },
+        ],
       },
 
       // ===== Catálogos =====
@@ -155,13 +159,16 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'servicios', pathMatch: 'full' },
           { path: 'servicios', component: Servicios },
-          { path: 'areas-interconsulta', component: AreasInterconsultaComponent },
+          {
+            path: 'areas-interconsulta',
+            component: AreasInterconsultaComponent,
+          },
           { path: 'guias-clinicas', component: GuiasClinicasComponent },
           { path: 'estudios-medicos', component: EstudiosMedicosComponent },
           { path: 'medicamentos', component: MedicamentosComponent },
           { path: 'tipos-sangre', component: TiposSangre },
           { path: 'tipos-documento', component: TiposDocumento },
-        ]
+        ],
       },
 
       // ===== Personas =====
@@ -174,32 +181,30 @@ export const routes: Routes = [
           { path: 'pacientes-list', component: Pacientes },
           { path: 'personal-medico', component: PersonalMedicoComponent },
 
-
           // ✅ RUTA CORREGIDA: Perfil de Paciente
           {
             path: 'perfil-paciente/:id',
             component: PerfilPaciente,
-            title: 'Perfil de Paciente'
+            title: 'Perfil de Paciente',
           },
 
           // Alias para acceso desde lista de pacientes
           {
             path: 'pacientes/:id/perfil',
-            redirectTo: 'perfil-paciente/:id'
+            redirectTo: 'perfil-paciente/:id',
           },
-
-        ]
+        ],
       },
       {
-  path: 'admin',
-  children: [
-    {
-      path: 'configuracion',
-      component: ConfiguracionComponent,
-      canActivate: [authGuard]
-    }
-  ]
-},
+        path: 'admin',
+        children: [
+          {
+            path: 'configuracion',
+            component: ConfiguracionComponent,
+            canActivate: [AuthGuard],
+          },
+        ],
+      },
 
       // ===== Gestión de Expedientes =====
       {
@@ -211,16 +216,19 @@ export const routes: Routes = [
           { path: 'internamientos', component: InternamientosComponent },
           {
             path: 'internamientos/:id',
-            loadComponent: () => import('./gestion-expedientes/internamientos/internamientos').then(m => m.InternamientosComponent)
+            loadComponent: () =>
+              import(
+                './gestion-expedientes/internamientos/internamientos'
+              ).then((m) => m.InternamientosComponent),
           },
           { path: 'signos-vitales', component: SignosVitalesComponent },
 
           {
             path: 'expedientes/:expedienteId/paciente/:id',
             component: PerfilPaciente,
-            title: 'Perfil de Paciente desde Expediente'
-          }
-        ]
+            title: 'Perfil de Paciente desde Expediente',
+          },
+        ],
       },
 
       // ===== Documentos Clínicos =====
@@ -238,12 +246,18 @@ export const routes: Routes = [
           { path: 'notas-postoperatoria', component: NotasPostoperatoria },
           { path: 'notas-postanestesica', component: NotasPostanestesica },
           { path: 'notas-egreso', component: NotasEgresoComponent },
-          { path: 'consentimientos-informados', component: ConsentimientosInformados },
+          {
+            path: 'consentimientos-informados',
+            component: ConsentimientosInformados,
+          },
           { path: 'solicitudes-estudio', component: SolicitudesEstudio },
           { path: 'referencias-traslado', component: ReferenciasTraslado },
-          { path: 'prescripciones-medicamento', component: PrescripcionesMedicamento },
+          {
+            path: 'prescripciones-medicamento',
+            component: PrescripcionesMedicamento,
+          },
           { path: 'registros-transfusion', component: RegistrosTransfusion },
-        ]
+        ],
       },
 
       // ===== Notas Especializadas =====
@@ -253,10 +267,8 @@ export const routes: Routes = [
           { path: '', redirectTo: 'notas-psicologia', pathMatch: 'full' },
           { path: 'notas-psicologia', component: NotasPsicologia },
           { path: 'notas-nutricion', component: NotasNutricion },
-        ]
+        ],
       },
-
-
     ],
   },
 
