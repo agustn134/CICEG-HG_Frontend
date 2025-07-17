@@ -16,6 +16,7 @@ export interface NotaPreoperatoria extends BaseEntity, AuditInfo {
 
   // Evaluación preoperatoria
   diagnostico_preoperatorio: string;
+  id_guia_diagnostico?: number;
   indicacion_quirurgica: string;
   riesgo_quirurgico?: 'Bajo' | 'Moderado' | 'Alto' | 'Muy Alto';
   clasificacion_asa?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';
@@ -63,6 +64,8 @@ export interface NotaPreoperatoria extends BaseEntity, AuditInfo {
   edad_paciente?: number;
   nombre_cirujano?: string;
   nombre_anestesiologo?: string;
+  guia_clinica_nombre?: string;
+  guia_clinica_codigo?: string;
 }
 
 // ==========================================
@@ -89,6 +92,7 @@ export interface CreateNotaPreoperatoriaDto {
   procedimiento_programado: string;
   fecha_cirugia_programada: string;
   diagnostico_preoperatorio: string;
+  id_guia_diagnostico?: number;
   indicacion_quirurgica: string;
   riesgo_quirurgico?: 'Bajo' | 'Moderado' | 'Alto' | 'Muy Alto';
   clasificacion_asa?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';

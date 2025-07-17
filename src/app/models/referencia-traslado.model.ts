@@ -6,6 +6,7 @@ export interface ReferenciaTraslado extends BaseEntity, AuditInfo {
   institucion_destino: string;
   servicio_destino?: string;
   motivo_traslado: string;
+  id_guia_diagnostico?: number;
   condiciones_traslado: string;
   urgencia_traslado?: 'Urgente' | 'Programado' | 'Electivo';
   medio_transporte?: 'Ambulancia' | 'Helicóptero' | 'Terrestre' | 'Particular';
@@ -24,6 +25,8 @@ export interface ReferenciaTraslado extends BaseEntity, AuditInfo {
   nombre_paciente?: string;
   numero_expediente?: string;
   institucion_origen?: string;
+  guia_clinica_nombre?: string;
+  guia_clinica_codigo?: string;
 }
 
 export interface ReferenciaTrasladoFilters extends BaseFilters {
@@ -40,6 +43,7 @@ export interface CreateReferenciaTrasladoDto {
   institucion_destino: string;
   servicio_destino?: string;
   motivo_traslado: string;
+  id_guia_diagnostico?: number;
   condiciones_traslado: string;
   urgencia_traslado?: string;
   medio_transporte?: string;
