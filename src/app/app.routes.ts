@@ -66,10 +66,12 @@ import { RegistrosTransfusion } from './documentos-clinicos/registros-transfusio
 import { NotasPsicologia } from './notas-especializadas/notas-psicologia/notas-psicologia';
 import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nutricion';
 import { authGuard } from './guards/auth-guard';
+import { ConfiguracionComponent } from './admin/configuracion/configuracion';
 
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
   { path: 'login', component: Login },
+
   // { path: 'recuperar-password', component: RecuperarPassword },
   // { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
@@ -184,9 +186,20 @@ export const routes: Routes = [
           {
             path: 'pacientes/:id/perfil',
             redirectTo: 'perfil-paciente/:id'
-          }
+          },
+
         ]
       },
+      {
+  path: 'admin',
+  children: [
+    {
+      path: 'configuracion',
+      component: ConfiguracionComponent,
+      canActivate: [authGuard]
+    }
+  ]
+},
 
       // ===== Gestión de Expedientes =====
       {
@@ -242,6 +255,7 @@ export const routes: Routes = [
           { path: 'notas-nutricion', component: NotasNutricion },
         ]
       },
+
 
     ],
   },
