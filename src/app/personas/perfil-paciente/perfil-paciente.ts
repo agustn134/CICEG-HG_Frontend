@@ -939,45 +939,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     console.log('✅ Nota de urgencias guardada:', response);
   }
 
-  // private async guardarNotaEvolucion(): Promise<void> {
-  //   if (!this.notaEvolucionForm.valid) {
-  //     throw new Error('Formulario de nota de evolución inválido');
-  //   }
-
-  //   const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
-  //     (t) => t.nombre === 'Nota de Evolución'
-  //   );
-  //   if (!tipoNotaEvolucion) {
-  //     throw new Error('Tipo de documento de evolución no encontrado');
-  //   }
-
-  //   const documentoEvolucion = await this.crearDocumentoEspecifico(
-  //     tipoNotaEvolucion.id_tipo_documento
-  //   );
-
-  //   const notaData: CreateNotaEvolucionDto = {
-  //     id_documento: documentoEvolucion.id_documento,
-  //     sintomas_signos:
-  //       this.notaEvolucionForm.value.subjetivo || 'Paciente refiere...',
-  //     habitus_exterior:
-  //       this.notaEvolucionForm.value.objetivo ||
-  //       'Paciente en condiciones generales...',
-  //     estado_nutricional: 'Adecuado para la edad',
-  //     estudios_laboratorio_gabinete: 'Sin estudios recientes que reportar',
-  //     evolucion_analisis:
-  //       this.notaEvolucionForm.value.analisis || 'Evolución clínica estable',
-  //     diagnosticos: 'Por determinar',
-  //     plan_estudios_tratamiento:
-  //       this.notaEvolucionForm.value.plan || 'Continuar manejo actual',
-  //     pronostico: 'Favorable para la vida',
-  //   };
-
-  //   const response = await firstValueFrom(
-  //     this.notaEvolucionService.createNotaEvolucion(notaData)
-  //   );
-  //   console.log(' Nota de evolución guardada:', response);
-  // }
-
   private async guardarNotaEvolucion(): Promise<void> {
     if (!this.notaEvolucionForm.valid) {
       throw new Error('Formulario de nota de evolución inválido');

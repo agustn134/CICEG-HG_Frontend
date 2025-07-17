@@ -59,7 +59,7 @@ export class Administradores implements OnInit, OnDestroy {
   error: string | null = null;
   success: string | null = null;
   mostrarFiltros = false;
-  mostrarEstadisticas = true;
+  mostrarEstadisticas = false; // Cambiado: estadísticas ocultas por defecto
   mostrarModal = false;
   mostrarModalPerfil = false;
   mostrarModalPassword = false;
@@ -285,6 +285,7 @@ private initializeForms(): void {
   }
 
   cargarEstadisticas(): void {
+    // SIMPLIFICADO: Solo cargar estadísticas básicas
     this.administradorService.getEstadisticas()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -294,7 +295,8 @@ private initializeForms(): void {
           }
         },
         error: (err) => {
-          console.error('Error al cargar estadísticas:', err);
+          // Error silencioso - las estadísticas no son críticas
+          console.warn('Estadísticas no disponibles:', err);
         }
       });
   }
@@ -529,6 +531,18 @@ private actualizarAdministrador(formData: any): void {
   // ==========================================
   // MÉTODOS DE ACCIONES
   // ==========================================
+
+  // NUEVA FUNCIÓN: Navegar a configuración del sistema
+  irAConfiguracion(): void {
+    this.router.navigate(['/app/admin/configuracion']);
+  }
+
+  // Verificar si el usuario actual puede ver configuración
+  puedeVerConfiguracion(): boolean {
+    // Aquí podrías verificar el nivel del usuario actual
+    // Por ahora, permitimos acceso a todos los administradores
+    return true;
+  }
 
   verPerfilCompleto(administrador: Administrador): void {
     this.administradorSeleccionado = administrador;

@@ -394,40 +394,34 @@
               <!-- Columna: Acciones -->
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex space-x-2">
+                  <!-- Botón principal: Ver Perfil (azul) -->
                   <button
                     (click)="verDetallePaciente(paciente)"
                     class="text-hospital-primary hover:text-hospital-primary-dark transition-colors"
-                    title="Ver detalles">
+                    title="Ver perfil del paciente">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                   </button>
 
+                  <!-- Botón secundario: Crear Expediente (verde) -->
                   <button
-                    (click)="editarPaciente(paciente)"
-                    class="text-hospital-warning hover:text-hospital-warning-dark transition-colors"
-                    title="Editar">
+                    (click)="crearExpediente(paciente)"
+                    class="text-hospital-success hover:text-hospital-success-dark transition-colors"
+                    title="Crear nuevo expediente médico">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                   </button>
 
+                  <!-- Botón terciario: Ver Expedientes (gris) -->
                   <button
                     (click)="verExpedientes(paciente)"
-                    class="text-hospital-success hover:text-hospital-success-dark transition-colors"
-                    title="Ver expedientes">
+                    class="text-hospital-gray-600 hover:text-hospital-gray-800 transition-colors"
+                    title="Ver expedientes existentes">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    (click)="eliminarPaciente(paciente)"
-                    class="text-hospital-emergency hover:text-hospital-emergency-dark transition-colors"
-                    title="Eliminar">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                   </button>
                 </div>
@@ -527,6 +521,7 @@
           <!-- Botones de acción -->
           <div class="border-t border-hospital-gray-200 pt-4 flex justify-between">
             <div class="flex space-x-2">
+              <!-- Botón principal: Ver Perfil (azul) -->
               <button
                 (click)="verDetallePaciente(paciente)"
                 class="btn-hospital bg-hospital-primary hover:bg-hospital-primary-dark text-white text-sm px-3 py-2">
@@ -534,62 +529,30 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 </svg>
-                Ver
+                Ver Perfil
               </button>
 
+              <!-- Botón secundario: Crear Expediente (verde) -->
               <button
-                (click)="editarPaciente(paciente)"
-                class="btn-hospital bg-hospital-warning hover:bg-hospital-warning-dark text-white text-sm px-3 py-2">
+                (click)="crearExpediente(paciente)"
+                class="btn-hospital bg-hospital-success hover:bg-hospital-success-dark text-white text-sm px-3 py-2">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                Editar
+                Crear Expediente
               </button>
             </div>
 
-            <!-- Dropdown de más acciones -->
-            <div class="relative">
+            <!-- Botón terciario: Ver Expedientes (gris) -->
+            <div class="flex space-x-2">
               <button
-                type="button"
-                class="btn-hospital bg-hospital-gray-200 hover:bg-hospital-gray-300 text-hospital-gray-700 text-sm px-3 py-2 dropdown-toggle">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                (click)="verExpedientes(paciente)"
+                class="btn-hospital bg-hospital-gray-200 hover:bg-hospital-gray-300 text-hospital-gray-700 text-sm px-3 py-2">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
+                Ver Expedientes
               </button>
-
-              <!-- Menu dropdown (necesitaría lógica adicional para mostrar/ocultar) -->
-              <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-hospital-gray-200 z-10">
-                <div class="py-1">
-                  <button
-                    (click)="verHistorialMedico(paciente)"
-                    class="block w-full text-left px-4 py-2 text-sm text-hospital-gray-700 hover:bg-hospital-gray-100">
-                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                    </svg>
-                    Historial médico
-                  </button>
-
-                  <button
-                    (click)="verExpedientes(paciente)"
-                    class="block w-full text-left px-4 py-2 text-sm text-hospital-gray-700 hover:bg-hospital-gray-100">
-                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Ver expedientes
-                  </button>
-
-                  <hr class="border-hospital-gray-200 my-1">
-
-                  <button
-                    (click)="eliminarPaciente(paciente)"
-                    class="block w-full text-left px-4 py-2 text-sm text-hospital-emergency hover:bg-hospital-emergency-light hover:text-white">
-                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                    Eliminar
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>

@@ -206,41 +206,33 @@ export class Pacientes implements OnInit, OnDestroy {
 
   verDetallePaciente(paciente: Paciente): void {
     this.pacienteSeleccionado = paciente;
-    this.router.navigate(['/personas/pacientes', paciente.id_paciente]);
+    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'perfil']);
   }
 
   editarPaciente(paciente: Paciente): void {
-    this.router.navigate(['/personas/pacientes', paciente.id_paciente, 'editar']);
+    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'editar']);
   }
 
   crearNuevoPaciente(): void {
     this.router.navigate(['/app/nuevo-paciente/inicio']);
   }
 
-  eliminarPaciente(paciente: Paciente): void {
-    if (confirm(`¿Está seguro de eliminar al paciente ${paciente.nombre_completo}?`)) {
-      this.pacientesService.deletePaciente(paciente.id_paciente!)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.mostrarMensaje('Paciente eliminado correctamente');
-              this.cargarPacientes();
-            }
-          },
-          error: (error) => {
-            this.mostrarError('Error al eliminar paciente: ' + error.message);
-          }
-        });
-    }
-  }
+  // REMOVIDO: Los doctores no necesitan eliminar pacientes
+  // eliminarPaciente() ha sido eliminado por seguridad
 
   verHistorialMedico(paciente: Paciente): void {
-    this.router.navigate(['/personas/pacientes', paciente.id_paciente, 'historial']);
+    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'historial']);
   }
 
   verExpedientes(paciente: Paciente): void {
-    this.router.navigate(['/expedientes'], {
+    this.router.navigate(['/app/gestion-expedientes/expedientes'], {
+      queryParams: { paciente: paciente.id_paciente }
+    });
+  }
+
+  // NUEVAS ACCIONES PARA DOCTORES
+  crearExpediente(paciente: Paciente): void {
+    this.router.navigate(['/app/nuevo-paciente/inicio'], {
       queryParams: { paciente: paciente.id_paciente }
     });
   }
