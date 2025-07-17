@@ -6,11 +6,12 @@ import { ModernSidebarComponent } from '../modern-sidebar/modern-sidebar';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService, Usuario } from '../../../services/auth/auth.service';
+import { ConfirmationModalComponent } from "../confirmation-modal/confirmation-modal";
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ModernSidebarComponent],
+  imports: [CommonModule, RouterOutlet, ModernSidebarComponent, ConfirmationModalComponent],
   template: `
     <div class="min-h-screen bg-gray-50">
       <!-- Modern Sidebar -->
@@ -423,18 +424,18 @@ import { AuthService, Usuario } from '../../../services/auth/auth.service';
         </footer>
       </main>
 
-      <!-- Overlay para cerrar dropdown -->
-      <!-- <div
-        *ngIf="isUserDropdownOpen"
-        (click)="closeUserDropdown()"
-        class="fixed inset-0 z-40"
-      ></div> -->
-      <div
-  *ngIf="isUserDropdownOpen"
-  (click)="closeUserDropdown()"
-  class="fixed inset-0 z-40"
-  style="pointer-events: auto;"
-></div>
+ <app-confirmation-modal
+        [isOpen]="showLogoutModal"
+        title="Cerrar Sesión"
+        message="¿Está seguro que desea cerrar sesión del sistema? Se perderá cualquier trabajo no guardado."
+        type="danger"
+        confirmText="Cerrar Sesión"
+        cancelText="Cancelar"
+        (confirmed)="confirmLogout()"
+        (cancelled)="cancelLogout()"
+      ></app-confirmation-modal>
+
+
     </div>
   `,
   styles: [
@@ -499,6 +500,7 @@ private timeInterval: any;
   systemStatus: 'online' | 'maintenance' | 'offline' = 'online';
   currentTime = '';
   welcomeMessage = '';
+showLogoutModal = false;
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -580,50 +582,6 @@ private timeInterval: any;
     this.isUserDropdownOpen = false;
   }
 
-  // onDropdownItemClick(action: string, event: Event): void {
-  //   event.preventDefault();
-  //   event.stopPropagation();
-
-  //   this.closeUserDropdown();
-
-  //   switch (action) {
-  //     case 'profile':
-  //       this.handleProfileClick();
-  //       break;
-  //     case 'settings':
-  //       this.handleSettingsClick();
-  //       break;
-  //     case 'logout':
-  //       this.handleLogoutClick();
-  //       break;
-  //     default:
-  //       console.log(`Acción no reconocida: ${action}`);
-  //   }
-  // }
-
-
-  // onDropdownItemClick(action: string, event: Event): void {
-  //   event.stopPropagation();
-
-  //   console.log(`🔄 Ejecutando acción: ${action}`);
-
-  //   this.closeUserDropdown();
-
-  //   switch (action) {
-  //     case 'profile':
-  //       this.handleProfileClick();
-  //       break;
-  //     case 'settings':
-  //       this.handleSettingsClick();
-  //       break;
-  //     case 'logout':
-  //       this.handleLogoutClick();
-  //       break;
-  //     default:
-  //       console.log(`❌ Acción no reconocida: ${action}`);
-  //   }
-  // }
-
 onDropdownItemClick(action: string, event: Event): void {
   event.stopPropagation();
   this.closeUserDropdown();
@@ -646,23 +604,29 @@ onDropdownItemClick(action: string, event: Event): void {
   }
 }
 
-private handleLogoutClick(): void {
-  console.log('🚪 Iniciando proceso de logout');
+// private handleLogoutClick(): void {
+//   console.log('🚪 Iniciando proceso de logout');
 
-  if (confirm('¿Está seguro que desea cerrar sesión del sistema?')) {
-    console.log('✅ Logout confirmado por el usuario');
-    try {
-      this.authService.logout();
-      console.log('✅ Sesión cerrada exitosamente');
-      // Redirigir explícitamente si es necesario
-      this.router.navigate(['/login']);
-    } catch (error) {
-      console.error('❌ Error durante el logout:', error);
-    }
-  } else {
-    console.log('❌ Logout cancelado por el usuario');
+//   if (confirm('¿Está seguro que desea cerrar sesión del sistema?')) {
+//     console.log('✅ Logout confirmado por el usuario');
+//     try {
+//       this.authService.logout();
+//       console.log('✅ Sesión cerrada exitosamente');
+//       // Redirigir explícitamente si es necesario
+//       this.router.navigate(['/login']);
+//     } catch (error) {
+//       console.error('❌ Error durante el logout:', error);
+//     }
+//   } else {
+//     console.log('❌ Logout cancelado por el usuario');
+//   }
+// }
+
+// Actualizar el método handleLogoutClick
+  private handleLogoutClick(): void {
+    console.log('🚪 Iniciando proceso de logout');
+    this.showLogoutModal = true; // Mostrar modal en lugar de confirm()
   }
-}
 
   private handleProfileClick(): void {
     console.log('🏥 Abriendo perfil del usuario');
@@ -672,6 +636,25 @@ private handleLogoutClick(): void {
   private handleSettingsClick(): void {
     console.log('⚙️ Abriendo configuración del sistema');
     // this.router.navigate(['/app/settings']);
+  }
+
+  // Agregar estos nuevos métodos
+  confirmLogout(): void {
+    console.log('✅ Logout confirmado por el usuario');
+    this.showLogoutModal = false;
+
+    try {
+      this.authService.logout();
+      console.log('✅ Sesión cerrada exitosamente');
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('❌ Error durante el logout:', error);
+    }
+  }
+
+  cancelLogout(): void {
+    console.log('❌ Logout cancelado por el usuario');
+    this.showLogoutModal = false;
   }
 
   // private handleLogoutClick(): void {
@@ -692,9 +675,9 @@ private handleLogoutClick(): void {
   //   }
   // }
 
-  private confirmLogout(): boolean {
-    return confirm('¿Está seguro que desea cerrar sesión del sistema?');
-  }
+  // private confirmLogout(): boolean {
+  //   return confirm('¿Está seguro que desea cerrar sesión del sistema?');
+  // }
 
   // Métodos para mostrar información del usuario
   getUserDisplayName(): string {
