@@ -1,1 +1,735 @@
-<p>prescripciones-medicamento works!</p>
+<!-- src/app/documentos-clinicos/prescripciones-medicamento/prescripciones-medicamento.html -->
+<div class="min-h-screen bg-hospital-gray-50">
+  <!-- ==========================================
+       HEADER PRINCIPAL
+       ========================================== -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h1 class="text-2xl font-bold text-hospital-gray-900">Prescripciones de Medicamento</h1>
+            <p class="text-sm text-hospital-gray-600">Gestión de prescripciones médicas y medicamentos</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <button (click)="openCreateModal()"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva Prescripción
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MENSAJES DE ESTADO
+       ========================================== -->
+  <div *ngIf="error" class="bg-hospital-emergency text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ error }}
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="success" class="bg-hospital-success text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ success }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       FILTROS Y BÚSQUEDA
+       ========================================== -->
+  <div class="bg-white shadow-sm border-b border-hospital-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Búsqueda General -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Buscar</label>
+            <input type="text" formControlName="buscar" class="form-field"
+              placeholder="Medicamento, dosis, indicaciones...">
+          </div>
+
+          <!-- Vía de Administración -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Vía de Administración</label>
+            <select formControlName="via_administracion" class="form-field">
+              <option value="">Todas</option>
+              <option *ngFor="let via of viasAdministracion" [value]="via">
+                {{ via }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Estado Activo -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Estado</label>
+            <select formControlName="activo" class="form-field">
+              <option [value]="true">Activas</option>
+              <option [value]="false">Inactivas</option>
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <!-- Fecha Inicio -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Fecha Inicio</label>
+            <input type="date" formControlName="fecha_inicio" class="form-field">
+          </div>
+
+          <!-- Fecha Fin -->
+          <div>
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Fecha Fin</label>
+            <input type="date" formControlName="fecha_fin" class="form-field">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-4">
+          <button type="submit" [disabled]="loading"
+            class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Buscar
+          </button>
+
+          <button type="button" (click)="clearSearch()"
+            class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+       ========================================== -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="loading w-8 h-8"></div>
+      <span class="ml-3 text-hospital-gray-600">Cargando prescripciones...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && prescripciones.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-hospital-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-hospital-gray-900">No hay prescripciones</h3>
+      <p class="mt-1 text-sm text-hospital-gray-500">Comience creando una nueva prescripción de medicamento.</p>
+      <div class="mt-6">
+        <button (click)="openCreateModal()"
+          class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark">
+          Crear Primera Prescripción
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TABLA DE PRESCRIPCIONES
+         ========================================== -->
+    <div *ngIf="!loading && prescripciones.length > 0" class="card-hospital overflow-hidden">
+      <div class="px-6 py-4 border-b border-hospital-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-medium text-hospital-gray-900">
+            Prescripciones de Medicamento
+          </h2>
+          <span class="text-sm text-hospital-gray-500">
+            {{ totalItems }} prescripciones encontradas
+          </span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-hospital-gray-200">
+          <thead class="bg-hospital-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Medicamento
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Dosis & Vía
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Frecuencia
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Período
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-hospital-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-hospital-gray-200">
+            <tr *ngFor="let prescripcion of prescripciones" class="hover:bg-hospital-gray-50">
+              <!-- Medicamento -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-hospital-primary bg-opacity-20 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-hospital-gray-900">
+                      {{ prescripcion.nombre_medicamento || 'Medicamento ID: ' + prescripcion.id_medicamento }}
+                    </div>
+                    <div class="text-sm text-hospital-gray-500">
+                      ID: {{ prescripcion.id_prescripcion }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Dosis & Vía -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-hospital-gray-900">
+                  {{ prescripcion.dosis }}
+                </div>
+                <div class="text-sm text-hospital-gray-500">
+                  {{ prescripcion.via_administracion || 'Oral' }}
+                </div>
+              </td>
+
+              <!-- Frecuencia -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-hospital-gray-900">
+                  {{ prescripcion.frecuencia }}
+                </div>
+                <div *ngIf="prescripcion.duracion" class="text-sm text-hospital-gray-500">
+                  Duración: {{ prescripcion.duracion }}
+                </div>
+              </td>
+
+              <!-- Período -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-hospital-gray-900">
+                  Inicio: {{ prescripcion.fecha_inicio | date:'dd/MM/yyyy' }}
+                </div>
+                <div *ngIf="prescripcion.fecha_fin" class="text-sm text-hospital-gray-500">
+                  Fin: {{ prescripcion.fecha_fin | date:'dd/MM/yyyy' }}
+                </div>
+              </td>
+
+              <!-- Estado -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="prescripcion.activo ? 'bg-hospital-success bg-opacity-20 text-hospital-success' : 'bg-hospital-gray-200 text-hospital-gray-600'">
+                  <svg class="w-1.5 h-1.5 mr-1.5" fill="currentColor" viewBox="0 0 8 8">
+                    <circle cx="4" cy="4" r="3" />
+                  </svg>
+                  {{ prescripcion.activo ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+
+              <!-- Acciones -->
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end space-x-2">
+                  <!-- Ver -->
+                  <button (click)="openViewModal(prescripcion)"
+                    class="text-hospital-info hover:text-hospital-info-dark"
+                    title="Ver detalles">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+
+                  <!-- Editar -->
+                  <button (click)="openEditModal(prescripcion)"
+                    class="text-hospital-warning hover:text-hospital-warning-dark"
+                    title="Editar prescripción">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+
+                  <!-- Toggle Activo -->
+                  <button (click)="onToggleActive(prescripcion)"
+                    [class]="prescripcion.activo ? 'text-hospital-warning hover:text-hospital-warning-dark' : 'text-hospital-success hover:text-hospital-success-dark'"
+                    [title]="prescripcion.activo ? 'Desactivar prescripción' : 'Activar prescripción'">
+                    <svg *ngIf="prescripcion.activo" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                    </svg>
+                    <svg *ngIf="!prescripcion.activo" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+
+                  <!-- Eliminar -->
+                  <button (click)="onDelete(prescripcion.id_prescripcion)"
+                    class="text-hospital-emergency hover:text-hospital-emergency-dark"
+                    title="Eliminar prescripción">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ==========================================
+           PAGINACIÓN
+           ========================================== -->
+      <div *ngIf="totalPages > 1" class="bg-white px-4 py-3 border-t border-hospital-gray-200 sm:px-6">
+        <div class="flex items-center justify-between">
+          <div class="flex justify-between flex-1 sm:hidden">
+            <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+              class="relative inline-flex items-center px-4 py-2 border border-hospital-gray-300 text-sm font-medium rounded-md text-hospital-gray-700 bg-white hover:bg-hospital-gray-50">
+              Anterior
+            </button>
+            <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-hospital-gray-300 text-sm font-medium rounded-md text-hospital-gray-700 bg-white hover:bg-hospital-gray-50">
+              Siguiente
+            </button>
+          </div>
+          <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-hospital-gray-700">
+                Mostrando página <span class="font-medium">{{ currentPage }}</span> de
+                <span class="font-medium">{{ totalPages }}</span>
+                ({{ totalItems }} resultados total)
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-hospital-gray-300 bg-white text-sm font-medium text-hospital-gray-500 hover:bg-hospital-gray-50">
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+
+                <button *ngFor="let page of [].constructor(totalPages); let i = index"
+                  (click)="onPageChange(i + 1)"
+                  [class]="(i + 1) === currentPage ? 'bg-hospital-primary text-white' : 'bg-white text-hospital-gray-500 hover:bg-hospital-gray-50'"
+                  class="relative inline-flex items-center px-4 py-2 border border-hospital-gray-300 text-sm font-medium">
+                  {{ i + 1 }}
+                </button>
+
+                <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-hospital-gray-300 bg-white text-sm font-medium text-hospital-gray-500 hover:bg-hospital-gray-50">
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL CREAR/EDITAR PRESCRIPCIÓN
+       ========================================== -->
+  <div *ngIf="showCreateModal || showEditModal"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-modal">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-medium text-hospital-gray-900">
+            {{ showCreateModal ? 'Nueva Prescripción' : 'Editar Prescripción' }}
+          </h3>
+          <button (click)="showCreateModal ? closeCreateModal() : closeEditModal()"
+            class="text-hospital-gray-400 hover:text-hospital-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="prescripcionForm" (ngSubmit)="showCreateModal ? onSubmitCreate() : onSubmitEdit()">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dosis -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Dosis <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="text" formControlName="dosis" class="form-field"
+                [class.error]="dosis?.invalid && dosis?.touched"
+                placeholder="ej: 500mg, 10ml, 1 tableta">
+              <p *ngIf="dosis?.invalid && dosis?.touched" class="mt-1 text-sm text-hospital-emergency">
+                La dosis es requerida
+              </p>
+            </div>
+
+            <!-- Vía de Administración -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Vía de Administración <span class="text-hospital-emergency">*</span>
+              </label>
+              <select formControlName="via_administracion" class="form-field"
+                [class.error]="viaAdministracion?.invalid && viaAdministracion?.touched">
+                <option *ngFor="let via of viasAdministracion" [value]="via">
+                  {{ via }}
+                </option>
+              </select>
+              <p *ngIf="viaAdministracion?.invalid && viaAdministracion?.touched" class="mt-1 text-sm text-hospital-emergency">
+                La vía de administración es requerida
+              </p>
+            </div>
+
+            <!-- Frecuencia -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Frecuencia <span class="text-hospital-emergency">*</span>
+              </label>
+              <select formControlName="frecuencia" class="form-field"
+                [class.error]="frecuencia?.invalid && frecuencia?.touched">
+                <option value="">Seleccionar frecuencia</option>
+                <option *ngFor="let freq of frecuenciasComunes" [value]="freq">
+                  {{ freq }}
+                </option>
+              </select>
+              <p *ngIf="frecuencia?.invalid && frecuencia?.touched" class="mt-1 text-sm text-hospital-emergency">
+                La frecuencia es requerida
+              </p>
+            </div>
+
+            <!-- Duración -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Duración</label>
+              <input type="text" formControlName="duracion" class="form-field"
+                placeholder="ej: 7 días, 2 semanas, hasta completar">
+            </div>
+
+            <!-- Fecha Inicio -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+                Fecha de Inicio <span class="text-hospital-emergency">*</span>
+              </label>
+              <input type="date" formControlName="fecha_inicio" class="form-field"
+                [class.error]="fechaInicio?.invalid && fechaInicio?.touched">
+              <p *ngIf="fechaInicio?.invalid && fechaInicio?.touched" class="mt-1 text-sm text-hospital-emergency">
+                La fecha de inicio es requerida
+              </p>
+            </div>
+
+            <!-- Fecha Fin -->
+            <div>
+              <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Fecha de Fin</label>
+              <input type="date" formControlName="fecha_fin" class="form-field">
+            </div>
+
+            <!-- Estado Activo -->
+            <div class="flex items-center">
+              <input type="checkbox" formControlName="activo"
+                class="h-4 w-4 text-hospital-primary border-hospital-gray-300 rounded">
+              <label class="ml-2 block text-sm text-hospital-gray-700">
+                Prescripción activa
+              </label>
+            </div>
+          </div>
+
+          <!-- Indicaciones Especiales -->
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+              Indicaciones Especiales
+            </label>
+            <textarea formControlName="indicaciones_especiales" rows="3" class="form-field" placeholder="Instrucciones adicionales, precauciones, contraindicaciones..."></textarea>
+         </div>
+
+         <!-- Botones -->
+         <div class="flex items-center justify-end space-x-4 mt-8">
+           <button type="button" (click)="showCreateModal ? closeCreateModal() : closeEditModal()"
+             class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+             Cancelar
+           </button>
+           <button type="submit" [disabled]="prescripcionForm.invalid || loading"
+             class="btn-hospital bg-hospital-primary text-white hover:bg-hospital-primary-dark"
+             [class.loading]="loading">
+             <svg *ngIf="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                 d="M5 13l4 4L19 7" />
+             </svg>
+             {{ showCreateModal ? 'Crear Prescripción' : 'Actualizar Prescripción' }}
+           </button>
+         </div>
+       </form>
+     </div>
+   </div>
+ </div>
+
+ <!-- ==========================================
+      MODAL VER DETALLES
+      ========================================== -->
+ <div *ngIf="showViewModal && selectedPrescripcion"
+   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-modal">
+   <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+     <div class="mt-3">
+       <!-- Header -->
+       <div class="flex items-center justify-between mb-6">
+         <div class="flex items-center">
+           <div class="flex-shrink-0 h-10 w-10">
+             <div class="h-10 w-10 rounded-full bg-hospital-primary bg-opacity-20 flex items-center justify-center">
+               <svg class="w-5 h-5 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                   d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+               </svg>
+             </div>
+           </div>
+           <div class="ml-4">
+             <h3 class="text-lg font-medium text-hospital-gray-900">Detalles de Prescripción</h3>
+             <p class="text-sm text-hospital-gray-600">ID: {{ selectedPrescripcion.id_prescripcion }}</p>
+           </div>
+         </div>
+         <button (click)="closeViewModal()"
+           class="text-hospital-gray-400 hover:text-hospital-gray-600">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+           </svg>
+         </button>
+       </div>
+
+       <!-- Contenido del Modal -->
+       <div class="space-y-6">
+         <!-- Información Principal -->
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div class="space-y-4">
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Medicamento</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">
+                 {{ selectedPrescripcion.nombre_medicamento || 'ID: ' + selectedPrescripcion.id_medicamento }}
+               </p>
+             </div>
+
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Dosis</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">{{ selectedPrescripcion.dosis }}</p>
+             </div>
+
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Vía de Administración</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">
+                 {{ selectedPrescripcion.via_administracion || 'Oral' }}
+               </p>
+             </div>
+
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Frecuencia</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">{{ selectedPrescripcion.frecuencia }}</p>
+             </div>
+           </div>
+
+           <div class="space-y-4">
+             <div *ngIf="selectedPrescripcion.duracion">
+               <label class="block text-sm font-medium text-hospital-gray-700">Duración</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">{{ selectedPrescripcion.duracion }}</p>
+             </div>
+
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Fecha de Inicio</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">
+                 {{ selectedPrescripcion.fecha_inicio | date:'dd/MM/yyyy' }}
+               </p>
+             </div>
+
+             <div *ngIf="selectedPrescripcion.fecha_fin">
+               <label class="block text-sm font-medium text-hospital-gray-700">Fecha de Fin</label>
+               <p class="mt-1 text-sm text-hospital-gray-900">
+                 {{ selectedPrescripcion.fecha_fin | date:'dd/MM/yyyy' }}
+               </p>
+             </div>
+
+             <div>
+               <label class="block text-sm font-medium text-hospital-gray-700">Estado</label>
+               <span class="inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                 [class]="selectedPrescripcion.activo ? 'bg-hospital-success bg-opacity-20 text-hospital-success' : 'bg-hospital-gray-200 text-hospital-gray-600'">
+                 <svg class="w-1.5 h-1.5 mr-1.5" fill="currentColor" viewBox="0 0 8 8">
+                   <circle cx="4" cy="4" r="3" />
+                 </svg>
+                 {{ selectedPrescripcion.activo ? 'Activa' : 'Inactiva' }}
+               </span>
+             </div>
+           </div>
+         </div>
+
+         <!-- Indicaciones Especiales -->
+         <div *ngIf="selectedPrescripcion.indicaciones_especiales">
+           <label class="block text-sm font-medium text-hospital-gray-700 mb-2">
+             Indicaciones Especiales
+           </label>
+           <div class="bg-hospital-gray-50 rounded-lg p-4">
+             <p class="text-sm text-hospital-gray-900 whitespace-pre-wrap">
+               {{ selectedPrescripcion.indicaciones_especiales }}
+             </p>
+           </div>
+         </div>
+
+         <!-- Información Adicional -->
+         <div class="border-t border-hospital-gray-200 pt-6">
+           <h4 class="text-sm font-medium text-hospital-gray-700 mb-3">Información Adicional</h4>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+             <div>
+               <span class="text-hospital-gray-500">Documento ID:</span>
+               <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.id_documento }}</span>
+             </div>
+             <!-- <div *ngIf="selectedPrescripcion.fecha_prescripcion">
+               <span class="text-hospital-gray-500">Fecha de Prescripción:</span>
+               <span class="ml-2 text-hospital-gray-900">
+                 {{ selectedPrescripcion.fecha_prescripcion | date:'dd/MM/yyyy HH:mm' }}
+               </span>
+             </div> -->
+             <div *ngIf="selectedPrescripcion.medico_prescriptor">
+               <span class="text-hospital-gray-500">Médico Prescriptor:</span>
+               <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.medico_prescriptor }}</span>
+             </div>
+             <!-- <div *ngIf="selectedPrescripcion.especialidad_medico">
+               <span class="text-hospital-gray-500">Especialidad:</span>
+               <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.especialidad_medico }}</span>
+             </div> -->
+           </div>
+         </div>
+
+         <!-- Acciones -->
+         <div class="flex items-center justify-end space-x-4 pt-6 border-t border-hospital-gray-200">
+           <button (click)="closeViewModal()"
+             class="btn-hospital bg-hospital-gray-200 text-hospital-gray-700 hover:bg-hospital-gray-300">
+             Cerrar
+           </button>
+           <button (click)="openEditModal(selectedPrescripcion); closeViewModal()"
+             class="btn-hospital bg-hospital-warning text-white hover:bg-hospital-warning-dark">
+             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+             </svg>
+             Editar
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <!-- ==========================================
+      TARJETAS DE PRESCRIPCIONES (Vista alternativa para móvil)
+      ========================================== -->
+ <div *ngIf="!loading && prescripciones.length > 0" class="lg:hidden mt-6">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="space-y-4">
+       <div *ngFor="let prescripcion of prescripciones" class="card-hospital">
+         <div class="flex items-center justify-between mb-4">
+           <div class="flex items-center">
+             <div class="flex-shrink-0 h-10 w-10">
+               <div class="h-10 w-10 rounded-full bg-hospital-primary bg-opacity-20 flex items-center justify-center">
+                 <svg class="w-5 h-5 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                     d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                 </svg>
+               </div>
+             </div>
+             <div class="ml-3">
+               <h3 class="text-sm font-semibold text-hospital-gray-900">
+                 {{ prescripcion.nombre_medicamento || 'Medicamento ID: ' + prescripcion.id_medicamento }}
+               </h3>
+               <p class="text-xs text-hospital-gray-600">ID: {{ prescripcion.id_prescripcion }}</p>
+             </div>
+           </div>
+           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+             [class]="prescripcion.activo ? 'bg-hospital-success bg-opacity-20 text-hospital-success' : 'bg-hospital-gray-200 text-hospital-gray-600'">
+             {{ prescripcion.activo ? 'Activa' : 'Inactiva' }}
+           </span>
+         </div>
+
+         <div class="space-y-3">
+           <div class="grid grid-cols-2 gap-3 text-sm">
+             <div>
+               <span class="text-hospital-gray-500">Dosis:</span>
+               <p class="font-medium text-hospital-gray-900">{{ prescripcion.dosis }}</p>
+             </div>
+             <div>
+               <span class="text-hospital-gray-500">Vía:</span>
+               <p class="font-medium text-hospital-gray-900">{{ prescripcion.via_administracion || 'Oral' }}</p>
+             </div>
+             <div>
+               <span class="text-hospital-gray-500">Frecuencia:</span>
+               <p class="font-medium text-hospital-gray-900">{{ prescripcion.frecuencia }}</p>
+             </div>
+             <div>
+               <span class="text-hospital-gray-500">Inicio:</span>
+               <p class="font-medium text-hospital-gray-900">{{ prescripcion.fecha_inicio | date:'dd/MM/yyyy' }}</p>
+             </div>
+           </div>
+
+           <div *ngIf="prescripcion.indicaciones_especiales" class="pt-3 border-t border-hospital-gray-200">
+             <span class="text-hospital-gray-500 text-sm">Indicaciones:</span>
+             <p class="text-sm text-hospital-gray-900 mt-1">{{ prescripcion.indicaciones_especiales }}</p>
+           </div>
+         </div>
+
+         <div class="mt-4 flex items-center justify-end space-x-2">
+           <button (click)="openViewModal(prescripcion)"
+             class="btn-hospital bg-hospital-info text-white hover:bg-hospital-info-dark text-xs px-3 py-1">
+             Ver
+           </button>
+           <button (click)="openEditModal(prescripcion)"
+             class="btn-hospital bg-hospital-warning text-white hover:bg-hospital-warning-dark text-xs px-3 py-1">
+             Editar
+           </button>
+           <button (click)="onToggleActive(prescripcion)"
+             [class]="prescripcion.activo ? 'btn-hospital bg-hospital-gray-500 text-white hover:bg-hospital-gray-600' : 'btn-hospital bg-hospital-success text-white hover:bg-hospital-success-dark'"
+             class="text-xs px-3 py-1">
+             {{ prescripcion.activo ? 'Desactivar' : 'Activar' }}
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+</div>

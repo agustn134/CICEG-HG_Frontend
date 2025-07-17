@@ -1,14 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-guias-clinicas',
-//   imports: [],
-//   templateUrl: './guias-clinicas.html',
-//   styleUrl: './guias-clinicas.css'
-// })
-// export class GuiasClinicas {
-
-// }
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -233,42 +222,86 @@ export class GuiasClinicasComponent implements OnInit {
     return !!(field?.errors && field.touched);
   }
 
-  // Método para filtrar guías por área
-  async filterByArea(area: string): Promise<void> {
-    if (!area) {
-      await this.loadGuiasClinicas();
-      return;
-    }
+  // // Método para filtrar guías por área
+  // async filterByArea(area: string): Promise<void> {
+  //   if (!area) {
+  //     await this.loadGuiasClinicas();
+  //     return;
+  //   }
 
-    try {
-      const response = await this.guiasClinicasService.getByArea(area);
-      this.guiasClinicas = response.data || [];
-    } catch (error: any) {
-      this.error = 'Error al filtrar guías clínicas';
-      console.error('Error filtering guias clinicas:', error);
-    }
-  }
+  //   try {
+  //     const response = await this.guiasClinicasService.getByArea(area);
+  //     this.guiasClinicas = response.data || [];
+  //   } catch (error: any) {
+  //     this.error = 'Error al filtrar guías clínicas';
+  //     console.error('Error filtering guias clinicas:', error);
+  //   }
+  // }
 
-  // Método para filtrar guías por fuente
-  async filterByFuente(fuente: string): Promise<void> {
-    if (!fuente) {
-      await this.loadGuiasClinicas();
-      return;
-    }
+  // // Método para filtrar guías por fuente
+  // async filterByFuente(fuente: string): Promise<void> {
+  //   if (!fuente) {
+  //     await this.loadGuiasClinicas();
+  //     return;
+  //   }
 
-    try {
-      const response = await this.guiasClinicasService.getByFuente(fuente);
-      this.guiasClinicas = response.data || [];
-    } catch (error: any) {
-      this.error = 'Error al filtrar guías clínicas';
-      console.error('Error filtering guias clinicas by fuente:', error);
-    }
-  }
+  //   try {
+  //     const response = await this.guiasClinicasService.getByFuente(fuente);
+  //     this.guiasClinicas = response.data || [];
+  //   } catch (error: any) {
+  //     this.error = 'Error al filtrar guías clínicas';
+  //     console.error('Error filtering guias clinicas by fuente:', error);
+  //   }
+  // }
 
-  // Formatear fecha para mostrar
-  formatDate(dateString: string): string {
-    if (!dateString) return 'No especificada';
+  // // Formatear fecha para mostrar
+  // formatDate(dateString: string): string {
+  //   if (!dateString) return 'No especificada';
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString('es-MX');
+  // }
+formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return 'No especificada';
+  try {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-MX');
+  } catch {
+    return 'Fecha inválida';
   }
+}
+
+  async filterByArea(event: Event): Promise<void> {
+  const target = event.target as HTMLSelectElement;
+  const area = target.value;
+  if (!area) {
+    await this.loadGuiasClinicas();
+    return;
+  }
+
+  try {
+    const response = await this.guiasClinicasService.getByArea(area);
+    this.guiasClinicas = response.data || [];
+  } catch (error: any) {
+    this.error = 'Error al filtrar guías clínicas';
+    console.error('Error filtering guias clinicas:', error);
+  }
+}
+
+async filterByFuente(event: Event): Promise<void> {
+  const target = event.target as HTMLSelectElement;
+  const fuente = target.value;
+  if (!fuente) {
+    await this.loadGuiasClinicas();
+    return;
+  }
+
+  try {
+    const response = await this.guiasClinicasService.getByFuente(fuente);
+    this.guiasClinicas = response.data || [];
+  } catch (error: any) {
+    this.error = 'Error al filtrar guías clínicas';
+    console.error('Error filtering guias clinicas by fuente:', error);
+  }
+}
+
 }

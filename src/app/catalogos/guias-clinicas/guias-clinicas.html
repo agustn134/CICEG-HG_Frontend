@@ -1,1 +1,284 @@
-<p>guias-clinicas works!</p>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h1 class="text-2xl font-bold text-gray-900">Guías Clínicas</h1>
+            <p class="text-sm text-gray-600">Gestión de guías clínicas y protocolos</p>
+          </div>
+        </div>
+        <button (click)="resetForm()" class="btn bg-blue-600 text-white hover:bg-blue-700">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nueva Guía
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Messages -->
+  <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {{ error }}
+    </div>
+  </div>
+
+  <div *ngIf="success" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {{ success }}
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Filters Section -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Área</label>
+          <select (change)="filterByArea($event)" class="form-select">
+      <option value="">Todas las áreas</option>
+      <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+    </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Fuente</label>
+          <select (change)="filterByFuente($event)" class="form-select">
+      <option value="">Todas las fuentes</option>
+      <option *ngFor="let fuente of fuentes" [value]="fuente">{{ fuente }}</option>
+    </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Especialidad</label>
+          <select class="form-select">
+            <option value="">Todas las especialidades</option>
+            <option *ngFor="let especialidad of especialidades" [value]="especialidad">{{ especialidad }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6" *ngIf="editingId || guiasClinicasForm.dirty">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">
+        {{ editingId ? 'Editar Guía Clínica' : 'Nueva Guía Clínica' }}
+      </h2>
+
+      <form [formGroup]="guiasClinicasForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+              <input type="text" formControlName="codigo" class="form-input" placeholder="Código de la guía">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Nombre <span class="text-red-500">*</span>
+              </label>
+              <input type="text" formControlName="nombre" class="form-input" [class.border-red-500]="isFieldInvalid('nombre')" placeholder="Nombre de la guía clínica">
+              <p *ngIf="getFieldError('nombre')" class="mt-1 text-sm text-red-600">{{ getFieldError('nombre') }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Área</label>
+              <select formControlName="area" class="form-select">
+                <option value="">Seleccionar área</option>
+                <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+              <select formControlName="especialidad" class="form-select">
+                <option value="">Seleccionar especialidad</option>
+                <option *ngFor="let especialidad of especialidades" [value]="especialidad">{{ especialidad }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fuente</label>
+              <select formControlName="fuente" class="form-select">
+                <option value="">Seleccionar fuente</option>
+                <option *ngFor="let fuente of fuentes" [value]="fuente">{{ fuente }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Versión</label>
+              <input type="text" formControlName="version" class="form-input" placeholder="Versión de la guía">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de Evidencia</label>
+              <select formControlName="nivel_evidencia" class="form-select">
+                <option value="">Seleccionar nivel</option>
+                <option *ngFor="let nivel of nivelesEvidencia" [value]="nivel">{{ nivel }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Actualización</label>
+              <input type="date" formControlName="fecha_actualizacion" class="form-input">
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center">
+                <input type="checkbox" formControlName="aplicable_pediatria" id="aplicable_pediatria" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="aplicable_pediatria" class="ml-2 block text-sm text-gray-700">Aplicable a Pediatría</label>
+              </div>
+
+              <div class="flex items-center">
+                <input type="checkbox" formControlName="aplicable_adultos" id="aplicable_adultos" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="aplicable_adultos" class="ml-2 block text-sm text-gray-700">Aplicable a Adultos</label>
+              </div>
+
+              <div class="flex items-center">
+                <input type="checkbox" formControlName="activo" id="activo" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="activo" class="ml-2 block text-sm text-gray-700">Activa</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea formControlName="descripcion" rows="3" class="form-textarea" placeholder="Descripción detallada de la guía clínica"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" (click)="resetForm()" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="guiasClinicasForm.invalid || isLoading" class="btn bg-blue-600 text-white hover:bg-blue-700">
+            <span *ngIf="isLoading" class="inline-flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Procesando...
+            </span>
+            <span *ngIf="!isLoading">
+              {{ editingId ? 'Actualizar Guía' : 'Guardar Guía' }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading && !guiasClinicasForm.dirty" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <span class="ml-3 text-gray-600">Cargando guías clínicas...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && guiasClinicas.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay guías clínicas</h3>
+      <p class="mt-1 text-sm text-gray-500">Comience creando una nueva guía clínica.</p>
+      <div class="mt-6">
+        <button (click)="resetForm()" class="btn bg-blue-600 text-white hover:bg-blue-700">
+          Crear Primera Guía
+        </button>
+      </div>
+    </div>
+
+    <!-- Guías List -->
+    <div *ngIf="!isLoading && guiasClinicas.length > 0" class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Código
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Área / Especialidad
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Fuente
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Última Actualización
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let guia of guiasClinicas" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ guia.codigo || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">{{ guia.nombre }}</div>
+                <div class="text-sm text-gray-500">{{ guia.version || 'Sin versión' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ guia.area || 'N/A' }}</div>
+                <div class="text-sm text-gray-500">{{ guia.especialidad || 'N/A' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ guia.fuente || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(guia.fecha_actualizacion) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  [class.bg-green-100]="guia.activo"
+                  [class.text-green-800]="guia.activo"
+                  [class.bg-red-100]="!guia.activo"
+                  [class.text-red-800]="!guia.activo">
+                  {{ guia.activo ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end space-x-2">
+                  <button (click)="editGuiaClinica(guia)" class="text-blue-600 hover:text-blue-900" title="Editar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button (click)="deleteGuiaClinica(guia.id_guia_diagnostico)" class="text-red-600 hover:text-red-900" title="Eliminar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
