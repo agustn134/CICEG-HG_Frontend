@@ -1,9 +1,11 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+// src/app/shared/layout/dashboard-layout/dashboard-layout.component.ts
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { ModernSidebarComponent } from '../modern-sidebar/modern-sidebar';
-import { filter } from 'rxjs/operators';
-import { AuthService } from '../../../services/auth/auth.service';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { AuthService, Usuario } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -118,7 +120,7 @@ import { AuthService } from '../../../services/auth/auth.service';
                   </button>
                 </div>
 
-                <!-- Current Time (Hidden on small mobile) -->
+                <!-- Current Time -->
                 <div
                   class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-lg"
                 >
@@ -166,9 +168,11 @@ import { AuthService } from '../../../services/auth/auth.service';
                     </div>
                     <div class="hidden sm:block text-left">
                       <p class="text-sm font-semibold text-gray-800">
-                        Dr. Administrador
+                        {{ getUserDisplayName() }}
                       </p>
-                      <p class="text-xs text-gray-500">Hospital General</p>
+                      <p class="text-xs text-gray-500">
+                        {{ getUserRole() }} - Hospital General
+                      </p>
                     </div>
                     <svg
                       class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-all duration-200"
@@ -215,10 +219,11 @@ import { AuthService } from '../../../services/auth/auth.service';
                         </div>
                         <div class="flex-1">
                           <p class="text-sm font-semibold text-gray-800">
-                            Dr. Administrador
+                            {{ getUserDisplayName() }}
                           </p>
                           <p class="text-xs text-gray-500">
-                            Hospital General San Luis de la Paz
+                            {{ getUserRole() }} - Hospital General San Luis de
+                            la Paz
                           </p>
                         </div>
                       </div>
@@ -227,10 +232,10 @@ import { AuthService } from '../../../services/auth/auth.service';
                     <!-- Menu Items -->
                     <div class="py-2">
                       <!-- Mi Perfil -->
-                      <a
-                        href="#"
-                        (click)="onDropdownItemClick('profile')"
-                        class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-800 transition-all duration-200 group"
+                      <button
+                        type="button"
+                        (click)="onDropdownItemClick('profile', $event)"
+                        class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-800 transition-all duration-200 group text-left"
                       >
                         <div
                           class="mr-3 p-2 bg-gray-100 rounded-lg group-hover:bg-blue-100 transition-colors duration-200"
@@ -255,26 +260,13 @@ import { AuthService } from '../../../services/auth/auth.service';
                             Ver y editar información personal
                           </p>
                         </div>
-                        <svg
-                          class="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </a>
+                      </button>
 
                       <!-- Configuración -->
-                      <a
-                        href="#"
-                        (click)="onDropdownItemClick('settings')"
-                        class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-800 transition-all duration-200 group"
+                      <button
+                        type="button"
+                        (click)="onDropdownItemClick('settings', $event)"
+                        class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-800 transition-all duration-200 group text-left"
                       >
                         <div
                           class="mr-3 p-2 bg-gray-100 rounded-lg group-hover:bg-blue-100 transition-colors duration-200"
@@ -299,29 +291,16 @@ import { AuthService } from '../../../services/auth/auth.service';
                             Preferencias del sistema
                           </p>
                         </div>
-                        <svg
-                          class="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </a>
+                      </button>
 
                       <!-- Separador -->
                       <div class="border-t border-gray-200 my-2"></div>
 
                       <!-- Cerrar Sesión -->
-                      <a
-                        href="#"
-                        (click)="onDropdownItemClick('logout')"
-                        class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                      <button
+                        type="button"
+                        (click)="onDropdownItemClick('logout', $event)"
+                        class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 group text-left"
                       >
                         <div
                           class="mr-3 p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-200"
@@ -346,7 +325,7 @@ import { AuthService } from '../../../services/auth/auth.service';
                             Salir del sistema
                           </p>
                         </div>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -391,7 +370,7 @@ import { AuthService } from '../../../services/auth/auth.service';
 
         <!-- Page Content -->
         <div class="p-4 sm:p-6">
-          <!-- Wizard Info Banner (if in wizard flow) -->
+          <!-- Wizard Info Banner -->
           <div
             *ngIf="isInWizardFlow()"
             class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
@@ -417,7 +396,7 @@ import { AuthService } from '../../../services/auth/auth.service';
             </div>
           </div>
 
-          <!-- Contenedor con animación suave -->
+          <!-- Contenedor con animación -->
           <div class="animate-fade-in">
             <router-outlet></router-outlet>
           </div>
@@ -431,7 +410,7 @@ import { AuthService } from '../../../services/auth/auth.service';
             >
               <div class="text-sm text-gray-600 text-center sm:text-left">
                 © 2025
-                <span class="font-semibold text-gray-800">CICEG-HG</span> -
+                <span class="font-semibold text-gray-800">SICEG-HG</span> -
                 Sistema de Expediente Clínico Electrónico
               </div>
               <div class="flex items-center space-x-4">
@@ -444,17 +423,32 @@ import { AuthService } from '../../../services/auth/auth.service';
         </footer>
       </main>
 
-      <!-- Overlay para cerrar dropdown al hacer clic fuera -->
-      <div
+      <!-- Overlay para cerrar dropdown -->
+      <!-- <div
         *ngIf="isUserDropdownOpen"
         (click)="closeUserDropdown()"
         class="fixed inset-0 z-40"
-      ></div>
+      ></div> -->
+      <div
+  *ngIf="isUserDropdownOpen"
+  (click)="closeUserDropdown()"
+  class="fixed inset-0 z-40"
+  style="pointer-events: auto;"
+></div>
     </div>
   `,
   styles: [
     `
-      /* Animaciones personalizadas mejoradas para hospital */
+    .user-dropdown-container {
+  position: relative;
+  z-index: 50; /* Mayor que el overlay */
+}
+
+.animate-dropdown-in {
+  animation: dropdownIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 60; /* Asegurar que está por encima del overlay */
+}
+
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -485,69 +479,23 @@ import { AuthService } from '../../../services/auth/auth.service';
         animation: dropdownIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      /* Mejoras específicas para dropdown del usuario */
-      .user-dropdown-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        transition: all 0.2s ease-in-out;
-        color: rgb(55 65 81);
-      }
-
-      .user-dropdown-item:hover {
-        background-color: rgb(249 250 251);
-        color: rgb(30 64 175);
-      }
-
-      /* Sistema de estado */
-      .system-status {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-      }
-
-      .system-status.online {
-        background-color: rgb(5 150 105);
-        color: white;
-      }
-
-      .system-status.maintenance {
-        background-color: rgb(217 119 6);
-        color: white;
-      }
-
-      .system-status.offline {
-        background-color: rgb(220 38 38);
-        color: white;
-      }
-
-      /* Mejoras de accesibilidad */
       :focus-visible {
         outline: 2px solid rgb(30 64 175);
         outline-offset: 2px;
       }
-
-      /* Ajustes responsivos adicionales */
-      @media (max-width: 640px) {
-        .animate-fade-in {
-          animation: none;
-        }
-      }
     `,
   ],
 })
-export class DashboardLayoutComponent implements OnInit {
+export class DashboardLayoutComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+private timeInterval: any;
+
   currentPageTitle = 'Panel Principal';
   isUserDropdownOpen = false;
   sidebarExpanded = true;
   isMobile = false;
+  currentUser: Usuario | null = null;
 
-  // Propiedades adicionales para funcionalidad mejorada
   systemStatus: 'online' | 'maintenance' | 'offline' = 'online';
   currentTime = '';
   welcomeMessage = '';
@@ -555,57 +503,75 @@ export class DashboardLayoutComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Escuchar cambios de ruta para actualizar el título
+    // Suscribirse a los cambios del usuario actual
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        this.currentUser = user;
+        this.updateWelcomeMessage();
+      });
+
+    // Escuchar cambios de ruta
     this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
       .subscribe((event: NavigationEnd) => {
         this.updatePageTitle(event.url);
       });
 
-    // Establecer título inicial
     this.updatePageTitle(this.router.url);
-
-    // Actualizar hora cada minuto
     this.updateTime();
     setInterval(() => this.updateTime(), 60000);
-
-    // Establecer mensaje de bienvenida
-    this.updateWelcomeMessage();
-
-    // Verificar tamaño de pantalla
     this.checkScreenSize();
+    this.timeInterval = setInterval(() => this.updateTime(), 60000);
+  }
 
-    // Cerrar dropdown al hacer clic fuera
-    document.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.user-dropdown-container')) {
-        this.isUserDropdownOpen = false;
-      }
-    });
+  ngOnDestroy(): void {
+    clearInterval(this.timeInterval);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   @HostListener('window:resize')
   onResize(): void {
     this.checkScreenSize();
-    // Cerrar dropdown en resize
     this.isUserDropdownOpen = false;
   }
 
   @HostListener('keydown.escape')
   onEscapeKey(): void {
-    // Cerrar dropdown con tecla Escape
     this.isUserDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-dropdown-container')) {
+      this.isUserDropdownOpen = false;
+    }
   }
 
   private checkScreenSize(): void {
     this.isMobile = window.innerWidth < 1024;
   }
 
+  // Agrega este método temporal al dashboard component
+  testLogout(): void {
+    console.log('🧪 Probando logout directamente...');
+    try {
+      this.authService.logout();
+      console.log('✅ Logout directo exitoso');
+    } catch (error) {
+      console.error('❌ Error en logout directo:', error);
+    }
+  }
+
   onSidebarStateChange(expanded: boolean): void {
     this.sidebarExpanded = expanded;
   }
 
-  // Métodos para manejar el dropdown del usuario
   toggleUserDropdown(): void {
     this.isUserDropdownOpen = !this.isUserDropdownOpen;
   }
@@ -614,141 +580,151 @@ export class DashboardLayoutComponent implements OnInit {
     this.isUserDropdownOpen = false;
   }
 
-  onDropdownItemClick(action: string): void {
-    this.closeUserDropdown();
+  // onDropdownItemClick(action: string, event: Event): void {
+  //   event.preventDefault();
+  //   event.stopPropagation();
 
-    switch (action) {
-      case 'profile':
-        this.handleProfileClick();
-        break;
-      case 'settings':
-        this.handleSettingsClick();
-        break;
-      case 'schedule':
-        this.handleScheduleClick();
-        break;
-      case 'help':
-        this.handleHelpClick();
-        break;
-      case 'logout':
-        this.handleLogoutClick();
-        break;
-      default:
-        console.log(`Acción no reconocida: ${action}`);
-    }
+  //   this.closeUserDropdown();
+
+  //   switch (action) {
+  //     case 'profile':
+  //       this.handleProfileClick();
+  //       break;
+  //     case 'settings':
+  //       this.handleSettingsClick();
+  //       break;
+  //     case 'logout':
+  //       this.handleLogoutClick();
+  //       break;
+  //     default:
+  //       console.log(`Acción no reconocida: ${action}`);
+  //   }
+  // }
+
+
+  // onDropdownItemClick(action: string, event: Event): void {
+  //   event.stopPropagation();
+
+  //   console.log(`🔄 Ejecutando acción: ${action}`);
+
+  //   this.closeUserDropdown();
+
+  //   switch (action) {
+  //     case 'profile':
+  //       this.handleProfileClick();
+  //       break;
+  //     case 'settings':
+  //       this.handleSettingsClick();
+  //       break;
+  //     case 'logout':
+  //       this.handleLogoutClick();
+  //       break;
+  //     default:
+  //       console.log(`❌ Acción no reconocida: ${action}`);
+  //   }
+  // }
+
+onDropdownItemClick(action: string, event: Event): void {
+  event.stopPropagation();
+  this.closeUserDropdown();
+
+  console.log(`🔄 Ejecutando acción: ${action}`);
+
+  switch (action) {
+    case 'profile':
+      this.handleProfileClick();
+      break;
+    case 'settings':
+      this.handleSettingsClick();
+      break;
+    case 'logout':
+      // No prevenir el comportamiento por defecto para logout
+      this.handleLogoutClick();
+      break;
+    default:
+      console.log(`❌ Acción no reconocida: ${action}`);
   }
+}
 
-  // Handlers para cada acción del dropdown
+private handleLogoutClick(): void {
+  console.log('🚪 Iniciando proceso de logout');
+
+  if (confirm('¿Está seguro que desea cerrar sesión del sistema?')) {
+    console.log('✅ Logout confirmado por el usuario');
+    try {
+      this.authService.logout();
+      console.log('✅ Sesión cerrada exitosamente');
+      // Redirigir explícitamente si es necesario
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('❌ Error durante el logout:', error);
+    }
+  } else {
+    console.log('❌ Logout cancelado por el usuario');
+  }
+}
+
   private handleProfileClick(): void {
     console.log('🏥 Abriendo perfil del usuario');
-    // TODO: Implementar navegación a perfil
-    // this.router.navigate(['/app/profile']);
+   this.router.navigate(['/app/personas/administradores']);
   }
 
   private handleSettingsClick(): void {
     console.log('⚙️ Abriendo configuración del sistema');
-    // TODO: Implementar navegación a configuración
     // this.router.navigate(['/app/settings']);
   }
 
-  private handleScheduleClick(): void {
-    console.log('📅 Abriendo horarios médicos');
-    // TODO: Implementar navegación a horarios
-    // this.router.navigate(['/app/schedule']);
-  }
+  // private handleLogoutClick(): void {
+  //   console.log('🚪 Iniciando proceso de logout');
+  //   console.log('🔍 Estado actual del usuario:', this.currentUser);
 
-  private handleHelpClick(): void {
-    console.log('❓ Abriendo centro de ayuda');
-    // TODO: Implementar modal de ayuda o navegación
-    // this.openHelpModal();
-  }
-
-  private handleLogoutClick(): void {
-    console.log('🚪 Cerrando sesión');
-    if (this.confirmLogout()) {
-      // TODO: Implementar lógica de logout
-      this.authService.logout();
-      this.router.navigate(['/login']);
-      console.log('Sesión cerrada exitosamente');
-    }
-  }
+  //   if (this.confirmLogout()) {
+  //     try {
+  //       console.log('✅ Logout confirmado por el usuario');
+  //       console.log('🔄 Llamando a authService.logout()');
+  //       this.authService.logout();
+  //       console.log('✅ Sesión cerrada exitosamente');
+  //     } catch (error) {
+  //       console.error('❌ Error durante el logout:', error);
+  //     }
+  //   } else {
+  //     console.log('❌ Logout cancelado por el usuario');
+  //   }
+  // }
 
   private confirmLogout(): boolean {
     return confirm('¿Está seguro que desea cerrar sesión del sistema?');
   }
 
-  private updatePageTitle(url: string): void {
-    // Mapeo de rutas a títulos amigables para médicos
-    const routeTitles: { [key: string]: string } = {
-      '/app/dashboard': 'Panel Principal',
+  // Métodos para mostrar información del usuario
+  getUserDisplayName(): string {
+    if (!this.currentUser) return 'Usuario';
 
-      // Wizard de nuevo paciente
-      '/app/nuevo-paciente': 'Registro de Nuevo Paciente',
-      '/app/nuevo-paciente/inicio': 'Iniciar Registro de Paciente',
-      '/app/nuevo-paciente/persona': 'Datos Personales del Paciente',
-      '/app/nuevo-paciente/paciente': 'Información Médica del Paciente',
-      '/app/nuevo-paciente/expediente': 'Creación de Expediente',
-      '/app/nuevo-paciente/documento-clinico': 'Selección de Documento Clínico',
-      '/app/nuevo-paciente/resumen': 'Resumen de Registro',
+    const { nombre_completo, tipo_usuario } = this.currentUser;
+    const prefix = tipo_usuario === 'medico' ? 'Dr.' : '';
 
-      // Pacientes
-      '/app/personas/pacientes': 'Buscar Pacientes',
-      '/app/personas/pacientes/nuevo': 'Registrar Nuevo Paciente',
-      '/app/personas/pacientes-list': 'Lista de Pacientes',
-      '/app/personas/personal-medico': 'Personal Médico',
-      '/app/personas/administradores': 'Administradores del Sistema',
-      '/app/personas': 'Gestión de Personas',
-
-      // Expedientes
-      '/app/gestion-expedientes/expedientes': 'Expedientes Clínicos',
-      '/app/gestion-expedientes/expedientes/nuevo': 'Crear Nuevo Expediente',
-      '/app/gestion-expedientes/camas': 'Gestión de Camas Hospitalarias',
-      '/app/gestion-expedientes/internamientos': 'Control de Hospitalizaciones',
-      '/app/gestion-expedientes/signos-vitales': 'Registro de Signos Vitales',
-      // Documentos clínicos
-      '/app/documentos-clinicos': 'Documentos Clínicos',
-      '/app/documentos-clinicos/nuevo': 'Crear Documento Clínico',
-      '/app/documentos-clinicos/plantillas': 'Plantillas de Documentos',
-      '/app/documentos-clinicos/historial': 'Historial de Documentos',
-
-      // Configuración
-      '/app/configuracion': 'Configuración del Sistema',
-      '/app/configuracion/perfil': 'Mi Perfil',
-      '/app/configuracion/usuarios': 'Gestión de Usuarios',
-      '/app/configuracion/roles': 'Gestión de Roles y Permisos',
-      '/app/configuracion/auditoria': 'Auditoría del Sistema',
-
-      // Reportes
-      '/app/reportes': 'Reportes y Estadísticas',
-      '/app/reportes/actividad': 'Reporte de Actividad',
-      '/app/reportes/pacientes': 'Reporte de Pacientes',
-      '/app/reportes/ingresos': 'Reporte de Ingresos',
-    };
-
-    // Encontrar la ruta más específica que coincida
-    let matchedRoute = '';
-    for (const route in routeTitles) {
-      if (url.startsWith(route)) {
-        // Added missing closing parenthesis here
-        if (route.length > matchedRoute.length) {
-          matchedRoute = route;
-        }
-      }
-    }
-
-    this.currentPageTitle = routeTitles[matchedRoute] || 'Panel Principal';
+    return `${prefix} ${nombre_completo}`.trim();
   }
 
-  private updateTime(): void {
-    const now = new Date();
-    this.currentTime = now.toLocaleTimeString('es-MX', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+  getUserRole(): string {
+    if (!this.currentUser) return 'Usuario';
+
+    const roles = {
+      medico: 'Médico',
+      administrador: 'Administrador',
+      enfermeria: 'Enfermería',
+      residente: 'Residente',
+    };
+
+    return roles[this.currentUser.tipo_usuario] || 'Usuario';
   }
 
   private updateWelcomeMessage(): void {
+    if (!this.currentUser) {
+      this.welcomeMessage = 'Bienvenido';
+      return;
+    }
+
     const hour = new Date().getHours();
     let greeting = '';
 
@@ -760,10 +736,68 @@ export class DashboardLayoutComponent implements OnInit {
       greeting = 'Buenas noches';
     }
 
-    this.welcomeMessage = `${greeting}, Dr. Administrador`;
+    const userPrefix = this.currentUser.tipo_usuario === 'medico' ? 'Dr.' : '';
+    this.welcomeMessage =
+      `${greeting}, ${userPrefix} ${this.currentUser.nombre_completo}`.trim();
   }
 
-  // Métodos públicos para la plantilla
+  private updateTime(): void {
+    const now = new Date();
+    this.currentTime = now.toLocaleTimeString('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  }
+
+  private updatePageTitle(url: string): void {
+    const routeTitles: { [key: string]: string } = {
+      '/app/dashboard': 'Panel Principal',
+      '/app/nuevo-paciente': 'Registro de Nuevo Paciente',
+      '/app/nuevo-paciente/inicio': 'Iniciar Registro de Paciente',
+      '/app/nuevo-paciente/persona': 'Datos Personales del Paciente',
+      '/app/nuevo-paciente/paciente': 'Información Médica del Paciente',
+      '/app/nuevo-paciente/expediente': 'Creación de Expediente',
+      '/app/nuevo-paciente/documento-clinico': 'Selección de Documento Clínico',
+      '/app/nuevo-paciente/resumen': 'Resumen de Registro',
+      '/app/personas/pacientes': 'Buscar Pacientes',
+      '/app/personas/pacientes/nuevo': 'Registrar Nuevo Paciente',
+      '/app/personas/pacientes-list': 'Lista de Pacientes',
+      '/app/personas/personal-medico': 'Personal Médico',
+      '/app/personas/administradores': 'Administradores del Sistema',
+      '/app/personas': 'Gestión de Personas',
+      '/app/gestion-expedientes/expedientes': 'Expedientes Clínicos',
+      '/app/gestion-expedientes/expedientes/nuevo': 'Crear Nuevo Expediente',
+      '/app/gestion-expedientes/camas': 'Gestión de Camas Hospitalarias',
+      '/app/gestion-expedientes/internamientos': 'Control de Hospitalizaciones',
+      '/app/gestion-expedientes/signos-vitales': 'Registro de Signos Vitales',
+      '/app/documentos-clinicos': 'Documentos Clínicos',
+      '/app/documentos-clinicos/nuevo': 'Crear Documento Clínico',
+      '/app/documentos-clinicos/plantillas': 'Plantillas de Documentos',
+      '/app/documentos-clinicos/historial': 'Historial de Documentos',
+      '/app/configuracion': 'Configuración del Sistema',
+      '/app/configuracion/perfil': 'Mi Perfil',
+      '/app/configuracion/usuarios': 'Gestión de Usuarios',
+      '/app/configuracion/roles': 'Gestión de Roles y Permisos',
+      '/app/configuracion/auditoria': 'Auditoría del Sistema',
+      '/app/reportes': 'Reportes y Estadísticas',
+      '/app/reportes/actividad': 'Reporte de Actividad',
+      '/app/reportes/pacientes': 'Reporte de Pacientes',
+      '/app/reportes/ingresos': 'Reporte de Ingresos',
+    };
+
+    let matchedRoute = '';
+    for (const route in routeTitles) {
+      if (url.startsWith(route)) {
+        if (route.length > matchedRoute.length) {
+          matchedRoute = route;
+        }
+      }
+    }
+
+    this.currentPageTitle = routeTitles[matchedRoute] || 'Panel Principal';
+  }
+
   getCurrentTime(): string {
     return this.currentTime;
   }
@@ -786,17 +820,14 @@ export class DashboardLayoutComponent implements OnInit {
   }
 
   getNotificationCount(): number {
-    // TODO: Implementar lógica real de notificaciones
     return 3; // Valor de ejemplo
   }
 
   isInWizardFlow(): boolean {
-    // TODO: Implementar lógica para detectar si está en el flujo del wizard
     return this.router.url.includes('/nuevo-paciente');
   }
 
   getCurrentWizardStep(): number {
-    // TODO: Implementar lógica para obtener el paso actual del wizard
     const wizardRoutes = [
       '/app/nuevo-paciente/inicio',
       '/app/nuevo-paciente/persona',
