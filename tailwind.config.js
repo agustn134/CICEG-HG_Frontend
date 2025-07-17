@@ -12,7 +12,7 @@ module.exports = {
           'primary': '#1e40af',      // bg-hospital-primary
           'primary-light': '#3b82f6', // bg-hospital-primary-light
           'primary-dark': '#1e3a8a',  // bg-hospital-primary-dark
-
+ 'primary-darker': '#1e2e6e',  // Añade esta línea
           // Verdes (salud, éxito)
           'success': '#059669',       // bg-hospital-success
           'success-light': '#10b981', // bg-hospital-success-light
