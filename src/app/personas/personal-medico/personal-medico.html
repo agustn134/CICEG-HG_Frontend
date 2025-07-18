@@ -9,7 +9,9 @@
           <!-- Icono SVG Profesional -->
           <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
             <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+              </path>
             </svg>
           </div>
           <div>
@@ -40,8 +42,7 @@
 
       <!-- Botones de Acción -->
       <div class="flex flex-wrap gap-3">
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
           (click)="mostrarFormularioCrear()">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,23 +51,24 @@
           Nuevo Personal
         </button>
 
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 shadow-sm"
           (click)="toggleEstadisticas()">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
           </svg>
           {{ mostrarEstadisticas ? 'Ocultar' : 'Ver' }} Estadísticas
         </button>
 
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 shadow-sm"
-          (click)="recargarDatos()"
-          [disabled]="loading">
+          (click)="recargarDatos()" [disabled]="loading">
           <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+            </path>
           </svg>
           Actualizar
         </button>
@@ -75,10 +77,13 @@
   </header>
 
   <!-- Panel de Estadísticas -->
-  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6" *ngIf="mostrarEstadisticas && estadisticas">
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6"
+    *ngIf="mostrarEstadisticas && estadisticas">
     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
       <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+        </path>
       </svg>
       Estadísticas del Personal Médico
     </h2>
@@ -93,7 +98,9 @@
           </div>
           <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+              </path>
             </svg>
           </div>
         </div>
@@ -108,7 +115,8 @@
           </div>
           <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
         </div>
@@ -123,7 +131,9 @@
           </div>
           <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+              </path>
             </svg>
           </div>
         </div>
@@ -138,7 +148,9 @@
           </div>
           <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+              </path>
             </svg>
           </div>
         </div>
@@ -153,26 +165,28 @@
       <div class="flex-1 relative">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </div>
-        <input
-          type="text"
+        <input type="text"
           class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          placeholder="Buscar por nombre, cédula profesional, especialidad..."
-          formControlName="buscar">
+          placeholder="Buscar por nombre, cédula profesional, especialidad..." formControlName="buscar">
       </div>
 
       <!-- Botón de Filtros -->
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 relative"
         (click)="toggleFiltros()">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z">
+          </path>
         </svg>
         Filtros Avanzados
-        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium" *ngIf="hayFiltrosAplicados">
+        <span
+          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium"
+          *ngIf="hayFiltrosAplicados">
           !
         </span>
       </button>
@@ -184,7 +198,9 @@
         <!-- Estado -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Estado del Personal</label>
-          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="activo">
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            formControlName="activo">
             <option *ngFor="let opcion of opcionesActivo" [value]="opcion.valor">
               {{ opcion.etiqueta }}
             </option>
@@ -194,7 +210,9 @@
         <!-- Especialidad -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Especialidad Médica</label>
-          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="especialidad">
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            formControlName="especialidad">
             <option value="">Todas las especialidades</option>
             <option *ngFor="let especialidad of especialidadesMedicas" [value]="especialidad">
               {{ especialidad }}
@@ -205,7 +223,9 @@
         <!-- Cargo -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Cargo Hospitalario</label>
-          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="cargo">
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            formControlName="cargo">
             <option value="">Todos los cargos</option>
             <option *ngFor="let cargo of cargosMedicos" [value]="cargo">
               {{ cargo }}
@@ -216,7 +236,9 @@
         <!-- Departamento -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Departamento</label>
-          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" formControlName="departamento">
+          <select
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            formControlName="departamento">
             <option value="">Todos los departamentos</option>
             <option *ngFor="let departamento of departamentosHospitalarios" [value]="departamento">
               {{ departamento }}
@@ -227,21 +249,22 @@
 
       <!-- Botones de Filtro -->
       <div class="flex flex-wrap gap-3">
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
           (click)="aplicarFiltros()">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           Aplicar Filtros
         </button>
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
           (click)="limpiarFiltros()">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+            </path>
           </svg>
           Limpiar Filtros
         </button>
@@ -253,29 +276,27 @@
   <div class="flex items-center justify-between mb-6">
     <!-- Controles de Vista -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex">
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200"
-        [class.bg-blue-600]="vistaActual === 'tabla'"
-        [class.text-white]="vistaActual === 'tabla'"
-        [class.text-gray-700]="vistaActual !== 'tabla'"
-        [class.hover:bg-gray-100]="vistaActual !== 'tabla'"
+        [class.bg-blue-600]="vistaActual === 'tabla'" [class.text-white]="vistaActual === 'tabla'"
+        [class.text-gray-700]="vistaActual !== 'tabla'" [class.hover:bg-gray-100]="vistaActual !== 'tabla'"
         (click)="cambiarVista('tabla')">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2z">
+          </path>
         </svg>
         Vista Tabla
       </button>
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200"
-        [class.bg-blue-600]="vistaActual === 'tarjetas'"
-        [class.text-white]="vistaActual === 'tarjetas'"
-        [class.text-gray-700]="vistaActual !== 'tarjetas'"
-        [class.hover:bg-gray-100]="vistaActual !== 'tarjetas'"
+        [class.bg-blue-600]="vistaActual === 'tarjetas'" [class.text-white]="vistaActual === 'tarjetas'"
+        [class.text-gray-700]="vistaActual !== 'tarjetas'" [class.hover:bg-gray-100]="vistaActual !== 'tarjetas'"
         (click)="cambiarVista('tarjetas')">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+          </path>
         </svg>
         Vista Tarjetas
       </button>
@@ -293,16 +314,15 @@
     <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
       <div class="flex-shrink-0">
         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
       </div>
       <div class="flex-1">
         <h3 class="text-sm font-medium text-red-800">Error</h3>
         <p class="text-sm text-red-700 mt-1">{{ error }}</p>
       </div>
-      <button
-        type="button"
-        class="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors"
+      <button type="button" class="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors"
         (click)="limpiarMensajes()">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -314,16 +334,15 @@
     <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
       <div class="flex-shrink-0">
         <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
       </div>
       <div class="flex-1">
         <h3 class="text-sm font-medium text-green-800">Éxito</h3>
         <p class="text-sm text-green-700 mt-1">{{ success }}</p>
       </div>
-      <button
-        type="button"
-        class="flex-shrink-0 text-green-400 hover:text-green-600 transition-colors"
+      <button type="button" class="flex-shrink-0 text-green-400 hover:text-green-600 transition-colors"
         (click)="limpiarMensajes()">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -345,7 +364,8 @@
   <main *ngIf="!loading">
 
     <!-- Vista de Tabla -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" *ngIf="vistaActual === 'tabla' && hayPersonalMedico">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+      *ngIf="vistaActual === 'tabla' && hayPersonalMedico">
       <div class="overflow-x-auto">
         <table class="w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -370,714 +390,988 @@
               </th>
               <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Productividad
-             </th>
-             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-               Acciones
-             </th>
-           </tr>
-         </thead>
-         <tbody class="bg-white divide-y divide-gray-200">
-           <tr *ngFor="let personal of personalMedico" class="hover:bg-gray-50 transition-colors duration-150">
-             <!-- Información Personal -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <div class="flex items-center">
-                 <div class="flex-shrink-0 w-12 h-12">
-                   <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                        [class.bg-blue-500]="personal.sexo === 'M'"
-                        [class.bg-pink-500]="personal.sexo === 'F'">
-                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                     </svg>
-                   </div>
-                 </div>
-                 <div class="ml-4">
-                   <div class="text-sm font-medium text-gray-900">
-                     {{ obtenerTituloProfesional(personal) }} {{ construirNombreCompleto(personal) }}
-                   </div>
-                   <div class="text-sm text-gray-500">ID: {{ personal.id_personal_medico }}</div>
-                   <div class="text-xs text-gray-400" *ngIf="personal.correo_electronico">
-                     {{ personal.correo_electronico }}
-                   </div>
-                 </div>
-               </div>
-             </td>
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let personal of personalMedico" class="hover:bg-gray-50 transition-colors duration-150">
+              <!-- Información Personal -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-12 h-12">
+                    <div
+                      class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                      [class.bg-blue-500]="personal.sexo === 'M'" [class.bg-pink-500]="personal.sexo === 'F'">
+                      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ obtenerTituloProfesional(personal) }} {{ construirNombreCompleto(personal) }}
+                    </div>
+                    <div class="text-sm text-gray-500">ID: {{ personal.id_personal_medico }}</div>
+                    <div class="text-xs text-gray-400" *ngIf="personal.correo_electronico">
+                      {{ personal.correo_electronico }}
+                    </div>
+                  </div>
+                </div>
+              </td>
 
-             <!-- Cédula -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                 {{ personal.numero_cedula }}
-               </div>
-             </td>
+              <!-- Cédula -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div
+                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  {{ personal.numero_cedula }}
+                </div>
+              </td>
 
-             <!-- Especialidad -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <div class="flex items-center gap-2">
-                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                       [class]="obtenerColorPorEspecialidad(personal.especialidad)">
-                   {{ obtenerIconoPorEspecialidad(personal.especialidad) }}
-                   {{ personal.especialidad }}
-                 </span>
-               </div>
-               <div class="text-xs text-blue-600 mt-1" *ngIf="esEspecialista(personal)">
-                 <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
-                   <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-                 </svg>
-                 Especialista
-               </div>
-             </td>
+              <!-- Especialidad -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                    [class]="obtenerColorPorEspecialidad(personal.especialidad)">
+                    {{ obtenerIconoPorEspecialidad(personal.especialidad) }}
+                    {{ personal.especialidad }}
+                  </span>
+                </div>
+                <div class="text-xs text-blue-600 mt-1" *ngIf="esEspecialista(personal)">
+                  <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+                  </svg>
+                  Especialista
+                </div>
+              </td>
 
-             <!-- Cargo -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <div class="text-sm text-gray-900">{{ personal.cargo || 'No asignado' }}</div>
-               <div class="text-xs text-gray-500" *ngIf="personal.cargo?.includes('Jefe')">
-                 <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
-                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                 </svg>
-                 Dirección
-               </div>
-             </td>
+              <!-- Cargo -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ personal.cargo || 'No asignado' }}</div>
+                <div class="text-xs text-gray-500" *ngIf="personal.cargo?.includes('Jefe')">
+                  <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  Dirección
+                </div>
+              </td>
 
-             <!-- Departamento -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <div class="text-sm text-gray-900">{{ personal.departamento || 'No asignado' }}</div>
-             </td>
+              <!-- Departamento -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ personal.departamento || 'No asignado' }}</div>
+              </td>
 
-             <!-- Estado -->
-             <td class="px-6 py-4 whitespace-nowrap">
-               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                     [class]="obtenerClaseEstado(personal.activo)">
-                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                   <circle cx="12" cy="12" r="3" *ngIf="personal.activo"/>
-                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" *ngIf="!personal.activo"/>
-                 </svg>
-                 {{ obtenerTextoEstado(personal.activo) }}
-               </span>
-             </td>
+              <!-- Estado -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                  [class]="obtenerClaseEstado(personal.activo)">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" *ngIf="personal.activo" />
+                    <path
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                      *ngIf="!personal.activo" />
+                  </svg>
+                  {{ obtenerTextoEstado(personal.activo) }}
+                </span>
+              </td>
 
-             <!-- Productividad -->
-             <td class="px-6 py-4 whitespace-nowrap text-center">
-               <div class="text-sm font-semibold text-gray-900">
-                 {{ convertirANumero(personal.total_documentos_creados) }}
-               </div>
-               <div class="text-xs font-medium" [class]="obtenerColorProductividad(convertirANumero(personal.total_documentos_creados))">
-                 {{ obtenerNivelProductividad(convertirANumero(personal.total_documentos_creados)) }}
-               </div>
-               <div class="text-xs text-gray-500 mt-1">
-                 {{ convertirANumero(personal.documentos_mes_actual) }} este mes
-               </div>
-             </td>
+              <!-- Productividad -->
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="text-sm font-semibold text-gray-900">
+                  {{ convertirANumero(personal.total_documentos_creados) }}
+                </div>
+                <div class="text-xs font-medium"
+                  [class]="obtenerColorProductividad(convertirANumero(personal.total_documentos_creados))">
+                  {{ obtenerNivelProductividad(convertirANumero(personal.total_documentos_creados)) }}
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  {{ convertirANumero(personal.documentos_mes_actual) }} este mes
+                </div>
+              </td>
 
-             <!-- Acciones -->
-             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-               <div class="flex items-center justify-end space-x-2">
-                 <!-- Ver Perfil -->
-                 <button
-                   type="button"
-                   class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-all duration-200"
-                   (click)="verPerfilCompleto(personal)"
-                   title="Ver perfil completo">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                   </svg>
-                 </button>
+              <!-- Acciones -->
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end space-x-2">
+                  <!-- Ver Perfil -->
+                  <button type="button"
+                    class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-all duration-200"
+                    (click)="verPerfilCompleto(personal)" title="Ver perfil completo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                      </path>
+                    </svg>
+                  </button>
 
-                 <!-- Editar -->
-                 <button
-                   type="button"
-                   class="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-all duration-200"
-                   (click)="mostrarFormularioEditar(personal)"
-                   title="Editar información">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                   </svg>
-                 </button>
+                  <!-- Editar -->
+                  <button type="button"
+                    class="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-all duration-200"
+                    (click)="mostrarFormularioEditar(personal)" title="Editar información">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                      </path>
+                    </svg>
+                  </button>
 
-                 <!-- Cambiar Estado -->
-                 <button
-                   type="button"
-                   class="p-2 rounded-full transition-all duration-200"
-                   [class.text-orange-600]="personal.activo"
-                   [class.hover:text-orange-800]="personal.activo"
-                   [class.hover:bg-orange-50]="personal.activo"
-                   [class.text-green-600]="!personal.activo"
-                   [class.hover:text-green-800]="!personal.activo"
-                   [class.hover:bg-green-50]="!personal.activo"
-                   (click)="cambiarEstado(personal)"
-                   [title]="personal.activo ? 'Desactivar personal' : 'Activar personal'">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="personal.activo">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                   </svg>
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="!personal.activo">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                   </svg>
-                 </button>
+                  <!-- Cambiar Estado -->
+                  <button type="button" class="p-2 rounded-full transition-all duration-200"
+                    [class.text-orange-600]="personal.activo" [class.hover:text-orange-800]="personal.activo"
+                    [class.hover:bg-orange-50]="personal.activo" [class.text-green-600]="!personal.activo"
+                    [class.hover:text-green-800]="!personal.activo" [class.hover:bg-green-50]="!personal.activo"
+                    (click)="cambiarEstado(personal)"
+                    [title]="personal.activo ? 'Desactivar personal' : 'Activar personal'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="personal.activo">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728">
+                      </path>
+                    </svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="!personal.activo">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </button>
 
-                 <!-- Ver Documentos -->
-                 <button
-                   type="button"
-                   class="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-50 transition-all duration-200"
-                   (click)="verDocumentosCreados(personal)"
-                   title="Ver documentos creados">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                   </svg>
-                 </button>
+                  <!-- Ver Documentos -->
+                  <button type="button"
+                    class="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-50 transition-all duration-200"
+                    (click)="verDocumentosCreados(personal)" title="Ver documentos creados">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                      </path>
+                    </svg>
+                  </button>
 
-                 <!-- Eliminar -->
-                 <button
-                   type="button"
-                   class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-all duration-200"
-                   (click)="eliminarPersonal(personal)"
-                   title="Eliminar personal">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                   </svg>
-                 </button>
-               </div>
-             </td>
-           </tr>
-         </tbody>
-       </table>
-     </div>
-   </div>
+                  <!-- Eliminar -->
+                  <button type="button"
+                    class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-all duration-200"
+                    (click)="eliminarPersonal(personal)" title="Eliminar personal">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-   <!-- Vista de Tarjetas -->
-   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" *ngIf="vistaActual === 'tarjetas' && hayPersonalMedico">
-     <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 group"
-          *ngFor="let personal of personalMedico">
+    <!-- Vista de Tarjetas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      *ngIf="vistaActual === 'tarjetas' && hayPersonalMedico">
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 group"
+        *ngFor="let personal of personalMedico">
 
-       <!-- Header de la Tarjeta -->
-       <div class="p-6 border-b border-gray-100">
-         <div class="flex items-start gap-4">
-           <!-- Avatar -->
-           <div class="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold"
-                [class.bg-blue-500]="personal.sexo === 'M'"
-                [class.bg-pink-500]="personal.sexo === 'F'">
-             <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-             </svg>
-           </div>
+        <!-- Header de la Tarjeta -->
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-start gap-4">
+            <!-- Avatar -->
+            <div class="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold"
+              [class.bg-blue-500]="personal.sexo === 'M'" [class.bg-pink-500]="personal.sexo === 'F'">
+              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </div>
 
-           <!-- Información Principal -->
-           <div class="flex-1 min-w-0">
-             <h3 class="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-               {{ obtenerTituloProfesional(personal) }} {{ construirNombreCompleto(personal) }}
-             </h3>
-             <p class="text-sm text-gray-600 mt-1">{{ personal.especialidad }}</p>
+            <!-- Información Principal -->
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                {{ obtenerTituloProfesional(personal) }} {{ construirNombreCompleto(personal) }}
+              </h3>
+              <p class="text-sm text-gray-600 mt-1">{{ personal.especialidad }}</p>
 
-             <!-- Estado -->
-             <div class="mt-2 flex items-center gap-2">
-               <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border"
-                     [class]="obtenerClaseEstado(personal.activo)">
-                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                   <circle cx="12" cy="12" r="3" *ngIf="personal.activo"/>
-                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" *ngIf="!personal.activo"/>
-                 </svg>
-                 {{ obtenerTextoEstado(personal.activo) }}
-               </span>
+              <!-- Estado -->
+              <div class="mt-2 flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border"
+                  [class]="obtenerClaseEstado(personal.activo)">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" *ngIf="personal.activo" />
+                    <path
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                      *ngIf="!personal.activo" />
+                  </svg>
+                  {{ obtenerTextoEstado(personal.activo) }}
+                </span>
 
-               <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border"
-                     [class]="obtenerColorPorEspecialidad(personal.especialidad)" *ngIf="esEspecialista(personal)">
-                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                   <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-                 </svg>
-                 Especialista
-               </span>
-             </div>
-           </div>
-         </div>
-       </div>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border"
+                  [class]="obtenerColorPorEspecialidad(personal.especialidad)" *ngIf="esEspecialista(personal)">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+                  </svg>
+                  Especialista
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-       <!-- Contenido de la Tarjeta -->
-       <div class="p-6 space-y-4">
-         <!-- Información Básica -->
-         <div class="space-y-3">
-           <div class="flex justify-between items-center">
-             <span class="text-sm font-medium text-gray-700">Cédula:</span>
-             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-               {{ personal.numero_cedula }}
-             </span>
-           </div>
+        <!-- Contenido de la Tarjeta -->
+        <div class="p-6 space-y-4">
+          <!-- Información Básica -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-700">Cédula:</span>
+              <span
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                {{ personal.numero_cedula }}
+              </span>
+            </div>
 
-           <div class="flex justify-between items-center" *ngIf="personal.cargo">
-             <span class="text-sm font-medium text-gray-700">Cargo:</span>
-             <span class="text-sm text-gray-900 text-right">{{ personal.cargo }}</span>
-           </div>
+            <div class="flex justify-between items-center" *ngIf="personal.cargo">
+              <span class="text-sm font-medium text-gray-700">Cargo:</span>
+              <span class="text-sm text-gray-900 text-right">{{ personal.cargo }}</span>
+            </div>
 
-           <div class="flex justify-between items-center" *ngIf="personal.departamento">
-             <span class="text-sm font-medium text-gray-700">Departamento:</span>
-             <span class="text-sm text-gray-900 text-right">{{ personal.departamento }}</span>
-           </div>
+            <div class="flex justify-between items-center" *ngIf="personal.departamento">
+              <span class="text-sm font-medium text-gray-700">Departamento:</span>
+              <span class="text-sm text-gray-900 text-right">{{ personal.departamento }}</span>
+            </div>
 
-           <div class="flex justify-between items-center" *ngIf="personal.telefono">
-             <span class="text-sm font-medium text-gray-700">Teléfono:</span>
-             <span class="text-sm text-gray-900">{{ personal.telefono }}</span>
-           </div>
+            <div class="flex justify-between items-center" *ngIf="personal.telefono">
+              <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+              <span class="text-sm text-gray-900">{{ personal.telefono }}</span>
+            </div>
 
-           <div class="flex justify-between items-center" *ngIf="personal.fecha_nacimiento">
-             <span class="text-sm font-medium text-gray-700">Edad:</span>
-             <span class="text-sm text-gray-900">{{ calcularEdad(personal.fecha_nacimiento) }} años</span>
-           </div>
-         </div>
+            <div class="flex justify-between items-center" *ngIf="personal.fecha_nacimiento">
+              <span class="text-sm font-medium text-gray-700">Edad:</span>
+              <span class="text-sm text-gray-900">{{ calcularEdad(personal.fecha_nacimiento) }} años</span>
+            </div>
+          </div>
 
-         <!-- Productividad -->
-         <div class="bg-gray-50 rounded-lg p-4">
-           <div class="flex justify-between items-center mb-2">
-             <span class="text-sm font-medium text-gray-700">Productividad:</span>
-             <span class="text-sm font-medium" [class]="obtenerColorProductividad(convertirANumero(personal.total_documentos_creados))">
-               {{ obtenerNivelProductividad(convertirANumero(personal.total_documentos_creados)) }}
-             </span>
-           </div>
-           <div class="flex justify-between text-sm text-gray-600">
-             <span>Documentos totales:</span>
-             <span class="font-semibold">{{ convertirANumero(personal.total_documentos_creados) }}</span>
-           </div>
-           <div class="flex justify-between text-sm text-gray-600">
-             <span>Este mes:</span>
-             <span class="font-semibold">{{ convertirANumero(personal.documentos_mes_actual) }}</span>
-           </div>
-         </div>
-       </div>
+          <!-- Productividad -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Productividad:</span>
+              <span class="text-sm font-medium"
+                [class]="obtenerColorProductividad(convertirANumero(personal.total_documentos_creados))">
+                {{ obtenerNivelProductividad(convertirANumero(personal.total_documentos_creados)) }}
+              </span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+              <span>Documentos totales:</span>
+              <span class="font-semibold">{{ convertirANumero(personal.total_documentos_creados) }}</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+              <span>Este mes:</span>
+              <span class="font-semibold">{{ convertirANumero(personal.documentos_mes_actual) }}</span>
+            </div>
+          </div>
+        </div>
 
-       <!-- Acciones de la Tarjeta -->
-       <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
-         <div class="flex flex-wrap gap-2">
-           <button
-             type="button"
-             class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-             (click)="verPerfilCompleto(personal)">
-             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-             </svg>
-             Ver Perfil
-           </button>
+        <!-- Acciones de la Tarjeta -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+          <div class="flex flex-wrap gap-2">
+            <button type="button"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              (click)="verPerfilCompleto(personal)">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                </path>
+              </svg>
+              Ver Perfil
+            </button>
 
-           <button
-             type="button"
-             class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
-             (click)="mostrarFormularioEditar(personal)">
-             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-             </svg>
-             Editar
-           </button>
+            <button type="button"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
+              (click)="mostrarFormularioEditar(personal)">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                </path>
+              </svg>
+              Editar
+            </button>
 
-           <button
-             type="button"
-             class="inline-flex items-center justify-center p-2 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
-             (click)="verDocumentosCreados(personal)"
-             title="Ver documentos">
-             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-             </svg>
-           </button>
-         </div>
-       </div>
-     </div>
-   </div>
+            <button type="button"
+              class="inline-flex items-center justify-center p-2 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors"
+              (click)="verDocumentosCreados(personal)" title="Ver documentos">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-   <!-- Estado Vacío -->
-   <div class="text-center py-16" *ngIf="!hayPersonalMedico && !loading">
-     <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-       <div class="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-         <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-         </svg>
-       </div>
+    <!-- Estado Vacío -->
+    <div class="text-center py-16" *ngIf="!hayPersonalMedico && !loading">
+      <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div class="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+            </path>
+          </svg>
+        </div>
 
-       <h3 class="text-xl font-semibold text-gray-900 mb-2">No se encontró personal médico</h3>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No se encontró personal médico</h3>
 
-       <p class="text-gray-600 mb-6" *ngIf="hayFiltrosAplicados; else noPersonal">
-         No hay personal que coincida con los filtros aplicados. Intenta ajustar los criterios de búsqueda.
-       </p>
-       <ng-template #noPersonal>
-         <p class="text-gray-600 mb-6">
-           Aún no hay personal médico registrado en el sistema. Comienza agregando el primer miembro del equipo médico.
-         </p>
-       </ng-template>
+        <p class="text-gray-600 mb-6" *ngIf="hayFiltrosAplicados; else noPersonal">
+          No hay personal que coincida con los filtros aplicados. Intenta ajustar los criterios de búsqueda.
+        </p>
+        <ng-template #noPersonal>
+          <p class="text-gray-600 mb-6">
+            Aún no hay personal médico registrado en el sistema. Comienza agregando el primer miembro del equipo médico.
+          </p>
+        </ng-template>
 
-       <div class="flex flex-col sm:flex-row gap-3 justify-center">
-         <button
-           type="button"
-           class="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-           (click)="mostrarFormularioCrear()"
-           *ngIf="!hayFiltrosAplicados">
-           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-           </svg>
-           Registrar Primer Personal
-         </button>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button type="button"
+            class="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+            (click)="mostrarFormularioCrear()" *ngIf="!hayFiltrosAplicados">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+              </path>
+            </svg>
+            Registrar Primer Personal
+          </button>
 
-         <button
-           type="button"
-           class="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
-           (click)="limpiarFiltros()"
-           *ngIf="hayFiltrosAplicados">
-           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-           </svg>
-           Limpiar Filtros
-         </button>
-       </div>
-     </div>
-   </div>
- </main>
+          <button type="button"
+            class="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+            (click)="limpiarFiltros()" *ngIf="hayFiltrosAplicados">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+              </path>
+            </svg>
+            Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
 
 </div>
 
-<!-- MODALES FUNCIONALES -->
 
-<!-- Modal de Formulario -->
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" *ngIf="mostrarModal">
- <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-   <div class="p-6 border-b border-gray-200">
-     <h2 class="text-xl font-semibold text-gray-900">
-       {{ isEditMode ? 'Editar Personal Médico' : 'Nuevo Personal Médico' }}
-     </h2>
-   </div>
 
-   <form [formGroup]="personalForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
-     <!-- Información Básica -->
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
-         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="nombre" placeholder="Nombre del médico">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('nombre')?.invalid && personalForm.get('nombre')?.touched">
-           El nombre es requerido
-         </div>
-       </div>
+<!-- Modal de Formulario - ACTUALIZADO CON CREDENCIALES -->
+<div
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
+  *ngIf="mostrarModal">
+  <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">
+        {{ isEditMode ? 'Editar Personal Médico' : 'Nuevo Personal Médico' }}
+      </h2>
+      <p class="text-sm text-gray-600 mt-1">
+        {{ isEditMode ? 'Actualiza la información del personal médico' : 'Registra un nuevo miembro del personal médico
+        con credenciales de acceso' }}
+      </p>
+    </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Paterno *</label>
-         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="apellido_paterno" placeholder="Apellido paterno">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('apellido_paterno')?.invalid && personalForm.get('apellido_paterno')?.touched">
-           El apellido paterno es requerido
-         </div>
-       </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Materno</label>
-         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+
+
+    <form [formGroup]="personalForm" (ngSubmit)="onSubmit()" class="p-6">
+
+ <!-- 🔥 AVISOS INFORMATIVOS GENERALES -->
+      <div class="mb-6" *ngIf="!isEditMode">
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <h4 class="text-sm font-medium text-amber-900">Datos Únicos Requeridos</h4>
+              <p class="text-xs text-amber-800 mt-1">
+                • El <strong>usuario</strong> debe ser único en el sistema<br>
+                • La <strong>cédula profesional</strong> no puede repetirse<br>
+                • El <strong>CURP</strong> debe ser único si se proporciona<br>
+                • El <strong>correo electrónico</strong> debe ser único si se proporciona
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+      <!-- 🔥 SECCIÓN DE CREDENCIALES CON AVISOS -->
+      <div class="mb-8" *ngIf="!isEditMode">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <div>
+              <h3 class="text-sm font-medium text-blue-900">Credenciales de Acceso al Sistema</h3>
+              <p class="text-xs text-blue-700 mt-1">
+                Estas credenciales permitirán al personal médico acceder al sistema para crear y gestionar documentos clínicos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Usuario con validación en tiempo real -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Usuario de Acceso *</label>
+            <input
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              formControlName="usuario"
+              placeholder="ej: dr.garcia2025, medico123"
+              (blur)="verificarUsuarioDisponible()"
+              [class.border-red-300]="personalForm.get('usuario')?.invalid && personalForm.get('usuario')?.touched"
+              [class.border-green-300]="personalForm.get('usuario')?.valid && personalForm.get('usuario')?.touched && !usuarioYaExiste"
+              [class.border-yellow-300]="usuarioYaExiste">
+
+            <!-- Validaciones del campo -->
+            <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('usuario')?.invalid && personalForm.get('usuario')?.touched">
+              <div *ngIf="personalForm.get('usuario')?.errors?.['required']">El usuario es requerido</div>
+              <div *ngIf="personalForm.get('usuario')?.errors?.['minlength']">El usuario debe tener al menos 3 caracteres</div>
+            </div>
+
+            <!-- Aviso de usuario disponible -->
+            <div class="text-green-600 text-sm mt-1" *ngIf="personalForm.get('usuario')?.valid && personalForm.get('usuario')?.touched && !usuarioYaExiste">
+              ✓ Usuario disponible
+            </div>
+
+            <!-- Aviso de usuario ya existe -->
+            <div class="text-yellow-600 text-sm mt-1" *ngIf="usuarioYaExiste">
+              ⚠️ Este usuario ya existe, prueba con otro
+            </div>
+
+            <!-- Sugerencias de usuarios -->
+            <div class="text-xs text-gray-500 mt-1">
+              <strong>Sugerencias:</strong> dr.apellido, medico001, dr.nombre2025
+            </div>
+          </div>
+
+          <!-- Contraseña con indicador de fortaleza -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
+            <div class="relative">
+              <input
+                [type]="mostrarPassword ? 'text' : 'password'"
+                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="password_texto"
+                placeholder="Mínimo 6 caracteres"
+                [class.border-red-300]="personalForm.get('password_texto')?.invalid && personalForm.get('password_texto')?.touched"
+                [class.border-green-300]="personalForm.get('password_texto')?.valid && personalForm.get('password_texto')?.touched">
+              <button
+                type="button"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                (click)="mostrarPassword = !mostrarPassword">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="!mostrarPassword">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" *ngIf="mostrarPassword">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Validaciones de contraseña -->
+            <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('password_texto')?.invalid && personalForm.get('password_texto')?.touched">
+              <div *ngIf="personalForm.get('password_texto')?.errors?.['required']">La contraseña es requerida</div>
+              <div *ngIf="personalForm.get('password_texto')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
+            </div>
+
+            <!-- Indicador de fortaleza -->
+            <div class="text-green-600 text-sm mt-1" *ngIf="personalForm.get('password_texto')?.valid && personalForm.get('password_texto')?.touched">
+              ✓ Contraseña válida
+            </div>
+
+            <!-- Barra de fortaleza -->
+            <div class="mt-2" *ngIf="personalForm.get('password_texto')?.value">
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full transition-all duration-300"
+                       [class]="obtenerClaseFortalezaPassword(personalForm.get('password_texto')?.value)"
+                       [style.width.%]="obtenerPorcentajeFortaleza(personalForm.get('password_texto')?.value)"></div>
+                </div>
+                <span class="text-xs font-medium"
+                      [class]="obtenerTextoFortaleza(personalForm.get('password_texto')?.value).clase">
+                  {{ obtenerTextoFortaleza(personalForm.get('password_texto')?.value).texto }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEPARADOR -->
+      <div class="border-t border-gray-200 mb-6" *ngIf="!isEditMode">
+        <div class="flex items-center justify-center -mt-3">
+          <span class="bg-white px-4 text-sm text-gray-500">Información Personal y Profesional</span>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN BÁSICA -->
+      <div class="space-y-6">
+        <!-- Información Personal -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Información Personal</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Nombre -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+              <input type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="nombre" placeholder="Nombre del médico"
+                [class.border-red-300]="personalForm.get('nombre')?.invalid && personalForm.get('nombre')?.touched">
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('nombre')?.invalid && personalForm.get('nombre')?.touched">
+                El nombre es requerido
+              </div>
+            </div>
+
+            <!-- Apellido Paterno -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Paterno *</label>
+              <input type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="apellido_paterno" placeholder="Apellido paterno"
+                [class.border-red-300]="personalForm.get('apellido_paterno')?.invalid && personalForm.get('apellido_paterno')?.touched">
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('apellido_paterno')?.invalid && personalForm.get('apellido_paterno')?.touched">
+                El apellido paterno es requerido
+              </div>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Materno</label>
+              <input type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 formControlName="apellido_materno" placeholder="Apellido materno">
-       </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Cédula Profesional *</label>
-         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-         formControlName="numero_cedula" placeholder="Número de cédula profesional">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('numero_cedula')?.invalid && personalForm.get('numero_cedula')?.touched">
-           La cédula profesional es requerida (mínimo 6 dígitos)
-         </div>
-       </div>
+            <!-- Fecha de Nacimiento -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento *</label>
+              <input type="date"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="fecha_nacimiento"
+                [class.border-red-300]="personalForm.get('fecha_nacimiento')?.invalid && personalForm.get('fecha_nacimiento')?.touched">
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('fecha_nacimiento')?.invalid && personalForm.get('fecha_nacimiento')?.touched">
+                La fecha de nacimiento es requerida
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Especialidad *</label>
-         <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 formControlName="especialidad">
-           <option value="">Seleccionar especialidad</option>
-           <option *ngFor="let especialidad of especialidadesMedicas" [value]="especialidad">
-             {{ especialidad }}
-           </option>
-         </select>
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('especialidad')?.invalid && personalForm.get('especialidad')?.touched">
-           La especialidad es requerida
-         </div>
-       </div>
+            <!-- Género -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Género *</label>
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="sexo"
+                [class.border-red-300]="personalForm.get('sexo')?.invalid && personalForm.get('sexo')?.touched">
+                <option value="">Seleccionar género</option>
+                <option *ngFor="let genero of opcionesGenero" [value]="genero.valor">
+                  {{ genero.etiqueta }}
+                </option>
+              </select>
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('sexo')?.invalid && personalForm.get('sexo')?.touched">
+                El género es requerido
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
-         <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 formControlName="cargo">
-           <option value="">Seleccionar cargo</option>
-           <option *ngFor="let cargo of cargosMedicos" [value]="cargo">
-             {{ cargo }}
-           </option>
-         </select>
-       </div>
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+              <input type="tel"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="telefono" placeholder="10 dígitos"
+                [class.border-red-300]="personalForm.get('telefono')?.invalid && personalForm.get('telefono')?.touched">
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('telefono')?.invalid && personalForm.get('telefono')?.touched">
+                El teléfono debe tener 10 dígitos
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
-         <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 formControlName="departamento">
-           <option value="">Seleccionar departamento</option>
-           <option *ngFor="let departamento of departamentosHospitalarios" [value]="departamento">
-             {{ departamento }}
-           </option>
-         </select>
-       </div>
+            <!-- Correo con validación de duplicados -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+              <input
+                type="email"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="correo_electronico"
+                placeholder="juan.garcia@hospital.gob.mx"
+                (blur)="verificarCorreoDisponible()"
+                [class.border-red-300]="personalForm.get('correo_electronico')?.invalid && personalForm.get('correo_electronico')?.touched"
+                [class.border-yellow-300]="correoYaExiste">
+              <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('correo_electronico')?.invalid && personalForm.get('correo_electronico')?.touched">
+                Ingresa un correo válido
+              </div>
+              <div class="text-yellow-600 text-sm mt-1" *ngIf="correoYaExiste">
+                ⚠️ Este correo ya está registrado
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento *</label>
-         <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="fecha_nacimiento">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('fecha_nacimiento')?.invalid && personalForm.get('fecha_nacimiento')?.touched">
-           La fecha de nacimiento es requerida
-         </div>
-       </div>
+            <!-- CURP con validación -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">CURP</label>
+              <input
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="curp"
+                placeholder="GARJ850315HGTLPC05"
+                maxlength="18"
+                (blur)="verificarCurpDisponible()"
+                [class.border-red-300]="personalForm.get('curp')?.invalid && personalForm.get('curp')?.touched"
+                [class.border-yellow-300]="curpYaExiste">
+              <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('curp')?.invalid && personalForm.get('curp')?.touched">
+                El CURP debe tener 18 caracteres válidos
+              </div>
+              <div class="text-yellow-600 text-sm mt-1" *ngIf="curpYaExiste">
+                ⚠️ Este CURP ya está registrado
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                18 caracteres: 4 letras + 6 números + 8 caracteres más
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Género *</label>
-         <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 formControlName="sexo">
-           <option value="">Seleccionar género</option>
-           <option *ngFor="let genero of opcionesGenero" [value]="genero.valor">
-             {{ genero.etiqueta }}
-           </option>
-         </select>
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('sexo')?.invalid && personalForm.get('sexo')?.touched">
-           El género es requerido
-         </div>
-       </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-         <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="telefono" placeholder="10 dígitos">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('telefono')?.invalid && personalForm.get('telefono')?.touched">
-           El teléfono debe tener 10 dígitos
-         </div>
-       </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
-         <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="correo_electronico" placeholder="correo@ejemplo.com">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('correo_electronico')?.invalid && personalForm.get('correo_electronico')?.touched">
-           Ingresa un correo válido
-         </div>
-       </div>
+            <!-- Tipo de Sangre -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Sangre</label>
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="tipo_sangre">
+                <option value="">Seleccionar tipo de sangre</option>
+                <option *ngFor="let tipo of tiposSangre" [value]="tipo">
+                  {{ tipo }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">CURP</label>
-         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                formControlName="curp" placeholder="18 caracteres" maxlength="18">
-         <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('curp')?.invalid && personalForm.get('curp')?.touched">
-           El CURP debe tener 18 caracteres válidos
-         </div>
-       </div>
+        <!-- Información Profesional -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Información Profesional</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cédula Profesional con validación -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cédula Profesional *</label>
+              <input
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="numero_cedula"
+                placeholder="12345678"
+                (blur)="verificarCedulaDisponible()"
+                [class.border-red-300]="personalForm.get('numero_cedula')?.invalid && personalForm.get('numero_cedula')?.touched"
+                [class.border-yellow-300]="cedulaYaExiste">
+              <div class="text-red-500 text-sm mt-1" *ngIf="personalForm.get('numero_cedula')?.invalid && personalForm.get('numero_cedula')?.touched">
+                La cédula profesional es requerida (mínimo 6 dígitos)
+              </div>
+              <div class="text-yellow-600 text-sm mt-1" *ngIf="cedulaYaExiste">
+                ⚠️ Esta cédula ya está registrada
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Número de cédula profesional otorgado por la SEP
+              </div>
+            </div>
 
-       <div>
-         <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Sangre</label>
-         <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 formControlName="tipo_sangre">
-           <option value="">Seleccionar tipo de sangre</option>
-           <option *ngFor="let tipo of tiposSangre" [value]="tipo">
-             {{ tipo }}
-           </option>
-         </select>
-       </div>
+            <!-- Especialidad -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Especialidad Médica *</label>
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="especialidad"
+                [class.border-red-300]="personalForm.get('especialidad')?.invalid && personalForm.get('especialidad')?.touched">
+                <option value="">Seleccionar especialidad</option>
+                <option *ngFor="let especialidad of especialidadesMedicas" [value]="especialidad">
+                  {{ especialidad }}
+                </option>
+              </select>
+              <div class="text-red-500 text-sm mt-1"
+                *ngIf="personalForm.get('especialidad')?.invalid && personalForm.get('especialidad')?.touched">
+                La especialidad es requerida
+              </div>
+            </div>
 
-       <div class="flex items-center">
-         <input type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            <!-- Cargo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cargo Hospitalario</label>
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="cargo">
+                <option value="">Seleccionar cargo</option>
+                <option *ngFor="let cargo of cargosMedicos" [value]="cargo">
+                  {{ cargo }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Departamento -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                formControlName="departamento">
+                <option value="">Seleccionar departamento</option>
+                <option *ngFor="let departamento of departamentosHospitalarios" [value]="departamento">
+                  {{ departamento }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Estado Activo -->
+            <div class="flex items-center space-x-3">
+              <input type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 formControlName="activo" id="activo">
-         <label for="activo" class="ml-2 block text-sm text-gray-900">Personal activo</label>
-       </div>
-     </div>
+              <label for="activo" class="text-sm font-medium text-gray-700">
+                Personal activo en el sistema
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
 
-     <!-- Botones -->
-     <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
-       <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-               (click)="cerrarModal()">
-         Cancelar
-       </button>
-       <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-               [disabled]="procesandoFormulario">
-         <svg class="w-4 h-4 mr-2 animate-spin" *ngIf="procesandoFormulario" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-         </svg>
-         {{ isEditMode ? 'Actualizar' : 'Crear' }} Personal
-       </button>
-     </div>
-   </form>
- </div>
+      <!-- BOTONES CON VALIDACIÓN MEJORADA -->
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-8">
+        <button
+          type="button"
+          class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+          (click)="cerrarModal()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="personalForm.invalid || procesandoFormulario || tieneConflictos">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 animate-spin" *ngIf="procesandoFormulario" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>{{ isEditMode ? 'Actualizar Personal' : 'Crear Personal Médico' }}</span>
+          </div>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
+
+
+
+
+
 
 <!-- Modal de Perfil Completo -->
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" *ngIf="mostrarModalPerfil && personalSeleccionado">
- <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-   <div class="p-6 border-b border-gray-200">
-     <div class="flex items-center justify-between">
-       <h2 class="text-xl font-semibold text-gray-900">Perfil Completo</h2>
-       <button type="button" class="text-gray-400 hover:text-gray-600" (click)="cerrarModalPerfil()">
-         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-         </svg>
-       </button>
-     </div>
-   </div>
+<div
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
+  *ngIf="mostrarModalPerfil && personalSeleccionado">
+  <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900">Perfil Completo</h2>
+        <button type="button" class="text-gray-400 hover:text-gray-600" (click)="cerrarModalPerfil()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-   <div class="p-6 space-y-6">
-     <!-- Información Personal -->
-     <div class="flex items-center gap-4">
-       <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            [class.bg-blue-500]="personalSeleccionado.sexo === 'M'"
-            [class.bg-pink-500]="personalSeleccionado.sexo === 'F'">
-         <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-         </svg>
-       </div>
-       <div>
-         <h3 class="text-2xl font-bold text-gray-900">
-           {{ obtenerTituloProfesional(personalSeleccionado) }} {{ construirNombreCompleto(personalSeleccionado) }}
-         </h3>
-         <p class="text-gray-600">{{ personalSeleccionado.especialidad }}</p>
-         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-2"
-               [class]="obtenerClaseEstado(personalSeleccionado.activo)">
-           {{ obtenerTextoEstado(personalSeleccionado.activo) }}
-         </span>
-       </div>
-     </div>
+    <div class="p-6 space-y-6">
+      <!-- Información Personal -->
+      <div class="flex items-center gap-4">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-lg"
+          [class.bg-blue-500]="personalSeleccionado.sexo === 'M'"
+          [class.bg-pink-500]="personalSeleccionado.sexo === 'F'">
+          <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">
+            {{ obtenerTituloProfesional(personalSeleccionado) }} {{ construirNombreCompleto(personalSeleccionado) }}
+          </h3>
+          <p class="text-gray-600">{{ personalSeleccionado.especialidad }}</p>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-2"
+            [class]="obtenerClaseEstado(personalSeleccionado.activo)">
+            {{ obtenerTextoEstado(personalSeleccionado.activo) }}
+          </span>
+        </div>
+      </div>
 
-     <!-- Información Profesional -->
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-       <div class="space-y-4">
-         <h4 class="text-lg font-semibold text-gray-900">Información Profesional</h4>
+      <!-- Información Profesional -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <h4 class="text-lg font-semibold text-gray-900">Información Profesional</h4>
 
-         <div class="space-y-3">
-           <div class="flex justify-between">
-             <span class="text-sm font-medium text-gray-700">Cédula:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.numero_cedula }}</span>
-           </div>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-700">Cédula:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.numero_cedula }}</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="personalSeleccionado.cargo">
-             <span class="text-sm font-medium text-gray-700">Cargo:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.cargo }}</span>
-           </div>
+            <div class="flex justify-between" *ngIf="personalSeleccionado.cargo">
+              <span class="text-sm font-medium text-gray-700">Cargo:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.cargo }}</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="personalSeleccionado.departamento">
-             <span class="text-sm font-medium text-gray-700">Departamento:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.departamento }}</span>
-           </div>
+            <div class="flex justify-between" *ngIf="personalSeleccionado.departamento">
+              <span class="text-sm font-medium text-gray-700">Departamento:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.departamento }}</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="esEspecialista(personalSeleccionado)">
-             <span class="text-sm font-medium text-gray-700">Nivel:</span>
-             <span class="text-sm text-blue-600 font-medium">Especialista</span>
-           </div>
-         </div>
-       </div>
+            <div class="flex justify-between" *ngIf="esEspecialista(personalSeleccionado)">
+              <span class="text-sm font-medium text-gray-700">Nivel:</span>
+              <span class="text-sm text-blue-600 font-medium">Especialista</span>
+            </div>
+          </div>
+        </div>
 
-       <div class="space-y-4">
-         <h4 class="text-lg font-semibold text-gray-900">Información Personal</h4>
+        <div class="space-y-4">
+          <h4 class="text-lg font-semibold text-gray-900">Información Personal</h4>
 
-         <div class="space-y-3">
-           <div class="flex justify-between" *ngIf="personalSeleccionado.fecha_nacimiento">
-             <span class="text-sm font-medium text-gray-700">Edad:</span>
-             <span class="text-sm text-gray-900">{{ calcularEdad(personalSeleccionado.fecha_nacimiento) }} años</span>
-           </div>
+          <div class="space-y-3">
+            <div class="flex justify-between" *ngIf="personalSeleccionado.fecha_nacimiento">
+              <span class="text-sm font-medium text-gray-700">Edad:</span>
+              <span class="text-sm text-gray-900">{{ calcularEdad(personalSeleccionado.fecha_nacimiento) }} años</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="personalSeleccionado.telefono">
-             <span class="text-sm font-medium text-gray-700">Teléfono:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.telefono }}</span>
-           </div>
+            <div class="flex justify-between" *ngIf="personalSeleccionado.telefono">
+              <span class="text-sm font-medium text-gray-700">Teléfono:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.telefono }}</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="personalSeleccionado.correo_electronico">
-             <span class="text-sm font-medium text-gray-700">Email:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.correo_electronico }}</span>
-           </div>
+            <div class="flex justify-between" *ngIf="personalSeleccionado.correo_electronico">
+              <span class="text-sm font-medium text-gray-700">Email:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.correo_electronico }}</span>
+            </div>
 
-           <div class="flex justify-between" *ngIf="personalSeleccionado.tipo_sangre">
-             <span class="text-sm font-medium text-gray-700">Tipo de Sangre:</span>
-             <span class="text-sm text-gray-900">{{ personalSeleccionado.tipo_sangre }}</span>
-           </div>
-         </div>
-       </div>
-     </div>
+            <div class="flex justify-between" *ngIf="personalSeleccionado.tipo_sangre">
+              <span class="text-sm font-medium text-gray-700">Tipo de Sangre:</span>
+              <span class="text-sm text-gray-900">{{ personalSeleccionado.tipo_sangre }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-     <!-- Productividad -->
-     <div class="bg-gray-50 rounded-lg p-4">
-       <h4 class="text-lg font-semibold text-gray-900 mb-3">Productividad</h4>
-       <div class="grid grid-cols-2 gap-4">
-         <div class="text-center">
-           <div class="text-2xl font-bold text-gray-900">{{ convertirANumero(personalSeleccionado.total_documentos_creados) }}</div>
-           <div class="text-sm text-gray-600">Documentos Totales</div>
-         </div>
-         <div class="text-center">
-           <div class="text-2xl font-bold text-gray-900">{{ convertirANumero(personalSeleccionado.documentos_mes_actual) }}</div>
-           <div class="text-sm text-gray-600">Este Mes</div>
-         </div>
-       </div>
-       <div class="mt-3 text-center">
-         <span class="text-sm font-medium" [class]="obtenerColorProductividad(convertirANumero(personalSeleccionado.total_documentos_creados))">
-           Nivel: {{ obtenerNivelProductividad(convertirANumero(personalSeleccionado.total_documentos_creados)) }}
-         </span>
-       </div>
-     </div>
+      <!-- Productividad -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-lg font-semibold text-gray-900 mb-3">Productividad</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">{{
+              convertirANumero(personalSeleccionado.total_documentos_creados) }}</div>
+            <div class="text-sm text-gray-600">Documentos Totales</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">{{
+              convertirANumero(personalSeleccionado.documentos_mes_actual) }}</div>
+            <div class="text-sm text-gray-600">Este Mes</div>
+          </div>
+        </div>
+        <div class="mt-3 text-center">
+          <span class="text-sm font-medium"
+            [class]="obtenerColorProductividad(convertirANumero(personalSeleccionado.total_documentos_creados))">
+            Nivel: {{ obtenerNivelProductividad(convertirANumero(personalSeleccionado.total_documentos_creados)) }}
+          </span>
+        </div>
+      </div>
 
-     <!-- Botones de Acción -->
-     <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
-       <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-               (click)="cerrarModalPerfil()">
-         Cerrar
-       </button>
-       <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-               (click)="mostrarFormularioEditar(personalSeleccionado)">
-         Editar
-       </button>
-     </div>
-   </div>
- </div>
+      <!-- Botones de Acción -->
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+        <button type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+          (click)="cerrarModalPerfil()">
+          Cerrar
+        </button>
+        <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          (click)="mostrarFormularioEditar(personalSeleccionado)">
+          Editar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal de Credenciales -->
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" *ngIf="mostrarModalCredenciales && personalSeleccionado">
- <div class="bg-white rounded-xl shadow-xl max-w-md w-full">
-   <div class="p-6 border-b border-gray-200">
-     <div class="flex items-center justify-between">
-       <h2 class="text-xl font-semibold text-gray-900">Credenciales de Acceso</h2>
-       <button type="button" class="text-gray-400 hover:text-gray-600" (click)="cerrarModalCredenciales()">
-         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-         </svg>
-       </button>
-     </div>
-   </div>
+<div
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
+  *ngIf="mostrarModalCredenciales && personalSeleccionado">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900">Credenciales de Acceso</h2>
+        <button type="button" class="text-gray-400 hover:text-gray-600" (click)="cerrarModalCredenciales()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-   <div class="p-6">
-     <div class="text-center mb-6">
-       <h3 class="text-lg font-medium text-gray-900">
-         {{ obtenerTituloProfesional(personalSeleccionado) }} {{ construirNombreCompleto(personalSeleccionado) }}
-       </h3>
-       <p class="text-sm text-gray-600">{{ personalSeleccionado.especialidad }}</p>
-     </div>
+    <div class="p-6">
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-medium text-gray-900">
+          {{ obtenerTituloProfesional(personalSeleccionado) }} {{ construirNombreCompleto(personalSeleccionado) }}
+        </h3>
+        <p class="text-sm text-gray-600">{{ personalSeleccionado.especialidad }}</p>
+      </div>
 
-     <div class="space-y-4">
-       <div class="bg-gray-50 rounded-lg p-4">
-         <div class="flex justify-between items-center mb-2">
-           <span class="text-sm font-medium text-gray-700">Usuario:</span>
-           <span class="text-sm text-gray-900 font-mono">{{ personalSeleccionado.id_personal_medico ? 'dr.' + personalSeleccionado.id_personal_medico : 'No asignado' }}</span>
-         </div>
-         <div class="flex justify-between items-center">
-           <span class="text-sm font-medium text-gray-700">ID Personal:</span>
-           <span class="text-sm text-gray-900">{{ personalSeleccionado.id_personal_medico }}</span>
-         </div>
-       </div>
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">Usuario:</span>
+            <span class="text-sm text-gray-900 font-mono">{{ personalSeleccionado.id_personal_medico ? 'dr.' +
+              personalSeleccionado.id_personal_medico : 'No asignado' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-700">ID Personal:</span>
+            <span class="text-sm text-gray-900">{{ personalSeleccionado.id_personal_medico }}</span>
+          </div>
+        </div>
 
-       <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-         <div class="flex items-start gap-3">
-           <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-           </svg>
-           <div>
-             <h4 class="text-sm font-medium text-blue-900">Información de Acceso</h4>
-             <p class="text-xs text-blue-700 mt-1">
-               Las credenciales se generan automáticamente basadas en el ID del personal médico.
-               Para cambiar la contraseña, contacte al administrador del sistema.
-             </p>
-           </div>
-         </div>
-       </div>
-     </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <h4 class="text-sm font-medium text-blue-900">Información de Acceso</h4>
+              <p class="text-xs text-blue-700 mt-1">
+                Las credenciales se generan automáticamente basadas en el ID del personal médico.
+                Para cambiar la contraseña, contacte al administrador del sistema.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-     <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
-       <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-               (click)="cerrarModalCredenciales()">
-         Cerrar
-       </button>
-     </div>
-   </div>
- </div>
+      <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+        <button type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+          (click)="cerrarModalCredenciales()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
