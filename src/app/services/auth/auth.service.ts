@@ -124,6 +124,12 @@ logout(): void {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
+  // ==========================================
+// OBTENER USUARIO ACTUAL
+// ==========================================
+getCurrentUser(): Usuario | null {
+  return this.currentUserValue;
+}
 
   // ==========================================
   // VERIFICAR TOKEN

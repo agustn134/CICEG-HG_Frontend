@@ -1,4 +1,3 @@
-// src/app/personas/pacientes/pacientes.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -49,7 +48,7 @@ export class Pacientes implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   mostrarFiltros = false;
-  mostrarEstadisticas = false;
+  mostrarEstadisticas = true; // Mostrar por defecto
   vistaActual: 'tabla' | 'tarjetas' = 'tabla';
 
   // Búsqueda y filtros
@@ -57,19 +56,15 @@ export class Pacientes implements OnInit, OnDestroy {
   filtrosForm: FormGroup;
   filtrosAplicados: PacienteFilters = {};
 
-  // Configuraciones simplificadas
+  // Configuraciones
   readonly opcionesGenero: { valor: Genero | '', etiqueta: string }[] = [
-    { valor: '', etiqueta: 'Todos' },
+    { valor: '', etiqueta: 'Todos los géneros' },
     { valor: Genero.MASCULINO, etiqueta: 'Masculino' },
     { valor: Genero.FEMENINO, etiqueta: 'Femenino' }
   ];
 
   // Exponer enum para el template
   readonly Genero = Genero;
-
-  // ==========================================
-  // CONSTRUCTOR Y CICLO DE VIDA
-  // ==========================================
 
   constructor() {
     this.filtrosForm = this.fb.group({
@@ -82,6 +77,7 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('🏥 Módulo de Pacientes SICEG-HG inicializado');
     this.inicializarComponente();
     this.configurarBusquedaEnTiempoReal();
     this.suscribirAEstadoDelServicio();
@@ -115,24 +111,21 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   private suscribirAEstadoDelServicio(): void {
-    // Suscribirse al estado de loading
     this.pacientesService.loading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.loading = loading);
 
-    // Suscribirse a errores
     this.pacientesService.error$
       .pipe(takeUntil(this.destroy$))
       .subscribe(error => this.error = error);
 
-    // Suscribirse a los pacientes
     this.pacientesService.pacientes$
       .pipe(takeUntil(this.destroy$))
       .subscribe(pacientes => this.pacientes = pacientes);
   }
 
   // ==========================================
-  // MÉTODOS DE CARGA DE DATOS (SIMPLIFICADOS)
+  // MÉTODOS DE CARGA DE DATOS
   // ==========================================
 
   cargarPacientes(): void {
@@ -142,6 +135,7 @@ export class Pacientes implements OnInit, OnDestroy {
         next: (response: ApiResponse<Paciente[]>) => {
           if (response.success && response.data) {
             this.pacientes = response.data;
+            console.log(`✅ ${this.pacientes.length} pacientes cargados`);
           }
         },
         error: (error) => {
@@ -157,15 +151,17 @@ export class Pacientes implements OnInit, OnDestroy {
         next: (response: ApiResponse<EstadisticasPacientes>) => {
           if (response.success && response.data) {
             this.estadisticas = response.data;
+            console.log('📊 Estadísticas de pacientes cargadas');
           }
         },
         error: (error) => {
-          console.warn('No se pudieron cargar las estadísticas:', error);
+          console.warn('⚠️ No se pudieron cargar las estadísticas:', error);
         }
       });
   }
 
   recargarDatos(): void {
+    console.log('🔄 Recargando datos de pacientes...');
     this.limpiarError();
     this.cargarPacientes();
     this.cargarEstadisticas();
@@ -186,10 +182,12 @@ export class Pacientes implements OnInit, OnDestroy {
       buscar: this.textoBusqueda || undefined
     };
 
+    console.log('🔍 Aplicando filtros:', this.filtrosAplicados);
     this.cargarPacientes();
   }
 
   limpiarFiltros(): void {
+    console.log('🧹 Limpiando filtros');
     this.filtrosForm.reset();
     this.textoBusqueda = '';
     this.filtrosAplicados = {};
@@ -198,6 +196,17 @@ export class Pacientes implements OnInit, OnDestroy {
 
   toggleFiltros(): void {
     this.mostrarFiltros = !this.mostrarFiltros;
+    console.log('🔧 Filtros:', this.mostrarFiltros ? 'mostrados' : 'ocultos');
+  }
+
+  toggleEstadisticas(): void {
+    this.mostrarEstadisticas = !this.mostrarEstadisticas;
+    console.log('📊 Estadísticas:', this.mostrarEstadisticas ? 'mostradas' : 'ocultas');
+  }
+
+  cambiarVista(nuevaVista: 'tabla' | 'tarjetas'): void {
+    this.vistaActual = nuevaVista;
+    console.log('👁️ Vista cambiada a:', nuevaVista);
   }
 
   // ==========================================
@@ -205,34 +214,29 @@ export class Pacientes implements OnInit, OnDestroy {
   // ==========================================
 
   verDetallePaciente(paciente: Paciente): void {
+    console.log('👤 Navegando al perfil del paciente:', paciente.nombre_completo);
     this.pacienteSeleccionado = paciente;
-    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'perfil']);
-  }
-
-  editarPaciente(paciente: Paciente): void {
-    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'editar']);
+    this.router.navigate(['/app/personas/perfil-paciente', paciente.id_paciente]);
   }
 
   crearNuevoPaciente(): void {
+    console.log('➕ Navegando al wizard de nuevo paciente');
     this.router.navigate(['/app/nuevo-paciente/inicio']);
   }
 
-  // REMOVIDO: Los doctores no necesitan eliminar pacientes
-  // eliminarPaciente() ha sido eliminado por seguridad
-
-  verHistorialMedico(paciente: Paciente): void {
-    this.router.navigate(['/app/personas/pacientes', paciente.id_paciente, 'historial']);
-  }
-
-  verExpedientes(paciente: Paciente): void {
+  crearExpediente(paciente: Paciente): void {
+    console.log('📄 Creando nuevo expediente para:', paciente.nombre_completo);
     this.router.navigate(['/app/gestion-expedientes/expedientes'], {
-      queryParams: { paciente: paciente.id_paciente }
+      queryParams: {
+        nuevo: true,
+        paciente: paciente.id_paciente
+      }
     });
   }
 
-  // NUEVAS ACCIONES PARA DOCTORES
-  crearExpediente(paciente: Paciente): void {
-    this.router.navigate(['/app/nuevo-paciente/inicio'], {
+  verExpedientes(paciente: Paciente): void {
+    console.log('📋 Ver expedientes de:', paciente.nombre_completo);
+    this.router.navigate(['/app/gestion-expedientes/expedientes'], {
       queryParams: { paciente: paciente.id_paciente }
     });
   }
@@ -241,140 +245,67 @@ export class Pacientes implements OnInit, OnDestroy {
   // MÉTODOS DE UTILIDAD PARA LA UI
   // ==========================================
 
-  cambiarVista(nuevaVista: 'tabla' | 'tarjetas'): void {
-    this.vistaActual = nuevaVista;
-  }
-
-  toggleEstadisticas(): void {
-    this.mostrarEstadisticas = !this.mostrarEstadisticas;
-  }
-
   formatearFecha(fecha?: string): string {
-  if (!fecha) return 'No disponible';
-  return new Date(fecha).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-}
-
-  // calcularEdad(fechaNacimiento: string): number {
-  //   if (!fechaNacimiento) return 0;
-  //   const hoy = new Date();
-  //   const nacimiento = new Date(fechaNacimiento);
-  //   let edad = hoy.getFullYear() - nacimiento.getFullYear();
-  //   const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
-
-  //   if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
-  //     edad--;
-  //   }
-
-  //   return edad;
-  // }
-
-  // obtenerClasePorGenero(genero: Genero): string {
-  //   return genero === Genero.MASCULINO ? 'badge-primary' : 'badge-secondary';
-  // }
-
-  // obtenerIconoPorGenero(genero: Genero): string {
-  //   return genero === Genero.MASCULINO ? '♂' : '♀';
-  // }
-
-  // obtenerTextoGenero(genero: Genero): string {
-  //   return genero === Genero.MASCULINO ? 'Masculino' : 'Femenino';
-  // }
-
-  // REEMPLAZA ESTOS MÉTODOS EN TU ARCHIVO pacientes.ts
-
-// ==========================================
-// MÉTODOS DE UTILIDAD PARA LA UI
-// ==========================================
-
-calcularEdad(fechaNacimiento?: string): number {
-  if (!fechaNacimiento) return 0;
-  const hoy = new Date();
-  const nacimiento = new Date(fechaNacimiento);
-  let edad = hoy.getFullYear() - nacimiento.getFullYear();
-  const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
-
-  if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
-    edad--;
+    if (!fecha) return 'No disponible';
+    return new Date(fecha).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
-  return edad;
-}
+  calcularEdad(fechaNacimiento?: string): number {
+    if (!fechaNacimiento) return 0;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
 
-obtenerClasePorGenero(genero?: Genero): string {
-  if (!genero) return 'bg-hospital-gray-500';
+    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
 
-  switch(genero) {
-    case Genero.MASCULINO:
-      return 'bg-hospital-primary';
-    case Genero.FEMENINO:
-      return 'bg-hospital-success';
-    default:
-      return 'bg-hospital-gray-500';
+    return edad;
   }
-}
 
-obtenerIconoPorGenero(genero?: Genero): string {
-  if (!genero) return '○';
+  obtenerClasePorGenero(genero?: Genero): string {
+    if (!genero) return 'bg-gray-500';
 
-  switch(genero) {
-    case Genero.MASCULINO:
-      return '♂';
-    case Genero.FEMENINO:
-      return '♀';
-    default:
-      return '○';
+    switch(genero) {
+      case Genero.MASCULINO:
+        return 'bg-blue-600';
+      case Genero.FEMENINO:
+        return 'bg-emerald-600';
+      default:
+        return 'bg-gray-500';
+    }
   }
-}
 
-obtenerTextoGenero(genero?: Genero): string {
-  if (!genero) return 'No especificado';
+  obtenerIconoPorGenero(genero?: Genero): string {
+    if (!genero) return '○';
 
-  switch(genero) {
-    case Genero.MASCULINO:
-      return 'Masculino';
-    case Genero.FEMENINO:
-      return 'Femenino';
-    default:
-      return 'No especificado';
+    switch(genero) {
+      case Genero.MASCULINO:
+        return '♂';
+      case Genero.FEMENINO:
+        return '♀';
+      default:
+        return '○';
+    }
   }
-}
 
-//   obtenerClasePorGenero(genero: Genero): string {
-//   switch(genero) {
-//     case Genero.MASCULINO:
-//       return 'bg-hospital-primary';
-//     case Genero.FEMENINO:
-//       return 'bg-hospital-success';
-//     default:
-//       return 'bg-hospital-gray-500';
-//   }
-// }
+  obtenerTextoGenero(genero?: Genero): string {
+    if (!genero) return 'No especificado';
 
-// obtenerIconoPorGenero(genero: Genero): string {
-//   switch(genero) {
-//     case Genero.MASCULINO:
-//       return '♂';
-//     case Genero.FEMENINO:
-//       return '♀';
-//     default:
-//       return '○';
-//   }
-// }
-
-// obtenerTextoGenero(genero: Genero): string {
-//   switch(genero) {
-//     case Genero.MASCULINO:
-//       return 'Masculino';
-//     case Genero.FEMENINO:
-//       return 'Femenino';
-//     default:
-//       return 'No especificado';
-//   }
-// }
+    switch(genero) {
+      case Genero.MASCULINO:
+        return 'Masculino';
+      case Genero.FEMENINO:
+        return 'Femenino';
+      default:
+        return 'No especificado';
+    }
+  }
 
   tieneAlergias(paciente: Paciente): boolean {
     return !!(paciente.alergias && paciente.alergias.trim().length > 0);
@@ -385,18 +316,12 @@ obtenerTextoGenero(genero?: Genero): string {
   }
 
   // ==========================================
-  // MÉTODOS DE MANEJO DE ERRORES Y MENSAJES
+  // MÉTODOS DE MANEJO DE ERRORES
   // ==========================================
 
   private mostrarError(mensaje: string): void {
     this.error = mensaje;
-    console.error(mensaje);
-  }
-
-  private mostrarMensaje(mensaje: string): void {
-    console.log(mensaje);
-    // Aquí podrías implementar un toast/notification simple
-    alert(mensaje); // Temporal, reemplazar con un sistema de notificaciones
+    console.error('❌', mensaje);
   }
 
   limpiarError(): void {
@@ -404,7 +329,7 @@ obtenerTextoGenero(genero?: Genero): string {
   }
 
   // ==========================================
-  // GETTERS SIMPLIFICADOS
+  // GETTERS
   // ==========================================
 
   get hayPacientes(): boolean {
@@ -419,5 +344,13 @@ obtenerTextoGenero(genero?: Genero): string {
 
   get totalPacientes(): number {
     return this.pacientes.length;
+  }
+
+  // ==========================================
+  // MÉTODOS DE TRACKING PARA ANGULAR
+  // ==========================================
+
+  trackById(index: number, item: Paciente): number {
+    return item.id_paciente;
   }
 }
