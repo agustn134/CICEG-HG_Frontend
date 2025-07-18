@@ -781,34 +781,6 @@ export class Login implements OnInit, OnDestroy {
     this.currentYear = new Date().getFullYear();
   }
 
-  // ngOnInit(): void {
-  //   if (this.authService.isLoggedIn) {
-  //     this.router.navigate(['/app/dashboard']);
-  //     return;
-  //   }
-
-  //   this.returnUrl =
-  //     this.route.snapshot.queryParams['returnUrl'] || '/app/dashboard';
-
-  //   // Load initial medical image
-  //   this.loadMedicalImage();
-
-  //   // Update time every minute
-  //   setInterval(() => {
-  //     this.currentTime = this.getCurrentTime();
-  //   }, 60000);
-
-  //   // Rotate medical facts every 8 seconds
-  //   setInterval(() => {
-  //     this.rotateMedicalFact();
-  //   }, 8000);
-
-  //   // Rotate image every 5 minutes (to avoid API rate limits)
-  //   setInterval(() => {
-  //     this.loadMedicalImage();
-  //   }, 300000);
-  // }
-
   ngOnInit(): void {
     if (this.authService.isLoggedIn) {
       this.router.navigate(['/app/dashboard']);

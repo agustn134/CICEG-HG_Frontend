@@ -2,6 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { tap, catchError, finalize } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 // ==========================================
 // INTERFACES
@@ -35,7 +37,7 @@ export interface ResetPasswordRequest {
   providedIn: 'root'
 })
 export class PasswordResetService {
-  // 🔥 CAMBIO: URL directa sin environments
+  // 🔥 URL del API
   private readonly API_URL = 'http://localhost:3000/api/auth/password-reset';
 
   // Estados del proceso
@@ -68,7 +70,22 @@ export class PasswordResetService {
     console.log('🔄 Enviando request a:', `${this.API_URL}/request`);
     console.log('🔄 Datos:', data);
 
-    return this.http.post<PasswordResetResponse>(`${this.API_URL}/request`, data, { headers });
+    return this.http.post<PasswordResetResponse>(`${this.API_URL}/request`, data, { headers })
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            this.setSuccess(response.message);
+          } else {
+            this.setError(response.message);
+          }
+        }),
+        catchError(error => {
+          console.error('❌ Error en requestPasswordReset:', error);
+          this.setError(error.error?.message || 'Error de conexión');
+          return throwError(() => error);
+        }),
+        finalize(() => this.setLoading(false))
+      );
   }
 
   /**
@@ -80,7 +97,20 @@ export class PasswordResetService {
 
     console.log('🔄 Validando token:', `${this.API_URL}/validate/${token}`);
 
-    return this.http.get<ValidateTokenResponse>(`${this.API_URL}/validate/${token}`);
+    return this.http.get<ValidateTokenResponse>(`${this.API_URL}/validate/${token}`)
+      .pipe(
+        tap(response => {
+          if (!response.success) {
+            this.setError(response.message);
+          }
+        }),
+        catchError(error => {
+          console.error('❌ Error en validateToken:', error);
+          this.setError(error.error?.message || 'Error al validar token');
+          return throwError(() => error);
+        }),
+        finalize(() => this.setLoading(false))
+      );
   }
 
   /**
@@ -95,31 +125,46 @@ export class PasswordResetService {
     });
 
     console.log('🔄 Reseteando password:', `${this.API_URL}/reset`);
+    console.log('🔄 Datos:', { token: data.token, passwordLength: data.newPassword.length });
 
-    return this.http.post<PasswordResetResponse>(`${this.API_URL}/reset`, data, { headers });
+    return this.http.post<PasswordResetResponse>(`${this.API_URL}/reset`, data, { headers })
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            this.setSuccess(response.message);
+          } else {
+            this.setError(response.message);
+          }
+        }),
+        catchError(error => {
+          console.error('❌ Error en resetPassword:', error);
+          this.setError(error.error?.message || 'Error al cambiar contraseña');
+          return throwError(() => error);
+        }),
+        finalize(() => this.setLoading(false))
+      );
   }
 
   // ==========================================
   // MÉTODOS DE ESTADO
   // ==========================================
 
-  private setLoading(loading: boolean): void {
+  public setLoading(loading: boolean): void {
     this.loadingSubject.next(loading);
   }
 
-  private clearMessages(): void {
-    this.errorSubject.next(null);
-    this.successSubject.next(null);
+  public setError(error: string | null): void {
+    this.errorSubject.next(error);
+    if (error) {
+      console.error('🔥 Error en PasswordResetService:', error);
+    }
   }
 
-  public setError(message: string): void {
-    this.errorSubject.next(message);
-    this.setLoading(false);
-  }
-
-  public setSuccess(message: string): void {
+  public setSuccess(message: string | null): void {
     this.successSubject.next(message);
-    this.setLoading(false);
+    if (message) {
+      console.log('✅ Éxito en PasswordResetService:', message);
+    }
   }
 
   public clearError(): void {
@@ -130,19 +175,20 @@ export class PasswordResetService {
     this.successSubject.next(null);
   }
 
-  // ==========================================
-  // GETTERS
-  // ==========================================
-
-  get isLoading(): boolean {
-    return this.loadingSubject.value;
+  public clearMessages(): void {
+    this.clearError();
+    this.clearSuccess();
   }
 
-  get currentError(): string | null {
-    return this.errorSubject.value;
-  }
+  // ==========================================
+  // MÉTODO DE UTILIDAD
+  // ==========================================
 
-  get currentSuccess(): string | null {
-    return this.successSubject.value;
+  public getCurrentState() {
+    return {
+      loading: this.loadingSubject.value,
+      error: this.errorSubject.value,
+      success: this.successSubject.value
+    };
   }
 }

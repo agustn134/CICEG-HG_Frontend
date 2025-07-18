@@ -74,7 +74,7 @@ export const routes: Routes = [
   { path: 'recuperar-password', component: RecuperarPassword },
   { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
-
+{ path: 'auth/reset-password', component: CambiarPassword },
   // === Redirección principal ===
   { path: '', redirectTo: '/app/dashboard', pathMatch: 'full' },
 
