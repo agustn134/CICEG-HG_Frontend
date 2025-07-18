@@ -76,49 +76,8 @@ import { ConfirmationModalComponent } from "../confirmation-modal/confirmation-m
               <div class="flex items-center space-x-2 sm:space-x-4">
                 <!-- Quick Actions (Hidden on mobile) -->
                 <div class="hidden lg:flex items-center space-x-2">
-                  <!-- Notifications -->
-                  <button
-                    class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
-                    <span
-                      *ngIf="getNotificationCount() > 0"
-                      class="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold"
-                    >
-                      {{ getNotificationCount() }}
-                    </span>
-                  </button>
 
-                  <!-- Help -->
-                  <button
-                    class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </button>
+
                 </div>
 
                 <!-- Current Time -->
@@ -339,31 +298,6 @@ import { ConfirmationModalComponent } from "../confirmation-modal/confirmation-m
                 <span class="font-medium">{{ getWelcomeMessage() }}</span>
                 <span class="text-gray-400">•</span>
                 <span>{{ getSystemStatus() }}</span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <button
-                  class="relative p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                  <span
-                    *ngIf="getNotificationCount() > 0"
-                    class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold"
-                  >
-                    {{ getNotificationCount() }}
-                  </span>
-                </button>
               </div>
             </div>
           </div>
@@ -604,23 +538,6 @@ onDropdownItemClick(action: string, event: Event): void {
   }
 }
 
-// private handleLogoutClick(): void {
-//   console.log('🚪 Iniciando proceso de logout');
-
-//   if (confirm('¿Está seguro que desea cerrar sesión del sistema?')) {
-//     console.log('✅ Logout confirmado por el usuario');
-//     try {
-//       this.authService.logout();
-//       console.log('✅ Sesión cerrada exitosamente');
-//       // Redirigir explícitamente si es necesario
-//       this.router.navigate(['/login']);
-//     } catch (error) {
-//       console.error('❌ Error durante el logout:', error);
-//     }
-//   } else {
-//     console.log('❌ Logout cancelado por el usuario');
-//   }
-// }
 
 // Actualizar el método handleLogoutClick
   private handleLogoutClick(): void {
@@ -628,10 +545,22 @@ onDropdownItemClick(action: string, event: Event): void {
     this.showLogoutModal = true; // Mostrar modal en lugar de confirm()
   }
 
-  private handleProfileClick(): void {
-    console.log('🏥 Abriendo perfil del usuario');
-   this.router.navigate(['/app/personas/administradores']);
+  // private handleProfileClick(): void {
+  //   console.log('🏥 Abriendo perfil del usuario');
+  //  this.router.navigate(['/app/personas/administradores']);
+  // }
+// En dashboard-layout.component.ts, cambiar handleProfileClick():
+private handleProfileClick(): void {
+  console.log('🏥 Abriendo perfil del usuario');
+
+  if (this.currentUser?.tipo_usuario === 'medico') {
+    // Ir al perfil médico
+    this.router.navigate(['/app/personas/perfil-medico', this.currentUser.id]);
+  } else {
+    // Ir a administradores
+    this.router.navigate(['/app/personas/administradores']);
   }
+}
 
   private handleSettingsClick(): void {
     console.log('⚙️ Abriendo configuración del sistema');
@@ -657,27 +586,6 @@ onDropdownItemClick(action: string, event: Event): void {
     this.showLogoutModal = false;
   }
 
-  // private handleLogoutClick(): void {
-  //   console.log('🚪 Iniciando proceso de logout');
-  //   console.log('🔍 Estado actual del usuario:', this.currentUser);
-
-  //   if (this.confirmLogout()) {
-  //     try {
-  //       console.log('✅ Logout confirmado por el usuario');
-  //       console.log('🔄 Llamando a authService.logout()');
-  //       this.authService.logout();
-  //       console.log('✅ Sesión cerrada exitosamente');
-  //     } catch (error) {
-  //       console.error('❌ Error durante el logout:', error);
-  //     }
-  //   } else {
-  //     console.log('❌ Logout cancelado por el usuario');
-  //   }
-  // }
-
-  // private confirmLogout(): boolean {
-  //   return confirm('¿Está seguro que desea cerrar sesión del sistema?');
-  // }
 
   // Métodos para mostrar información del usuario
   getUserDisplayName(): string {
@@ -803,7 +711,7 @@ onDropdownItemClick(action: string, event: Event): void {
   }
 
   getNotificationCount(): number {
-    return 3; // Valor de ejemplo
+    return 3;
   }
 
   isInWizardFlow(): boolean {

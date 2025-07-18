@@ -1,0 +1,28 @@
+/* src/app/personas/perfil-medico/perfil-medico.css */
+.perfil-medico {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hover effects mejorados */
+.paciente-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive mejoras */
+@media (max-width: 768px) {
+  .estadisticas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+  }
+}

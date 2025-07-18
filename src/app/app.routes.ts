@@ -67,6 +67,7 @@ import { NotasPsicologia } from './notas-especializadas/notas-psicologia/notas-p
 import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nutricion';
 import { AuthGuard } from './guards/auth-guard';
 import { ConfiguracionComponent } from './admin/configuracion/configuracion';
+import { PerfilMedico } from './personas/perfil-medico/perfil-medico';
 
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
@@ -187,6 +188,11 @@ export const routes: Routes = [
             component: PerfilPaciente,
             title: 'Perfil de Paciente',
           },
+          {
+      path: 'perfil-medico/:id',
+      component: PerfilMedico,
+      title: 'Perfil Médico'
+    },
 
           // Alias para acceso desde lista de pacientes
           {

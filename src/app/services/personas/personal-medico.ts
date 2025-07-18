@@ -95,6 +95,34 @@ export interface PersonalMedicoFilters {
   limit?: number;
 }
 
+
+
+export interface MedicoConPacientes {
+  // Datos del médico
+  id_personal_medico: number;
+  nombre_completo: string;
+  numero_cedula: string;
+  especialidad: string;
+  cargo: string;
+  departamento: string;
+
+  // Estadísticas
+  total_documentos_creados: number;
+  documentos_mes_actual: number;
+
+  // Pacientes
+  pacientes_atendidos: PacienteAtendido[];
+}
+
+export interface PacienteAtendido {
+  id_paciente: number;
+  nombre_completo: string;
+  numero_expediente: string;
+  edad: number;
+  ultimo_documento: string;
+  total_documentos: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -292,6 +320,24 @@ export class PersonalMedicoService {
         })
       );
   }
+
+  /**
+ * Obtener perfil médico con pacientes atendidos
+ * GET /api/personas/personal-medico/:id/perfil-completo
+ */
+getPerfilMedicoConPacientes(id: number): Observable<ApiResponse<MedicoConPacientes>> {
+  this.setLoading(true);
+  this.clearError();
+
+  return this.http.get<ApiResponse<MedicoConPacientes>>(`${this.API_URL}/${id}/perfil-completo`)
+    .pipe(
+      tap(() => this.setLoading(false)),
+      catchError(error => {
+        this.handleError('Error al obtener perfil médico con pacientes', error);
+        return throwError(() => error);
+      })
+    );
+}
 
   // ==========================================
   // MÉTODOS DE UTILIDAD
