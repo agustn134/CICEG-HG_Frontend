@@ -71,8 +71,8 @@ import { ConfiguracionComponent } from './admin/configuracion/configuracion';
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
   { path: 'login', component: Login },
-  // { path: 'recuperar-password', component: RecuperarPassword },
-  // { path: 'cambiar-password', component: CambiarPassword },
+  { path: 'recuperar-password', component: RecuperarPassword },
+  { path: 'cambiar-password', component: CambiarPassword },
   // { path: 'registro', component: Registro },
 
   // === Redirección principal ===
