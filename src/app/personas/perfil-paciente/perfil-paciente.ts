@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -44,6 +44,11 @@ import { Servicio } from '../../models/servicio.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
 import { AuthService } from '../../services/auth/auth.service';
 
+import { GuiasClinicasService } from '../../services/catalogos/guias-clinicas';
+import { GuiaClinica } from '../../models/guia-clinica.model';
+
+
+
 interface PacienteCompleto {
   persona: any;
   paciente: Paciente;
@@ -79,6 +84,7 @@ interface FormularioEstado {
   templateUrl: './perfil-paciente.html',
   styleUrl: './perfil-paciente.css',
 })
+
 export class PerfilPaciente implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   pacienteCompleto: PacienteCompleto | null = null;
@@ -127,6 +133,14 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   datosClinicosConsolidados: any = {};
   resumenGeneral: any = {};
 
+
+  // 🔥 NUEVAS PROPIEDADES PARA GUÍAS CLÍNICAS
+  guiasClinicas: GuiaClinica[] = [];
+  guiasClinicasFiltradas: GuiaClinica[] = [];
+  guiaClinicaSeleccionada: GuiaClinica | null = null;
+  filtroGuiaClinica: string = '';
+  mostrarDropdownGuias: boolean = false;
+
   constructor(
     private authService: AuthService, // 🔥 Agregar esto
     private route: ActivatedRoute,
@@ -142,7 +156,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private notasEgresoService: NotasEgresoService,
     private serviciosService: ServiciosService,
     private tiposDocumentoService: TiposDocumentoService,
-    private personalMedicoService: PersonalMedicoService
+    private personalMedicoService: PersonalMedicoService,
+    private guiasClinicasService: GuiasClinicasService,
   ) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
@@ -158,6 +173,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   get signosVitalesDisponibles(): SignosVitales[] {
     return this.pacienteCompleto?.signosVitales || [];
   }
+
   debugPacienteCompleto(): void {
     console.log('🔍 DEBUG pacienteCompleto completo:', this.pacienteCompleto);
     console.log('🔍 DEBUG persona:', this.pacienteCompleto?.persona);
@@ -189,19 +205,17 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
+
     setTimeout(() => {
       this.debugPacienteCompleto();
     }, 2000);
 
-    // Iniciar autoguardado
     this.iniciarAutoguardado();
 
-    // Recuperar datos locales si existen
     setTimeout(() => {
       this.recuperarDatosLocales();
     }, 1000);
 
-    // Escuchar cambios de conexión
     window.addEventListener('online', () => {
       this.hayProblemasConexion = false;
       this.verificarConexion();
@@ -211,14 +225,12 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       this.hayProblemasConexion = true;
       this.estadoAutoguardado = 'offline';
     });
-    // Obtener médico del servicio de autenticación
+
     this.authService.currentUser$.subscribe((user) => {
       if (user && user.tipo_usuario === 'medico') {
         this.medicoActual = user.id;
       }
     });
-    // 🔥 AGREGAR ESTO PARA INICIALIZAR MÉDICO
-    // this.medicoActual = 9; // Por ahora hardcodeado, después vendrá del login
 
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -230,6 +242,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
+
+    this.cargarGuiasClinicas();
   }
 
   ngOnDestroy(): void {
@@ -245,6 +259,186 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  // 🔥 MÉTODO PARA CARGAR GUÍAS CLÍNICAS
+  private async cargarGuiasClinicas(): Promise<void> {
+    try {
+      const response = await this.guiasClinicasService.getAll({ activo: true });
+      if (response.success) {
+        this.guiasClinicas = response.data || [];
+        this.guiasClinicasFiltradas = [...this.guiasClinicas];
+      }
+    } catch (error) {
+      console.error('Error al cargar guías clínicas:', error);
+    }
+  }
+
+  // 🔥 MÉTODO PARA FILTRAR GUÍAS POR ÁREA
+  private filtrarGuiasPorArea(area: string): GuiaClinica[] {
+    if (!area) return this.guiasClinicas;
+
+    return this.guiasClinicas.filter(guia =>
+      guia.area?.toLowerCase().includes(area.toLowerCase()) ||
+      guia.nombre?.toLowerCase().includes(area.toLowerCase())
+    );
+  }
+
+  // 🔥 MÉTODO PARA BUSCAR GUÍAS CLÍNICAS
+  buscarGuiaClinica(event: Event): void {
+  const target = event.target as HTMLInputElement;
+  const termino = target?.value || '';
+
+  this.filtroGuiaClinica = termino;
+
+  if (!termino) {
+    this.guiasClinicasFiltradas = [...this.guiasClinicas];
+    return;
+  }
+
+  this.guiasClinicasFiltradas = this.guiasClinicas.filter(guia =>
+    guia.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
+    guia.codigo?.toLowerCase().includes(termino.toLowerCase()) ||
+    guia.area?.toLowerCase().includes(termino.toLowerCase())
+  );
+}
+
+// 🔥 AGREGAR MÉTODO ALTERNATIVO MÁS SEGURO
+buscarGuiaClinicaPorTermino(termino: string): void {
+  this.filtroGuiaClinica = termino;
+
+  if (!termino) {
+    this.guiasClinicasFiltradas = [...this.guiasClinicas];
+    return;
+  }
+
+  this.guiasClinicasFiltradas = this.guiasClinicas.filter(guia =>
+    guia.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
+    guia.codigo?.toLowerCase().includes(termino.toLowerCase()) ||
+    guia.area?.toLowerCase().includes(termino.toLowerCase())
+  );
+}
+
+// 🔥 MÉTODO PARA MANEJAR EVENTOS DE INPUT DE FORMA SEGURA
+onInputGuiaClinica(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input && input.value !== undefined) {
+    this.buscarGuiaClinicaPorTermino(input.value);
+  }
+}
+
+// 🔥 MÉTODO PARA MANEJAR CAMBIOS EN NGMODEL
+onGuiaClinicaInputChange(value: string): void {
+  this.buscarGuiaClinicaPorTermino(value || '');
+}
+
+
+
+  // 🔥 MÉTODO SEGURO PARA SELECCIONAR GUÍA CLÍNICA
+seleccionarGuiaClinica(guia: GuiaClinica | null): void {
+  if (!guia) return;
+
+  this.guiaClinicaSeleccionada = guia;
+  this.filtroGuiaClinica = guia.nombre || '';
+  this.mostrarDropdownGuias = false;
+
+  // Actualizar el formulario activo con la guía seleccionada
+  this.actualizarFormularioConGuia(guia);
+}
+
+  // 🔥 MÉTODO PARA ACTUALIZAR EL FORMULARIO CON LA GUÍA SELECCIONADA
+  private actualizarFormularioConGuia(guia: GuiaClinica): void {
+    switch (this.formularioActivo) {
+      case 'historiaClinica':
+        this.historiaClinicaForm.patchValue({
+          id_guia_diagnostico: guia.id_guia_diagnostico
+        });
+        break;
+      case 'notaUrgencias':
+        this.notaUrgenciasForm.patchValue({
+          id_guia_diagnostico: guia.id_guia_diagnostico
+        });
+        break;
+      case 'notaEvolucion':
+        // La nota de evolución también puede tener guía diagnóstica
+        this.notaEvolucionForm.patchValue({
+          id_guia_diagnostico: guia.id_guia_diagnostico
+        });
+        break;
+    }
+  }
+
+
+
+// 🔥 MÉTODO SEGURO PARA LIMPIAR GUÍA CLÍNICA
+limpiarGuiaClinica(): void {
+  this.guiaClinicaSeleccionada = null;
+  this.filtroGuiaClinica = '';
+  this.mostrarDropdownGuias = false;
+
+  // Limpiar del formulario activo
+  switch (this.formularioActivo) {
+    case 'historiaClinica':
+      this.historiaClinicaForm.patchValue({
+        id_guia_diagnostico: null
+      });
+      break;
+    case 'notaUrgencias':
+      this.notaUrgenciasForm.patchValue({
+        id_guia_diagnostico: null
+      });
+      break;
+    case 'notaEvolucion':
+      this.notaEvolucionForm.patchValue({
+        id_guia_diagnostico: null
+      });
+      break;
+  }
+}
+
+   // 🔥 MÉTODO PARA MOSTRAR/OCULTAR DROPDOWN
+  toggleDropdownGuias(): void {
+    this.mostrarDropdownGuias = !this.mostrarDropdownGuias;
+    if (this.mostrarDropdownGuias) {
+      this.guiasClinicasFiltradas = [...this.guiasClinicas];
+    }
+  }
+
+// 🔥 MÉTODO PARA TRACKBY EN NGFOR (MEJORA PERFORMANCE)
+trackByGuiaId(index: number, guia: GuiaClinica): number {
+  return guia.id_guia_diagnostico;
+}
+
+// 🔥 MÉTODO PARA CERRAR DROPDOWN AL HACER CLICK FUERA
+@HostListener('document:click', ['$event'])
+onClickOutside(event: Event): void {
+  const target = event.target as HTMLElement;
+  const dropdown = target?.closest('.relative');
+
+  if (!dropdown) {
+    this.mostrarDropdownGuias = false;
+  }
+}
+
+// 🔥 MÉTODO SEGURO PARA OBTENER VALOR DE EVENTO
+private getEventValue(event: Event): string {
+  const target = event.target as HTMLInputElement;
+  return target?.value || '';
+}
+
+// 🔥 MÉTODO PARA VALIDAR GUÍA CLÍNICA SELECCIONADA
+get esGuiaClinicaValida(): boolean {
+  return !!(this.guiaClinicaSeleccionada?.id_guia_diagnostico);
+}
+
+// 🔥 MÉTODO PARA OBTENER TEXTO DEL FILTRO DE FORMA SEGURA
+get textoFiltroGuia(): string {
+  return this.filtroGuiaClinica || '';
+}
+
+
+
+
+
 
   private initializeComponent(): void {
     this.isLoading = true;
@@ -271,6 +465,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         },
       });
   }
+
   private initializeSignosVitalesForm(): FormGroup {
     return this.fb.group({
       temperatura: [null, [Validators.min(30), Validators.max(45)]],
@@ -297,6 +492,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       observaciones: [''],
     });
   }
+
+
   private initializeHistoriaClinicaForm(): FormGroup {
     return this.fb.group({
       antecedentes_heredo_familiares: ['', Validators.required],
@@ -319,6 +516,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       plan_diagnostico: [''],
       plan_terapeutico: ['', Validators.required],
       pronostico: ['', Validators.required],
+      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
     });
   }
   private initializeNotaUrgenciasForm(): FormGroup {
@@ -332,6 +530,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       diagnostico: ['', Validators.required],
       plan_tratamiento: ['', Validators.required],
       pronostico: ['', Validators.required],
+      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
     });
   }
   private initializeNotaEvolucionForm(): FormGroup {
@@ -344,8 +543,10 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       diagnosticos: ['', Validators.required],
       plan_estudios_tratamiento: ['', Validators.required],
       pronostico: ['', Validators.required],
+      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
     });
   }
+
   private cargarDatosPaciente(): Observable<any> {
     if (!this.pacienteId) {
       throw new Error('ID de paciente no válido');
@@ -859,6 +1060,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
     const historiaData: CreateHistoriaClinicaDto = {
       id_documento: this.documentoClinicoActual!,
+      id_guia_diagnostico: this.historiaClinicaForm.value.id_guia_diagnostico || null,
       antecedentes_heredo_familiares:
         this.historiaClinicaForm.value.antecedentes_heredo_familiares || null,
       habitos_higienicos:
@@ -921,10 +1123,11 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
     const notaData = {
       id_documento: documentoUrgencias.id_documento,
+      id_guia_diagnostico: this.notaUrgenciasForm.value.id_guia_diagnostico || null,
       motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
       estado_conciencia: this.notaUrgenciasForm.value.estado_conciencia,
       resumen_interrogatorio:
-        this.notaUrgenciasForm.value.resumen_interrogatorio,
+      this.notaUrgenciasForm.value.resumen_interrogatorio,
       exploracion_fisica: this.notaUrgenciasForm.value.exploracion_fisica,
       resultados_estudios: this.notaUrgenciasForm.value.resultados_estudios,
       estado_mental: this.notaUrgenciasForm.value.estado_mental,
@@ -957,6 +1160,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
     const notaData: CreateNotaEvolucionDto = {
       id_documento: documentoEvolucion.id_documento,
+      id_guia_diagnostico: this.notaEvolucionForm.value.id_guia_diagnostico || null,
       sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
       habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
       estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
