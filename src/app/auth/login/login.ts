@@ -11,6 +11,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService, LoginRequest } from '../../services/auth/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
+import {
+  CONFIGURACION_DEFAULT,
+  ConfiguracionLogos,
+} from '../../models/configuracion.model';
 
 interface MedicalImage {
   id: string;
@@ -37,34 +41,94 @@ interface MedicalFact {
       <header class="bg-white shadow-sm border-b border-hospital-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center py-4">
-            <div class="flex items-center space-x-3">
-              <div
-                class="h-12 w-12 bg-hospital-primary rounded-lg flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h1 class="text-xl font-bold text-hospital-gray-900">
-                  SICEG-HG
-                </h1>
-                <p class="text-xs text-hospital-gray-500">
-                  Sistema Integral de Expedientes Clínicos
-                </p>
-              </div>
-            </div>
+
+
+<div class="flex items-center space-x-3">
+
+
+
+  <!-- <div class="h-12 w-12 flex items-center justify-center">
+    <img
+      src="/assets/images/logos/LOGO-SICEG-HG.png"
+      alt="Logo SICEG-HG"
+      class="h-12 w-auto object-contain"
+      (error)="onLogoError($event)"
+    />
+  </div> -->
+<div class="h-12 w-12 flex items-center justify-center"
+     [class.bg-hospital-primary]="logoError"
+     [class.rounded-lg]="logoError">
+
+  <!-- Logo principal -->
+  <img
+    *ngIf="!logoError"
+    [src]="logoUrl"
+    alt="Logo SICEG-HG"
+    class="h-12 w-auto object-contain"
+    (error)="onLogoError($event)"
+  />
+
+  <!-- SVG de respaldo -->
+  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="500.000000pt" height="500.000000pt" viewBox="0 0 500.000000 500.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,500.000000) scale(0.100000,-0.100000)"
+fill="#000000" stroke="none">
+<path d="M2043 4988 c-13 -6 -27 -26 -33 -47 -6 -22 -10 -301 -10 -738 l0
+-703 -724 0 -725 0 -20 -26 c-21 -26 -21 -37 -21 -469 0 -432 0 -443 21 -469
+l20 -26 724 0 724 0 3 -724 c3 -696 4 -725 22 -745 19 -21 24 -21 482 -21
+l463 0 15 22 c14 20 16 107 16 745 l0 723 725 0 c712 0 725 0 745 20 19 19 20
+33 20 478 0 431 -1 460 -18 475 -17 15 -86 17 -743 19 l-724 3 -3 726 c-2 723
+-2 726 -23 745 -20 18 -45 19 -468 21 -307 1 -453 -1 -468 -9z m790 -499 c14
+-6 30 -22 36 -36 8 -16 11 -185 11 -548 l0 -525 532 0 532 0 23 -22 23 -21 0
+-333 0 -333 -26 -20 c-26 -21 -36 -21 -555 -21 l-528 0 -3 -534 c-3 -509 -4
+-535 -22 -555 -19 -21 -26 -21 -350 -21 -182 0 -336 4 -342 8 -32 21 -34 52
+-34 576 l0 526 -525 0 c-363 0 -532 3 -548 11 -44 20 -47 42 -47 365 0 319 4
+352 45 368 9 3 255 6 546 6 l529 0 0 531 c0 356 3 537 11 550 6 11 20 24 32
+29 33 13 631 12 660 -1z"/>
+<path d="M650 778 c-62 -32 -90 -77 -90 -145 0 -90 28 -126 146 -187 39 -21
+81 -46 93 -57 27 -25 27 -63 0 -90 -19 -19 -30 -21 -88 -16 -36 2 -88 14 -114
+26 l-48 21 3 -63 3 -62 40 -14 c22 -8 78 -14 125 -14 67 -1 93 4 125 20 77 40
+113 107 100 184 -10 57 -57 106 -154 157 -44 24 -88 50 -96 58 -23 24 -18 60
+13 84 23 18 35 21 76 15 27 -3 65 -12 83 -20 l34 -14 20 45 c10 25 17 50 14
+55 -11 17 -109 39 -175 39 -48 0 -78 -6 -110 -22z"/>
+<path d="M1490 779 c-118 -53 -182 -182 -166 -335 13 -126 58 -204 143 -245
+55 -26 177 -32 251 -10 l42 12 0 53 0 54 -57 -15 c-33 -9 -81 -13 -112 -11
+-47 4 -59 10 -87 40 -74 81 -68 268 11 337 56 48 103 50 217 6 11 -4 20 7 36
+44 11 28 18 52 14 55 -4 2 -31 11 -61 20 -77 22 -175 20 -231 -5z"/>
+<path d="M2544 782 c-87 -30 -151 -98 -175 -186 -19 -66 -13 -193 11 -258 24
+-65 86 -128 146 -149 49 -17 210 -15 279 4 l50 13 3 157 3 157 -121 0 -120 0
+0 -50 0 -50 55 0 56 0 -3 -67 -3 -68 -60 -3 c-118 -5 -175 59 -175 196 0 169
+100 249 260 208 35 -9 64 -15 65 -14 6 6 35 81 35 89 0 4 -23 15 -52 24 -69
+20 -190 19 -254 -3z"/>
+<path d="M4105 782 c-34 -11 -67 -33 -102 -68 -68 -67 -87 -129 -81 -258 3
+-77 8 -99 33 -145 40 -73 85 -107 169 -127 59 -15 80 -16 157 -6 49 7 100 17
+114 22 l25 10 0 155 0 155 -120 0 -120 0 0 -50 0 -50 55 0 56 0 -3 -67 -3 -68
+-72 0 c-62 0 -75 3 -99 25 -86 80 -86 262 1 343 54 49 124 55 241 22 17 -6 24
+1 41 43 l21 50 -57 16 c-73 20 -191 20 -256 -2z"/>
+<path d="M1060 485 l0 -305 65 0 65 0 0 305 0 305 -65 0 -65 0 0 -305z"/>
+<path d="M1900 485 l0 -305 175 0 175 0 0 55 0 55 -110 0 -110 0 0 80 0 80
+105 0 105 0 0 50 0 50 -105 0 -105 0 0 70 0 70 110 0 110 0 0 50 0 50 -175 0
+-175 0 0 -305z"/>
+<path d="M3280 485 l0 -305 65 0 65 0 0 135 0 135 125 0 125 0 0 -135 0 -135
+65 0 65 0 0 305 0 305 -65 0 -65 0 0 -120 0 -120 -125 0 -125 0 0 120 0 120
+-65 0 -65 0 0 -305z"/>
+<path d="M2950 410 l0 -50 115 0 115 0 0 50 0 50 -115 0 -115 0 0 -50z"/>
+</g>
+</svg>
+</div>
+
+  <div>
+    <h1 class="text-xl font-bold text-hospital-gray-900">
+      SICEG-HG
+    </h1>
+    <p class="text-xs text-hospital-gray-500">
+      Sistema Integral de Expedientes Clínicos
+    </p>
+  </div>
+</div>
+
             <div class="text-right hidden sm:block">
               <p class="text-sm text-hospital-gray-600 font-medium">
                 Hospital General
@@ -554,21 +618,7 @@ interface MedicalFact {
                       (click)="irARecuperarPassword()"
                       class="font-medium text-hospital-primary hover:text-hospital-primary-dark transition-colors duration-200 flex items-center"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-6 6c-2 0-6-1.58-6-4a2 2 0 012-2h2m10-2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2h10a2 2 0 012 2z"
-                        />
-                      </svg>
-                      ¿Olvidaste tu contraseña? Click Aquí
+                      ¿Olvidaste tu contraseña?
                     </button>
                   </div>
                 </div>
@@ -608,11 +658,24 @@ interface MedicalFact {
       .forgot-password-link:hover {
         @apply underline;
       }
+
+      .logo-container {
+  transition: all 0.3s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+}
+
+.logo-image {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
     `,
   ],
 })
 export class Login implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  configuracion: ConfiguracionLogos = CONFIGURACION_DEFAULT;
 
   loginForm: FormGroup;
   isLoading = false;
@@ -629,6 +692,12 @@ export class Login implements OnInit, OnDestroy {
   dayOfYear: number;
   weekOfYear: number;
   currentYear: number;
+
+  // 🔧 NUEVO: Propiedad para el logo
+  logoUrl = '/assets/images/logos/LOGO-SICEG-HG.png';
+  logoError = false;
+
+
 
   // Medical facts data (updated with more professional facts)
   private medicalFacts: MedicalFact[] = [
@@ -720,7 +789,7 @@ export class Login implements OnInit, OnDestroy {
       const data = await response.json();
 
       this.medicalFacts[0] = {
-        title: 'Momento de Humor 😄',
+        title: 'Momento de Humor',
         description: `${data.setup} - ${data.punchline}`,
         icon: 'fas fa-laugh',
         source: 'Official Joke API',
@@ -921,22 +990,52 @@ export class Login implements OnInit, OnDestroy {
   }
 
   // ✨ Frases motivacionales para personal médico
+  // 🔧 SOLUCIÓN: Reemplazar loadMotivationalQuotes con contenido local
   private async loadMotivationalQuotes(): Promise<void> {
-    try {
-      const response = await fetch(
-        'https://api.quotable.io/random?tags=inspirational|motivational'
-      );
-      const data = await response.json();
-
-      this.medicalFacts.unshift({
-        title: 'Inspiración del Día',
-        description: `"${data.content}"`,
+    // 🎯 Frases motivacionales locales sin API externa
+    const motivationalQuotes = [
+      {
+        title: 'Inspiración Médica',
+        description:
+          '"La medicina es una ciencia de incertidumbre y un arte de probabilidad." - William Osler',
         icon: 'fas fa-star',
-        source: `${data.author} - Quotable API`,
-      });
-    } catch (error) {
-      console.log('Error cargando frases motivacionales');
-    }
+        source: 'Frase Médica Célebre',
+      },
+      {
+        title: 'Vocación de Servicio',
+        description:
+          '"Curar a veces, aliviar a menudo, consolar siempre." - Hipócrates',
+        icon: 'fas fa-heart',
+        source: 'Juramento Hipocrático',
+      },
+      {
+        title: 'Excelencia Hospitalaria',
+        description:
+          '"La calidad nunca es un accidente; siempre es el resultado del esfuerzo inteligente." - John Ruskin',
+        icon: 'fas fa-award',
+        source: 'Filosofía Médica',
+      },
+      {
+        title: 'Trabajo en Equipo',
+        description:
+          '"Solos podemos hacer muy poco; juntos podemos hacer mucho." - Helen Keller',
+        icon: 'fas fa-users',
+        source: 'Inspiración Colaborativa',
+      },
+      {
+        title: 'Innovación SICEG',
+        description:
+          '"La tecnología médica al servicio de la humanidad y la atención integral del paciente."',
+        icon: 'fas fa-laptop-medical',
+        source: 'Hospital General SLP',
+      },
+    ];
+
+    const randomQuote =
+      motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+
+    // Reemplazar el primer fact con la frase motivacional
+    this.medicalFacts[0] = randomQuote;
   }
 
   // 🧠 Facts curiosos e interesantes
@@ -1049,4 +1148,11 @@ export class Login implements OnInit, OnDestroy {
       control.markAsTouched();
     });
   }
+
+  // Agregar este método en la clase Login
+onLogoError(event: any): void {
+    console.warn('Error cargando logo, usando fallback');
+    this.logoError = true;
+  }
+
 }
