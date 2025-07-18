@@ -568,7 +568,7 @@ interface MedicalFact {
                           d="M15 7a2 2 0 012 2m4 0a6 6 0 01-6 6c-2 0-6-1.58-6-4a2 2 0 012-2h2m10-2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2h10a2 2 0 012 2z"
                         />
                       </svg>
-                      ¿Olvidaste tu contraseña?
+                      ¿Olvidaste tu contraseña? Click Aquí
                     </button>
                   </div>
                 </div>
