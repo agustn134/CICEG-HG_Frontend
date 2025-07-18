@@ -153,6 +153,18 @@
   </div>
 </div>
 
+<!-- Panel de Estado de PDFs -->
+<div class="fixed bottom-4 right-4 z-40">
+  <div *ngIf="success && success.includes('PDF')"
+    class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transform transition-all duration-500">
+    <i class="fas fa-check-circle"></i>
+    <span class="text-sm font-medium">{{ success }}</span>
+    <button (click)="success = null" class="text-white hover:text-green-200">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
 <!-- ==========================================
      CONTENIDO PRINCIPAL
      ========================================== -->
@@ -707,7 +719,7 @@
           </div>
 
           <!-- Botón Guardar -->
-          <div class="mt-6 flex justify-end">
+          <!-- <div class="mt-6 flex justify-end">
             <button type="button" (click)="guardarFormularioActivo()"
               [disabled]="!signosVitalesForm.valid || isCreatingDocument"
               class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
@@ -715,13 +727,33 @@
               <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar Signos Vitales' }}
             </button>
-            <!-- AGREGAR DESPUÉS DEL BOTÓN GUARDAR SIGNOS VITALES -->
             <button type="button" (click)="generarPDF('Signos Vitales')" [disabled]="!formularioEstado.signosVitales"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300">
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
               <i class="fas fa-file-pdf mr-2"></i>
               {{ formularioEstado.signosVitales ? 'Generar PDF' : 'Guardar primero' }}
             </button>
-          </div>
+          </div> -->
+
+          <!-- En cada formulario, actualizar los botones: -->
+<div class="mt-6 flex justify-end space-x-3">
+  <button type="button" (click)="guardarFormularioActivo()"
+    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
+    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
+  </button>
+
+  <button type="button" (click)="generarPDF('Signos Vitales')"
+    [disabled]="!formularioEstado.signosVitales"
+    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+    <i class="fas fa-file-pdf mr-2"></i>
+    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
+    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
+  </button>
+</div>
+
+
         </form>
       </div>
 
@@ -894,77 +926,73 @@
 
               <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
 
-<!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
-<div class="relative">
-  <label class="block text-sm font-medium text-gray-700 mb-1">
-    Guía Clínica de Diagnóstico
-    <span class="text-blue-500 ml-1 cursor-help" title="Seleccione una guía clínica oficial para el diagnóstico">
-      <i class="fas fa-question-circle"></i>
-    </span>
-  </label>
+              <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
+              <div class="relative">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Guía Clínica de Diagnóstico
+                  <span class="text-blue-500 ml-1 cursor-help"
+                    title="Seleccione una guía clínica oficial para el diagnóstico">
+                    <i class="fas fa-question-circle"></i>
+                  </span>
+                </label>
 
-  <div class="relative">
-    <div class="flex">
-      <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-      <input
-        type="text"
-        [(ngModel)]="filtroGuiaClinica"
-        (input)="onGuiaClinicaInputChange($any($event.target).value)"
-        (focus)="toggleDropdownGuias()"
-        (click)="toggleDropdownGuias()"
-        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Buscar guía clínica por nombre, código o área..."
-        [readonly]="!!guiaClinicaSeleccionada">
+                <div class="relative">
+                  <div class="flex">
+                    <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
+                    <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                      (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
+                      (click)="toggleDropdownGuias()"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Buscar guía clínica por nombre, código o área..."
+                      [readonly]="!!guiaClinicaSeleccionada">
 
-      <button
-        type="button"
-        (click)="toggleDropdownGuias()"
-        class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
+                    <button type="button" (click)="toggleDropdownGuias()"
+                      class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
 
-    <!-- Información de la guía seleccionada -->
-    <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
-          <div class="text-sm text-blue-700">
-            <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{ guiaClinicaSeleccionada.fuente }}</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          (click)="limpiarGuiaClinica()"
-          class="text-red-500 hover:text-red-700 ml-4">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
+                  <!-- Información de la guía seleccionada -->
+                  <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
+                        <div class="text-sm text-blue-700">
+                          <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo
+                            }}</span>
+                          <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area
+                            }}</span>
+                          <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{
+                            guiaClinicaSeleccionada.fuente }}</span>
+                        </div>
+                      </div>
+                      <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
 
-    <!-- Dropdown de guías clínicas -->
-    <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
-         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                  <!-- Dropdown de guías clínicas -->
+                  <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
+                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
 
-      <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
-        No se encontraron guías clínicas
-      </div>
+                    <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
+                      No se encontraron guías clínicas
+                    </div>
 
-      <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
-           (click)="seleccionarGuiaClinica(guia)"
-           class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-        <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
-        <div class="text-sm text-gray-600">
-          <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
-          <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
-          <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                    <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
+                      (click)="seleccionarGuiaClinica(guia)"
+                      class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                      <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
+                      <div class="text-sm text-gray-600">
+                        <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
+                        <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
+                        <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
@@ -1009,12 +1037,16 @@
               <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar Historia Clínica' }}
             </button>
+
+
+            <!-- 🔥 AGREGAR ESTE BOTÓN PARA HISTORIA CLÍNICA -->
             <button type="button" (click)="generarPDF('Historia Clínica')"
               [disabled]="!formularioEstado.historiaClinica"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300">
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
               <i class="fas fa-file-pdf mr-2"></i>
               {{ formularioEstado.historiaClinica ? 'Generar PDF' : 'Guardar primero' }}
             </button>
+
           </div>
         </form>
       </div>
@@ -1113,79 +1145,74 @@
             </div>
 
 
-<!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
+            <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
 
-<!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
-<div class="relative">
-  <label class="block text-sm font-medium text-gray-700 mb-1">
-    Guía Clínica de Diagnóstico
-    <span class="text-blue-500 ml-1 cursor-help" title="Seleccione una guía clínica oficial para el diagnóstico">
-      <i class="fas fa-question-circle"></i>
-    </span>
-  </label>
+            <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Guía Clínica de Diagnóstico
+                <span class="text-blue-500 ml-1 cursor-help"
+                  title="Seleccione una guía clínica oficial para el diagnóstico">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
 
-  <div class="relative">
-    <div class="flex">
-      <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-      <input
-        type="text"
-        [(ngModel)]="filtroGuiaClinica"
-        (input)="onGuiaClinicaInputChange($any($event.target).value)"
-        (focus)="toggleDropdownGuias()"
-        (click)="toggleDropdownGuias()"
-        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Buscar guía clínica por nombre, código o área..."
-        [readonly]="!!guiaClinicaSeleccionada">
+              <div class="relative">
+                <div class="flex">
+                  <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
+                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                    (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
+                    (click)="toggleDropdownGuias()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar guía clínica por nombre, código o área..."
+                    [readonly]="!!guiaClinicaSeleccionada">
 
-      <button
-        type="button"
-        (click)="toggleDropdownGuias()"
-        class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
+                  <button type="button" (click)="toggleDropdownGuias()"
+                    class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
 
-    <!-- Información de la guía seleccionada -->
-    <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
-          <div class="text-sm text-blue-700">
-            <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{ guiaClinicaSeleccionada.fuente }}</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          (click)="limpiarGuiaClinica()"
-          class="text-red-500 hover:text-red-700 ml-4">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
+                <!-- Información de la guía seleccionada -->
+                <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
+                      <div class="text-sm text-blue-700">
+                        <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
+                        <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area
+                          }}</span>
+                        <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{
+                          guiaClinicaSeleccionada.fuente }}</span>
+                      </div>
+                    </div>
+                    <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
 
-    <!-- Dropdown de guías clínicas -->
-    <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
-         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                <!-- Dropdown de guías clínicas -->
+                <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
+                  class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
 
-      <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
-        No se encontraron guías clínicas
-      </div>
+                  <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
+                    No se encontraron guías clínicas
+                  </div>
 
-      <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
-           (click)="seleccionarGuiaClinica(guia)"
-           class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-        <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
-        <div class="text-sm text-gray-600">
-          <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
-          <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
-          <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                  <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
+                    (click)="seleccionarGuiaClinica(guia)"
+                    class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                    <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
+                    <div class="text-sm text-gray-600">
+                      <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
+                      <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
+                      <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
 
             <div>
@@ -1217,22 +1244,27 @@
 
           </div>
 
-          <!-- Botón Guardar -->
-          <div class="mt-6 flex justify-end">
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
-              class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Urgencias' }}
-            </button>
-            <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300">
-              <i class="fas fa-file-pdf mr-2"></i>
-              {{ formularioEstado.notaUrgencias ? 'Generar PDF' : 'Guardar primero' }}
-            </button>
 
-          </div>
+          <!-- En cada formulario, actualizar los botones: -->
+<div class="mt-6 flex justify-end space-x-3">
+  <button type="button" (click)="guardarFormularioActivo()"
+    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
+    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
+  </button>
+
+  <button type="button" (click)="generarPDF('Signos Vitales')"
+    [disabled]="!formularioEstado.signosVitales"
+    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+    <i class="fas fa-file-pdf mr-2"></i>
+    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
+    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
+  </button>
+</div>
+
+
         </form>
       </div>
 
@@ -1333,79 +1365,74 @@
               </div>
             </div>
 
-<!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
+            <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
 
-<!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
-<div class="relative">
-  <label class="block text-sm font-medium text-gray-700 mb-1">
-    Guía Clínica de Diagnóstico
-    <span class="text-blue-500 ml-1 cursor-help" title="Seleccione una guía clínica oficial para el diagnóstico">
-      <i class="fas fa-question-circle"></i>
-    </span>
-  </label>
+            <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Guía Clínica de Diagnóstico
+                <span class="text-blue-500 ml-1 cursor-help"
+                  title="Seleccione una guía clínica oficial para el diagnóstico">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
 
-  <div class="relative">
-    <div class="flex">
-      <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-      <input
-        type="text"
-        [(ngModel)]="filtroGuiaClinica"
-        (input)="onGuiaClinicaInputChange($any($event.target).value)"
-        (focus)="toggleDropdownGuias()"
-        (click)="toggleDropdownGuias()"
-        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Buscar guía clínica por nombre, código o área..."
-        [readonly]="!!guiaClinicaSeleccionada">
+              <div class="relative">
+                <div class="flex">
+                  <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
+                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                    (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
+                    (click)="toggleDropdownGuias()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar guía clínica por nombre, código o área..."
+                    [readonly]="!!guiaClinicaSeleccionada">
 
-      <button
-        type="button"
-        (click)="toggleDropdownGuias()"
-        class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
+                  <button type="button" (click)="toggleDropdownGuias()"
+                    class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
 
-    <!-- Información de la guía seleccionada -->
-    <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
-          <div class="text-sm text-blue-700">
-            <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area }}</span>
-            <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{ guiaClinicaSeleccionada.fuente }}</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          (click)="limpiarGuiaClinica()"
-          class="text-red-500 hover:text-red-700 ml-4">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
+                <!-- Información de la guía seleccionada -->
+                <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
+                      <div class="text-sm text-blue-700">
+                        <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
+                        <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area
+                          }}</span>
+                        <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{
+                          guiaClinicaSeleccionada.fuente }}</span>
+                      </div>
+                    </div>
+                    <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
 
-    <!-- Dropdown de guías clínicas -->
-    <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
-         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                <!-- Dropdown de guías clínicas -->
+                <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
+                  class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
 
-      <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
-        No se encontraron guías clínicas
-      </div>
+                  <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
+                    No se encontraron guías clínicas
+                  </div>
 
-      <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
-           (click)="seleccionarGuiaClinica(guia)"
-           class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-        <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
-        <div class="text-sm text-gray-600">
-          <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
-          <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
-          <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                  <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
+                    (click)="seleccionarGuiaClinica(guia)"
+                    class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                    <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
+                    <div class="text-sm text-gray-600">
+                      <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
+                      <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
+                      <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Plan de Estudios y Tratamiento -->
             <div>
@@ -1437,7 +1464,7 @@
           </div>
 
           <!-- Botón Guardar -->
-          <div class="mt-6 flex justify-end">
+          <!-- <div class="mt-6 flex justify-end">
             <button type="button" (click)="guardarFormularioActivo()"
               [disabled]="!notaEvolucionForm.valid || isCreatingDocument"
               class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
@@ -1445,34 +1472,57 @@
               <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Evolución' }}
             </button>
-            <!-- AGREGAR DESPUÉS DEL BOTÓN GUARDAR NOTA EVOLUCIÓN -->
             <button type="button" (click)="generarPDF('Nota de Evolución')" [disabled]="!formularioEstado.notaEvolucion"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300">
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
               <i class="fas fa-file-pdf mr-2"></i>
               {{ formularioEstado.notaEvolucion ? 'Generar PDF' : 'Guardar primero' }}
             </button>
-          </div>
+          </div> -->
+
+          <!-- En cada formulario, actualizar los botones: -->
+<div class="mt-6 flex justify-end space-x-3">
+  <button type="button" (click)="guardarFormularioActivo()"
+    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
+    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
+  </button>
+
+  <button type="button" (click)="generarPDF('Signos Vitales')"
+    [disabled]="!formularioEstado.signosVitales"
+    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+    <i class="fas fa-file-pdf mr-2"></i>
+    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
+    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
+  </button>
+</div>
+
+
         </form>
       </div>
 
       <!-- ==========================================
            RESUMEN DE DOCUMENTOS CREADOS
            ========================================== -->
+      <!-- ==========================================
+     RESUMEN DE DOCUMENTOS CREADOS - MEJORADO
+     ========================================== -->
       <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-semibold text-gray-900">
             <i class="fas fa-file-alt mr-2 text-gray-600"></i>
             Documentos del Expediente
           </h3>
-          <p class="text-sm text-gray-600 mt-1">Documentos clínicos existentes en el expediente</p>
+          <p class="text-sm text-gray-600 mt-1">Documentos clínicos existentes - Descarga PDF disponible</p>
         </div>
 
         <div class="px-6 py-4">
           <div *ngIf="tieneDocumentos" class="space-y-3">
             <div *ngFor="let documento of documentosDisponibles"
-              class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-              <div class="flex items-center space-x-3">
-                <div [class]="getColorClase('blue')" class="p-2 rounded-lg">
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <div class="flex items-center space-x-4">
+                <div [class]="getColorClase('blue')" class="p-3 rounded-lg">
                   <i class="fas fa-file-medical-alt text-lg"></i>
                 </div>
                 <div>
@@ -1481,19 +1531,37 @@
                   <p class="text-sm text-gray-600">
                     Creado: {{ formatearFecha(documento?.fecha_elaboracion || '') }}
                   </p>
-                  <span
-                    [class]="(documento?.estado === 'Activo') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                    {{ documento?.estado || 'Sin estado' }}
-                  </span>
+                  <div class="flex items-center space-x-3 mt-1">
+                    <span
+                      [class]="(documento?.estado === 'Activo') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                      {{ documento?.estado || 'Sin estado' }}
+                    </span>
+                    <span class="text-xs text-blue-600">
+                      <i class="fas fa-download mr-1"></i>
+                      PDF disponible
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              <!-- 🔥 BOTONES MEJORADOS CON PDF -->
               <div class="flex space-x-2">
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                <button
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors">
                   <i class="fas fa-eye mr-1"></i>
                   Ver
                 </button>
-                <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+
+                <!-- 🔥 BOTÓN PRINCIPAL DE PDF -->
+                <button (click)="generarPDF(documento?.nombre_tipo_documento || 'Documento')"
+                  class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1 rounded-md transition-colors flex items-center">
+                  <i class="fas fa-file-pdf mr-1"></i>
+                  PDF
+                </button>
+
+                <button
+                  class="text-gray-600 hover:text-gray-800 text-sm font-medium px-3 py-1 rounded-md hover:bg-gray-50 transition-colors">
                   <i class="fas fa-edit mr-1"></i>
                   Editar
                 </button>
@@ -1504,7 +1572,11 @@
           <div *ngIf="!tieneDocumentos" class="text-center py-8">
             <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Sin documentos</h3>
-            <p class="text-gray-600">Aún no se han creado documentos clínicos para este paciente.</p>
+            <p class="text-gray-600 mb-4">Aún no se han creado documentos clínicos para este paciente.</p>
+            <p class="text-sm text-blue-600">
+              <i class="fas fa-arrow-up mr-1"></i>
+              Complete los formularios arriba para generar documentos PDF
+            </p>
           </div>
         </div>
       </div>
@@ -1838,6 +1910,61 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ==========================================
+     INFORMACIÓN SOBRE GENERACIÓN DE PDFs
+     ========================================== -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6">
+      <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-file-pdf text-white text-xl"></i>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-blue-900 mb-2">
+            Generación de Documentos PDF
+          </h3>
+          <div class="text-sm text-blue-800 space-y-2">
+            <p class="mb-3">
+              <strong>Para médicos del Hospital General San Luis de la Paz:</strong>
+              El sistema genera automáticamente documentos PDF profesionales con formato oficial.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 class="font-semibold text-blue-900 mb-2">Proceso Automatizado:</h4>
+                <ul class="text-xs space-y-1">
+                  <li>• Complete el formulario médico</li>
+                  <li>• Haga clic en "Guardar" primero</li>
+                  <li>• Luego presione "Generar PDF"</li>
+                  <li>• El archivo se descarga automáticamente</li>
+                </ul>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-blue-200">
+                <h4 class="font-semibold text-blue-900 mb-2">Contenido Incluido:</h4>
+                <ul class="text-xs space-y-1">
+                  <li>• Logo oficial del hospital</li>
+                  <li>• Datos completos del paciente</li>
+                  <li>• Información médica registrada</li>
+                  <li>• Guía clínica seleccionada</li>
+                  <li>• Fecha/hora de generación</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p class="text-xs text-yellow-800">
+                <i class="fas fa-info-circle mr-1"></i>
+                <strong>Nota:</strong> Los PDFs cumplen con los estándares médicos oficiales de México.
+                Cada documento incluye numeración de páginas y elementos de seguridad.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>

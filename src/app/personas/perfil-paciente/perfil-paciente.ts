@@ -46,7 +46,7 @@ import { AuthService } from '../../services/auth/auth.service';
 
 import { GuiasClinicasService } from '../../services/catalogos/guias-clinicas';
 import { GuiaClinica } from '../../models/guia-clinica.model';
-
+import { PdfGeneratorService } from '../../services/pdf-generator.service'; // Agregar import
 
 
 interface PacienteCompleto {
@@ -158,7 +158,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private tiposDocumentoService: TiposDocumentoService,
     private personalMedicoService: PersonalMedicoService,
     private guiasClinicasService: GuiasClinicasService,
-  ) {
+    private pdfGeneratorService: PdfGeneratorService
+) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
     this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
@@ -683,11 +684,14 @@ get textoFiltroGuia(): string {
         default:
           throw new Error('Tipo de formulario no válido');
       }
-      this.formularioEstado[this.formularioActivo] = true;
-      this.estadoAutoguardado = 'guardado';
-      this.success = `${this.getTituloFormulario(
-        this.formularioActivo
-      )} guardado correctamente`;
+      // this.formularioEstado[this.formularioActivo] = true;
+      // this.estadoAutoguardado = 'guardado';
+      // this.success = `${this.getTituloFormulario(
+      //   this.formularioActivo
+      // )} guardado correctamente`;
+      setTimeout(() => {
+  this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
+}, 1000);
 
       localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
 
@@ -696,9 +700,9 @@ get textoFiltroGuia(): string {
       this.cargarDatosPaciente().subscribe((data) => {
         this.construirPacienteCompleto(data);
       });
-      setTimeout(() => {
-        this.avanzarAlSiguientePaso();
-      }, 1500);
+      // setTimeout(() => {
+      //   this.avanzarAlSiguientePaso();
+      // }, 1500);
     } catch (error) {
       console.error(`Error al guardar ${this.formularioActivo}:`, error);
       this.error = `Error al guardar ${this.formularioActivo}`;
@@ -709,25 +713,27 @@ get textoFiltroGuia(): string {
   }
 
   private avanzarAlSiguientePaso(): void {
-    const secuenciaFormularios = [
-      'signosVitales',
-      'historiaClinica',
-      'notaUrgencias',
-      'notaEvolucion',
-    ];
-    const indiceActual = secuenciaFormularios.indexOf(this.formularioActivo);
+    // const secuenciaFormularios = [
+    //   'signosVitales',
+    //   'historiaClinica',
+    //   'notaUrgencias',
+    //   'notaEvolucion',
+    // ];
+    // const indiceActual = secuenciaFormularios.indexOf(this.formularioActivo);
 
-    if (indiceActual !== -1 && indiceActual < secuenciaFormularios.length - 1) {
-      const siguienteFormulario = secuenciaFormularios[indiceActual + 1];
-      console.log(
-        `🎯 Avanzando de ${this.formularioActivo} a ${siguienteFormulario}`
-      );
-      this.cambiarFormulario(siguienteFormulario);
-    } else {
-      console.log('Todos los formularios completados');
-      this.success = '¡Todos los documentos han sido creados exitosamente!';
-    }
+    // if (indiceActual !== -1 && indiceActual < secuenciaFormularios.length - 1) {
+    //   const siguienteFormulario = secuenciaFormularios[indiceActual + 1];
+    //   console.log(
+    //     `🎯 Avanzando de ${this.formularioActivo} a ${siguienteFormulario}`
+    //   );
+    //   this.cambiarFormulario(siguienteFormulario);
+    // } else {
+    //   console.log('Todos los formularios completados');
+    //   this.success = '¡Todos los documentos han sido creados exitosamente!';
+    // }
+  console.log(`✅ Formulario ${this.formularioActivo} completado`);
   }
+
   private getTituloFormulario(formulario: string): string {
     const titulos: { [key: string]: string } = {
       signosVitales: 'Signos Vitales',
@@ -1195,23 +1201,99 @@ get textoFiltroGuia(): string {
     console.log('✅ Nota de evolución guardada:', response);
   }
 
-  // 3. AGREGAR FUNCIÓN PARA GENERAR PDF (PLACEHOLDER)
-  async generarPDF(tipoDocumento: string): Promise<void> {
-    // 🔥 PLACEHOLDER PARA CUANDO IMPLEMENTEMOS PDFMAKE
-    console.log(`📄 Generando PDF para: ${tipoDocumento}`);
 
-    // Simular generación de PDF
+//   async generarPDF(tipoDocumento: string): Promise<void> {
+//   try {
+//     console.log(`📄 Generando PDF para: ${tipoDocumento}`);
+
+//     // Preparar datos según el tipo de documento
+//     const datosDocumento = {
+//       paciente: this.pacienteCompleto,
+//       medico: this.medicoActual,
+//       expediente: this.pacienteCompleto?.expediente
+//     };
+
+//     // Generar PDF según el tipo
+//     switch (tipoDocumento) {
+//       case 'Historia Clínica':
+//         await this.pdfGeneratorService.generarHistoriaClinica(datosDocumento);
+//         break;
+//       case 'Nota de Evolución':
+//         await this.pdfGeneratorService.generarNotaEvolucion(datosDocumento);
+//         break;
+//       case 'Nota de Urgencias':
+//         await this.pdfGeneratorService.generarNotaUrgencias(datosDocumento);
+//         break;
+//       case 'Signos Vitales':
+//         await this.pdfGeneratorService.generarSignosVitales(datosDocumento);
+//         break;
+//       default:
+//         console.warn('Tipo de documento no soportado:', tipoDocumento);
+//     }
+
+//     this.success = `PDF de ${tipoDocumento} generado correctamente`;
+//   } catch (error) {
+//     console.error('Error al generar PDF:', error);
+//     this.error = 'Error al generar el PDF';
+//   }
+// }
+
+async generarPDF(tipoDocumento: string): Promise<void> {
+  try {
+    console.log(`Generando PDF para: ${tipoDocumento}`);
+
+    // Show loading state
+    this.isCreatingDocument = true;
+
+    switch (tipoDocumento) {
+      case 'Historia Clínica':
+        await this.pdfGeneratorService.generarHistoriaClinica({
+          paciente: this.pacienteCompleto,
+          medico: this.medicoActual,
+          expediente: this.pacienteCompleto?.expediente
+        });
+        break;
+      case 'Nota de Evolución':
+        await this.pdfGeneratorService.generarNotaEvolucion({
+          paciente: this.pacienteCompleto,
+          medico: this.medicoActual,
+          expediente: this.pacienteCompleto?.expediente
+        });
+        break;
+      case 'Nota de Urgencias':
+        await this.pdfGeneratorService.generarNotaUrgencias({
+          paciente: this.pacienteCompleto,
+          medico: this.medicoActual,
+          expediente: this.pacienteCompleto?.expediente
+        });
+        break;
+      case 'Signos Vitales':
+        await this.pdfGeneratorService.generarSignosVitales({
+          paciente: this.pacienteCompleto,
+          medico: this.medicoActual,
+          expediente: this.pacienteCompleto?.expediente
+        });
+        break;
+      default:
+        console.warn('Tipo de documento no soportado:', tipoDocumento);
+    }
+
     this.success = `PDF de ${tipoDocumento} generado correctamente`;
-
-    // TODO: Implementar PDFMake aquí
-    // 1. Obtener datos del documento desde la BD
-    // 2. Crear template con PDFMake
-    // 3. Generar y descargar PDF
-
-    alert(
-      `🚧 PRÓXIMAMENTE: PDF de ${tipoDocumento}\n\nPor ahora los datos se están guardando correctamente en PostgreSQL.`
-    );
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
   }
+}
+
+
+
+mostrarConfirmacionPDF(tipoDocumento: string): void {
+  if (confirm(`✅ ${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`)) {
+    this.generarPDF(tipoDocumento);
+  }
+}
 
   private async crearDocumentoClinicoPadre(): Promise<void> {
     if (!this.pacienteCompleto?.expediente.id_expediente) {

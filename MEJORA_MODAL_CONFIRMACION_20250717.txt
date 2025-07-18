@@ -34,3 +34,24 @@ Fecha: 17/07/2025 15:27
 Estudiante: [Tu nombre]
 Proyecto: SICEG-HG - Sistema Hospitalario
 
+
+El PDF se genera en el navegador usando los datos que el backend ya proporciona.
+
+┌─────────────────────────────────────────┐
+│           FRONTEND (Angular)            │
+│  ┌─────────────────────────────────────┐│
+│  │        PDF-Generator Service        ││  ← PDFMake aquí
+│  │   • Consume datos del backend       ││
+│  │   • Genera PDFs localmente          ││
+│  │   • Maneja plantillas y estilos     ││
+│  └─────────────────────────────────────┘│
+└─────────────────────────────────────────┘
+                    ↕ HTTP
+┌─────────────────────────────────────────┐
+│            BACKEND (Node.js)            │
+│  • APIs de documentos clínicos          │  ← Sin PDFMake
+│  • Gestión de guías clínicas            │
+│  • Datos de pacientes y médicos         │
+└─────────────────────────────────────────┘
+
+

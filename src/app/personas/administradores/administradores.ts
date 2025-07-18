@@ -1,5 +1,5 @@
 // src/app/personas/administradores/administradores.ts
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -77,6 +77,14 @@ export class Administradores implements OnInit, OnDestroy {
   administradorEnEdicion: Administrador | null = null;
   procesandoFormulario = false;
 
+  menuAccionesAbierto: number | null = null;
+fechaActualizacion: string = new Date().toISOString();
+
+
+ private actualizarFechaActualizacion(): void {
+    this.fechaActualizacion = new Date().toISOString();
+  }
+
   // Configuraciones
   readonly nivelesAcceso = [
     { valor: NivelAcceso.USUARIO, etiqueta: 'Usuario', descripcion: 'Acceso básico al sistema' },
@@ -129,6 +137,17 @@ get passwordFormValid(): boolean {
 // También puedes agregar este método auxiliar si no lo tienes
 obtenerNombreCompleto(administrador: Administrador): string {
   return this.construirNombreCompleto(administrador);
+}
+
+// Agregar estos métodos
+toggleMenuAcciones(adminId: number): void {
+  this.menuAccionesAbierto = this.menuAccionesAbierto === adminId ? null : adminId;
+}
+
+// Cerrar menú al hacer clic fuera (opcional)
+@HostListener('document:click', ['$event'])
+onDocumentClick(event: Event): void {
+  this.menuAccionesAbierto = null;
 }
 
   // ==========================================
@@ -266,8 +285,26 @@ private initializeForms(): void {
   // MÉTODOS CRUD
   // ==========================================
 
-  cargarAdministradores(): void {
+  // cargarAdministradores(): void {
+  //   this.limpiarMensajes();
+  //   this.administradorService.getAdministradores(this.filtrosAplicados)
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe({
+  //       next: (response) => {
+  //         if (response.success && response.data) {
+  //           this.administradores = response.data;
+  //         } else {
+  //           this.mostrarError(response.message || 'Error al cargar administradores');
+  //         }
+  //       },
+  //       error: (err) => {
+  //         this.mostrarError(err.message || 'Error al cargar administradores');
+  //       }
+  //     });
+  // }
+cargarAdministradores(): void {
     this.limpiarMensajes();
+    this.actualizarFechaActualizacion(); // ← Agregar esta línea
     this.administradorService.getAdministradores(this.filtrosAplicados)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -283,6 +320,7 @@ private initializeForms(): void {
         }
       });
   }
+
 
   cargarEstadisticas(): void {
     // SIMPLIFICADO: Solo cargar estadísticas básicas
@@ -678,8 +716,10 @@ cambiarEstado(administrador: Administrador): void {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
 
+   // 🔥 MODIFICAR el método recargarDatos para actualizar la fecha
   recargarDatos(): void {
     this.limpiarMensajes();
+    this.actualizarFechaActualizacion(); // ← Agregar esta línea
     this.cargarAdministradores();
     this.cargarEstadisticas();
   }
