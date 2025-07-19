@@ -179,7 +179,16 @@ export interface ExpedienteFilters extends BaseFilters {
 export interface CreateExpedienteDto {
   id_paciente: number;
   numero_expediente?: string;
-  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+
+  /**
+   * Número administrativo de formato libre
+   * - Opcional
+   * - Entre 3 y 50 caracteres
+   * - Permite: letras, números, guiones, puntos, espacios, guiones bajos, barras
+   * - Ejemplos: "2025-001", "EXP-HG-001", "HG/001/2025", "A123", "EXPEDIENTE 001"
+   */
+  numero_expediente_administrativo?: string;
+
   fecha_apertura?: string;
   estado?: string;
   notas_administrativas?: string;
