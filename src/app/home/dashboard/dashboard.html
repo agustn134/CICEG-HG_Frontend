@@ -5,7 +5,7 @@
        ========================================== -->
   <div class="bg-white border-b border-gray-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <!-- Breadcrumb -->
       <nav class="flex py-3 text-sm" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -65,17 +65,17 @@
        ========================================== -->
   <div *ngIf="estadisticas" class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      
+
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-medium text-gray-900">Resumen del Sistema SICEG-HG</h3>
-        <button (click)="toggleEstadisticas()" 
+        <button (click)="toggleEstadisticas()"
                 class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
           {{ mostrarEstadisticas ? 'Ocultar' : 'Mostrar' }} métricas
         </button>
       </div>
 
       <div *ngIf="mostrarEstadisticas" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        
+
         <!-- Pacientes Activos -->
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
           <div class="flex items-center justify-between">
@@ -200,7 +200,7 @@
           </div>
 
           <div class="space-y-4">
-            
+
             <!-- Nuevo Paciente (Wizard) -->
             <a routerLink="/app/nuevo-paciente/inicio"
                class="group block p-4 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 transition-all duration-300 relative">
@@ -403,7 +403,7 @@
        </div>
 
        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-         
+
          <!-- Personas -->
          <a routerLink="/app/personas/pacientes"
             class="flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition-colors group border border-gray-200 hover:border-blue-300">
@@ -520,6 +520,17 @@
              Nuevo Registro
            </a>
          </div>
+
+         <div class="mt-6">
+    <button
+      (click)="irAAreaBienestar()"
+      class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center">
+      <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      Área de Bienestar Personal
+    </button>
+  </div>
        </div>
      </div>
    </div>

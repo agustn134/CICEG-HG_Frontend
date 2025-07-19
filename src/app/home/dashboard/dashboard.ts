@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { Subject, takeUntil, forkJoin, of } from 'rxjs';
 
 // Servicios del sistema SICEG-HG
@@ -38,6 +38,8 @@ interface AlertaUrgente {
   time: string;
   action: string;
 }
+
+
 
 @Component({
   selector: 'app-dashboard',
@@ -83,7 +85,8 @@ export class Dashboard implements OnInit, OnDestroy {
     private expedientesService: ExpedientesService,
     private documentosService: DocumentosService,
     private sistemaInfoService: SistemaInfoService,
-    private authService: AuthService
+    private authService: AuthService,
+        private router: Router // 🔥 Inyectar Router aquí
   ) {}
 
   ngOnInit(): void {
@@ -163,6 +166,8 @@ export class Dashboard implements OnInit, OnDestroy {
       };
     }
   }
+
+
 
   private obtenerActividadReciente(): ActividadReciente[] {
     // Datos de actividad reciente del sistema SICEG-HG
@@ -422,8 +427,8 @@ export class Dashboard implements OnInit, OnDestroy {
     }
   }
 
-  private navigateTo(route: string): void {
-    window.location.href = route;
+   private navigateTo(route: string): void {
+    this.router.navigate([route]); // Usar router en lugar de window.location.href
   }
 
   // ==========================================
@@ -437,4 +442,12 @@ export class Dashboard implements OnInit, OnDestroy {
   trackByType(index: number, item: any): string {
     return item.type;
   }
+
+    // 🔥 MÉTODO CORREGIDO
+  irAAreaBienestar(): void {
+    console.log('🎯 Navegando al área de bienestar...');
+    this.router.navigate(['/app/bienestar']);
+  }
+
+
 }

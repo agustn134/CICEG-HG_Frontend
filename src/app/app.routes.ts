@@ -68,6 +68,7 @@ import { NotasNutricion } from './notas-especializadas/notas-nutricion/notas-nut
 import { AuthGuard } from './guards/auth-guard';
 import { ConfiguracionComponent } from './admin/configuracion/configuracion';
 import { PerfilMedico } from './personas/perfil-medico/perfil-medico';
+import { AreaDescansoComponent} from './personal/area-descanso/area-descanso.component';
 
 export const routes: Routes = [
   // === Rutas públicas (autenticación) ===
@@ -88,6 +89,14 @@ export const routes: Routes = [
       // === Dashboard principal ===
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
+      {
+        path: 'bienestar',
+        component: AreaDescansoComponent,
+        data: {
+          title: 'Área de Bienestar',
+          description: 'Espacio de relajación para el personal médico'
+        }
+      },
 
       // ===== 🧠 FLUJO WIZARD NUEVO PACIENTE =====
       {
@@ -277,6 +286,8 @@ export const routes: Routes = [
       },
     ],
   },
+
+
 
   // === Redirección por defecto ===
   { path: '**', redirectTo: '/app/dashboard' },
