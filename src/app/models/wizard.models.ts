@@ -68,13 +68,23 @@ export interface DatosPaciente {
 }
 
 
+// export interface DatosExpediente {
+//   id_paciente?: number;
+//   id_expediente?: number;
+//   numero_expediente?: string;
+//   estado: string;
+//   notas_administrativas?: string;
+//   crear_historia_clinica: boolean;
+//   fecha_apertura?: string;
+// }
 export interface DatosExpediente {
   id_paciente?: number;
   id_expediente?: number;
   numero_expediente?: string;
-  estado: string;
+  numero_expediente_administrativo?: string; // ✅ AGREGAR ESTE CAMPO
+  estado?: string;
   notas_administrativas?: string;
-  crear_historia_clinica: boolean;
+  crear_historia_clinica?: boolean;
   fecha_apertura?: string;
 }
 

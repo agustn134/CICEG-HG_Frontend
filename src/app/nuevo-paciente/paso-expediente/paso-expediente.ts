@@ -65,15 +65,16 @@ export class PasoExpediente implements OnInit, OnDestroy {
   // INICIALIZACIÓN
   // ==========================================
 
-  private initializeForm(): void {
-    this.expedienteForm = this.fb.group({
-      numero_expediente: [''], // Opcional, se puede generar automáticamente
-      estado: ['Activo', [Validators.required]],
-      crear_historia_clinica: [true],
-      notas_administrativas: [''],
-      fecha_apertura: [new Date().toISOString().split('T')[0]] // Fecha por defecto
-    });
-  }
+private initializeForm(): void {
+  this.expedienteForm = this.fb.group({
+    numero_expediente: [''], // Opcional, se puede generar automáticamente
+    numero_expediente_administrativo: [''], // ✅ NUEVO CAMPO
+    estado: ['Activo', [Validators.required]],
+    crear_historia_clinica: [true],
+    notas_administrativas: [''],
+    fecha_apertura: [new Date().toISOString().split('T')[0]] // Fecha por defecto
+  });
+}
 
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
@@ -218,129 +219,165 @@ export class PasoExpediente implements OnInit, OnDestroy {
   // ACCIONES CON BACKEND - MÉTODO PRINCIPAL CORREGIDO
   // ==========================================
 
-  // ✅ MÉTODO PRINCIPAL CORREGIDO Y SIMPLIFICADO
-  crearExpediente(): void {
-    console.log('🔄 Form submitted. Valid:', this.expedienteForm.valid);
+// ✅ MÉTODO PRINCIPAL CORREGIDO Y SIMPLIFICADO
 
-    if (!this.expedienteForm.valid) {
-      console.log('❌ Form invalid');
-      return;
-    }
 
-    this.isLoading = true;
-    this.estadoProceso = 'creando';
-    this.autoGuardadoStatus = 'Creando expediente...';
-    this.wizardStateService.setWizardEstado(EstadoWizard.COMPLETANDO);
 
-    const currentState = this.wizardStateService.getCurrentState();
-    const formData = this.expedienteForm.value;
+crearExpediente(): void {
+  console.log('🔄 Form submitted. Valid:', this.expedienteForm.valid);
 
-    // Verificar que tenemos el ID del paciente
-    const idPaciente = currentState.id_paciente_creado;
-    if (!idPaciente) {
-      console.error('❌ No se encontró el ID del paciente');
-      alert('Error: No se encontró el ID del paciente. Reinicie el proceso.');
-      this.isLoading = false;
-      this.estadoProceso = 'error';
-      this.autoGuardadoStatus = '';
-      return;
-    }
-
-    try {
-      // Preparar datos para crear expediente
-      const expedienteData: CreateExpedienteDto = {
-        id_paciente: idPaciente,
-        numero_expediente: formData.numero_expediente || this.generarNumeroExpediente(),
-        fecha_apertura: formData.fecha_apertura || new Date().toISOString(),
-        estado: formData.estado || 'Activo',
-        notas_administrativas: formData.notas_administrativas || 'Expediente creado mediante wizard',
-        crear_historia_clinica: formData.crear_historia_clinica,
-        id_medico_creador: 9 // TODO: Obtener del contexto de usuario cuando tengas login
-      };
-
-      console.log('🚀 Enviando al backend (ExpedientesService):', expedienteData);
-
-      // Llamada real al backend
-      this.expedientesService.createExpediente(expedienteData).subscribe({
-        next: (response: ApiResponse<Expediente>) => {
-          console.log('✅ Respuesta del backend (expediente creado):', response);
-
-          if (response.success && response.data) {
-            // Actualizar datos en el wizard state
-            const datosExpedienteCompletos: Partial<DatosExpediente> = {
-              id_paciente: idPaciente,
-              id_expediente: response.data.id_expediente,
-              numero_expediente: response.data.numero_expediente,
-              estado: response.data.estado,
-              notas_administrativas: formData.notas_administrativas,
-              crear_historia_clinica: formData.crear_historia_clinica,
-              fecha_apertura: response.data.fecha_apertura
-            };
-
-            this.wizardStateService.updateExpedienteData(datosExpedienteCompletos);
-
-            // Guardar ID del expediente creado
-            this.wizardStateService.updateIds({
-              id_expediente: response.data.id_expediente!
-            });
-
-            // Marcar paso como completado
-            this.wizardStateService.markStepAsCompleted(WizardStep.EXPEDIENTE);
-
-            // Actualizar estado local
-            this.expedienteCreado = {
-              id_expediente: response.data.id_expediente,
-              numero_expediente: response.data.numero_expediente,
-              fecha_apertura: response.data.fecha_apertura,
-              estado: response.data.estado,
-              historia_clinica_creada: formData.crear_historia_clinica
-            };
-
-            // Actualizar UI
-            this.isLoading = false;
-            this.estadoProceso = 'completado';
-            this.autoGuardadoStatus = '✅ Expediente creado exitosamente';
-
-            console.log('✅ Expediente creado con ID:', response.data.id_expediente);
-            console.log('✅ Número de expediente:', response.data.numero_expediente);
-
-            // 🔥 REDIRIGIR AL PERFIL DEL PACIENTE después de crear expediente
-            setTimeout(() => {
-              this.irAPerfilPaciente(idPaciente);
-            }, 2000);
-
-          } else {
-            throw new Error(response.message || 'Error desconocido al crear expediente');
-          }
-        },
-
-        error: (error: any) => {
-          console.error('❌ Error al crear expediente:', error);
-          this.isLoading = false;
-          this.estadoProceso = 'error';
-
-          let errorMessage = '❌ Error al crear expediente';
-          if (error.error?.message) {
-            errorMessage = `❌ ${error.error.message}`;
-          } else if (error.message) {
-            errorMessage = `❌ ${error.message}`;
-          }
-
-          this.autoGuardadoStatus = errorMessage;
-          setTimeout(() => {
-            this.autoGuardadoStatus = '';
-          }, 8000);
-        }
-      });
-
-    } catch (error: any) {
-      console.error('❌ Error al preparar datos:', error);
-      this.isLoading = false;
-      this.estadoProceso = 'error';
-      this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
-    }
+  if (!this.expedienteForm.valid) {
+    console.log('❌ Form invalid');
+    return;
   }
 
+  this.isLoading = true;
+  this.estadoProceso = 'creando';
+  this.autoGuardadoStatus = 'Creando expediente...';
+  this.wizardStateService.setWizardEstado(EstadoWizard.COMPLETANDO);
+
+  const currentState = this.wizardStateService.getCurrentState();
+  const formData = this.expedienteForm.value;
+
+  // Verificar que tenemos el ID del paciente
+  const idPaciente = currentState.id_paciente_creado;
+  if (!idPaciente) {
+    console.error('❌ No se encontró el ID del paciente');
+    alert('Error: No se encontró el ID del paciente. Reinicie el proceso.');
+    this.isLoading = false;
+    this.estadoProceso = 'error';
+    this.autoGuardadoStatus = '';
+    return;
+  }
+
+  try {
+    // Preparar datos para crear expediente
+    const expedienteData: CreateExpedienteDto = {
+      id_paciente: idPaciente,
+      numero_expediente: formData.numero_expediente || this.generarNumeroExpediente(),
+      numero_expediente_administrativo: formData.numero_expediente_administrativo?.trim() || null, // ✅ NUEVO CAMPO
+      fecha_apertura: formData.fecha_apertura || new Date().toISOString(),
+      estado: formData.estado || 'Activo',
+      notas_administrativas: formData.notas_administrativas || 'Expediente creado mediante wizard',
+      crear_historia_clinica: formData.crear_historia_clinica,
+      id_medico_creador: 9 // TODO: Obtener del contexto de usuario cuando tengas login
+    };
+
+    console.log('🚀 Enviando al backend (ExpedientesService):', expedienteData);
+
+    // Llamada real al backend
+    this.expedientesService.createExpediente(expedienteData).subscribe({
+      next: (response: ApiResponse<Expediente>) => {
+        console.log('✅ Respuesta del backend (expediente creado):', response);
+
+        if (response.success && response.data) {
+          // Actualizar datos en el wizard state
+          const datosExpedienteCompletos: Partial<DatosExpediente> = {
+            id_paciente: idPaciente,
+            id_expediente: response.data.id_expediente,
+            numero_expediente: response.data.numero_expediente,
+            numero_expediente_administrativo: response.data.numero_expediente_administrativo, // ✅ NUEVO CAMPO
+            estado: response.data.estado,
+            notas_administrativas: formData.notas_administrativas,
+            crear_historia_clinica: formData.crear_historia_clinica,
+            fecha_apertura: response.data.fecha_apertura
+          };
+
+          this.wizardStateService.updateExpedienteData(datosExpedienteCompletos);
+
+          // Guardar ID del expediente creado
+          this.wizardStateService.updateIds({
+            id_expediente: response.data.id_expediente!
+          });
+
+          // Marcar paso como completado
+          this.wizardStateService.markStepAsCompleted(WizardStep.EXPEDIENTE);
+
+          // Actualizar estado local
+          this.expedienteCreado = {
+            id_expediente: response.data.id_expediente,
+            numero_expediente: response.data.numero_expediente,
+            numero_expediente_administrativo: response.data.numero_expediente_administrativo, // ✅ NUEVO CAMPO
+            fecha_apertura: response.data.fecha_apertura,
+            estado: response.data.estado,
+            historia_clinica_creada: formData.crear_historia_clinica
+          };
+
+          // Actualizar UI
+          this.isLoading = false;
+          this.estadoProceso = 'completado';
+          this.autoGuardadoStatus = '✅ Expediente creado exitosamente';
+
+          console.log('✅ Expediente creado con ID:', response.data.id_expediente);
+          console.log('✅ Número de expediente:', response.data.numero_expediente);
+          console.log('✅ Número administrativo:', response.data.numero_expediente_administrativo);
+
+          // 🔥 REDIRIGIR AL PERFIL DEL PACIENTE después de crear expediente
+          setTimeout(() => {
+            this.irAPerfilPaciente(idPaciente);
+          }, 2000);
+
+        } else {
+          throw new Error(response.message || 'Error desconocido al crear expediente');
+        }
+      },
+
+      error: (error: any) => {
+        console.error('❌ Error al crear expediente:', error);
+        this.isLoading = false;
+        this.estadoProceso = 'error';
+
+        let errorMessage = '❌ Error al crear expediente';
+        if (error.error?.message) {
+          errorMessage = `❌ ${error.error.message}`;
+        } else if (error.message) {
+          errorMessage = `❌ ${error.message}`;
+        }
+
+        this.autoGuardadoStatus = errorMessage;
+        setTimeout(() => {
+          this.autoGuardadoStatus = '';
+        }, 8000);
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ Error al preparar datos:', error);
+    this.isLoading = false;
+    this.estadoProceso = 'error';
+    this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
+  }
+}
+
+// ✅ NUEVO MÉTODO: Validar número administrativo
+validarNumeroAdministrativo(numero: string): boolean {
+  if (!numero) return true; // Es opcional
+
+  // Validación básica de formato (puedes ajustar según tus reglas)
+  const patron = /^\d{4}-\d{6}$/; // Formato: YYYY-NNNNNN
+  return patron.test(numero);
+}
+
+// ✅ MÉTODO CORREGIDO: Verificar disponibilidad del número administrativo
+verificarDisponibilidadNumero(): void {
+  const numero = this.expedienteForm.get('numero_expediente_administrativo')?.value;
+
+  if (numero && numero.trim().length > 0) {
+    // Solo validar formato local
+    if (!this.validarNumeroAdministrativo(numero.trim())) {
+      this.expedienteForm.get('numero_expediente_administrativo')?.setErrors({ 'formato': true });
+    } else {
+      // Limpiar errores de formato
+      const control = this.expedienteForm.get('numero_expediente_administrativo');
+      if (control?.errors?.['formato']) {
+        delete control.errors['formato'];
+        if (Object.keys(control.errors).length === 0) {
+          control.setErrors(null);
+        }
+      }
+    }
+  }
+}
 
 
 

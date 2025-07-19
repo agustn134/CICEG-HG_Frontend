@@ -8,6 +8,8 @@ export interface Expediente extends BaseEntity, AuditInfo {
   id_expediente: number;
   id_paciente: number;
   numero_expediente: string;
+  // 🆕 Número asignado manualmente por expedientes clínicos
+  numero_expediente_administrativo?: string;
   fecha_apertura: string;
   estado: string; // 'Activo', 'Cerrado', 'Archivado', 'Suspendido', 'Eliminado'
   notas_administrativas?: string;
@@ -121,6 +123,7 @@ export interface SignosVitalesResumen {
 export interface ExpedienteBusqueda {
   id_expediente: number;
   numero_expediente: string;
+  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
   fecha_apertura: string;
   estado: string;
   nombre_paciente: string;
@@ -142,6 +145,7 @@ export interface ExpedientesPorPaciente {
 export interface ExpedienteResumen {
   id_expediente: number;
   numero_expediente: string;
+  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
   fecha_apertura: string;
   estado: string;
   notas_administrativas?: string;
@@ -175,7 +179,8 @@ export interface ExpedienteFilters extends BaseFilters {
 export interface CreateExpedienteDto {
   id_paciente: number;
   numero_expediente?: string;
-  fecha_apertura?: string;  // ← CAMPO FALTANTE
+  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+  fecha_apertura?: string;
   estado?: string;
   notas_administrativas?: string;
   crear_historia_clinica?: boolean;
@@ -183,6 +188,7 @@ export interface CreateExpedienteDto {
 }
 export interface UpdateExpedienteDto {
   estado?: string;
+  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
   notas_administrativas?: string;
   id_medico_modificador?: number;
 }

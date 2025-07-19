@@ -208,22 +208,22 @@ obtenerTextoGeneroSeguro(sexo?: Genero): string {
   return this.obtenerTextoGenero(sexo);
 }
 
-  buscarExpedientes(query: string): void {
-    if (query.length >= 2) {
-      this.expedientesService.buscarExpedientes(query)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response: ApiResponse<ExpedienteBusqueda[]>) => {
-            if (response.success && response.data) {
-              console.log('Resultados de búsqueda:', response.data);
-            }
-          },
-          error: (error) => {
-            console.warn('Error en búsqueda:', error);
+buscarExpedientes(query: string): void {
+  if (query.length >= 2) {
+    this.expedientesService.buscarExpedientes(query)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: ApiResponse<ExpedienteBusqueda[]>) => {
+          if (response.success && response.data) {
+            console.log('Resultados de búsqueda:', response.data);
           }
-        });
-    }
+        },
+        error: (error) => {
+          console.warn('Error en búsqueda:', error);
+        }
+      });
   }
+}
 
   // ==========================================
   // MÉTODOS DE NAVEGACIÓN Y ACCIONES

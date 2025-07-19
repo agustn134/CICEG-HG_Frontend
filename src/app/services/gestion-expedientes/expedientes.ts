@@ -1,7 +1,9 @@
 // src/app/services/gestion-expedientes/expedientes.service.ts
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs'; // ✅ AGREGAR ESTE IMPORT
 import { BaseService } from '../base.service';
 import {
   Expediente,
@@ -11,8 +13,11 @@ import {
   CreateExpedienteDto,
   UpdateExpedienteDto,
   ApiResponse,
-  Genero
+  Genero,
+  ExpedienteBusqueda
 } from '../../models';
+
+
 // ==========================================
 // INTERFACES ESPECÍFICAS PARA EL SERVICIO
 // ==========================================
@@ -37,17 +42,17 @@ export interface Internamiento {
 }
 
 
-export interface ExpedienteBusqueda {
-  id_expediente: number;
-  numero_expediente: string;
-  fecha_apertura: string;
-  estado: string;
-  nombre_paciente: string;
-  curp?: string;
-  edad: number;
-  sexo: Genero;
-  internamiento_activo: number;
-}
+// export interface ExpedienteBusqueda {
+//   id_expediente: number;
+//   numero_expediente: string;
+//   fecha_apertura: string;
+//   estado: string;
+//   nombre_paciente: string;
+//   curp?: string;
+//   edad: number;
+//   sexo: Genero;
+//   internamiento_activo: number;
+// }
 
 export interface ExpedientesPorPaciente {
   paciente: {
@@ -57,6 +62,7 @@ export interface ExpedientesPorPaciente {
   expedientes: {
     id_expediente: number;
     numero_expediente: string;
+    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
     fecha_apertura: string;
     estado: string;
     notas_administrativas?: string;
@@ -81,6 +87,7 @@ export interface DashboardExpedientes {
   expedientes_con_internamiento_activo: {
     id_expediente: number;
     numero_expediente: string;
+    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
     nombre_paciente: string;
     fecha_ingreso: string;
     servicio?: string;
@@ -91,6 +98,7 @@ export interface DashboardExpedientes {
   expedientes_mas_activos: {
     id_expediente: number;
     numero_expediente: string;
+    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
     nombre_paciente: string;
     total_documentos: number;
     documentos_semana: number;
@@ -101,6 +109,7 @@ export interface DashboardExpedientes {
     mensaje: string;
     fecha_alerta: string;
     numero_expediente?: string;
+    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
     nombre_paciente?: string;
   }[];
 }
@@ -258,13 +267,224 @@ export class ExpedientesService extends BaseService<Expediente> {
   // MÉTODOS ESPECÍFICOS DE LA API
   // ==========================================
 
-  /**
-   * Buscar expedientes para autocomplete
-   * GET /api/gestion-expedientes/expedientes/buscar
-   */
-  buscarExpedientes(query: string, activosSolo: boolean = true): Observable<ApiResponse<ExpedienteBusqueda[]>> {
-    return this.customGet('/buscar', { q: query, activos_solo: activosSolo });
+// src/app/services/gestion-expedientes/expedientes.service.ts
+
+/**
+ * Buscar expedientes para autocomplete (versión mejorada)
+ * GET /api/gestion-expedientes/expedientes/buscar
+ */
+buscarExpedientes(termino: string, activosSolo: boolean = true): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  // Validación básica
+  if (!termino || termino.trim().length < 2) {
+    return of({ success: true, data: [], message: 'Término de búsqueda muy corto' });
   }
+
+  let params = new HttpParams()
+    .set('q', termino.trim())
+    .set('activos_solo', activosSolo.toString());
+
+  return this.http.get<ApiResponse<ExpedienteBusqueda[]>>(this.buildUrl('/buscar'), { params })
+    .pipe(
+      catchError((error) => {
+        console.error('Error al buscar expedientes:', error);
+        return of({ success: false, data: [], message: 'Error en la búsqueda' });
+      })
+    );
+}
+
+/**
+ * Obtener expedientes agrupados por estado
+ */
+getExpedientesAgrupadosPorEstado(): Observable<{ [estado: string]: number }> {
+  return this.getExpedientes().pipe(
+    map(response => {
+      const agrupados: { [estado: string]: number } = {};
+      // ✅ CORREGIR: Verificar que response.data existe
+      const expedientes = response.data || [];
+      expedientes.forEach(exp => {
+        agrupados[exp.estado] = (agrupados[exp.estado] || 0) + 1;
+      });
+      return agrupados;
+    }),
+    catchError(() => of({}))
+  );
+}
+
+/**
+ * Actualizar números administrativos en lote
+ */
+/**
+ * Actualizar números administrativos en lote
+ */
+actualizarNumerosAdministrativosEnLote(actualizaciones: {
+  id_expediente: number;
+  numero_expediente_administrativo: string;
+}[], idMedicoModificador?: number): Observable<{ exitosos: number; errores: any[] }> {
+
+  const promesas = actualizaciones.map(async (actualizacion) => {
+    try {
+      // ✅ CORREGIR: Usar firstValueFrom en lugar de toPromise()
+      await firstValueFrom(this.updateNumeroAdministrativo(
+        actualizacion.id_expediente,
+        actualizacion.numero_expediente_administrativo,
+        idMedicoModificador
+      ));
+      return { exito: true, id: actualizacion.id_expediente };
+    } catch (error) {
+      return { exito: false, id: actualizacion.id_expediente, error };
+    }
+  });
+
+  return new Observable(subscriber => {
+    Promise.all(promesas).then(resultados => {
+      const exitosos = resultados.filter(r => r.exito).length;
+      const errores = resultados.filter(r => !r.exito);
+
+      subscriber.next({ exitosos, errores });
+      subscriber.complete();
+    }).catch(error => {
+      subscriber.error(error);
+    });
+  });
+}
+
+/**
+ * Exportar expedientes a CSV/Excel
+ */
+exportarExpedientes(filters?: ExpedienteFilters, formato: 'csv' | 'excel' = 'csv'): Observable<Blob> {
+  return this.getExpedientes(filters).pipe(
+    map(response => {
+      // ✅ CORREGIR: Verificar que response.data existe
+      const data = response.data || [];
+
+      if (formato === 'csv') {
+        return this.convertirACSV(data);
+      } else {
+        return this.convertirAExcel(data);
+      }
+    }),
+    catchError(error => {
+      console.error('Error al exportar expedientes:', error);
+      throw error;
+    })
+  );
+}
+
+private convertirACSV(expedientes: Expediente[]): Blob {
+  const headers = [
+    'ID Expediente',
+    'Número Sistema',
+    'Número Administrativo',
+    'Paciente',
+    'Fecha Apertura',
+    'Estado',
+    'Total Documentos',
+    'Internamientos Activos'
+  ];
+
+  // ✅ CORREGIR: Verificar que expedientes existe y no es undefined
+  const expedientesSeguros = expedientes || [];
+  const filas = expedientesSeguros.map(exp => [
+    exp.id_expediente,
+    exp.numero_expediente,
+    exp.numero_expediente_administrativo || '',
+    exp.nombre_paciente || '',
+    exp.fecha_apertura,
+    exp.estado,
+    exp.total_documentos || 0,
+    exp.internamientos_activos || 0
+  ]);
+
+  const csvContent = [headers, ...filas]
+    .map(row => row.map(field => `"${field}"`).join(','))
+    .join('\n');
+
+  return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+}
+/**
+ * Obtener estadísticas de números administrativos
+ */
+/**
+ * Obtener estadísticas de números administrativos
+ */
+getEstadisticasNumerosAdministrativos(): Observable<{
+  total_expedientes: number;
+  con_numero_administrativo: number;
+  sin_numero_administrativo: number;
+  porcentaje_completado: number;
+}> {
+  return this.getExpedientes().pipe(
+    map(response => {
+      // ✅ CORREGIR: Verificar que response.data existe
+      const expedientes = response.data || [];
+      const total = expedientes.length;
+      const conNumero = expedientes.filter(exp => exp.numero_expediente_administrativo).length;
+      const sinNumero = total - conNumero;
+      const porcentaje = total > 0 ? Math.round((conNumero / total) * 100) : 0;
+
+      return {
+        total_expedientes: total,
+        con_numero_administrativo: conNumero,
+        sin_numero_administrativo: sinNumero,
+        porcentaje_completado: porcentaje
+      };
+    }),
+    catchError(() => of({
+      total_expedientes: 0,
+      con_numero_administrativo: 0,
+      sin_numero_administrativo: 0,
+      porcentaje_completado: 0
+    }))
+  );
+}
+
+/**
+ * Validar número administrativo con reglas específicas del hospital
+ */
+validarNumeroAdministrativoAvanzado(numero: string): {
+  valido: boolean;
+  errores: string[];
+  sugerencias: string[];
+} {
+  const errores: string[] = [];
+  const sugerencias: string[] = [];
+
+  // Validación de formato básico
+  if (!this.validarFormatoNumeroAdministrativo(numero)) {
+    errores.push('El formato debe ser YYYY-NNNNNN');
+    sugerencias.push(`Ejemplo: ${this.sugerirNumeroAdministrativo()}`);
+  }
+
+  // Validación de año
+  const año = numero.substring(0, 4);
+  const añoActual = new Date().getFullYear();
+  if (parseInt(año) > añoActual) {
+    errores.push('El año no puede ser mayor al año actual');
+  }
+
+  if (parseInt(año) < 2020) {
+    errores.push('El año debe ser 2020 o posterior');
+  }
+
+  // Validación de secuencia
+  const secuencia = numero.substring(5);
+  if (secuencia === '000000') {
+    errores.push('La secuencia no puede ser 000000');
+    sugerencias.push('Use una secuencia válida');
+  }
+
+  return {
+    valido: errores.length === 0,
+    errores,
+    sugerencias
+  };
+}
+
+private convertirAExcel(expedientes: Expediente[]): Blob {
+  // Implementación básica - en producción usar una librería como xlsx
+  return this.convertirACSV(expedientes);
+}
+
 
   /**
    * Obtener dashboard de expedientes
@@ -326,6 +546,170 @@ export class ExpedientesService extends BaseService<Expediente> {
   }): Observable<ApiResponse<AlertasExpediente>> {
     return this.customGet(`/${idExpediente}/alertas`, filters);
   }
+
+/**
+ * Actualizar expediente incluyendo número administrativo
+ * PUT /api/gestion-expedientes/expedientes/:id
+ */
+updateExpediente(id: number, data: UpdateExpedienteDto): Observable<ApiResponse<Expediente>> {
+  return this.update(id, data);
+}
+
+/**
+ * Actualizar solo el número administrativo
+ */
+updateNumeroAdministrativo(id: number, numeroAdministrativo: string, idMedicoModificador?: number): Observable<ApiResponse<Expediente>> {
+  return this.updateExpediente(id, {
+    numero_expediente_administrativo: numeroAdministrativo,
+    id_medico_modificador: idMedicoModificador
+  });
+}
+
+/**
+ * Buscar por número administrativo específicamente
+ */
+buscarPorNumeroAdministrativo(numeroAdministrativo: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  return this.buscarExpedientes(numeroAdministrativo, true);
+}
+
+/**
+ * Buscar por cualquier tipo de número (sistema o administrativo)
+ */
+buscarPorCualquierNumero(numero: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  return this.buscarExpedientes(numero, true);
+}
+
+/**
+ * Verificar si existe un número administrativo
+ */
+verificarNumeroAdministrativo(numero: string): Observable<boolean> {
+  return this.buscarPorNumeroAdministrativo(numero).pipe(
+    map(response => response.data ? response.data.length > 0 : false),
+    catchError(() => of(false))
+  );
+}
+
+/**
+ * Buscar expedientes y devolver solo los datos (sin ApiResponse wrapper)
+ * Para casos donde se necesite solo el array
+ */
+buscarExpedientesSoloData(termino: string, activosSolo: boolean = true): Observable<ExpedienteBusqueda[]> {
+  return this.buscarExpedientes(termino, activosSolo).pipe(
+    map(response => response.data || []),
+    catchError(() => of([]))
+  );
+}
+
+/**
+ * Buscar por número administrativo (solo datos)
+ */
+buscarPorNumeroAdministrativoSoloData(numeroAdministrativo: string): Observable<ExpedienteBusqueda[]> {
+  return this.buscarExpedientesSoloData(numeroAdministrativo, true);
+}
+
+/**busquedaAvanzada
+ * Buscar por cualquier tipo de número (solo datos)
+ */
+buscarPorCualquierNumeroSoloData(numero: string): Observable<ExpedienteBusqueda[]> {
+  return this.buscarExpedientesSoloData(numero, true);
+}
+
+
+
+
+
+
+/**
+   * Obtener estadísticas de números administrativos
+   */
+  // getEstadisticasNumerosAdministrativos(): Observable<{
+  //   total_expedientes: number;
+  //   con_numero_administrativo: number;
+  //   sin_numero_administrativo: number;
+  //   porcentaje_completado: number;
+  // }> {
+  //   return this.getExpedientes().pipe(
+  //     map(response => {
+  //       const expedientes = response.data || []; // ✅ CORREGIDO
+  //       const total = expedientes.length;
+  //       const conNumero = expedientes.filter(exp => exp.numero_expediente_administrativo).length;
+  //       const sinNumero = total - conNumero;
+  //       const porcentaje = total > 0 ? Math.round((conNumero / total) * 100) : 0;
+
+  //       return {
+  //         total_expedientes: total,
+  //         con_numero_administrativo: conNumero,
+  //         sin_numero_administrativo: sinNumero,
+  //         porcentaje_completado: porcentaje
+  //       };
+  //     }),
+  //     catchError(() => of({
+  //       total_expedientes: 0,
+  //       con_numero_administrativo: 0,
+  //       sin_numero_administrativo: 0,
+  //       porcentaje_completado: 0
+  //     }))
+  //   );
+  // }
+
+
+/**
+ * Validar formato de número administrativo
+ */
+validarFormatoNumeroAdministrativo(numero: string): boolean {
+  // Ejemplo de validación: YYYY-NNNNNN
+  const patron = /^\d{4}-\d{6}$/;
+  return patron.test(numero);
+}
+
+/**
+ * Sugerir formato de número administrativo
+ */
+sugerirNumeroAdministrativo(): string {
+  const year = new Date().getFullYear();
+  const timestamp = Date.now().toString().slice(-6);
+  return `${year}-${timestamp}`;
+}
+
+
+
+/**
+ * Búsqueda avanzada que distingue entre tipos de número
+ */
+busquedaAvanzada(criterios: {
+  numero_sistema?: string;
+  numero_administrativo?: string;
+  nombre_paciente?: string;
+  curp?: string;
+  activos_solo?: boolean;
+}): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  // Construir query de búsqueda inteligente
+  const queries: string[] = [];
+
+  if (criterios.numero_sistema) queries.push(criterios.numero_sistema);
+  if (criterios.numero_administrativo) queries.push(criterios.numero_administrativo);
+  if (criterios.nombre_paciente) queries.push(criterios.nombre_paciente);
+  if (criterios.curp) queries.push(criterios.curp);
+
+  const queryString = queries.join(' ');
+  return this.buscarExpedientes(queryString, criterios.activos_solo ?? true);
+}
+
+/**
+ * Búsqueda avanzada (solo datos)
+ */
+busquedaAvanzadaSoloData(criterios: {
+  numero_sistema?: string;
+  numero_administrativo?: string;
+  nombre_paciente?: string;
+  curp?: string;
+  activos_solo?: boolean;
+}): Observable<ExpedienteBusqueda[]> {
+  return this.busquedaAvanzada(criterios).pipe(
+    map(response => response.data || []),
+    catchError(() => of([]))
+  );
+}
 
   /**
    * Actualizar alerta específica
@@ -405,26 +789,27 @@ export class ExpedientesService extends BaseService<Expediente> {
     return this.update(idExpediente, { ...data });
   }
 
-  /**
-   * Obtener estadísticas de expedientes (override del método base)
-   */
-  override getEstadisticas(): Observable<ApiResponse<any>> {
-    return this.getDashboard();
-  }
+/**
+ * Obtener estadísticas de expedientes (override del método base)
+ */
+override getEstadisticas(): Observable<ApiResponse<any>> {
+  return this.getDashboard();
+}
 
-  /**
-   * Buscar expedientes por número
-   */
-  buscarPorNumero(numeroExpediente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
-    return this.buscarExpedientes(numeroExpediente);
-  }
 
-  /**
-   * Buscar expedientes por paciente (nombre, CURP, etc.)
-   */
-  buscarPorPaciente(queryPaciente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
-    return this.buscarExpedientes(queryPaciente);
-  }
+
+/**
+ * Buscar expedientes por número
+ */
+buscarPorNumero(numeroExpediente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  return this.buscarExpedientes(numeroExpediente);
+}
+/**
+ * Buscar expedientes por paciente (nombre, CURP, etc.)
+ */
+buscarPorPaciente(queryPaciente: string): Observable<ApiResponse<ExpedienteBusqueda[]>> {
+  return this.buscarExpedientes(queryPaciente);
+}
 
   /**
    * Obtener expedientes del día actual
