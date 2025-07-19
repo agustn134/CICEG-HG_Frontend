@@ -64,15 +64,22 @@ export class PasoExpediente implements OnInit, OnDestroy {
   // ==========================================
   // INICIALIZACIÓN
   // ==========================================
-
 private initializeForm(): void {
   this.expedienteForm = this.fb.group({
     numero_expediente: [''], // Opcional, se puede generar automáticamente
-    numero_expediente_administrativo: [''], // ✅ NUEVO CAMPO
+    numero_expediente_administrativo: ['', [
+      // ✅ VALIDADOR PERSONALIZADO PARA FORMATO LIBRE
+      (control: any) => {
+        if (!control.value) return null; // Opcional
+
+        const validacion = this.expedientesService?.validarNumeroAdministrativoLibre(control.value);
+        return validacion?.valido ? null : { formato: validacion?.errores[0] || 'Formato inválido' };
+      }
+    ]],
     estado: ['Activo', [Validators.required]],
     crear_historia_clinica: [true],
     notas_administrativas: [''],
-    fecha_apertura: [new Date().toISOString().split('T')[0]] // Fecha por defecto
+    fecha_apertura: [new Date().toISOString().split('T')[0]]
   });
 }
 
@@ -349,26 +356,65 @@ crearExpediente(): void {
   }
 }
 
-// ✅ NUEVO MÉTODO: Validar número administrativo
+// // ✅ NUEVO MÉTODO: Validar número administrativo
+// validarNumeroAdministrativo(numero: string): boolean {
+//   if (!numero) return true; // Es opcional
+
+//   // Validación básica de formato (puedes ajustar según tus reglas)
+//   const patron = /^\d{4}-\d{6}$/; // Formato: YYYY-NNNNNN
+//   return patron.test(numero);
+// }
+
+// ✅ MÉTODO ACTUALIZADO: Validar número administrativo con formato libre
 validarNumeroAdministrativo(numero: string): boolean {
   if (!numero) return true; // Es opcional
 
-  // Validación básica de formato (puedes ajustar según tus reglas)
-  const patron = /^\d{4}-\d{6}$/; // Formato: YYYY-NNNNNN
-  return patron.test(numero);
+  const validacion = this.expedientesService.validarNumeroAdministrativoLibre(numero);
+
+  if (!validacion.valido) {
+    console.warn('Errores de validación:', validacion.errores);
+    // Opcional: mostrar errores al usuario
+  }
+
+  return validacion.valido;
 }
 
-// ✅ MÉTODO CORREGIDO: Verificar disponibilidad del número administrativo
+
+
+// // ✅ MÉTODO CORREGIDO: Verificar disponibilidad del número administrativo
+// verificarDisponibilidadNumero(): void {
+//   const numero = this.expedienteForm.get('numero_expediente_administrativo')?.value;
+
+//   if (numero && numero.trim().length > 0) {
+//     // Solo validar formato local
+//     if (!this.validarNumeroAdministrativo(numero.trim())) {
+//       this.expedienteForm.get('numero_expediente_administrativo')?.setErrors({ 'formato': true });
+//     } else {
+//       // Limpiar errores de formato
+//       const control = this.expedienteForm.get('numero_expediente_administrativo');
+//       if (control?.errors?.['formato']) {
+//         delete control.errors['formato'];
+//         if (Object.keys(control.errors).length === 0) {
+//           control.setErrors(null);
+//         }
+//       }
+//     }
+//   }
+// }
+// ✅ MÉTODO ACTUALIZADO: Verificar solo formato básico (sin verificar duplicados en backend por ahora)
 verificarDisponibilidadNumero(): void {
   const numero = this.expedienteForm.get('numero_expediente_administrativo')?.value;
 
   if (numero && numero.trim().length > 0) {
-    // Solo validar formato local
-    if (!this.validarNumeroAdministrativo(numero.trim())) {
-      this.expedienteForm.get('numero_expediente_administrativo')?.setErrors({ 'formato': true });
+    const validacion = this.expedientesService.validarNumeroAdministrativoLibre(numero.trim());
+
+    const control = this.expedienteForm.get('numero_expediente_administrativo');
+
+    if (!validacion.valido) {
+      // Mostrar errores de formato
+      control?.setErrors({ 'formato': validacion.errores[0] });
     } else {
       // Limpiar errores de formato
-      const control = this.expedienteForm.get('numero_expediente_administrativo');
       if (control?.errors?.['formato']) {
         delete control.errors['formato'];
         if (Object.keys(control.errors).length === 0) {
@@ -379,7 +425,18 @@ verificarDisponibilidadNumero(): void {
   }
 }
 
-
+// ✅ MÉTODO PARA OBTENER EJEMPLOS
+obtenerEjemplosFormato(): string[] {
+  return [
+    '2025-001',
+    'EXP-2025-001',
+    'HG/001/2025',
+    'A123',
+    'EXPEDIENTE 001',
+    '2025001',
+    'HG-A-001'
+  ];
+}
 
 
 

@@ -196,30 +196,47 @@
       </p>
     </div>
 
-    <!-- ✅ NUEVO CAMPO: Número de expediente administrativo -->
-    <div>
-      <label for="numero_expediente_administrativo" class="block text-sm font-medium text-gray-700">
-        Número de Expediente Administrativo
-        <span class="text-gray-400 font-normal">(Opcional)</span>
-      </label>
-      <div class="mt-1">
-        <input
-          type="text"
-          id="numero_expediente_administrativo"
-          formControlName="numero_expediente_administrativo"
-          class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Ej: 2025-001234"
-          maxlength="20"
-          (blur)="verificarDisponibilidadNumero()"
-        />
-        <!-- Mensaje de error si el número está duplicado -->
-        <div *ngIf="expedienteForm.get('numero_expediente_administrativo')?.errors?.['duplicado']"
-     class="mt-1 text-sm text-red-600">
-  Este número administrativo ya está en uso
-</div>
-      </div>
+<div>
+  <label for="numero_expediente_administrativo" class="block text-sm font-medium text-gray-700">
+    Número de Expediente Administrativo
+    <span class="text-gray-400 font-normal">(Opcional - Formato libre)</span>
+  </label>
+  <div class="mt-1">
+    <input
+      type="text"
+      id="numero_expediente_administrativo"
+      formControlName="numero_expediente_administrativo"
+      class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+      placeholder="Ej: 2025-001, EXP-HG-001, HG/001/2025, A123, EXPEDIENTE 001"
+      maxlength="50"
+      (blur)="verificarDisponibilidadNumero()"
+    />
 
+    <!-- Mensaje de error de formato -->
+    <div *ngIf="expedienteForm.get('numero_expediente_administrativo')?.errors?.['formato']"
+         class="mt-1 text-sm text-red-600">
+      {{ expedienteForm.get('numero_expediente_administrativo')?.errors?.['formato'] }}
     </div>
+  </div>
+
+  <!-- Ayuda y ejemplos -->
+  <div class="mt-2">
+    <p class="text-xs text-gray-500 mb-1">
+      <strong>Formato libre:</strong> Ingrese el número como acostumbra el área administrativa.
+      Se permiten letras, números, guiones, puntos, espacios, guiones bajos y barras (/).
+    </p>
+
+    <!-- Ejemplos útiles -->
+    <div class="flex flex-wrap gap-1">
+      <span class="text-xs text-gray-400">Ejemplos:</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">2025-001</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">EXP-2025-001</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">HG/001/2025</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">A123</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">EXPEDIENTE 001</span>
+    </div>
+  </div>
+</div>
 
     <!-- Estado inicial -->
     <div>
