@@ -1,9 +1,3 @@
-<!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
-
-<!-- ==========================================
-     ESTADOS DE CARGA Y ERROR
-     ========================================== -->
-
 <!-- Loading -->
 <div *ngIf="mostrarCargando" class="flex items-center justify-center min-h-screen bg-gray-50">
   <div class="text-center">
@@ -718,8 +712,9 @@
               placeholder="Observaciones adicionales sobre los signos vitales..."></textarea>
           </div>
 
-          <!-- Botón Guardar -->
-          <!-- <div class="mt-6 flex justify-end">
+
+          <!-- ✅ BOTONES CORREGIDOS - SOLO GUARDAR -->
+          <div class="mt-6 flex justify-end">
             <button type="button" (click)="guardarFormularioActivo()"
               [disabled]="!signosVitalesForm.valid || isCreatingDocument"
               class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
@@ -727,31 +722,7 @@
               <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar Signos Vitales' }}
             </button>
-            <button type="button" (click)="generarPDF('Signos Vitales')" [disabled]="!formularioEstado.signosVitales"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-              <i class="fas fa-file-pdf mr-2"></i>
-              {{ formularioEstado.signosVitales ? 'Generar PDF' : 'Guardar primero' }}
-            </button>
-          </div> -->
-
-          <!-- En cada formulario, actualizar los botones: -->
-<div class="mt-6 flex justify-end space-x-3">
-  <button type="button" (click)="guardarFormularioActivo()"
-    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
-    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
-  </button>
-
-  <button type="button" (click)="generarPDF('Signos Vitales')"
-    [disabled]="!formularioEstado.signosVitales"
-    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-    <i class="fas fa-file-pdf mr-2"></i>
-    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
-    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
-  </button>
-</div>
+          </div>
 
 
         </form>
@@ -924,8 +895,6 @@
               </div>
 
 
-              <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
-
               <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
               <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -938,13 +907,16 @@
 
                 <div class="relative">
                   <div class="flex">
-                    <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-                    <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
-                      (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
-                      (click)="toggleDropdownGuias()"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Buscar guía clínica por nombre, código o área..."
-                      [readonly]="!!guiaClinicaSeleccionada">
+                    <<input type="text"
+       [(ngModel)]="filtroGuiaClinica"
+       [ngModelOptions]="{standalone: true}"
+       (input)="onGuiaClinicaInputChange($event)"
+       (focus)="toggleDropdownGuias()"
+       (click)="toggleDropdownGuias()"
+       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+       placeholder="Buscar guía clínica por nombre, código o área..."
+       [readonly]="!!guiaClinicaSeleccionada">
+
 
                     <button type="button" (click)="toggleDropdownGuias()"
                       class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1051,6 +1023,8 @@
         </form>
       </div>
 
+
+
       <!-- FORMULARIO DE NOTA DE URGENCIAS -->
       <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -1144,9 +1118,6 @@
               </div>
             </div>
 
-
-            <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
-
             <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -1159,13 +1130,17 @@
 
               <div class="relative">
                 <div class="flex">
-                  <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
-                    (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
-                    (click)="toggleDropdownGuias()"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Buscar guía clínica por nombre, código o área..."
-                    [readonly]="!!guiaClinicaSeleccionada">
+                  <!-- 🔥 EN NOTA DE URGENCIAS (línea ~1500 aprox) -->
+<input type="text"
+       [ngModel]="filtroGuiaClinica"
+       (ngModelChange)="onGuiaClinicaInputChange($event)"
+       [ngModelOptions]="{standalone: true}"
+       (input)="onGuiaClinicaInputChange($any($event.target).value)"
+       (focus)="toggleDropdownGuias()"
+       (click)="toggleDropdownGuias()"
+       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+       placeholder="Buscar guía clínica por nombre, código o área..."
+       [readonly]="!!guiaClinicaSeleccionada">
 
                   <button type="button" (click)="toggleDropdownGuias()"
                     class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1244,29 +1219,29 @@
 
           </div>
 
+          <!-- NOTA DE URGENCIAS - CORREGIR BOTONES -->
+          <div class="mt-6 flex justify-end space-x-3">
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
+              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Urgencias' }}
+            </button>
 
-          <!-- En cada formulario, actualizar los botones: -->
-<div class="mt-6 flex justify-end space-x-3">
-  <button type="button" (click)="guardarFormularioActivo()"
-    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
-    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
-  </button>
-
-  <button type="button" (click)="generarPDF('Signos Vitales')"
-    [disabled]="!formularioEstado.signosVitales"
-    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-    <i class="fas fa-file-pdf mr-2"></i>
-    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
-    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
-  </button>
-</div>
+            <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias"
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              <span *ngIf="formularioEstado.notaUrgencias">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.notaUrgencias">Guardar primero</span>
+            </button>
+          </div>
 
 
         </form>
       </div>
+
+
 
       <!-- FORMULARIO DE NOTA DE EVOLUCIÓN -->
       <div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">
@@ -1365,8 +1340,6 @@
               </div>
             </div>
 
-            <!-- src/app/personas/perfil-paciente/perfil-paciente.html -->
-
             <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -1379,13 +1352,16 @@
 
               <div class="relative">
                 <div class="flex">
-                  <!-- 🔥 CORREGIR EL INPUT CON MANEJO SEGURO DE EVENTOS -->
-                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
-                    (input)="onGuiaClinicaInputChange($any($event.target).value)" (focus)="toggleDropdownGuias()"
-                    (click)="toggleDropdownGuias()"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Buscar guía clínica por nombre, código o área..."
-                    [readonly]="!!guiaClinicaSeleccionada">
+                  <input type="text"
+       [ngModel]="filtroGuiaClinica"
+       (ngModelChange)="onGuiaClinicaInputChange($event)"
+       [ngModelOptions]="{standalone: true}"
+       (input)="onGuiaClinicaInputChange($any($event.target).value)"
+       (focus)="toggleDropdownGuias()"
+       (click)="toggleDropdownGuias()"
+       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+       placeholder="Buscar guía clínica por nombre, código o área..."
+       [readonly]="!!guiaClinicaSeleccionada">
 
                   <button type="button" (click)="toggleDropdownGuias()"
                     class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1463,51 +1439,33 @@
 
           </div>
 
-          <!-- Botón Guardar -->
-          <!-- <div class="mt-6 flex justify-end">
+          <div class="mt-6 flex justify-end space-x-3">
             <button type="button" (click)="guardarFormularioActivo()"
               [disabled]="!notaEvolucionForm.valid || isCreatingDocument"
-              class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
               <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
               <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Evolución' }}
             </button>
+
             <button type="button" (click)="generarPDF('Nota de Evolución')" [disabled]="!formularioEstado.notaEvolucion"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
               <i class="fas fa-file-pdf mr-2"></i>
-              {{ formularioEstado.notaEvolucion ? 'Generar PDF' : 'Guardar primero' }}
+              <span *ngIf="formularioEstado.notaEvolucion">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.notaEvolucion">Guardar primero</span>
             </button>
-          </div> -->
-
-          <!-- En cada formulario, actualizar los botones: -->
-<div class="mt-6 flex justify-end space-x-3">
-  <button type="button" (click)="guardarFormularioActivo()"
-    [disabled]="!signosVitalesForm.valid || isCreatingDocument"
-    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-    {{ isCreatingDocument ? 'Guardando...' : 'Guardar en Base de Datos' }}
-  </button>
-
-  <button type="button" (click)="generarPDF('Signos Vitales')"
-    [disabled]="!formularioEstado.signosVitales"
-    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-    <i class="fas fa-file-pdf mr-2"></i>
-    <span *ngIf="formularioEstado.signosVitales">📄 Descargar PDF</span>
-    <span *ngIf="!formularioEstado.signosVitales">Guardar primero</span>
-  </button>
-</div>
+          </div>
 
 
         </form>
       </div>
 
+
+
       <!-- ==========================================
            RESUMEN DE DOCUMENTOS CREADOS
            ========================================== -->
-      <!-- ==========================================
-     RESUMEN DE DOCUMENTOS CREADOS - MEJORADO
-     ========================================== -->
+
       <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-semibold text-gray-900">
@@ -1586,6 +1544,7 @@
     <!-- ==========================================
          TAB: HISTORIAL CLÍNICO
          ========================================== -->
+
     <div *ngIf="tabActiva === 'historial'" class="space-y-6">
 
       <!-- Filtros -->
@@ -1608,13 +1567,17 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>
-            <input type="date" [(ngModel)]="filtroHistorial.fechaDesde"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date"
+       [(ngModel)]="filtroHistorial.fechaDesde"
+       [ngModelOptions]="{standalone: true}"
+       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>
-            <input type="date" [(ngModel)]="filtroHistorial.fechaHasta"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date"
+       [(ngModel)]="filtroHistorial.fechaHasta"
+       [ngModelOptions]="{standalone: true}"
+       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
       </div>

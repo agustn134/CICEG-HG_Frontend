@@ -38,7 +38,7 @@ import {
 } from '../../models/signos-vitales.model';
 import { CreateHistoriaClinicaDto } from '../../models/historia-clinica.model';
 import { CreateNotaUrgenciasDto } from '../../models/nota-urgencias.model';
-import { CreateNotaEvolucionDto } from '../../models/nota-evolucion.model';
+import { CAMPOS_OBLIGATORIOS_NOM004, CreateNotaEvolucionDto } from '../../models/nota-evolucion.model';
 import { TipoDocumento } from '../../models/tipo-documento.model';
 import { Servicio } from '../../models/servicio.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
@@ -50,8 +50,38 @@ import { PdfGeneratorService } from '../../services/pdf-generator.service'; // A
 
 
 interface PacienteCompleto {
-  persona: any;
-  paciente: Paciente;
+  persona: {
+    // Datos personales de la persona - campos conocidos
+    nombre?: string;
+    apellido_paterno?: string;
+    apellido_materno?: string;
+    fecha_nacimiento?: string;
+    lugar_nacimiento?: string;
+    ciudad_nacimiento?: string;
+    municipio_nacimiento?: string;
+    estado_nacimiento?: string;
+    sexo?: string;
+    telefono?: string;
+    correo_electronico?: string;
+    domicilio?: string;
+    direccion?: string;
+    calle?: string;
+    numero_exterior?: string;
+    numero_interior?: string;
+    colonia?: string;
+    ciudad?: string;
+    estado?: string;
+    codigo_postal?: string;
+    curp?: string;
+    tipo_sangre?: string;
+    // Mantener index signature para propiedades adicionales
+    [key: string]: any;
+  };
+  paciente: Paciente & { // ✅ EXTENDER EL TIPO PACIENTE
+    persona?: any;
+    fecha_nacimiento?: string;
+    [key: string]: any;
+  };
   expediente: Expediente;
   documentos: DocumentoClinico[] | null;
   ultimoInternamiento: any;
@@ -158,7 +188,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private tiposDocumentoService: TiposDocumentoService,
     private personalMedicoService: PersonalMedicoService,
     private guiasClinicasService: GuiasClinicasService,
-    private pdfGeneratorService: PdfGeneratorService
+    private pdfGeneratorService: PdfGeneratorService,
 ) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
@@ -328,10 +358,23 @@ onInputGuiaClinica(event: Event): void {
 }
 
 // 🔥 MÉTODO PARA MANEJAR CAMBIOS EN NGMODEL
-onGuiaClinicaInputChange(value: string): void {
-  this.buscarGuiaClinicaPorTermino(value || '');
-}
+onGuiaClinicaInputChange(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  const value = input?.value || '';
 
+  this.filtroGuiaClinica = value;
+
+  if (!value) {
+    this.guiasClinicasFiltradas = [...this.guiasClinicas];
+    return;
+  }
+
+  this.guiasClinicasFiltradas = this.guiasClinicas.filter(guia =>
+    guia.nombre?.toLowerCase().includes(value.toLowerCase()) ||
+    guia.codigo?.toLowerCase().includes(value.toLowerCase()) ||
+    guia.area?.toLowerCase().includes(value.toLowerCase())
+  );
+}
 
 
   // 🔥 MÉTODO SEGURO PARA SELECCIONAR GUÍA CLÍNICA
@@ -535,18 +578,49 @@ get textoFiltroGuia(): string {
     });
   }
   private initializeNotaEvolucionForm(): FormGroup {
-    return this.fb.group({
-      sintomas_signos: ['', Validators.required],
-      habitus_exterior: ['', Validators.required],
-      estado_nutricional: ['', Validators.required],
-      estudios_laboratorio_gabinete: ['', Validators.required],
-      evolucion_analisis: ['', Validators.required],
-      diagnosticos: ['', Validators.required],
-      plan_estudios_tratamiento: ['', Validators.required],
-      pronostico: ['', Validators.required],
-      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
-    });
-  }
+  return this.fb.group({
+    // 🔥 CAMPOS OBLIGATORIOS SEGÚN NOM-004-SSA3-2012
+    sintomas_signos: ['', [Validators.required, Validators.minLength(10)]],
+    habitus_exterior: ['', [Validators.required, Validators.minLength(5)]],
+    estado_nutricional: ['', [Validators.required, Validators.minLength(5)]],
+    estudios_laboratorio_gabinete: ['', [Validators.required, Validators.minLength(10)]],
+    evolucion_analisis: ['', [Validators.required, Validators.minLength(10)]],
+    diagnosticos: ['', [Validators.required, Validators.minLength(10)]],
+    plan_estudios_tratamiento: ['', [Validators.required, Validators.minLength(10)]],
+    pronostico: ['', [Validators.required, Validators.minLength(5)]],
+
+    // 🔥 CAMPOS OPCIONALES MEJORADOS
+    id_guia_diagnostico: [null],
+    dias_hospitalizacion: [null, [Validators.min(0), Validators.max(365)]],
+    fecha_ultimo_ingreso: [''],
+
+    // Signos vitales en nota de evolución
+    temperatura: [null, [Validators.min(30), Validators.max(45)]],
+    frecuencia_cardiaca: [null, [Validators.min(30), Validators.max(250)]],
+    frecuencia_respiratoria: [null, [Validators.min(8), Validators.max(60)]],
+    presion_arterial_sistolica: [null, [Validators.min(60), Validators.max(250)]],
+    presion_arterial_diastolica: [null, [Validators.min(30), Validators.max(150)]],
+    saturacion_oxigeno: [null, [Validators.min(50), Validators.max(100)]],
+    peso_actual: [null, [Validators.min(0.5), Validators.max(300)]],
+    talla_actual: [null, [Validators.min(30), Validators.max(250)]],
+
+    // Exploración física detallada
+    exploracion_cabeza: [''],
+    exploracion_cuello: [''],
+    exploracion_torax: [''],
+    exploracion_abdomen: [''],
+    exploracion_extremidades: [''],
+    exploracion_columna: [''],
+    exploracion_genitales: [''],
+    exploracion_neurologico: [''],
+
+    // Campos adicionales
+    diagnosticos_guias: [''],
+    interconsultas: ['No se solicitaron interconsultas en esta evolución'],
+    indicaciones_medicas: [''],
+    observaciones_adicionales: ['']
+  });
+}
 
   private cargarDatosPaciente(): Observable<any> {
     if (!this.pacienteId) {
@@ -601,21 +675,7 @@ get textoFiltroGuia(): string {
     }).pipe(takeUntil(this.destroy$));
   }
 
-  private construirPacienteCompleto(data: any): void {
-    this.pacienteCompleto = {
-      persona: data.paciente?.data || {},
-      paciente: data.paciente?.data || {},
-      expediente: data.expediente?.data || {},
-      documentos: Array.isArray(data.documentos?.data)
-        ? data.documentos.data
-        : [],
-      ultimoInternamiento: null,
-      signosVitales: Array.isArray(data.signosVitales?.data)
-        ? data.signosVitales.data
-        : [],
-    };
-    this.preLlenarFormularios();
-  }
+
 
   private procesarCatalogos(data: any): void {
     this.tiposDocumentosDisponibles = (data.tiposDocumento?.data || []).map(
@@ -660,77 +720,82 @@ get textoFiltroGuia(): string {
     return formularios.includes(this.formularioActivo);
   }
 
-  async guardarFormularioActivo(): Promise<void> {
-    if (this.isCreatingDocument) return;
+async guardarFormularioActivo(): Promise<void> {
+  if (this.isCreatingDocument) return;
 
-    this.isCreatingDocument = true;
-    this.error = null;
-    this.success = null;
+  this.isCreatingDocument = true;
+  this.error = null;
+  this.success = null;
 
-    try {
-      switch (this.formularioActivo) {
-        case 'signosVitales':
-          await this.guardarSignosVitales();
-          break;
-        case 'historiaClinica':
-          await this.guardarHistoriaClinica();
-          break;
-        case 'notaUrgencias':
-          await this.guardarNotaUrgencias();
-          break;
-        case 'notaEvolucion':
-          await this.guardarNotaEvolucion();
-          break;
-        default:
-          throw new Error('Tipo de formulario no válido');
-      }
-      // this.formularioEstado[this.formularioActivo] = true;
-      // this.estadoAutoguardado = 'guardado';
-      // this.success = `${this.getTituloFormulario(
-      //   this.formularioActivo
-      // )} guardado correctamente`;
-      setTimeout(() => {
-  this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
-}, 1000);
+  try {
+    switch (this.formularioActivo) {
+      case 'signosVitales':
+        await this.guardarSignosVitales();
+        this.formularioEstado.signosVitales = true;
+        this.success = `${this.getTituloFormulario(this.formularioActivo)} guardado correctamente`;
+        break;
 
-      localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+      case 'historiaClinica':
+        await this.guardarHistoriaClinica();
+        // ✅ MARCAR COMO COMPLETADO SIEMPRE (incluso con error 409)
+        this.formularioEstado.historiaClinica = true;
+        this.success = 'Historia Clínica procesada correctamente';
+        break;
 
-      console.log('Formulario completado:', this.formularioActivo);
-      console.log('Estado actualizado:', this.formularioEstado);
-      this.cargarDatosPaciente().subscribe((data) => {
-        this.construirPacienteCompleto(data);
-      });
-      // setTimeout(() => {
-      //   this.avanzarAlSiguientePaso();
-      // }, 1500);
-    } catch (error) {
-      console.error(`Error al guardar ${this.formularioActivo}:`, error);
-      this.error = `Error al guardar ${this.formularioActivo}`;
-      this.manejarError(error, 'guardar formulario');
-    } finally {
-      this.isCreatingDocument = false;
+      case 'notaUrgencias':
+        await this.guardarNotaUrgencias();
+        this.formularioEstado.notaUrgencias = true;
+        break;
+
+      case 'notaEvolucion':
+        await this.guardarNotaEvolucion();
+        this.formularioEstado.notaEvolucion = true;
+        break;
+
+      default:
+        throw new Error('Tipo de formulario no válido');
     }
+
+    // 🔥 MOSTRAR CONFIRMACIÓN DE PDF (excepto para signos vitales)
+    if (this.formularioActivo !== 'signosVitales') {
+      setTimeout(() => {
+        this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
+      }, 1000);
+    }
+
+    // Limpiar datos locales
+    localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+
+    console.log('✅ Formulario completado:', this.formularioActivo);
+    console.log('✅ Estado actualizado:', this.formularioEstado);
+
+    // Recargar datos del paciente
+    this.cargarDatosPaciente().subscribe((data) => {
+      this.construirPacienteCompleto(data);
+    });
+
+  } catch (error: any) {
+    console.error(`❌ Error al guardar ${this.formularioActivo}:`, error);
+
+    // 🔥 MANEJO DE ERRORES MÁS SUAVE
+    if (error?.message?.includes('validación')) {
+      this.error = error.message;
+    } else if (error?.message?.includes('permisos')) {
+      this.error = error.message;
+    } else if (error?.message?.includes('conexión')) {
+      this.error = error.message;
+      this.hayProblemasConexion = true;
+    } else {
+      this.error = `Error al procesar ${this.getTituloFormulario(this.formularioActivo)}`;
+    }
+
+    this.manejarError(error, 'guardar formulario');
+
+  } finally {
+    this.isCreatingDocument = false;
   }
-
+}
   private avanzarAlSiguientePaso(): void {
-    // const secuenciaFormularios = [
-    //   'signosVitales',
-    //   'historiaClinica',
-    //   'notaUrgencias',
-    //   'notaEvolucion',
-    // ];
-    // const indiceActual = secuenciaFormularios.indexOf(this.formularioActivo);
-
-    // if (indiceActual !== -1 && indiceActual < secuenciaFormularios.length - 1) {
-    //   const siguienteFormulario = secuenciaFormularios[indiceActual + 1];
-    //   console.log(
-    //     `🎯 Avanzando de ${this.formularioActivo} a ${siguienteFormulario}`
-    //   );
-    //   this.cambiarFormulario(siguienteFormulario);
-    // } else {
-    //   console.log('Todos los formularios completados');
-    //   this.success = '¡Todos los documentos han sido creados exitosamente!';
-    // }
   console.log(`✅ Formulario ${this.formularioActivo} completado`);
   }
 
@@ -1034,82 +1099,122 @@ get textoFiltroGuia(): string {
       console.warn(' No se pudo obtener id_documento de la respuesta');
     }
   }
+private async guardarHistoriaClinica(): Promise<void> {
+  if (!this.historiaClinicaForm.valid) {
+    throw new Error('Formulario de historia clínica inválido');
+  }
 
-  private async guardarHistoriaClinica(): Promise<void> {
-    if (!this.historiaClinicaForm.valid) {
-      throw new Error('Formulario de historia clínica inválido');
+  console.log(
+    '🔍 Estado del documentoClinicoActual:',
+    this.documentoClinicoActual
+  );
+  console.log('🔍 Estado de formularios:', this.formularioEstado);
+
+  // Verificar o crear documento clínico padre
+  if (!this.documentoClinicoActual) {
+    if (
+      this.signosVitalesDisponibles &&
+      this.signosVitalesDisponibles.length > 0
+    ) {
+      const ultimoSigno = this.signosVitalesDisponibles[0];
+      if (ultimoSigno.id_documento) {
+        this.documentoClinicoActual = ultimoSigno.id_documento;
+        console.log(
+          '✅ Documento clínico obtenido de signos vitales:',
+          this.documentoClinicoActual
+        );
+      }
     }
-    console.log(
-      ' Estado del documentoClinicoActual:',
-      this.documentoClinicoActual
-    );
-    console.log(' Estado de formularios:', this.formularioEstado);
 
     if (!this.documentoClinicoActual) {
-      if (
-        this.signosVitalesDisponibles &&
-        this.signosVitalesDisponibles.length > 0
-      ) {
-        const ultimoSigno = this.signosVitalesDisponibles[0];
-        if (ultimoSigno.id_documento) {
-          this.documentoClinicoActual = ultimoSigno.id_documento;
-          console.log(
-            '✅ Documento clínico obtenido de signos vitales:',
-            this.documentoClinicoActual
-          );
-        }
-      }
-      if (!this.documentoClinicoActual) {
-        console.log('🔄 Creando nuevo documento clínico padre...');
-        await this.crearDocumentoClinicoPadre();
-      }
+      console.log('🔄 Creando nuevo documento clínico padre...');
+      await this.crearDocumentoClinicoPadre();
     }
-    const historiaData: CreateHistoriaClinicaDto = {
-      id_documento: this.documentoClinicoActual!,
-      id_guia_diagnostico: this.historiaClinicaForm.value.id_guia_diagnostico || null,
-      antecedentes_heredo_familiares:
-        this.historiaClinicaForm.value.antecedentes_heredo_familiares || null,
-      habitos_higienicos:
-        this.historiaClinicaForm.value.habitos_higienicos || null,
-      habitos_alimenticios:
-        this.historiaClinicaForm.value.habitos_alimenticios || null,
-      actividad_fisica: this.historiaClinicaForm.value.actividad_fisica || null,
-      ocupacion: this.historiaClinicaForm.value.ocupacion || null,
-      vivienda: this.historiaClinicaForm.value.vivienda || null,
-      toxicomanias: this.historiaClinicaForm.value.toxicomanias || null,
-      padecimiento_actual:
-        this.historiaClinicaForm.value.padecimiento_actual || null,
-      sintomas_generales:
-        this.historiaClinicaForm.value.sintomas_generales || null,
-      aparatos_sistemas:
-        this.historiaClinicaForm.value.aparatos_sistemas || null,
-      exploracion_general:
-        this.historiaClinicaForm.value.exploracion_general || null,
-      exploracion_cabeza:
-        this.historiaClinicaForm.value.exploracion_cabeza || null,
-      exploracion_cuello:
-        this.historiaClinicaForm.value.exploracion_cuello || null,
-      exploracion_torax:
-        this.historiaClinicaForm.value.exploracion_torax || null,
-      exploracion_abdomen:
-        this.historiaClinicaForm.value.exploracion_abdomen || null,
-      exploracion_extremidades:
-        this.historiaClinicaForm.value.exploracion_extremidades || null,
-      impresion_diagnostica:
-        this.historiaClinicaForm.value.impresion_diagnostica || null,
-      plan_diagnostico: this.historiaClinicaForm.value.plan_diagnostico || null,
-      plan_terapeutico: this.historiaClinicaForm.value.plan_terapeutico || null,
-      pronostico: this.historiaClinicaForm.value.pronostico || null,
-    };
+  }
 
-    console.log(' Enviando historia clínica al backend:', historiaData);
+  // Preparar datos de la historia clínica
+  const historiaData: CreateHistoriaClinicaDto = {
+    id_documento: this.documentoClinicoActual!,
+    id_guia_diagnostico: this.historiaClinicaForm.value.id_guia_diagnostico || null,
+    antecedentes_heredo_familiares:
+      this.historiaClinicaForm.value.antecedentes_heredo_familiares || null,
+    habitos_higienicos:
+      this.historiaClinicaForm.value.habitos_higienicos || null,
+    habitos_alimenticios:
+      this.historiaClinicaForm.value.habitos_alimenticios || null,
+    actividad_fisica: this.historiaClinicaForm.value.actividad_fisica || null,
+    ocupacion: this.historiaClinicaForm.value.ocupacion || null,
+    vivienda: this.historiaClinicaForm.value.vivienda || null,
+    toxicomanias: this.historiaClinicaForm.value.toxicomanias || null,
+    padecimiento_actual:
+      this.historiaClinicaForm.value.padecimiento_actual || null,
+    sintomas_generales:
+      this.historiaClinicaForm.value.sintomas_generales || null,
+    aparatos_sistemas:
+      this.historiaClinicaForm.value.aparatos_sistemas || null,
+    exploracion_general:
+      this.historiaClinicaForm.value.exploracion_general || null,
+    exploracion_cabeza:
+      this.historiaClinicaForm.value.exploracion_cabeza || null,
+    exploracion_cuello:
+      this.historiaClinicaForm.value.exploracion_cuello || null,
+    exploracion_torax:
+      this.historiaClinicaForm.value.exploracion_torax || null,
+    exploracion_abdomen:
+      this.historiaClinicaForm.value.exploracion_abdomen || null,
+    exploracion_extremidades:
+      this.historiaClinicaForm.value.exploracion_extremidades || null,
+    impresion_diagnostica:
+      this.historiaClinicaForm.value.impresion_diagnostica || null,
+    plan_diagnostico: this.historiaClinicaForm.value.plan_diagnostico || null,
+    plan_terapeutico: this.historiaClinicaForm.value.plan_terapeutico || null,
+    pronostico: this.historiaClinicaForm.value.pronostico || null,
+  };
 
+  console.log('📤 Enviando historia clínica al backend:', historiaData);
+
+  try {
     const response = await firstValueFrom(
       this.historiasClinicasService.createHistoriaClinica(historiaData)
     );
 
-    console.log(' Historia clínica guardada exitosamente:', response);
+    console.log('✅ Historia clínica guardada exitosamente:', response);
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar historia clínica:', error);
+
+    // 🔥 MANEJO ESPECÍFICO PARA DIFERENTES TIPOS DE ERROR
+    if (error?.status === 409) {
+      console.log('⚠️ Historia clínica ya existe para este documento');
+      console.log('ℹ️ El documento ya tiene una historia clínica asociada');
+
+      // 🎯 NO LANZAR ERROR - permitir que continúe el flujo
+      // El PDF se puede generar con los datos del formulario
+      return; // Salir sin error para continuar con PDF
+
+    } else if (error?.status === 400) {
+      console.error('❌ Error de validación en el servidor:', error.error?.message);
+      throw new Error(`Error de validación: ${error.error?.message || 'Datos inválidos'}`);
+
+    } else if (error?.status === 403) {
+      console.error('❌ No tienes permisos para crear historia clínica');
+      throw new Error('No tienes permisos para crear historia clínica');
+
+    } else if (error?.status === 500) {
+      console.error('❌ Error interno del servidor');
+      throw new Error('Error interno del servidor. Intenta nuevamente');
+
+    } else if (error?.status === 0) {
+      console.error('❌ Error de conexión');
+      throw new Error('Error de conexión. Verifica tu red');
+
+    } else {
+      // Error desconocido
+      console.error('❌ Error desconocido:', error);
+      throw new Error(`Error inesperado: ${error?.message || 'Error desconocido'}`);
+    }
   }
+}
 
   private async guardarNotaUrgencias(): Promise<void> {
     if (!this.notaUrgenciasForm.valid) {
@@ -1148,140 +1253,289 @@ get textoFiltroGuia(): string {
     console.log('✅ Nota de urgencias guardada:', response);
   }
 
+  // private async guardarNotaEvolucion(): Promise<void> {
+  //   if (!this.notaEvolucionForm.valid) {
+  //     throw new Error('Formulario de nota de evolución inválido');
+  //   }
+
+  //   const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
+  //     (t) => t.nombre === 'Nota de Evolución'
+  //   );
+  //   if (!tipoNotaEvolucion) {
+  //     throw new Error('Tipo de documento de evolución no encontrado');
+  //   }
+
+  //   const documentoEvolucion = await this.crearDocumentoEspecifico(
+  //     tipoNotaEvolucion.id_tipo_documento
+  //   );
+
+  //   const notaData: CreateNotaEvolucionDto = {
+  //     id_documento: documentoEvolucion.id_documento,
+  //     id_guia_diagnostico: this.notaEvolucionForm.value.id_guia_diagnostico || null,
+  //     sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
+  //     habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
+  //     estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
+  //     estudios_laboratorio_gabinete:
+  //       this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
+  //     evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
+  //     diagnosticos: this.notaEvolucionForm.value.diagnosticos,
+  //     plan_estudios_tratamiento:
+  //       this.notaEvolucionForm.value.plan_estudios_tratamiento,
+  //     pronostico: this.notaEvolucionForm.value.pronostico,
+  //     interconsultas: this.notaEvolucionForm.value.interconsultas || '',
+  //     indicaciones_medicas:
+  //       this.notaEvolucionForm.value.indicaciones_medicas || '',
+  //     // Campos opcionales de exploración física
+  //     exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
+  //     exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
+  //     exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
+  //     exploracion_abdomen:
+  //       this.notaEvolucionForm.value.exploracion_abdomen || '',
+  //     exploracion_extremidades:
+  //       this.notaEvolucionForm.value.exploracion_extremidades || '',
+  //     exploracion_neurologico:
+  //       this.notaEvolucionForm.value.exploracion_neurologico || '',
+  //   };
+
+  //   console.log('🔥 Enviando nota de evolución al backend:', notaData);
+
+  //   const response = await firstValueFrom(
+  //     this.notaEvolucionService.createNotaEvolucion(notaData)
+  //   );
+
+  //   console.log('✅ Nota de evolución guardada:', response);
+  // }
+
+
   private async guardarNotaEvolucion(): Promise<void> {
-    if (!this.notaEvolucionForm.valid) {
-      throw new Error('Formulario de nota de evolución inválido');
-    }
-
-    const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
-      (t) => t.nombre === 'Nota de Evolución'
-    );
-    if (!tipoNotaEvolucion) {
-      throw new Error('Tipo de documento de evolución no encontrado');
-    }
-
-    const documentoEvolucion = await this.crearDocumentoEspecifico(
-      tipoNotaEvolucion.id_tipo_documento
-    );
-
-    const notaData: CreateNotaEvolucionDto = {
-      id_documento: documentoEvolucion.id_documento,
-      id_guia_diagnostico: this.notaEvolucionForm.value.id_guia_diagnostico || null,
-      sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
-      habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
-      estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
-      estudios_laboratorio_gabinete:
-        this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
-      evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
-      diagnosticos: this.notaEvolucionForm.value.diagnosticos,
-      plan_estudios_tratamiento:
-        this.notaEvolucionForm.value.plan_estudios_tratamiento,
-      pronostico: this.notaEvolucionForm.value.pronostico,
-      interconsultas: this.notaEvolucionForm.value.interconsultas || '',
-      indicaciones_medicas:
-        this.notaEvolucionForm.value.indicaciones_medicas || '',
-      // Campos opcionales de exploración física
-      exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
-      exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
-      exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
-      exploracion_abdomen:
-        this.notaEvolucionForm.value.exploracion_abdomen || '',
-      exploracion_extremidades:
-        this.notaEvolucionForm.value.exploracion_extremidades || '',
-      exploracion_neurologico:
-        this.notaEvolucionForm.value.exploracion_neurologico || '',
-    };
-
-    console.log('🔥 Enviando nota de evolución al backend:', notaData);
-
-    const response = await firstValueFrom(
-      this.notaEvolucionService.createNotaEvolucion(notaData)
-    );
-
-    console.log('✅ Nota de evolución guardada:', response);
+  if (!this.notaEvolucionForm.valid) {
+    // 🔥 VALIDACIÓN ESPECÍFICA CON CAMPOS NOM-004
+    const errores = this.validarFormularioNOM004();
+    throw new Error(`Formulario inválido: ${errores.join(', ')}`);
   }
 
+  const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Nota de Evolución'
+  );
 
-//   async generarPDF(tipoDocumento: string): Promise<void> {
-//   try {
-//     console.log(`📄 Generando PDF para: ${tipoDocumento}`);
+  if (!tipoNotaEvolucion) {
+    throw new Error('Tipo de documento de evolución no encontrado');
+  }
 
-//     // Preparar datos según el tipo de documento
-//     const datosDocumento = {
-//       paciente: this.pacienteCompleto,
-//       medico: this.medicoActual,
-//       expediente: this.pacienteCompleto?.expediente
-//     };
+  const documentoEvolucion = await this.crearDocumentoEspecifico(
+    tipoNotaEvolucion.id_tipo_documento
+  );
 
-//     // Generar PDF según el tipo
-//     switch (tipoDocumento) {
-//       case 'Historia Clínica':
-//         await this.pdfGeneratorService.generarHistoriaClinica(datosDocumento);
-//         break;
-//       case 'Nota de Evolución':
-//         await this.pdfGeneratorService.generarNotaEvolucion(datosDocumento);
-//         break;
-//       case 'Nota de Urgencias':
-//         await this.pdfGeneratorService.generarNotaUrgencias(datosDocumento);
-//         break;
-//       case 'Signos Vitales':
-//         await this.pdfGeneratorService.generarSignosVitales(datosDocumento);
-//         break;
-//       default:
-//         console.warn('Tipo de documento no soportado:', tipoDocumento);
-//     }
+  // 🔥 DATOS COMPLETOS SEGÚN TU MODELO ACTUALIZADO
+  const notaData: CreateNotaEvolucionDto = {
+    id_documento: documentoEvolucion.id_documento,
+    id_guia_diagnostico: this.notaEvolucionForm.value.id_guia_diagnostico || null,
 
-//     this.success = `PDF de ${tipoDocumento} generado correctamente`;
-//   } catch (error) {
-//     console.error('Error al generar PDF:', error);
-//     this.error = 'Error al generar el PDF';
-//   }
-// }
+    // Datos de hospitalización
+    dias_hospitalizacion: this.notaEvolucionForm.value.dias_hospitalizacion || null,
+    fecha_ultimo_ingreso: this.notaEvolucionForm.value.fecha_ultimo_ingreso || null,
 
+    // Signos vitales actuales
+    temperatura: this.notaEvolucionForm.value.temperatura || null,
+    frecuencia_cardiaca: this.notaEvolucionForm.value.frecuencia_cardiaca || null,
+    frecuencia_respiratoria: this.notaEvolucionForm.value.frecuencia_respiratoria || null,
+    presion_arterial_sistolica: this.notaEvolucionForm.value.presion_arterial_sistolica || null,
+    presion_arterial_diastolica: this.notaEvolucionForm.value.presion_arterial_diastolica || null,
+    saturacion_oxigeno: this.notaEvolucionForm.value.saturacion_oxigeno || null,
+    peso_actual: this.notaEvolucionForm.value.peso_actual || null,
+    talla_actual: this.notaEvolucionForm.value.talla_actual || null,
+
+    // Campos obligatorios NOM-004
+    sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
+    habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
+    estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
+    estudios_laboratorio_gabinete: this.notaEvolucionForm.value.estudios_laboratorio_gabinete,
+    evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis,
+    diagnosticos: this.notaEvolucionForm.value.diagnosticos,
+    plan_estudios_tratamiento: this.notaEvolucionForm.value.plan_estudios_tratamiento,
+    pronostico: this.notaEvolucionForm.value.pronostico,
+
+    // Exploración física detallada
+    exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
+    exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
+    exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
+    exploracion_abdomen: this.notaEvolucionForm.value.exploracion_abdomen || '',
+    exploracion_extremidades: this.notaEvolucionForm.value.exploracion_extremidades || '',
+    exploracion_columna: this.notaEvolucionForm.value.exploracion_columna || '',
+    exploracion_genitales: this.notaEvolucionForm.value.exploracion_genitales || '',
+    exploracion_neurologico: this.notaEvolucionForm.value.exploracion_neurologico || '',
+
+    // Campos adicionales
+    diagnosticos_guias: this.notaEvolucionForm.value.diagnosticos_guias || '',
+    interconsultas: this.notaEvolucionForm.value.interconsultas || 'No se solicitaron interconsultas',
+    indicaciones_medicas: this.notaEvolucionForm.value.indicaciones_medicas || '',
+    observaciones_adicionales: this.notaEvolucionForm.value.observaciones_adicionales || ''
+  };
+
+  console.log('🔥 Enviando nota de evolución completa al backend:', notaData);
+
+  const response = await firstValueFrom(
+    this.notaEvolucionService.createNotaEvolucion(notaData)
+  );
+
+  console.log('✅ Nota de evolución guardada exitosamente:', response);
+}
+
+
+// 🔥 MÉTODO NUEVO PARA VALIDAR SEGÚN NOM-004
+private validarFormularioNOM004(): string[] {
+  const errores: string[] = [];
+  const form = this.notaEvolucionForm;
+
+  // Validar campos obligatorios NOM-004
+  CAMPOS_OBLIGATORIOS_NOM004.forEach(campo => {
+    if (campo === 'id_documento') return; // Se maneja automáticamente
+
+    const control = form.get(campo);
+    if (!control?.value || (typeof control.value === 'string' && control.value.trim() === '')) {
+      errores.push(`${campo.replace('_', ' ')} es obligatorio según NOM-004`);
+    }
+  });
+
+  // Validar longitud mínima para campos críticos
+  const camposConLongitud = [
+    { campo: 'sintomas_signos', minimo: 10 },
+    { campo: 'evolucion_analisis', minimo: 10 },
+    { campo: 'diagnosticos', minimo: 10 },
+    { campo: 'plan_estudios_tratamiento', minimo: 10 }
+  ];
+
+  camposConLongitud.forEach(({ campo, minimo }) => {
+    const valor = form.get(campo)?.value;
+    if (valor && valor.length < minimo) {
+      errores.push(`${campo.replace('_', ' ')} debe tener al menos ${minimo} caracteres`);
+    }
+  });
+
+  return errores;
+}
+
+// 🔥 MÉTODO PARA VALIDAR DATOS ANTES DE ENVÍO
+private validarDatosNOM004(): { valido: boolean; errores: string[]; advertencias: string[] } {
+  const datos = this.notaEvolucionForm.value;
+
+  return this.notaEvolucionService.validarDatosNOM004(datos);
+}
+
+
+
+
+
+
+// En perfil-paciente.ts, actualizar el método generarPDF:
 async generarPDF(tipoDocumento: string): Promise<void> {
   try {
-    console.log(`Generando PDF para: ${tipoDocumento}`);
-
-    // Show loading state
+    console.log(`🔥 Generando PDF para: ${tipoDocumento}`);
     this.isCreatingDocument = true;
+
+    // 🔥 OBTENER DATOS COMPLETOS DEL MÉDICO ACTUAL
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+
+    // 🔥 PREPARAR DATOS DEL PACIENTE CON ESTRUCTURA MEJORADA
+    const datosPacienteEstructurados = {
+      // ✅ INCLUIR DATOS DIRECTOS DEL PACIENTE
+      ...this.pacienteCompleto,
+
+      // ✅ ASEGURAR QUE LOS DATOS DE PERSONA ESTÉN DISPONIBLES
+      persona: this.pacienteCompleto?.persona || this.pacienteCompleto,
+
+      // ✅ EXPEDIENTE
+      expediente: this.pacienteCompleto?.expediente,
+
+      // ✅ SIGNOS VITALES HISTÓRICOS SI EXISTEN
+      signosVitalesDisponibles: this.pacienteCompleto?.signosVitales || []
+    };
+
+    console.log('📋 Datos del paciente estructurados:', datosPacienteEstructurados);
+    console.log('🩺 Signos vitales del formulario:', this.signosVitalesForm.value);
+    console.log('📖 Guía clínica seleccionada:', this.guiaClinicaSeleccionada);
 
     switch (tipoDocumento) {
       case 'Historia Clínica':
         await this.pdfGeneratorService.generarHistoriaClinica({
-          paciente: this.pacienteCompleto,
-          medico: this.medicoActual,
-          expediente: this.pacienteCompleto?.expediente
+          paciente: datosPacienteEstructurados,
+          medico: medicoCompleto,
+          expediente: this.pacienteCompleto?.expediente,
+          historiaClinica: {
+            ...this.historiaClinicaForm.value,
+            // ✅ ACCESO CORRECTO A LUGAR DE NACIMIENTO
+            lugar_nacimiento: this.extraerLugarNacimiento()
+          },
+          signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES DEL FORMULARIO ACTUAL
+          guiaClinica: this.guiaClinicaSeleccionada
         });
         break;
+
       case 'Nota de Evolución':
         await this.pdfGeneratorService.generarNotaEvolucion({
-          paciente: this.pacienteCompleto,
-          medico: this.medicoActual,
-          expediente: this.pacienteCompleto?.expediente
+          paciente: datosPacienteEstructurados,
+          medico: medicoCompleto,
+          expediente: this.pacienteCompleto?.expediente,
+          notaEvolucion: this.notaEvolucionForm.value,
+          signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES ACTUALES
+          guiaClinica: this.guiaClinicaSeleccionada
         });
         break;
+
       case 'Nota de Urgencias':
         await this.pdfGeneratorService.generarNotaUrgencias({
-          paciente: this.pacienteCompleto,
-          medico: this.medicoActual,
-          expediente: this.pacienteCompleto?.expediente
+          paciente: datosPacienteEstructurados,
+          medico: medicoCompleto,
+          expediente: this.pacienteCompleto?.expediente,
+          notaUrgencias: this.notaUrgenciasForm.value,
+          signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES ACTUALES
+          guiaClinica: this.guiaClinicaSeleccionada
         });
         break;
+
       case 'Signos Vitales':
         await this.pdfGeneratorService.generarSignosVitales({
-          paciente: this.pacienteCompleto,
-          medico: this.medicoActual,
-          expediente: this.pacienteCompleto?.expediente
+          paciente: datosPacienteEstructurados,
+          medico: medicoCompleto,
+          expediente: this.pacienteCompleto?.expediente,
+          signosVitales: {
+            ...this.signosVitalesForm.value,
+            // ✅ INCLUIR OBSERVACIONES ADICIONALES SI EXISTEN
+            observaciones: this.signosVitalesForm.value.observaciones ||
+                          'Sin observaciones específicas. Paciente estable.'
+          }
         });
         break;
+
       default:
-        console.warn('Tipo de documento no soportado:', tipoDocumento);
+        console.warn('⚠️ Tipo de documento no soportado:', tipoDocumento);
+        throw new Error(`Tipo de documento "${tipoDocumento}" no es válido`);
     }
 
-    this.success = `PDF de ${tipoDocumento} generado correctamente`;
+    // ✅ MENSAJE DE ÉXITO MEJORADO
+    this.success = `✅ PDF de ${tipoDocumento} generado exitosamente`;
+    console.log(`✅ PDF de ${tipoDocumento} creado correctamente`);
+
+    // 🔥 OPCIONAL: LIMPIAR MENSAJE DESPUÉS DE 5 SEGUNDOS
+    setTimeout(() => {
+      this.success = '';
+    }, 5000);
+
   } catch (error) {
-    console.error('Error al generar PDF:', error);
-    this.error = 'Error al generar el PDF. Por favor intente nuevamente.';
+    console.error('❌ Error al generar PDF:', error);
+
+    // 🔥 MENSAJE DE ERROR MÁS ESPECÍFICO
+    if (error instanceof Error) {
+      this.error = `Error al generar PDF: ${error.message}`;
+    } else {
+      this.error = 'Error al generar el PDF. Por favor intente nuevamente.';
+    }
+
+    // 🔥 OPCIONAL: LIMPIAR ERROR DESPUÉS DE 8 SEGUNDOS
+    setTimeout(() => {
+      this.error = '';
+    }, 8000);
+
   } finally {
     this.isCreatingDocument = false;
   }
@@ -1289,7 +1543,191 @@ async generarPDF(tipoDocumento: string): Promise<void> {
 
 
 
+
+// 🔥 MÉTODO AUXILIAR PARA EXTRAER DIRECCIÓN COMPLETA
+private extraerDireccionCompleta(): string {
+  const persona = this.pacienteCompleto?.persona;
+  const personaInfo = this.personaInfo;
+
+  if (!persona && !personaInfo) return 'Sin dirección registrada';
+
+  // Helper para acceso seguro a propiedades
+  const getProperty = (obj: any, prop: string): any => {
+    return obj?.[prop] || null;
+  };
+
+  // Usar el objeto persona principal o personaInfo como fallback
+  const datosPersona = persona || personaInfo;
+
+  const partes = [
+    getProperty(datosPersona, 'domicilio') ||
+    getProperty(datosPersona, 'direccion') ||
+    getProperty(datosPersona, 'calle'),
+
+    getProperty(datosPersona, 'numero_exterior') ?
+      `#${getProperty(datosPersona, 'numero_exterior')}` : '',
+
+    getProperty(datosPersona, 'numero_interior') ?
+      `Int. ${getProperty(datosPersona, 'numero_interior')}` : '',
+
+    getProperty(datosPersona, 'colonia'),
+    getProperty(datosPersona, 'municipio') || getProperty(datosPersona, 'ciudad'),
+    getProperty(datosPersona, 'estado'),
+
+    getProperty(datosPersona, 'codigo_postal') ?
+      `C.P. ${getProperty(datosPersona, 'codigo_postal')}` : ''
+  ].filter(parte => parte && parte.trim() !== '' && parte.trim() !== 'null');
+
+  return partes.length > 0 ? partes.join(', ') : 'Sin dirección registrada';
+}
+
+
+
+
+private extraerLugarNacimiento(): string {
+  // ✅ USAR MÉTODO MEJORADO CON HELPERS
+  const objetos = [
+    this.pacienteCompleto?.persona,
+    this.personaInfo,
+    this.pacienteCompleto?.paciente as any
+  ];
+
+  const propiedades = [
+    'lugar_nacimiento',
+    'ciudad_nacimiento',
+    'municipio_nacimiento',
+    'estado_nacimiento'
+  ];
+
+  for (const propiedad of propiedades) {
+    const valor = this.findPropertyInObjects(objetos, propiedad);
+    if (valor) return valor;
+  }
+
+  return 'No especificado';
+}
+
+
+
+
+private construirPacienteCompleto(data: any): void {
+  console.log('🔍 Datos recibidos para construir paciente completo:', data);
+
+  // ✅ ACCESO SEGURO A LOS DATOS CON TYPE ASSERTION
+  const pacienteData = data.paciente?.data as any || {};
+
+  this.pacienteCompleto = {
+    // ✅ ESTRUCTURA MEJORADA - acceso seguro a persona
+    persona: pacienteData.persona ||
+             pacienteData['persona'] ||
+             pacienteData,
+
+    paciente: {
+      ...pacienteData,
+      // ✅ ASEGURAR QUE TENGA ACCESO A PERSONA
+      persona: pacienteData.persona || pacienteData['persona']
+    } as Paciente & { persona?: any; [key: string]: any },
+
+    expediente: data.expediente?.data || {},
+    documentos: Array.isArray(data.documentos?.data) ? data.documentos.data : [],
+    ultimoInternamiento: null,
+    signosVitales: Array.isArray(data.signosVitales?.data) ? data.signosVitales.data : [],
+  };
+
+  console.log('✅ Paciente completo construido:', this.pacienteCompleto);
+  console.log('✅ Persona info:', this.pacienteCompleto.persona);
+
+  this.preLlenarFormularios();
+}
+
+// 🔥 MÉTODO HELPER ESPECÍFICO PARA FECHAS
+private obtenerFechaNacimiento(): string | null {
+  const objetos = [
+    this.pacienteCompleto?.persona,
+    this.personaInfo,
+    this.pacienteCompleto?.paciente as any
+  ];
+
+  for (const obj of objetos) {
+    const fecha = this.getNestedProperty(obj, 'fecha_nacimiento');
+    if (fecha && typeof fecha === 'string') {
+      return fecha;
+    }
+  }
+
+  return null;
+}
+
+
+// 🔥 MÉTODO NUEVO PARA OBTENER DATOS COMPLETOS DEL MÉDICO
+private async obtenerDatosMedicoCompleto(): Promise<any> {
+  try {
+    if (!this.medicoActual) {
+      throw new Error('No hay médico autenticado');
+    }
+
+    console.log('🩺 Obteniendo datos completos del médico:', this.medicoActual);
+
+    const response = await firstValueFrom(
+      this.personalMedicoService.getPersonalMedicoById(this.medicoActual)
+    );
+
+    if (response?.success && response.data) {
+      const medico = response.data;
+
+      return {
+        id_personal_medico: medico.id_personal_medico,
+        nombre_completo: `${medico.nombre} ${medico.apellido_paterno} ${medico.apellido_materno}`,
+        nombre: medico.nombre,
+        apellido_paterno: medico.apellido_paterno,
+        apellido_materno: medico.apellido_materno,
+        numero_cedula: medico.numero_cedula,
+        especialidad: medico.especialidad,
+        cargo: medico.cargo,
+        departamento: medico.departamento
+      };
+    }
+
+    // Fallback con datos del usuario autenticado
+    const usuarioActual = this.authService.getCurrentUser();
+    return {
+      id_personal_medico: this.medicoActual,
+      nombre_completo: usuarioActual?.nombre_completo || 'Médico no identificado',
+      numero_cedula: 'No disponible',
+      especialidad: usuarioActual?.especialidad || 'No especificada',
+      cargo: usuarioActual?.cargo || 'Médico',
+      departamento: usuarioActual?.departamento || 'No especificado'
+    };
+
+  } catch (error) {
+    console.error('❌ Error al obtener datos del médico:', error);
+
+    // Fallback básico
+    return {
+      id_personal_medico: this.medicoActual || 0,
+      nombre_completo: 'Médico no identificado',
+      numero_cedula: 'No disponible',
+      especialidad: 'No especificada',
+      cargo: 'Médico',
+      departamento: 'No especificado'
+    };
+  }
+}
+
+
+// mostrarConfirmacionPDF(tipoDocumento: string): void {
+//   if (confirm(`✅ ${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`)) {
+//     this.generarPDF(tipoDocumento);
+//   }
+// }
 mostrarConfirmacionPDF(tipoDocumento: string): void {
+  // ❌ No mostrar confirmación para signos vitales
+  if (tipoDocumento === 'Signos Vitales') {
+    console.log('PDF de signos vitales desactivado por ahora');
+    return;
+  }
+
+  // ✅ Mostrar confirmación para otros documentos
   if (confirm(`✅ ${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`)) {
     this.generarPDF(tipoDocumento);
   }
@@ -1404,24 +1842,34 @@ mostrarConfirmacionPDF(tipoDocumento: string): void {
   }
 
   calcularEdad(fechaNacimiento?: string): number {
-    const fecha =
-      fechaNacimiento ||
-      this.pacienteCompleto?.persona?.persona?.fecha_nacimiento;
-    if (!fecha) return 0;
+  // ✅ USAR MÉTODOS HELPER PARA ACCESO SEGURO
+  let fecha = fechaNacimiento;
 
-    const today = new Date();
-    const birthDate = new Date(fecha);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (!fecha) {
+    // Buscar fecha de nacimiento usando métodos seguros
+    const persona = this.pacienteCompleto?.persona;
+    const personaInfo = this.personaInfo;
 
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age;
+    fecha = this.getNestedProperty(persona, 'fecha_nacimiento') ||
+            this.getNestedProperty(personaInfo, 'fecha_nacimiento') ||
+            this.getNestedProperty(this.pacienteCompleto?.paciente as any, 'fecha_nacimiento');
   }
+
+  if (!fecha) return 0;
+
+  const today = new Date();
+  const birthDate = new Date(fecha);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age;
+}
 
   formatearFecha(fecha: string): string {
     if (!fecha) return 'No disponible';
@@ -1438,22 +1886,47 @@ mostrarConfirmacionPDF(tipoDocumento: string): void {
   }
 
   getNombreCompleto(): string {
-    const personaReal =
-      this.pacienteCompleto?.persona?.persona ||
-      this.pacienteCompleto?.paciente?.id_persona;
-    if (!personaReal) return 'Cargando...';
-    const { nombre, apellido_paterno, apellido_materno } = personaReal;
-    return `${nombre || ''} ${apellido_paterno || ''} ${
-      apellido_materno || ''
-    }`.trim();
+  const persona = this.pacienteCompleto?.persona;
+  const personaInfo = this.personaInfo;
+
+  // ✅ BUSCAR EN MÚLTIPLES UBICACIONES DE FORMA SEGURA
+  const objetos = [persona, personaInfo, this.pacienteCompleto?.paciente as any];
+
+  let nombre = '';
+  let apellidoPaterno = '';
+  let apellidoMaterno = '';
+
+  // Buscar nombre en todos los objetos posibles
+  for (const obj of objetos) {
+    if (!nombre) nombre = this.getNestedProperty(obj, 'nombre') || '';
+    if (!apellidoPaterno) apellidoPaterno = this.getNestedProperty(obj, 'apellido_paterno') || '';
+    if (!apellidoMaterno) apellidoMaterno = this.getNestedProperty(obj, 'apellido_materno') || '';
+
+    // Si ya tenemos todos los datos, salir del bucle
+    if (nombre && apellidoPaterno && apellidoMaterno) break;
   }
 
-  get personaInfo() {
-    return (
-      this.pacienteCompleto?.persona?.persona ||
-      this.pacienteCompleto?.paciente?.id_persona ||
-      {}
-    );
+  const nombreCompleto = `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+
+  return nombreCompleto || 'Sin nombre registrado';
+}
+
+  get personaInfo(): any {
+  // ✅ ACCESO SEGURO CON MÚLTIPLES FALLBACKS
+  const pacienteCompleto = this.pacienteCompleto;
+
+  if (!pacienteCompleto) return {};
+
+  // ✅ USAR TYPE ASSERTION Y ACCESO SEGURO
+  const pacienteData = pacienteCompleto.paciente as any;
+
+  // Intentar diferentes rutas de acceso
+  return pacienteCompleto.persona ||
+         pacienteCompleto['persona'] ||
+         pacienteData?.persona ||
+         pacienteData?.['persona'] ||
+         pacienteCompleto.paciente ||
+         {};
   }
 
   getColorClase(color: string): string {
@@ -1509,6 +1982,42 @@ mostrarConfirmacionPDF(tipoDocumento: string): void {
   refrescarDatos(): void {
     this.initializeComponent();
   }
+
+  // 🔥 MÉTODO HELPER PARA BUSCAR EN MÚLTIPLES OBJETOS
+private findPropertyInObjects(objects: any[], property: string): any {
+  for (const obj of objects) {
+    if (!obj) continue;
+
+    const value = this.getNestedProperty(obj, property);
+    if (value && typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+// 🔥 TYPE GUARDS PARA VALIDACIÓN SEGURA
+private esObjetoValido(obj: any): boolean {
+  return obj && typeof obj === 'object' && !Array.isArray(obj);
+}
+
+private tienePropiedad(obj: any, prop: string): boolean {
+  return this.esObjetoValido(obj) && (prop in obj || obj[prop] !== undefined);
+}
+
+// 🔥 MÉTODO MEJORADO CON TYPE GUARDS
+private getNestedProperty(obj: any, path: string): any {
+  if (!this.esObjetoValido(obj)) return null;
+
+  // Intentar acceso directo primero
+  if (this.tienePropiedad(obj, path)) {
+    return obj[path];
+  }
+
+  return null;
+}
+
+
 
   /**
    * Maneja errores de forma inteligente sin interrumpir el trabajo

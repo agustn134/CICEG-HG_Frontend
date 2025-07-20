@@ -7,14 +7,13 @@ import { BaseEntity, AuditInfo, BaseFilters } from './base.models';
 export interface NotaEvolucion extends BaseEntity, AuditInfo {
   id_nota_evolucion: number;
   id_documento: number;
-
-    id_guia_diagnostico?: number;
+  id_guia_diagnostico?: number;
 
   // Datos de hospitalización
   dias_hospitalizacion?: number;
   fecha_ultimo_ingreso?: string;
 
-  // Signos vitales actuales
+  // Signos vitales actuales (NOM-004-SSA3-2012 - 6.2.2)
   temperatura?: number;
   frecuencia_cardiaca?: number;
   frecuencia_respiratoria?: number;
@@ -24,15 +23,15 @@ export interface NotaEvolucion extends BaseEntity, AuditInfo {
   peso_actual?: number;
   talla_actual?: number;
 
-  // Campos obligatorios de exploración
-  sintomas_signos: string;
-  habitus_exterior: string;
-  estado_nutricional: string;
-  estudios_laboratorio_gabinete: string;
-  evolucion_analisis: string;
-  diagnosticos: string;
-  plan_estudios_tratamiento: string;
-  pronostico: string;
+  // Campos obligatorios de exploración (NOM-004-SSA3-2012)
+  sintomas_signos: string;                    // 6.2.1 - Evolución del cuadro
+  habitus_exterior: string;                   // Exploración física
+  estado_nutricional: string;                 // Estado nutricional
+  estudios_laboratorio_gabinete: string;      // 6.2.3 - Resultados de estudios
+  evolucion_analisis: string;                 // 6.2.1 - Evolución clínica
+  diagnosticos: string;                       // 6.2.4 - Diagnósticos
+  plan_estudios_tratamiento: string;          // 6.2.6 - Tratamiento
+  pronostico: string;                         // 6.2.5 - Pronóstico
 
   // Exploración física detallada (opcional)
   exploracion_cabeza?: string;
@@ -44,12 +43,17 @@ export interface NotaEvolucion extends BaseEntity, AuditInfo {
   exploracion_genitales?: string;
   exploracion_neurologico?: string;
 
-  // Campos adicionales
-  diagnosticos_guias?: string;
-  interconsultas?: string;
-  indicaciones_medicas?: string;
-  fecha_elaboracion?: string;
-  observaciones_adicionales?: string;
+  // 🔥 NUEVOS CAMPOS AGREGADOS PARA COMPLETAR NOM-004
+  interconsultas?: string;                    // 6.2.7 - Interconsultas
+  indicaciones_medicas?: string;              // Indicaciones específicas
+  diagnosticos_guias?: string;                // Diagnósticos según guías
+  observaciones_adicionales?: string;         // Observaciones generales
+
+  // 🔥 CAMPOS DE AUDITORÍA Y FIRMA DIGITAL (NOM-004-SSA3-2012 - 5.4)
+  fecha_elaboracion?: string;                 // Fecha automática de creación
+  medico_responsable?: string;                // Médico que elabora
+  cedula_profesional?: string;                // Cédula del médico
+  firma_electronica?: string;                 // Firma electrónica
 
   // Campos calculados del backend
   id_expediente?: number;
@@ -63,7 +67,7 @@ export interface NotaEvolucion extends BaseEntity, AuditInfo {
   especialidad?: string;
   servicio_nombre?: string;
 
-  // 🔥 AGREGAR CAMPOS DE GUÍA CLÍNICA CALCULADOS
+  // Campos de guía clínica calculados
   guia_clinica_nombre?: string;
   guia_clinica_codigo?: string;
   guia_clinica_descripcion?: string;
@@ -87,13 +91,14 @@ export interface NotaEvolucionFilters extends BaseFilters {
 // DTO PARA CREACIÓN (SEGÚN ESTRUCTURA REAL)
 // ==========================================
 export interface CreateNotaEvolucionDto {
-  id_documento: number; // Obligatorio
-id_guia_diagnostico?: number;
-  // Datos de hospitalización (opcionales)
+  id_documento: number;
+  id_guia_diagnostico?: number;
+
+  // Datos de hospitalización
   dias_hospitalizacion?: number;
   fecha_ultimo_ingreso?: string;
 
-  // Signos vitales (opcionales)
+  // Signos vitales
   temperatura?: number;
   frecuencia_cardiaca?: number;
   frecuencia_respiratoria?: number;
@@ -103,7 +108,7 @@ id_guia_diagnostico?: number;
   peso_actual?: number;
   talla_actual?: number;
 
-  // Campos obligatorios de la nota
+  // Campos obligatorios NOM-004
   sintomas_signos: string;
   habitus_exterior: string;
   estado_nutricional: string;
@@ -113,7 +118,7 @@ id_guia_diagnostico?: number;
   plan_estudios_tratamiento: string;
   pronostico: string;
 
-  // Exploración física (opcional)
+  // Exploración física
   exploracion_cabeza?: string;
   exploracion_cuello?: string;
   exploracion_torax?: string;
@@ -123,12 +128,35 @@ id_guia_diagnostico?: number;
   exploracion_genitales?: string;
   exploracion_neurologico?: string;
 
-  // Campos adicionales (opcionales)
-  diagnosticos_guias?: string;
+  // 🔥 CAMPOS NUEVOS OBLIGATORIOS SEGÚN NOM-004
   interconsultas?: string;
   indicaciones_medicas?: string;
+  diagnosticos_guias?: string;
   observaciones_adicionales?: string;
 }
+
+
+export const CAMPOS_OBLIGATORIOS_NOM004 = [
+  'id_documento',
+  'sintomas_signos',           // 6.2.1 - Evolución del cuadro clínico
+  'habitus_exterior',          // Exploración física general
+  'estado_nutricional',        // Estado nutricional
+  'estudios_laboratorio_gabinete', // 6.2.3 - Resultados relevantes
+  'evolucion_analisis',        // 6.2.1 - Evolución y análisis
+  'diagnosticos',              // 6.2.4 - Diagnósticos principales
+  'plan_estudios_tratamiento', // 6.2.6 - Plan terapéutico
+  'pronostico'                 // 6.2.5 - Pronóstico
+];
+
+export const CAMPOS_RECOMENDADOS_NOM004 = [
+  'temperatura',
+  'frecuencia_cardiaca',
+  'frecuencia_respiratoria',
+  'presion_arterial_sistolica',
+  'presion_arterial_diastolica',
+  'interconsultas',
+  'indicaciones_medicas'
+];
 
 // ==========================================
 // DTO PARA ACTUALIZACIÓN
