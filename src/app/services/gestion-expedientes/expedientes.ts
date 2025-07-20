@@ -441,7 +441,62 @@ getEstadisticasNumerosAdministrativos(): Observable<{
 /**
  * Validar número administrativo con reglas específicas del hospital
  */
+// validarNumeroAdministrativoAvanzado(numero: string): {
+//   valido: boolean;
+//   errores: string[];
+//   sugerencias: string[];
+// } {
+//   const errores: string[] = [];
+//   const sugerencias: string[] = [];
+
+//   // Validación de formato básico
+//   if (!this.validarFormatoNumeroAdministrativo(numero)) {
+//     errores.push('El formato debe ser YYYY-NNNNNN');
+//     sugerencias.push(`Ejemplo: ${this.sugerirNumeroAdministrativo()}`);
+//   }
+
+//   // Validación de año
+//   const año = numero.substring(0, 4);
+//   const añoActual = new Date().getFullYear();
+//   if (parseInt(año) > añoActual) {
+//     errores.push('El año no puede ser mayor al año actual');
+//   }
+
+//   if (parseInt(año) < 2020) {
+//     errores.push('El año debe ser 2020 o posterior');
+//   }
+
+//   // Validación de secuencia
+//   const secuencia = numero.substring(5);
+//   if (secuencia === '000000') {
+//     errores.push('La secuencia no puede ser 000000');
+//     sugerencias.push('Use una secuencia válida');
+//   }
+
+//   return {
+//     valido: errores.length === 0,
+//     errores,
+//     sugerencias
+//   };
+// }
+
+/**
+ * Reemplazar el método anterior con validación libre
+ */
 validarNumeroAdministrativoAvanzado(numero: string): {
+  valido: boolean;
+  errores: string[];
+  sugerencias: string[];
+} {
+  return this.validarNumeroAdministrativoLibre(numero);
+}
+
+
+
+/**
+ * Validar número administrativo con formato libre
+ */
+validarNumeroAdministrativoLibre(numero: string): {
   valido: boolean;
   errores: string[];
   sugerencias: string[];
@@ -449,28 +504,29 @@ validarNumeroAdministrativoAvanzado(numero: string): {
   const errores: string[] = [];
   const sugerencias: string[] = [];
 
-  // Validación de formato básico
-  if (!this.validarFormatoNumeroAdministrativo(numero)) {
-    errores.push('El formato debe ser YYYY-NNNNNN');
-    sugerencias.push(`Ejemplo: ${this.sugerirNumeroAdministrativo()}`);
+  // Si está vacío, es válido (campo opcional)
+  if (!numero || numero.trim().length === 0) {
+    return { valido: true, errores, sugerencias };
   }
 
-  // Validación de año
-  const año = numero.substring(0, 4);
-  const añoActual = new Date().getFullYear();
-  if (parseInt(año) > añoActual) {
-    errores.push('El año no puede ser mayor al año actual');
+  const numeroLimpio = numero.trim();
+
+  // Validación de longitud mínima
+  if (numeroLimpio.length < 3) {
+    errores.push('El número debe tener al menos 3 caracteres');
+    sugerencias.push('Ingrese un número más específico');
   }
 
-  if (parseInt(año) < 2020) {
-    errores.push('El año debe ser 2020 o posterior');
+  // Validación de longitud máxima
+  if (numeroLimpio.length > 50) {
+    errores.push('El número no puede exceder 50 caracteres');
   }
 
-  // Validación de secuencia
-  const secuencia = numero.substring(5);
-  if (secuencia === '000000') {
-    errores.push('La secuencia no puede ser 000000');
-    sugerencias.push('Use una secuencia válida');
+  // Solo caracteres alfanuméricos, guiones, puntos, espacios, guiones bajos y barras
+  const patronPermitido = /^[a-zA-Z0-9\-\.\s_/]+$/;
+  if (!patronPermitido.test(numeroLimpio)) {
+    errores.push('Solo se permiten letras, números, guiones, puntos, espacios, guiones bajos y barras');
+    sugerencias.push('Ejemplos válidos: "2025-001", "EXP-2025-001", "HG/001/2025", "A123", "EXPEDIENTE 001"');
   }
 
   return {
@@ -479,6 +535,10 @@ validarNumeroAdministrativoAvanzado(numero: string): {
     sugerencias
   };
 }
+
+
+
+
 
 private convertirAExcel(expedientes: Expediente[]): Blob {
   // Implementación básica - en producción usar una librería como xlsx
@@ -653,22 +713,61 @@ buscarPorCualquierNumeroSoloData(numero: string): Observable<ExpedienteBusqueda[
   // }
 
 
-/**
- * Validar formato de número administrativo
- */
-validarFormatoNumeroAdministrativo(numero: string): boolean {
-  // Ejemplo de validación: YYYY-NNNNNN
-  const patron = /^\d{4}-\d{6}$/;
-  return patron.test(numero);
-}
+// /**
+//  * Validar formato de número administrativo
+//  */
+// validarFormatoNumeroAdministrativo(numero: string): boolean {
+//   // Ejemplo de validación: YYYY-NNNNNN
+//   const patron = /^\d{4}-\d{6}$/;
+//   return patron.test(numero);
+// }
 
 /**
- * Sugerir formato de número administrativo
+ * Actualizar formato libre (sin restricciones específicas)
+ */
+validarFormatoNumeroAdministrativo(numero: string): boolean {
+  if (!numero) return true; // Opcional, puede estar vacío
+
+  const numeroLimpio = numero.trim();
+
+  // Validación libre: solo verificar longitud y caracteres básicos
+  return numeroLimpio.length >= 3 &&
+         numeroLimpio.length <= 50 &&
+         /^[a-zA-Z0-9\-\.\s_/]+$/.test(numeroLimpio);
+}
+
+
+// /**
+//  * Sugerir formato de número administrativo
+//  */
+// sugerirNumeroAdministrativo(): string {
+//   const year = new Date().getFullYear();
+//   const timestamp = Date.now().toString().slice(-6);
+//   return `${year}-${timestamp}`;
+// }
+
+/**
+ * Sugerir ejemplos de formato libre
  */
 sugerirNumeroAdministrativo(): string {
   const year = new Date().getFullYear();
-  const timestamp = Date.now().toString().slice(-6);
-  return `${year}-${timestamp}`;
+  const mes = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const dia = new Date().getDate().toString().padStart(2, '0');
+
+  // Ofrecer varios ejemplos de formato libre
+  const ejemplos = [
+    `${year}-001`,
+    `EXP-${year}-001`,
+    `HG-${mes}${dia}-001`,
+    `${year}${mes}001`,
+    `${year}/001`,
+    `A-${year}-001`,
+    `EXPEDIENTE-001`,
+    `${year}001`,
+    `EXP${year}001`
+  ];
+
+  return ejemplos[Math.floor(Math.random() * ejemplos.length)];
 }
 
 
