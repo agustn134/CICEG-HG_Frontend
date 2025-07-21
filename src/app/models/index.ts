@@ -34,11 +34,31 @@ export * from './internamiento.model';
 export * from './signos-vitales.model';
 
 // ==========================================
+// 🔥 EXPORTAR CONSTANTES COMPARTIDAS PRIMERO (EVITAR CONFLICTOS)
+// ==========================================
+export {
+  CLASIFICACIONES_ASA,
+  TIPOS_ANESTESIA,
+  ESTADOS_RECUPERACION,
+  ESCALA_ALDRETE_MAXIMA,
+  ESCALA_ALDRETE_MINIMA_EGRESO,
+  VALORES_ALDRETE
+} from './shared/constantes-anestesia';
+
+export type {
+  ClasificacionASA,
+  TipoAnestesia,
+  EstadoRecuperacion,
+  ValorAldrete
+} from './shared/constantes-anestesia';
+
+// ==========================================
 // EXPORTACIONES DOCUMENTOS CLÍNICOS
 // ==========================================
 export * from './documento-clinico.model';
 export * from './historia-clinica.model';
 export * from './nota-urgencias.model';
+
 // 🔥 EXPORTACIÓN ESPECÍFICA PARA EVITAR CONFLICTOS
 export type {
   NotaEvolucion,
@@ -60,9 +80,27 @@ export {
   NotaEvolucionUtils,
   SECCIONES_FORMULARIO
 } from './nota-evolucion.model';
+
 export * from './nota-interconsulta.model';
 export * from './nota-preoperatoria.model';
-export * from './nota-preanestesica.model';
+
+// 🔥 EXPORTACIÓN ESPECÍFICA PARA NOTA PREANESTÉSICA (SIN CONFLICTOS)
+export type {
+  NotaPreanestesica,
+  CreateNotaPreanestesicaDto,
+  UpdateNotaPreanestesicaDto,
+  NotaPreanestesicaFilters,
+  NotaPreanestesicaCompleta,
+  ClasificacionASADetallada,
+  RiesgoAnestesico,
+  EstadisticasPreanestesicas
+} from './nota-preanestesica.model';
+
+export {
+  CLASIFICACIONES_ASA_DETALLADAS,
+  TIPOS_ANESTESIA_DETALLADOS
+} from './nota-preanestesica.model';
+
 export * from './nota-postoperatoria.model';
 export * from './nota-postanestesica.model';
 export * from './nota-egreso.model';

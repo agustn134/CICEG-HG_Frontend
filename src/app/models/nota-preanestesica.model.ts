@@ -1,5 +1,11 @@
 // src/app/models/nota-preanestesica.model.ts
 import { BaseEntity, AuditInfo, BaseFilters } from './base.models';
+import {
+  ClasificacionASA,
+  TipoAnestesia,
+  CLASIFICACIONES_ASA,
+  TIPOS_ANESTESIA
+} from './shared/constantes-anestesia';
 
 // ==========================================
 // INTERFACE NOTA PREANESTÉSICA
@@ -7,6 +13,9 @@ import { BaseEntity, AuditInfo, BaseFilters } from './base.models';
 export interface NotaPreanestesica extends BaseEntity, AuditInfo {
   id_nota_preanestesica: number;
   id_documento: number;
+
+  clasificacion_asa?: ClasificacionASA;
+  tipo_anestesia_propuesto?: TipoAnestesia;
 
   // Evaluación preanestésica
   antecedentes_anestesicos?: string;
@@ -26,13 +35,11 @@ export interface NotaPreanestesica extends BaseEntity, AuditInfo {
   estudios_gabinete?: string;
 
   // Evaluación de riesgo
-  clasificacion_asa?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';
   riesgo_cardiovascular?: string;
   riesgo_respiratorio?: string;
   riesgo_anestesico?: 'Bajo' | 'Moderado' | 'Alto' | 'Muy Alto';
 
   // Plan anestésico
-  tipo_anestesia_propuesto?: string;
   tecnica_anestesica?: string;
   medicamentos_preanestesicos?: string;
   precauciones_especiales?: string;
@@ -65,9 +72,9 @@ export interface NotaPreanestesica extends BaseEntity, AuditInfo {
 // ==========================================
 export interface NotaPreanestesicaFilters extends BaseFilters {
   id_anestesiologo?: number;
-  clasificacion_asa?: string;
+  clasificacion_asa?: ClasificacionASA;
   riesgo_anestesico?: string;
-  tipo_anestesia?: string;
+  tipo_anestesia?: TipoAnestesia;
   fecha_inicio?: string;
   fecha_fin?: string;
   procedimiento?: string;
@@ -92,11 +99,11 @@ export interface CreateNotaPreanestesicaDto {
   sistema_nervioso?: string;
   laboratorios_relevantes?: string;
   estudios_gabinete?: string;
-  clasificacion_asa?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';
+  clasificacion_asa?: ClasificacionASA;
   riesgo_cardiovascular?: string;
   riesgo_respiratorio?: string;
   riesgo_anestesico?: 'Bajo' | 'Moderado' | 'Alto' | 'Muy Alto';
-  tipo_anestesia_propuesto?: string;
+  tipo_anestesia_propuesto?: TipoAnestesia;
   tecnica_anestesica?: string;
   medicamentos_preanestesicos?: string;
   precauciones_especiales?: string;
@@ -158,10 +165,10 @@ export interface NotaPreanestesicaCompleta extends NotaPreanestesica {
 }
 
 // ==========================================
-// CLASIFICACIONES Y ESCALAS
+// INTERFACES ESPECÍFICAS PARA PREANESTÉSICA (SIN CONFLICTOS)
 // ==========================================
-export interface ClasificacionASA {
-  grado: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';
+export interface ClasificacionASADetallada {
+  grado: ClasificacionASA;
   descripcion: string;
   ejemplo: string;
   mortalidad_estimada: string;
@@ -212,48 +219,48 @@ export interface EstadisticasPreanestesicas {
 }
 
 // ==========================================
-// CONSTANTES
+// CONSTANTES ESPECÍFICAS PARA PREANESTÉSICA
 // ==========================================
-export const CLASIFICACIONES_ASA: Record<string, ClasificacionASA> = {
-  'I': {
-    grado: 'I',
+export const CLASIFICACIONES_ASA_DETALLADAS: Record<ClasificacionASA, ClasificacionASADetallada> = {
+  'ASA I': {
+    grado: 'ASA I',
     descripcion: 'Paciente sano normal',
     ejemplo: 'Sin alteraciones orgánicas, fisiológicas o psiquiátricas',
     mortalidad_estimada: '0.06-0.08%'
   },
-  'II': {
-    grado: 'II',
+  'ASA II': {
+    grado: 'ASA II',
     descripcion: 'Paciente con enfermedad sistémica leve',
     ejemplo: 'HTA controlada, DM sin complicaciones, obesidad leve',
     mortalidad_estimada: '0.27-0.4%'
   },
-  'III': {
-    grado: 'III',
+  'ASA III': {
+    grado: 'ASA III',
     descripcion: 'Paciente con enfermedad sistémica grave',
     ejemplo: 'HTA no controlada, DM con complicaciones, EPOC moderado',
     mortalidad_estimada: '1.8-4.3%'
   },
-  'IV': {
-    grado: 'IV',
+  'ASA IV': {
+    grado: 'ASA IV',
     descripcion: 'Paciente con enfermedad sistémica grave que amenaza la vida',
     ejemplo: 'Insuficiencia cardiaca severa, sepsis, coma',
     mortalidad_estimada: '7.8-23%'
   },
-  'V': {
-    grado: 'V',
+  'ASA V': {
+    grado: 'ASA V',
     descripcion: 'Paciente moribundo',
     ejemplo: 'Politraumatizado grave, ruptura de aneurisma',
     mortalidad_estimada: '9.4-51%'
   },
-  'VI': {
-    grado: 'VI',
+  'ASA VI': {
+    grado: 'ASA VI',
     descripcion: 'Paciente con muerte cerebral para donación de órganos',
     ejemplo: 'Donante de órganos con muerte cerebral',
     mortalidad_estimada: 'N/A'
   }
 };
 
-export const TIPOS_ANESTESIA = [
+export const TIPOS_ANESTESIA_DETALLADOS = [
   'General balanceada',
   'General intravenosa',
   'Regional epidural',
