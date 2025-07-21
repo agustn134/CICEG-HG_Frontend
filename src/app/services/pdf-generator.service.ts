@@ -8032,6 +8032,918 @@ private validarCumplimientoInformeDiario(
     }
   }
 
+  // 📄 HOJA FRONTAL DE EXPEDIENTE SEGÚN NOM-004-SSA3-2012
+  async generarHojaFrontalExpediente(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('📋 Generando Hoja Frontal de Expediente según NOM-004...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const expedienteData = datos.expediente || {};
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [40, 60, 40, 60],
+
+        content: [
+          { text: '', margin: [0, 20] },
+
+          // 🔹 DATOS BÁSICOS DEL PACIENTE
+          {
+            table: {
+              widths: ['40%', '30%', '15%', '15%'],
+              body: [
+                [
+                  {
+                    text: 'NOMBRE:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: 'EXPEDIENTE:',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.numero_expediente,
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                ],
+                [
+                  {
+                    text: 'EDAD:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: 'CURP:',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.curp || '',
+                    fontSize: 8,
+                    border: [false, false, false, true],
+                  },
+                ],
+                [
+                  {
+                    text: 'FECHA DE NACIMIENTO:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || '',
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: 'GÉNERO:',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                ],
+                [
+                  {
+                    text: 'TRANSFUSIONES:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: expedienteData.transfusiones || '',
+                    fontSize: 9,
+                    colSpan: 3,
+                    border: [false, false, false, true],
+                  },
+                  {},
+                  {},
+                ],
+                [
+                  {
+                    text: 'TIPO SANGUÍNEO:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.tipo_sangre || '',
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: 'TELÉFONO:',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.telefono || '',
+                    fontSize: 9,
+                    border: [false, false, false, true],
+                  },
+                ],
+                [
+                  {
+                    text: 'NOMBRE DEL PADRE O TUTOR:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: pacienteCompleto.familiar_responsable || '',
+                    fontSize: 9,
+                    colSpan: 3,
+                    border: [false, false, false, true],
+                  },
+                  {},
+                  {},
+                ],
+                [
+                  {
+                    text: 'DOMICILIO:',
+                    fontSize: 9,
+                    bold: true,
+                    border: [false, false, false, true],
+                  },
+                  {
+                    text: this.formatearDireccionMejorada(pacienteCompleto),
+                    fontSize: 9,
+                    colSpan: 3,
+                    border: [false, false, false, true],
+                  },
+                  {},
+                  {},
+                ],
+                [
+                  { text: '', border: [false, false, false, false] },
+                  { text: '', border: [false, false, false, false] },
+                  { text: '', border: [false, false, false, false] },
+                  { text: '', border: [false, false, false, false] },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 TABLA DE REGISTROS DE HOSPITALIZACIONES
+          {
+            table: {
+              widths: ['25%', '25%', '25%', '25%'],
+              body: [
+                [
+                  {
+                    text: 'FECHA DE INGRESO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'FECHA DE EGRESO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'DIAGNÓSTICO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'MÉDICO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                ],
+                // Generar 25 filas vacías para llenar a mano
+                ...Array.from({ length: 25 }, (_, index) => [
+                  {
+                    text: index === 0 && expedienteData.registros?.[0]?.fecha_ingreso ?
+                      expedienteData.registros[0].fecha_ingreso : '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: index === 0 && expedienteData.registros?.[0]?.fecha_egreso ?
+                      expedienteData.registros[0].fecha_egreso : '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: index === 0 && expedienteData.registros?.[0]?.diagnostico ?
+                      expedienteData.registros[0].diagnostico : '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: index === 0 && expedienteData.registros?.[0]?.medico ?
+                      expedienteData.registros[0].medico : '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                ]),
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 SEGUNDA TABLA DE REGISTROS ADICIONALES
+          {
+            table: {
+              widths: ['25%', '25%', '25%', '25%'],
+              body: [
+                [
+                  {
+                    text: 'FECHA DE INGRESO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'FECHA DE EGRESO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'DIAGNÓSTICO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                  {
+                    text: 'MÉDICO',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [3, 5, 3, 5],
+                  },
+                ],
+                // Generar 25 filas vacías adicionales
+                ...Array.from({ length: 25 }, () => [
+                  {
+                    text: '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                  {
+                    text: '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    minHeight: 20,
+                  },
+                ]),
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [40, 20],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 8,
+                    color: '#000000',
+                  },
+                  {
+                    text: 'Hoja Frontal de Expediente - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#000000',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#000000',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `hoja-frontal-expediente-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+      console.log('ℹ️ Nota: Este es un formato básico que probablemente se llene a mano');
+
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Hoja Frontal:', error);
+      throw error;
+    }
+  }
+
+  // 📄 SOLICITUD DE LABORATORIO SEGÚN NOM-004-SSA3-2012
+  async generarSolicitudLaboratorio(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('🧪 Generando Solicitud de Laboratorio según NOM-004...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const laboratorioData = datos.solicitudLaboratorio || {};
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [30, 60, 30, 50],
+
+        header: {
+          margin: [30, 15, 30, 15],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'INSTITUTO DE SALUD DEL ESTADO DE GUANAJUATO',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
+                  fontSize: 12,
+                  bold: true,
+                  alignment: 'center',
+                  margin: [0, 2, 0, 0],
+                },
+              ],
+              [
+                {
+                  text: 'SOLICITUD DE ESTUDIOS DE LABORATORIO',
+                  fontSize: 10,
+                  bold: true,
+                  alignment: 'center',
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 NOTA IMPORTANTE
+          {
+            text: 'Nota: Favor de pasar a caja para que le indiquen el monto a pagar de sus estudios, si se le indica',
+            fontSize: 8,
+            italics: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 5],
+          },
+          {
+            text: 'SEA PUNTUAL A SU CITA',
+            fontSize: 9,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 DATOS DEL PACIENTE
+          {
+            table: {
+              widths: ['20%', '30%', '20%', '30%'],
+              body: [
+                [
+                  { text: 'NOMBRE DEL PACIENTE:', fontSize: 8, bold: true },
+                  { text: pacienteCompleto.nombre_completo, fontSize: 8, colSpan: 3 },
+                  {},
+                  {},
+                ],
+                [
+                  { text: 'FECHA DE NACIMIENTO:', fontSize: 8, bold: true },
+                  { text: pacienteCompleto.fecha_nacimiento || '', fontSize: 8 },
+                  { text: 'CURP:', fontSize: 8, bold: true },
+                  { text: pacienteCompleto.curp || '', fontSize: 7 },
+                ],
+                [
+                  { text: 'NÚMERO DE EXPEDIENTE:', fontSize: 8, bold: true },
+                  { text: pacienteCompleto.numero_expediente, fontSize: 8 },
+                  { text: 'No CAUSAS:', fontSize: 8, bold: true },
+                  { text: laboratorioData.numero_causas || '', fontSize: 8 },
+                ],
+                [
+                  { text: 'DIAGNÓSTICO CAUSAS Y/O SMNG SIN ABREVIATURAS:', fontSize: 8, bold: true, colSpan: 4 },
+                  {},
+                  {},
+                  {},
+                ],
+                [
+                  {
+                    text: laboratorioData.diagnostico || 'Diagnóstico por especificar',
+                    fontSize: 8,
+                    colSpan: 4,
+                    margin: [0, 5, 0, 5]
+                  },
+                  {},
+                  {},
+                  {},
+                ],
+                [
+                  { text: 'FECHA DE SOLICITUD:', fontSize: 8, bold: true },
+                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
+                  { text: 'FECHA PRÓXIMA CONSULTA:', fontSize: 8, bold: true },
+                  { text: laboratorioData.fecha_proxima_consulta || '', fontSize: 8 },
+                ],
+                [
+                  { text: 'EDAD:', fontSize: 8, bold: true },
+                  { text: `${pacienteCompleto.edad} años`, fontSize: 8 },
+                  { text: 'SERVICIO:', fontSize: 8, bold: true },
+                  { text: medicoCompleto.departamento, fontSize: 8 },
+                ],
+                [
+                  { text: 'No CAMA:', fontSize: 8, bold: true },
+                  { text: laboratorioData.numero_cama || 'Ambulatorio', fontSize: 8 },
+                  { text: 'PRIORIDAD:', fontSize: 8, bold: true },
+                  {
+                    text: [
+                      { text: '☐ URGENTE  ', fontSize: 8 },
+                      { text: '☐ RUTINA', fontSize: 8 }
+                    ],
+                    fontSize: 8
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 ESTUDIOS DE LABORATORIO
+          {
+            table: {
+              widths: ['25%', '25%', '25%', '25%'],
+              body: [
+                // HEMATOLOGÍA
+                [
+                  { text: 'HEMATOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                  { text: 'INMUNOHEMATOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                ],
+                [
+                  { text: '☐ BIOMETRÍA HEMÁTICA', fontSize: 7 },
+                  { text: '20109', fontSize: 7, alignment: 'center' },
+                  { text: '☐ PRUEBAS CRUZADAS', fontSize: 7 },
+                  { text: '20107', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ GRUPO SANGUÍNEO', fontSize: 7 },
+                  { text: '20108', fontSize: 7, alignment: 'center' },
+                  { text: '☐ COOMBS DIRECTO', fontSize: 7 },
+                  { text: '19210', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ VEL SEDIMENTACIÓN GLOBULAR', fontSize: 7 },
+                  { text: '20103', fontSize: 7, alignment: 'center' },
+                  { text: '☐ COOMBS INDIRECTO', fontSize: 7 },
+                  { text: '19211', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ RETICULOCITOS', fontSize: 7 },
+                  { text: '20102', fontSize: 7, alignment: 'center' },
+                  { text: '', fontSize: 7 },
+                  { text: '', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ FROTIS SANGRE GOTA GRUESA', fontSize: 7 },
+                  { text: '20105', fontSize: 7, alignment: 'center' },
+                  { text: 'INMUNOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                ],
+                [
+                  { text: '☐ FROTIS SANGRE PERIFÉRICA', fontSize: 7 },
+                  { text: '20105', fontSize: 7, alignment: 'center' },
+                  { text: '☐ REACCIONES FEBRILES', fontSize: 7 },
+                  { text: '19201', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ HEMOGLOBINA GLICOSILADA', fontSize: 7 },
+                  { text: '19303', fontSize: 7, alignment: 'center' },
+                  { text: '☐ PROTEÍNA C REACTIVA', fontSize: 7 },
+                  { text: '19206', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: 'PAQUETES', fontSize: 8, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                  { text: '☐ FACTOR REUMATOIDE', fontSize: 7 },
+                  { text: '19207', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ BIOMETRÍA,VSG,RETICULOCITOS', fontSize: 7 },
+                  { text: '20202', fontSize: 7, alignment: 'center' },
+                  { text: '☐ ANTIESTREPTOLISINAS', fontSize: 7 },
+                  { text: '19205', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '', fontSize: 7 },
+                  { text: '', fontSize: 7 },
+                  { text: '☐ VDRL', fontSize: 7 },
+                  { text: '22131', fontSize: 7, alignment: 'center' },
+                ],
+                // COAGULACIÓN
+                [
+                  { text: 'COAGULACIÓN', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                  { text: '☐ ANTÍGENO PROSTÁTICO CUALITATIVO', fontSize: 7 },
+                  { text: '19212', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ T. PROTROMBINA', fontSize: 7 },
+                  { text: '20113', fontSize: 7, alignment: 'center' },
+                  { text: '☐ RPR PRUEBA DE SÍFILIS', fontSize: 7 },
+                  { text: '19206', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ TROMBOPLASTINA PARCIAL', fontSize: 7 },
+                  { text: '20114', fontSize: 7, alignment: 'center' },
+                  { text: '☐ HGC Beta CUALITATIVA sérica', fontSize: 7 },
+                  { text: '19720', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ FIBRINÓGENO', fontSize: 7 },
+                  { text: '20116', fontSize: 7, alignment: 'center' },
+                  { text: '☐ PRUEBA DE EMBARAZO EN ORINA', fontSize: 7 },
+                  { text: '19715', fontSize: 7, alignment: 'center' },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 10],
+          },
+
+          // 🔹 SEGUNDA TABLA - BIOQUÍMICA Y OTROS
+          {
+            table: {
+              widths: ['25%', '25%', '25%', '25%'],
+              body: [
+                // BIOQUÍMICA CLÍNICA
+                [
+                  { text: 'BIOQUÍMICA CLÍNICA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                  { text: 'URIANALISIS', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                ],
+                [
+                  { text: '☐ TAMIZ GESTACIONAL 50 G/1HR', fontSize: 7 },
+                  { text: '19303', fontSize: 7, alignment: 'center' },
+                  { text: '☐ EXAMEN GENERAL DE ORINA', fontSize: 7 },
+                  { text: '20201', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ GLUCOSA POST-PRANDIAL', fontSize: 7 },
+                  { text: '19302', fontSize: 7, alignment: 'center' },
+                  { text: '☐ CLORO', fontSize: 7 },
+                  { text: '19601', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ CURVA TOLERANCIA GLUCOSA', fontSize: 7 },
+                  { text: '19303', fontSize: 7, alignment: 'center' },
+                  { text: '☐ POTASIO', fontSize: 7 },
+                  { text: '19601', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ GLUCOSA', fontSize: 7 },
+                  { text: '19301', fontSize: 7, alignment: 'center' },
+                  { text: '☐ SODIO', fontSize: 7 },
+                  { text: '19601', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ UREA/BUN', fontSize: 7 },
+                  { text: '19304', fontSize: 7, alignment: 'center' },
+                  { text: '☐ MICROALBUMINURIA EN ORINA 24 HRS', fontSize: 7 },
+                  { text: '22803', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ CREATININA', fontSize: 7 },
+                  { text: '19306', fontSize: 7, alignment: 'center' },
+                  { text: '☐ DEPURACIÓN DE CREATININA', fontSize: 7 },
+                  { text: '19501', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ ÁCIDO ÚRICO', fontSize: 7 },
+                  { text: '19307', fontSize: 7, alignment: 'center' },
+                  { text: '', fontSize: 7 },
+                  { text: '', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ COLESTEROL TOTAL', fontSize: 7 },
+                  { text: '19307', fontSize: 7, alignment: 'center' },
+                  { text: 'PARASITOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {},
+                ],
+                [
+                  { text: '☐ HDL COLESTEROL', fontSize: 7 },
+                  { text: '19703', fontSize: 7, alignment: 'center' },
+                  { text: '☐ COPROPARASITOSCÓPICO 3', fontSize: 7 },
+                  { text: '20001', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ PERFIL DE LÍPIDOS', fontSize: 7 },
+                  { text: '20203', fontSize: 7, alignment: 'center' },
+                  { text: '☐ COPROPARASITOSCÓPICO 1', fontSize: 7 },
+                  { text: '20001', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ TRIGLICÉRIDOS', fontSize: 7 },
+                  { text: '19702', fontSize: 7, alignment: 'center' },
+                  { text: '☐ CITOLOGÍA DE MOCO FECAL', fontSize: 7 },
+                  { text: '20006', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ BILIRRUBINA DIRECTA', fontSize: 7 },
+                  { text: '19308', fontSize: 7, alignment: 'center' },
+                  { text: '☐ COPROLÓGICO', fontSize: 7 },
+                  { text: '20005', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ BILIRRUBINA TOTAL', fontSize: 7 },
+                  { text: '22118', fontSize: 7, alignment: 'center' },
+                  { text: '☐ AMIBA EN FRESCO', fontSize: 7 },
+                  { text: '20006', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ AST (TGO)', fontSize: 7 },
+                  { text: '19401', fontSize: 7, alignment: 'center' },
+                  { text: '☐ SANGRE OCULTA EN HECES', fontSize: 7 },
+                  { text: '19502', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ ALT (TGP)', fontSize: 7 },
+                  { text: '19402', fontSize: 7, alignment: 'center' },
+                  { text: '☐ AZÚCARES REDUCTORES', fontSize: 7 },
+                  { text: '20005', fontSize: 7, alignment: 'center' },
+                ],
+                [
+                  { text: '☐ FOSFATASA ALCALINA (ALP)', fontSize: 7 },
+                  { text: '19403', fontSize: 7, alignment: 'center' },
+                  { text: '☐ ROTAVIRUS', fontSize: 7 },
+                  { text: '19215', fontSize: 7, alignment: 'center' },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 10],
+          },
+
+          // 🔹 TERCERA TABLA - PAQUETES Y OTROS
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  { text: 'PAQUETES DE ESTUDIOS', fontSize: 9, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+                  { text: 'OTROS ESTUDIOS', fontSize: 9, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+                ],
+                [
+                  { text: '☐ QUÍMICA SANGUÍNEA III (20204)', fontSize: 7 },
+                  { text: '☐ GASOMETRÍA ARTERIAL (19606)', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ QUÍMICA SANGUÍNEA IV (20207)', fontSize: 7 },
+                  { text: '☐ GASOMETRÍA VENOSA (17301)', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ PERFIL HEPÁTICO (20208)', fontSize: 7 },
+                  { text: '☐ EOSINÓFILOS EN MOCO NASAL (19203)', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ PERFIL QUIRÚRGICO (20209)', fontSize: 7 },
+                  { text: '', fontSize: 7 },
+                ],
+                [
+                  { text: '☐ PERFIL REUMÁTICO (20210)', fontSize: 7 },
+                  { text: 'OTROS ESTUDIOS ESPECIALES:', fontSize: 8, bold: true },
+                ],
+                [
+                  { text: '☐ PERFIL CONTROL DE EMBARAZO (20211)', fontSize: 7 },
+                  {
+                    text: laboratorioData.otros_estudios || '________________________',
+                    fontSize: 7,
+                    margin: [0, 10, 0, 10]
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 DATOS DEL MÉDICO Y HORARIOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: `NOMBRE Y CÉDULA DEL MÉDICO: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                    fontSize: 8,
+                    bold: true,
+                    margin: [5, 5, 5, 5],
+                  },
+                ],
+                [
+                  {
+                    table: {
+                      widths: ['33%', '33%', '34%'],
+                      body: [
+                        [
+                          { text: 'HORA DE TOMA DE MUESTRA:', fontSize: 7, bold: true },
+                          { text: 'HORA DE RECEPCIÓN:', fontSize: 7, bold: true },
+                          { text: 'HORA DE ENTREGA:', fontSize: 7, bold: true },
+                        ],
+                        [
+                          { text: '________________', fontSize: 8, alignment: 'center' },
+                          { text: '________________', fontSize: 8, alignment: 'center' },
+                          { text: '________________', fontSize: 8, alignment: 'center' },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 5, 5, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [30, 10],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#000000',
+                  },
+                  {
+                    text: 'Solicitud de Laboratorio - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#000000',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#000000',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `solicitud-laboratorio-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('✅ PDF de Solicitud de Laboratorio generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Solicitud de Laboratorio:', error);
+      throw error;
+    }
+  }
 
 
 
