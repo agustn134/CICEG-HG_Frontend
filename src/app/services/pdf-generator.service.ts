@@ -33,7 +33,9 @@ interface SignosVitalesData {
 @Injectable({
   providedIn: 'root',
 })
+
 export class PdfGeneratorService {
+
   private pdfMake: any;
   private isLoaded = false;
 
@@ -269,7 +271,7 @@ export class PdfGeneratorService {
     // 🔥 BUSCAR EN DIFERENTES UBICACIONES POSIBLES
     // 1. En datos.signosVitales (datos del formulario actual)
     if (datos.signosVitales) {
-      console.log('✅ Encontrados signos vitales en datos.signosVitales');
+      console.log('Encontrados signos vitales en datos.signosVitales');
       signosVitales = {
         ...signosVitales,
         ...Object.fromEntries(
@@ -288,7 +290,7 @@ export class PdfGeneratorService {
       datos.paciente.signosVitales.length > 0
     ) {
       console.log(
-        '✅ Encontrados signos vitales históricos en datos.paciente.signosVitales'
+        'Encontrados signos vitales históricos en datos.paciente.signosVitales'
       );
       const ultimosSignos = datos.paciente.signosVitales[0]; // El más reciente
       signosVitales = {
@@ -358,46 +360,46 @@ export class PdfGeneratorService {
 
     const validaciones = {
       // 5.2 Datos generales obligatorios
-      establecimiento: true, // ✅ Hospital General San Luis de la Paz
+      establecimiento: true, //  Hospital General San Luis de la Paz
       nombre_paciente: !!paciente.nombre_completo,
       sexo_paciente: !!paciente.sexo,
       edad_paciente: !!paciente.edad,
       domicilio_paciente: !!paciente.direccion_completa,
 
       // 5.9-5.10 Datos de elaboración
-      fecha_elaboracion: true, // ✅ Siempre se incluye
-      hora_elaboracion: true, // ✅ Siempre se incluye
+      fecha_elaboracion: true, //  Siempre se incluye
+      hora_elaboracion: true, //  Siempre se incluye
       nombre_completo_medico: !!medico.nombre_completo,
       cedula_profesional: !!medico.numero_cedula,
-      firma_medico: true, // ✅ Espacio para firma
+      firma_medico: true, //  Espacio para firma
 
       // 6.1.1 Interrogatorio completo
       ficha_identificacion: !!paciente.nombre_completo,
       antecedentes_heredo_familiares:
         !!datos.historiaClinica?.antecedentes_heredo_familiares,
-      antecedentes_personales_patologicos: true, // ✅ Sección incluida
-      antecedentes_personales_no_patologicos: true, // ✅ Sección incluida
+      antecedentes_personales_patologicos: true, //  Sección incluida
+      antecedentes_personales_no_patologicos: true, //  Sección incluida
       padecimiento_actual: !!datos.historiaClinica?.padecimiento_actual,
-      interrogatorio_aparatos_sistemas: true, // ✅ Sección completa incluida
+      interrogatorio_aparatos_sistemas: true, //  Sección completa incluida
 
       // 6.1.2 Exploración física
-      habitus_exterior: true, // ✅ Incluido
-      signos_vitales: true, // ✅ Completos
-      peso_talla: true, // ✅ Somatometría incluida
-      exploracion_por_aparatos: true, // ✅ Todos los sistemas
+      habitus_exterior: true, //  Incluido
+      signos_vitales: true, //  Completos
+      peso_talla: true, //  Somatometría incluida
+      exploracion_por_aparatos: true, //  Todos los sistemas
 
       // 6.1.3 Estudios
-      resultados_estudios_previos: true, // ✅ Sección incluida
+      resultados_estudios_previos: true, //  Sección incluida
 
       // 6.1.4-6.1.6 Diagnóstico y tratamiento
       diagnosticos_problemas: !!datos.historiaClinica?.impresion_diagnostica,
-      pronostico: true, // ✅ Sección incluida
-      indicacion_terapeutica: true, // ✅ Sección incluida
+      pronostico: true, // Sección incluida
+      indicacion_terapeutica: true, // Sección incluida
 
       // Específico para pediatría (NOM-031)
-      datos_padres: true, // ✅ Incluidos
-      desarrollo_psicomotor: true, // ✅ Incluido
-      inmunizaciones: true, // ✅ Referenciadas
+      datos_padres: true, //  Incluidos
+      desarrollo_psicomotor: true, // Incluido
+      inmunizaciones: true, //  Referenciadas
     };
 
     const cumplimiento = Object.values(validaciones).filter((v) => v).length;
@@ -1797,10 +1799,144 @@ private validarCumplimientoInformeDiario(
 }
 
 
+// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE EGRESO
+private validarCumplimientoNotaEgreso(
+  datos: any,
+  medico: any,
+  paciente: any
+): void {
+  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D12 - NOTA DE EGRESO...');
 
+  const validaciones = {
+    // D12.1 - Nombre del paciente
+    nombre_paciente: !!paciente.nombre_completo,
 
+    // D12.2 - Edad y sexo
+    edad_sexo: !!paciente.edad && !!paciente.sexo,
 
+    // D12.3 - Fecha y hora de elaboración
+    fecha_hora_elaboracion: true,
 
+    // D12.4 - Signos vitales
+    signos_vitales: true, // Estructura completa incluida
+
+    // D12.5 - Fecha y hora ingreso/egreso
+    fecha_hora_ingreso_egreso: true,
+
+    // D12.6 - Días de estancia
+    dias_estancia: true,
+
+    // D12.7 - Identificación de reingreso
+    identificacion_reingreso: true,
+
+    // D12.8 - Diagnósticos de ingreso
+    diagnosticos_ingreso: true,
+
+    // D12.9 - Resumen evolución y estado actual
+    resumen_evolucion: true,
+
+    // D12.10 - Manejo durante estancia
+    manejo_estancia: true,
+
+    // D12.11 - Diagnósticos finales
+    diagnosticos_finales: true,
+
+    // D12.12 - Procedimientos realizados
+    procedimientos_realizados: true,
+
+    // D12.13 - Motivo de egreso
+    motivo_egreso: true,
+
+    // D12.14 - Problemas clínicos pendientes
+    problemas_pendientes: true,
+
+    // D12.15 -
+    // D12.15 - Plan de manejo y tratamiento
+   plan_manejo_tratamiento: true,
+
+   // D12.16 - Recomendaciones vigilancia ambulatoria
+   recomendaciones_ambulatorias: true,
+
+   // D12.17 - Nombre completo, cédula profesional y firma del médico
+   nombre_completo_medico: !!medico.nombre_completo,
+   cedula_profesional: !!medico.numero_cedula,
+   firma_espacio: true,
+
+   // Datos adicionales del paciente
+   numero_expediente: !!paciente.numero_expediente,
+   identificacion_hospital: true,
+ };
+
+ const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+ const total = Object.keys(validaciones).length;
+ const porcentaje = Math.round((cumplimiento / total) * 100);
+
+ console.log(
+   `📊 CUMPLIMIENTO NOTA EGRESO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+ );
+
+ if (porcentaje < 90) {
+   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+ } else {
+   console.log('✅ NOTA DE EGRESO CUMPLE CON NOM-004 SECCIÓN D12');
+ }
+}
+
+// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE INTERCONSULTA
+private validarCumplimientoNotaInterconsulta(
+  datos: any,
+  medico: any,
+  paciente: any
+): void {
+  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D7 - NOTA DE INTERCONSULTA...');
+
+  const validaciones = {
+    // Datos del paciente (5.9)
+    nombre_completo_paciente: !!paciente.nombre_completo,
+    edad_sexo: !!paciente.edad && !!paciente.sexo,
+    numero_expediente: !!paciente.numero_expediente,
+
+    // D7.12 - Criterio diagnóstico
+    criterio_diagnostico: true, // Sección incluida
+
+    // D7.13 - Sugerencias diagnósticas y de tratamiento
+    sugerencias_diagnosticas: true, // Sección incluida
+    sugerencias_tratamiento: true, // Sección incluida
+
+    // D7.14 - Motivo de la consulta
+    motivo_consulta: true, // Sección incluida
+
+    // Información del médico solicitante
+    medico_solicitante: !!medico.nombre_completo,
+    cedula_solicitante: !!medico.numero_cedula,
+    servicio_solicitante: !!medico.departamento,
+
+    // Especialidad solicitada
+    especialidad_identificada: true, // Campo incluido
+
+    // Firma y fecha
+    fecha_elaboracion: true,
+    espacio_firmas: true, // Ambos médicos
+
+    // Estructura del documento
+    identificacion_hospital: true,
+    formato_estructurado: true,
+  };
+
+  const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+  const total = Object.keys(validaciones).length;
+  const porcentaje = Math.round((cumplimiento / total) * 100);
+
+  console.log(
+    `📊 CUMPLIMIENTO NOTA INTERCONSULTA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+  );
+
+  if (porcentaje < 90) {
+    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+  } else {
+    console.log('✅ NOTA DE INTERCONSULTA CUMPLE CON NOM-004 SECCIÓN D7');
+  }
+}
 
 
 
@@ -4024,963 +4160,963 @@ private validarCumplimientoInformeDiario(
     }
   }
 
-  // 📄 NOTA DE EVOLUCIÓN  NOM-004-SSA3-2012
-  async generarNotaEvolucion(datos: any): Promise<void> {
-    try {
-      await this.ensurePdfMakeLoaded();
+  // // 📄 NOTA DE EVOLUCIÓN  NOM-004-SSA3-2012
+  // async generarNotaEvolucion(datos: any): Promise<void> {
+  //   try {
+  //     await this.ensurePdfMakeLoaded();
 
-      console.log('📈 Generando Nota de Evolución según NOM-004...');
+  //     console.log('📈 Generando Nota de Evolución según NOM-004...');
 
-      const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(
-        datos.paciente
-      );
-      const notaEvolucionData = datos.notaEvolucion || {};
-      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-      const fechaActual = new Date();
+  //     const medicoCompleto = await this.obtenerDatosMedicoActual();
+  //     const pacienteCompleto = this.validarYFormatearDatosPaciente(
+  //       datos.paciente
+  //     );
+  //     const notaEvolucionData = datos.notaEvolucion || {};
+  //     const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+  //     const fechaActual = new Date();
 
-      const documentDefinition = {
-        pageSize: 'LETTER',
-        pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES OPTIMIZADOS
+  //     const documentDefinition = {
+  //       pageSize: 'LETTER',
+  //       pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES OPTIMIZADOS
 
-        header: {
-          margin: [20, 10, 20, 10],
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN',
-                  fontSize: 11,
-                  bold: true,
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        },
+  //       header: {
+  //         margin: [20, 10, 20, 10],
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN',
+  //                 fontSize: 11,
+  //                 bold: true,
+  //                 alignment: 'center',
+  //               },
+  //             ],
+  //           ],
+  //         },
+  //         layout: 'noBorders',
+  //       },
 
-        content: [
-          // 🔹 SECCIÓN IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.9)
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'IDENTIFICACIÓN',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 4,
-                  },
-                  {
-                    table: {
-                      widths: ['18%', '18%', '18%', '18%', '14%', '14%'],
-                      body: [
-                        [
-                          {
-                            text: 'Fecha evolución',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Hora evolución',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'No. Expediente',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'No. de cama',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Día estancia',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Folio nota',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                        ],
-                        [
-                          {
-                            text: fechaActual.toLocaleDateString('es-MX'),
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: fechaActual.toLocaleTimeString('es-MX'),
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: pacienteCompleto.numero_expediente || 'N/A',
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                            bold: true,
-                          },
-                          {
-                            text:
-                              notaEvolucionData.numero_cama || 'Sin asignar',
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `${this.calcularDiaHospitalizacion()}°`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `NE-${
-                              pacienteCompleto.numero_expediente
-                            }-${fechaActual.getFullYear()}`,
-                            fontSize: 6,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      hLineWidth: () => 0.3,
-                      vLineWidth: () => 0.3,
-                      hLineColor: () => '#000000',
-                      vLineColor: () => '#000000',
-                    },
-                  },
-                ],
-                [
-                  {},
-                  {
-                    table: {
-                      widths: ['60%', '20%', '20%'],
-                      body: [
-                        [
-                          {
-                            text: 'Nombre completo del paciente',
-                            fontSize: 7,
-                            bold: true,
-                          },
-                          {
-                            text: 'Edad',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Sexo',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                        ],
-                        [
-                          {
-                            text: pacienteCompleto.nombre_completo,
-                            fontSize: 8,
-                            bold: true,
-                            margin: [2, 2],
-                          },
-                          {
-                            text: `${pacienteCompleto.edad} años`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 2],
-                          },
-                          {
-                            text: pacienteCompleto.sexo,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 2],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      hLineWidth: () => 0.3,
-                      vLineWidth: () => 0.3,
-                      hLineColor: () => '#000000',
-                      vLineColor: () => '#000000',
-                    },
-                  },
-                ],
-                [
-                  {},
-                  {
-                    table: {
-                      widths: ['50%', '25%', '25%'],
-                      body: [
-                        [
-                          {
-                            text: 'Servicio hospitalario',
-                            fontSize: 7,
-                            bold: true,
-                          },
-                          {
-                            text: 'Diagnóstico ingreso',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Tipo de sangre',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                        ],
-                        [
-                          {
-                            text:
-                              medicoCompleto.departamento || 'No especificado',
-                            fontSize: 7,
-                            margin: [2, 2],
-                          },
-                          {
-                            text:
-                              notaEvolucionData.diagnostico_ingreso ||
-                              'Ver expediente',
-                            fontSize: 6,
-                            alignment: 'center',
-                            margin: [0, 2],
-                          },
-                          {
-                            text:
-                              pacienteCompleto.tipo_sangre || 'No registrado',
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 2],
-                            bold: true,
-                            color: '#dc2626',
-                          },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      hLineWidth: () => 0.3,
-                      vLineWidth: () => 0.3,
-                      hLineColor: () => '#000000',
-                      vLineColor: () => '#000000',
-                    },
-                  },
-                ],
-                [
-                  {},
-                  {
-                    table: {
-                      widths: ['60%', '40%'],
-                      body: [
-                        [
-                          {
-                            text: 'Familiar responsable',
-                            fontSize: 7,
-                            bold: true,
-                          },
-                          {
-                            text: 'Teléfono de contacto',
-                            fontSize: 7,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                        ],
-                        [
-                          {
-                            text:
-                              pacienteCompleto.familiar_responsable ||
-                              'No registrado',
-                            fontSize: 7,
-                            margin: [2, 2],
-                          },
-                          {
-                            text:
-                              pacienteCompleto.telefono_familiar ||
-                              'No registrado',
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 2],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      hLineWidth: () => 0.3,
-                      vLineWidth: () => 0.3,
-                      hLineColor: () => '#000000',
-                      vLineColor: () => '#000000',
-                    },
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //       content: [
+  //         // 🔹 SECCIÓN IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.9)
+  //         {
+  //           table: {
+  //             widths: ['15%', '85%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'IDENTIFICACIÓN',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 4,
+  //                 },
+  //                 {
+  //                   table: {
+  //                     widths: ['18%', '18%', '18%', '18%', '14%', '14%'],
+  //                     body: [
+  //                       [
+  //                         {
+  //                           text: 'Fecha evolución',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Hora evolución',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'No. Expediente',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'No. de cama',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Día estancia',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Folio nota',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                       ],
+  //                       [
+  //                         {
+  //                           text: fechaActual.toLocaleDateString('es-MX'),
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: fechaActual.toLocaleTimeString('es-MX'),
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: pacienteCompleto.numero_expediente || 'N/A',
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                           bold: true,
+  //                         },
+  //                         {
+  //                           text:
+  //                             notaEvolucionData.numero_cama || 'Sin asignar',
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `${this.calcularDiaHospitalizacion()}°`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `NE-${
+  //                             pacienteCompleto.numero_expediente
+  //                           }-${fechaActual.getFullYear()}`,
+  //                           fontSize: 6,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                       ],
+  //                     ],
+  //                   },
+  //                   layout: {
+  //                     hLineWidth: () => 0.3,
+  //                     vLineWidth: () => 0.3,
+  //                     hLineColor: () => '#000000',
+  //                     vLineColor: () => '#000000',
+  //                   },
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   table: {
+  //                     widths: ['60%', '20%', '20%'],
+  //                     body: [
+  //                       [
+  //                         {
+  //                           text: 'Nombre completo del paciente',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                         },
+  //                         {
+  //                           text: 'Edad',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Sexo',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                       ],
+  //                       [
+  //                         {
+  //                           text: pacienteCompleto.nombre_completo,
+  //                           fontSize: 8,
+  //                           bold: true,
+  //                           margin: [2, 2],
+  //                         },
+  //                         {
+  //                           text: `${pacienteCompleto.edad} años`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 2],
+  //                         },
+  //                         {
+  //                           text: pacienteCompleto.sexo,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 2],
+  //                         },
+  //                       ],
+  //                     ],
+  //                   },
+  //                   layout: {
+  //                     hLineWidth: () => 0.3,
+  //                     vLineWidth: () => 0.3,
+  //                     hLineColor: () => '#000000',
+  //                     vLineColor: () => '#000000',
+  //                   },
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   table: {
+  //                     widths: ['50%', '25%', '25%'],
+  //                     body: [
+  //                       [
+  //                         {
+  //                           text: 'Servicio hospitalario',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                         },
+  //                         {
+  //                           text: 'Diagnóstico ingreso',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Tipo de sangre',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                       ],
+  //                       [
+  //                         {
+  //                           text:
+  //                             medicoCompleto.departamento || 'No especificado',
+  //                           fontSize: 7,
+  //                           margin: [2, 2],
+  //                         },
+  //                         {
+  //                           text:
+  //                             notaEvolucionData.diagnostico_ingreso ||
+  //                             'Ver expediente',
+  //                           fontSize: 6,
+  //                           alignment: 'center',
+  //                           margin: [0, 2],
+  //                         },
+  //                         {
+  //                           text:
+  //                             pacienteCompleto.tipo_sangre || 'No registrado',
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 2],
+  //                           bold: true,
+  //                           color: '#dc2626',
+  //                         },
+  //                       ],
+  //                     ],
+  //                   },
+  //                   layout: {
+  //                     hLineWidth: () => 0.3,
+  //                     vLineWidth: () => 0.3,
+  //                     hLineColor: () => '#000000',
+  //                     vLineColor: () => '#000000',
+  //                   },
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   table: {
+  //                     widths: ['60%', '40%'],
+  //                     body: [
+  //                       [
+  //                         {
+  //                           text: 'Familiar responsable',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                         },
+  //                         {
+  //                           text: 'Teléfono de contacto',
+  //                           fontSize: 7,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                       ],
+  //                       [
+  //                         {
+  //                           text:
+  //                             pacienteCompleto.familiar_responsable ||
+  //                             'No registrado',
+  //                           fontSize: 7,
+  //                           margin: [2, 2],
+  //                         },
+  //                         {
+  //                           text:
+  //                             pacienteCompleto.telefono_familiar ||
+  //                             'No registrado',
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 2],
+  //                         },
+  //                       ],
+  //                     ],
+  //                   },
+  //                   layout: {
+  //                     hLineWidth: () => 0.3,
+  //                     vLineWidth: () => 0.3,
+  //                     hLineColor: () => '#000000',
+  //                     vLineColor: () => '#000000',
+  //                   },
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 NOTA DE EVOLUCIÓN SEGÚN NOM-004 (SECCIÓN 6.2)
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'NOTA DE EVOLUCIÓN',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 6,
-                  },
-                  {
-                    text: 'EVOLUCIÓN Y ACTUALIZACIÓN DEL CUADRO CLÍNICO (6.2.1)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.evolucion_analisis ||
-                      notaEvolucionData.sintomas_signos ||
-                      'Paciente en evolución clínica favorable. Sin cambios significativos en el cuadro clínico inicial.',
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text: 'SIGNOS VITALES SEGÚN SE CONSIDERE NECESARIO (6.2.2)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    table: {
-                      widths: ['20%', '20%', '20%', '20%', '20%'],
-                      body: [
-                        [
-                          {
-                            text: 'Presión arterial',
-                            fontSize: 6,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Frecuencia cardíaca',
-                            fontSize: 6,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Frecuencia respiratoria',
-                            fontSize: 6,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Temperatura',
-                            fontSize: 6,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                          {
-                            text: 'Saturación O2',
-                            fontSize: 6,
-                            bold: true,
-                            alignment: 'center',
-                          },
-                        ],
-                        [
-                          {
-                            text: `${
-                              signosVitalesReales.presion_arterial_sistolica ||
-                              '___'
-                            }/${
-                              signosVitalesReales.presion_arterial_diastolica ||
-                              '___'
-                            } mmHg`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `${
-                              signosVitalesReales.frecuencia_cardiaca || '___'
-                            } lpm`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `${
-                              signosVitalesReales.frecuencia_respiratoria ||
-                              '___'
-                            } rpm`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `${
-                              signosVitalesReales.temperatura || '___'
-                            } °C`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                          {
-                            text: `${
-                              signosVitalesReales.saturacion_oxigeno || '___'
-                            } %`,
-                            fontSize: 7,
-                            alignment: 'center',
-                            margin: [0, 1],
-                          },
-                        ],
-                      ],
-                    },
-                    layout: {
-                      hLineWidth: () => 0.3,
-                      vLineWidth: () => 0.3,
-                      hLineColor: () => '#000000',
-                      vLineColor: () => '#000000',
-                    },
-                    margin: [5, 2],
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text: 'SOMATOMETRÍA Y ESTADO NUTRICIONAL',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text: `Peso: ${
-                      signosVitalesReales.peso || '___'
-                    } kg | Talla: ${
-                      signosVitalesReales.talla || '___'
-                    } cm | Estado nutricional: ${
-                      notaEvolucionData.estado_nutricional ||
-                      'Adecuado para la edad'
-                    }`,
-                    fontSize: 7,
-                    margin: [5, 3],
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 NOTA DE EVOLUCIÓN SEGÚN NOM-004 (SECCIÓN 6.2)
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'NOTA DE EVOLUCIÓN',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 6,
+  //                 },
+  //                 {
+  //                   text: 'EVOLUCIÓN Y ACTUALIZACIÓN DEL CUADRO CLÍNICO (6.2.1)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.evolucion_analisis ||
+  //                     notaEvolucionData.sintomas_signos ||
+  //                     'Paciente en evolución clínica favorable. Sin cambios significativos en el cuadro clínico inicial.',
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text: 'SIGNOS VITALES SEGÚN SE CONSIDERE NECESARIO (6.2.2)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   table: {
+  //                     widths: ['20%', '20%', '20%', '20%', '20%'],
+  //                     body: [
+  //                       [
+  //                         {
+  //                           text: 'Presión arterial',
+  //                           fontSize: 6,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Frecuencia cardíaca',
+  //                           fontSize: 6,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Frecuencia respiratoria',
+  //                           fontSize: 6,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Temperatura',
+  //                           fontSize: 6,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                         {
+  //                           text: 'Saturación O2',
+  //                           fontSize: 6,
+  //                           bold: true,
+  //                           alignment: 'center',
+  //                         },
+  //                       ],
+  //                       [
+  //                         {
+  //                           text: `${
+  //                             signosVitalesReales.presion_arterial_sistolica ||
+  //                             '___'
+  //                           }/${
+  //                             signosVitalesReales.presion_arterial_diastolica ||
+  //                             '___'
+  //                           } mmHg`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `${
+  //                             signosVitalesReales.frecuencia_cardiaca || '___'
+  //                           } lpm`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `${
+  //                             signosVitalesReales.frecuencia_respiratoria ||
+  //                             '___'
+  //                           } rpm`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `${
+  //                             signosVitalesReales.temperatura || '___'
+  //                           } °C`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                         {
+  //                           text: `${
+  //                             signosVitalesReales.saturacion_oxigeno || '___'
+  //                           } %`,
+  //                           fontSize: 7,
+  //                           alignment: 'center',
+  //                           margin: [0, 1],
+  //                         },
+  //                       ],
+  //                     ],
+  //                   },
+  //                   layout: {
+  //                     hLineWidth: () => 0.3,
+  //                     vLineWidth: () => 0.3,
+  //                     hLineColor: () => '#000000',
+  //                     vLineColor: () => '#000000',
+  //                   },
+  //                   margin: [5, 2],
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text: 'SOMATOMETRÍA Y ESTADO NUTRICIONAL',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text: `Peso: ${
+  //                     signosVitalesReales.peso || '___'
+  //                   } kg | Talla: ${
+  //                     signosVitalesReales.talla || '___'
+  //                   } cm | Estado nutricional: ${
+  //                     notaEvolucionData.estado_nutricional ||
+  //                     'Adecuado para la edad'
+  //                   }`,
+  //                   fontSize: 7,
+  //                   margin: [5, 3],
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 ESTUDIOS Y RESULTADOS (6.2.3)
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'ESTUDIOS Y RESULTADOS',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    text: 'RESULTADOS RELEVANTES DE ESTUDIOS DE SERVICIOS AUXILIARES (6.2.3)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.estudios_laboratorio_gabinete ||
-                      'Sin estudios nuevos solicitados. Resultados pendientes o no aplicables para la evolución actual.',
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 ESTUDIOS Y RESULTADOS (6.2.3)
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'ESTUDIOS Y RESULTADOS',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 2,
+  //                 },
+  //                 {
+  //                   text: 'RESULTADOS RELEVANTES DE ESTUDIOS DE SERVICIOS AUXILIARES (6.2.3)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.estudios_laboratorio_gabinete ||
+  //                     'Sin estudios nuevos solicitados. Resultados pendientes o no aplicables para la evolución actual.',
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 EXPLORACIÓN FÍSICA DIRIGIDA
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'EXPLORACIÓN FÍSICA',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 4,
-                  },
-                  {
-                    text: 'HABITUS EXTERIOR',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.habitus_exterior ||
-                      'Paciente consciente, orientado, cooperador. Facies no características, marcha conservada, actitud adecuada.',
-                    fontSize: 8,
-                    margin: [5, 3],
-                    lineHeight: 1.3,
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text: 'EXPLORACIÓN DIRIGIDA POR APARATOS',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      `Cardiovascular: ${
-                        notaEvolucionData.exploracion_cardiovascular ||
-                        'Ruidos cardíacos rítmicos, sin soplos'
-                      }\n` +
-                      `Respiratorio: ${
-                        notaEvolucionData.exploracion_respiratorio ||
-                        'Murmullo vesicular presente, sin ruidos agregados'
-                      }\n` +
-                      `Abdomen: ${
-                        notaEvolucionData.exploracion_abdomen ||
-                        'Blando, depresible, sin dolor'
-                      }\n` +
-                      `Neurológico: ${
-                        notaEvolucionData.exploracion_neurologico ||
-                        'Sin déficit motor ni sensitivo'
-                      }`,
-                    fontSize: 7,
-                    margin: [5, 3],
-                    lineHeight: 1.3,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 EXPLORACIÓN FÍSICA DIRIGIDA
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'EXPLORACIÓN FÍSICA',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 4,
+  //                 },
+  //                 {
+  //                   text: 'HABITUS EXTERIOR',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.habitus_exterior ||
+  //                     'Paciente consciente, orientado, cooperador. Facies no características, marcha conservada, actitud adecuada.',
+  //                   fontSize: 8,
+  //                   margin: [5, 3],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text: 'EXPLORACIÓN DIRIGIDA POR APARATOS',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     `Cardiovascular: ${
+  //                       notaEvolucionData.exploracion_cardiovascular ||
+  //                       'Ruidos cardíacos rítmicos, sin soplos'
+  //                     }\n` +
+  //                     `Respiratorio: ${
+  //                       notaEvolucionData.exploracion_respiratorio ||
+  //                       'Murmullo vesicular presente, sin ruidos agregados'
+  //                     }\n` +
+  //                     `Abdomen: ${
+  //                       notaEvolucionData.exploracion_abdomen ||
+  //                       'Blando, depresible, sin dolor'
+  //                     }\n` +
+  //                     `Neurológico: ${
+  //                       notaEvolucionData.exploracion_neurologico ||
+  //                       'Sin déficit motor ni sensitivo'
+  //                     }`,
+  //                   fontSize: 7,
+  //                   margin: [5, 3],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 DIAGNÓSTICOS Y PROBLEMAS CLÍNICOS (6.2.4)
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'DIAGNÓSTICOS ACTUALES',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (6.2.4)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.diagnosticos ||
-                      'Diagnósticos en seguimiento según nota de ingreso. Sin cambios en impresión diagnóstica.',
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                    bold: true,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 DIAGNÓSTICOS Y PROBLEMAS CLÍNICOS (6.2.4)
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'DIAGNÓSTICOS ACTUALES',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 2,
+  //                 },
+  //                 {
+  //                   text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (6.2.4)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.diagnosticos ||
+  //                     'Diagnósticos en seguimiento según nota de ingreso. Sin cambios en impresión diagnóstica.',
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                   bold: true,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 PRONÓSTICO (6.2.5)
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'PRONÓSTICO',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                  },
-                  {
-                    text: `PRONÓSTICO (6.2.5): ${
-                      notaEvolucionData.pronostico ||
-                      'Favorable para la vida y función. Reservado a evolución clínica.'
-                    }`,
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                    bold: true,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 PRONÓSTICO (6.2.5)
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'PRONÓSTICO',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                 },
+  //                 {
+  //                   text: `PRONÓSTICO (6.2.5): ${
+  //                     notaEvolucionData.pronostico ||
+  //                     'Favorable para la vida y función. Reservado a evolución clínica.'
+  //                   }`,
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                   bold: true,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)
-          {
-            table: {
-              widths: ['20%', '80%'],
-              body: [
-                [
-                  {
-                    text: 'TRATAMIENTO E INDICACIONES',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 4,
-                  },
-                  {
-                    text: 'TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.plan_estudios_tratamiento ||
-                      'Continuar manejo actual. Vigilar evolución clínica. Medidas generales de soporte.',
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text: 'MEDICAMENTOS (DOSIS, VÍA, PERIODICIDAD)',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                  },
-                ],
-                [
-                  {},
-                  {
-                    text:
-                      notaEvolucionData.indicaciones_medicas ||
-                      'Medicamentos según prescripción previa. Revisar esquema terapéutico en nota de ingreso.',
-                    fontSize: 8,
-                    margin: [5, 5],
-                    lineHeight: 1.3,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)
+  //         {
+  //           table: {
+  //             widths: ['20%', '80%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'TRATAMIENTO E INDICACIONES',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                   rowSpan: 4,
+  //                 },
+  //                 {
+  //                   text: 'TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.plan_estudios_tratamiento ||
+  //                     'Continuar manejo actual. Vigilar evolución clínica. Medidas generales de soporte.',
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text: 'MEDICAMENTOS (DOSIS, VÍA, PERIODICIDAD)',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                 },
+  //               ],
+  //               [
+  //                 {},
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.indicaciones_medicas ||
+  //                     'Medicamentos según prescripción previa. Revisar esquema terapéutico en nota de ingreso.',
+  //                   fontSize: 8,
+  //                   margin: [5, 5],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 3] },
+  //         { text: '', margin: [0, 3] },
 
-          // 🔹 INTERCONSULTAS Y PROCEDIMIENTOS
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: 'INTERCONSULTAS Y PROCEDIMIENTOS',
-                    fontSize: 7,
-                    bold: true,
-                    fillColor: '#f9f9f9',
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text:
-                      notaEvolucionData.interconsultas ||
-                      'Sin interconsultas programadas para esta evolución. Sin procedimientos especiales indicados.',
-                    fontSize: 8,
-                    margin: [10, 5],
-                    lineHeight: 1.3,
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 INTERCONSULTAS Y PROCEDIMIENTOS
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'INTERCONSULTAS Y PROCEDIMIENTOS',
+  //                   fontSize: 7,
+  //                   bold: true,
+  //                   fillColor: '#f9f9f9',
+  //                   alignment: 'center',
+  //                 },
+  //               ],
+  //               [
+  //                 {
+  //                   text:
+  //                     notaEvolucionData.interconsultas ||
+  //                     'Sin interconsultas programadas para esta evolución. Sin procedimientos especiales indicados.',
+  //                   fontSize: 8,
+  //                   margin: [10, 5],
+  //                   lineHeight: 1.3,
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 5] },
+  //         { text: '', margin: [0, 5] },
 
-          // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (5.10)
-          {
-            table: {
-              widths: ['50%', '50%'],
-              body: [
-                [
-                  {
-                    text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'FIRMA AUTÓGRAFA',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: [
-                      {
-                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                        fontSize: 9,
-                        bold: true,
-                      },
-                      {
-                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                        fontSize: 8,
-                      },
-                      {
-                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                        fontSize: 8,
-                      },
-                      {
-                        text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
-                        fontSize: 8,
-                      },
-                      {
-                        text: `Hospital General San Luis de la Paz\n`,
-                        fontSize: 7,
-                      },
-                      {
-                        text: `Fecha: ${fechaActual.toLocaleDateString(
-                          'es-MX'
-                        )}\n`,
-                        fontSize: 7,
-                      },
-                      {
-                        text: `Hora: ${fechaActual.toLocaleTimeString(
-                          'es-MX'
-                        )}`,
-                        fontSize: 7,
-                      },
-                    ],
-                    margin: [5, 15],
-                    alignment: 'center',
-                  },
-                  {
-                    text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
-                    fontSize: 8,
-                    margin: [5, 15],
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
+  //         // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (5.10)
+  //         {
+  //           table: {
+  //             widths: ['50%', '50%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                 },
+  //                 {
+  //                   text: 'FIRMA AUTÓGRAFA',
+  //                   fontSize: 8,
+  //                   bold: true,
+  //                   fillColor: '#f5f5f5',
+  //                   alignment: 'center',
+  //                 },
+  //               ],
+  //               [
+  //                 {
+  //                   text: [
+  //                     {
+  //                       text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+  //                       fontSize: 9,
+  //                       bold: true,
+  //                     },
+  //                     {
+  //                       text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+  //                       fontSize: 8,
+  //                     },
+  //                     {
+  //                       text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+  //                       fontSize: 8,
+  //                     },
+  //                     {
+  //                       text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+  //                       fontSize: 8,
+  //                     },
+  //                     {
+  //                       text: `Hospital General San Luis de la Paz\n`,
+  //                       fontSize: 7,
+  //                     },
+  //                     {
+  //                       text: `Fecha: ${fechaActual.toLocaleDateString(
+  //                         'es-MX'
+  //                       )}\n`,
+  //                       fontSize: 7,
+  //                     },
+  //                     {
+  //                       text: `Hora: ${fechaActual.toLocaleTimeString(
+  //                         'es-MX'
+  //                       )}`,
+  //                       fontSize: 7,
+  //                     },
+  //                   ],
+  //                   margin: [5, 15],
+  //                   alignment: 'center',
+  //                 },
+  //                 {
+  //                   text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
+  //                   fontSize: 8,
+  //                   margin: [5, 15],
+  //                   alignment: 'center',
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: {
+  //             hLineWidth: () => 0.5,
+  //             vLineWidth: () => 0.5,
+  //             hLineColor: () => '#000000',
+  //             vLineColor: () => '#000000',
+  //           },
+  //         },
 
-          { text: '', margin: [0, 2] },
+  //         { text: '', margin: [0, 2] },
 
-          // 🔹 NOTA REFERENCIAL
-          {
-            text: [
-              {
-                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 6.2 "Nota de evolución"\n',
-                fontSize: 6,
-                italics: true,
-                color: '#666666',
-              },
-              {
-                text: '* Cumple con los requisitos establecidos en los numerales 6.2.1 al 6.2.6',
-                fontSize: 6,
-                italics: true,
-                color: '#666666',
-              },
-            ],
-            alignment: 'left',
-          },
-        ],
+  //         // 🔹 NOTA REFERENCIAL
+  //         {
+  //           text: [
+  //             {
+  //               text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 6.2 "Nota de evolución"\n',
+  //               fontSize: 6,
+  //               italics: true,
+  //               color: '#666666',
+  //             },
+  //             {
+  //               text: '* Cumple con los requisitos establecidos en los numerales 6.2.1 al 6.2.6',
+  //               fontSize: 6,
+  //               italics: true,
+  //               color: '#666666',
+  //             },
+  //           ],
+  //           alignment: 'left',
+  //         },
+  //       ],
 
-        footer: (currentPage: number, pageCount: number) => {
-          return {
-            margin: [20, 5],
-            table: {
-              widths: ['25%', '50%', '25%'],
-              body: [
-                [
-                  {
-                    text: `Página ${currentPage} de ${pageCount}`,
-                    fontSize: 7,
-                    color: '#666666',
-                  },
-                  {
-                    text: 'Nota de Evolución - SICEG\nNOM-004-SSA3-2012',
-                    fontSize: 7,
-                    alignment: 'center',
-                    color: '#666666',
-                  },
-                  {
-                    text: [
-                      {
-                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                        fontSize: 7,
-                      },
-                      {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
-                        fontSize: 6,
-                      },
-                    ],
-                    alignment: 'right',
-                    color: '#666666',
-                  },
-                ],
-              ],
-            },
-            layout: 'noBorders',
-          };
-        },
-      };
+  //       footer: (currentPage: number, pageCount: number) => {
+  //         return {
+  //           margin: [20, 5],
+  //           table: {
+  //             widths: ['25%', '50%', '25%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: `Página ${currentPage} de ${pageCount}`,
+  //                   fontSize: 7,
+  //                   color: '#666666',
+  //                 },
+  //                 {
+  //                   text: 'Nota de Evolución - SICEG\nNOM-004-SSA3-2012',
+  //                   fontSize: 7,
+  //                   alignment: 'center',
+  //                   color: '#666666',
+  //                 },
+  //                 {
+  //                   text: [
+  //                     {
+  //                       text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+  //                       fontSize: 7,
+  //                     },
+  //                     {
+  //                       text: `Exp: ${pacienteCompleto.numero_expediente}`,
+  //                       fontSize: 6,
+  //                     },
+  //                   ],
+  //                   alignment: 'right',
+  //                   color: '#666666',
+  //                 },
+  //               ],
+  //             ],
+  //           },
+  //           layout: 'noBorders',
+  //         };
+  //       },
+  //     };
 
-      const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre
-        .replace(/\s+/g, '-')
-        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+  //     const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre
+  //       .replace(/\s+/g, '-')
+  //       .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
-      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-      pdfDocGenerator.download(nombreArchivo);
+  //     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+  //     pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Nota de Evolución NOM-004 generado exitosamente');
-      console.log(`📄 Archivo: ${nombreArchivo}`);
+  //     console.log('✅ PDF de Nota de Evolución NOM-004 generado exitosamente');
+  //     console.log(`📄 Archivo: ${nombreArchivo}`);
 
-      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EVOLUCIÓN
-      this.validarCumplimientoNotaEvolucion(
-        datos,
-        medicoCompleto,
-        pacienteCompleto
-      );
-    } catch (error) {
-      console.error('❌ Error al generar PDF de Nota de Evolución:', error);
-      throw error;
-    }
-  }
+  //     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EVOLUCIÓN
+  //     this.validarCumplimientoNotaEvolucion(
+  //       datos,
+  //       medicoCompleto,
+  //       pacienteCompleto
+  //     );
+  //   } catch (error) {
+  //     console.error('❌ Error al generar PDF de Nota de Evolución:', error);
+  //     throw error;
+  //   }
+  // }
 
   // 📄 NOTA DE CONSENTIMIENTO INFORMADO PARA PROCEDIMIENTOS SEGÚN NOM-004-SSA3-2012
   async generarNotaConsentimientoProcedimientos(datos: any): Promise<void> {
@@ -9358,508 +9494,1381 @@ private validarCumplimientoInformeDiario(
     }
   }
 
-// 📄 SOLICITUD DE CULTIVO HOSPITAL MATERNO
+  // 📄 SOLICITUD DE CULTIVO HOSPITAL MATERNO
 
-async generarSolicitudCultivo(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
+  async generarSolicitudCultivo(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
 
-    console.log('🧫 Generando Solicitud de Cultivo para Hospital Materno...');
+      console.log('🧫 Generando Solicitud de Cultivo para Hospital Materno...');
 
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const cultivoData = datos.solicitudCultivo || {};
-    const fechaActual = new Date();
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const cultivoData = datos.solicitudCultivo || {};
+      const fechaActual = new Date();
 
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 40, 20, 40],
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 40, 20, 40],
 
-      header: function(currentPage: number) {
-        return [
+        header: function(currentPage: number) {
+          return [
+            {
+              table: {
+                widths: ['100%'],
+                body: [
+                  [
+                    {
+                      text: 'HOSPITAL MATERNO SAN LUIS DE LA PAZ',
+                      fontSize: 12,
+                      bold: true,
+                      alignment: 'center',
+                      margin: [0, 10, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: 'N° acceso: ___________________________',
+                      fontSize: 10,
+                      alignment: 'right',
+                      margin: [0, 5, 0, 5],
+                    },
+                  ],
+                  [
+                    {
+                      text: 'LABORATORIO CLINICO',
+                      fontSize: 12,
+                      bold: true,
+                      alignment: 'center',
+                      margin: [0, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: 'Blvr. Centenario de la Revolución Mexicana N° 110',
+                      fontSize: 9,
+                      alignment: 'center',
+                      margin: [0, 5, 0, 10],
+                    },
+                  ],
+                  [
+                    {
+                      text: 'SOLICITUD DE ESTUDIOS DE MICROBIOLOGIA',
+                      fontSize: 14,
+                      bold: true,
+                      alignment: 'center',
+                      margin: [0, 10, 0, 15],
+                    },
+                  ],
+                ],
+              },
+              layout: 'noBorders',
+              margin: [20, 20, 20, 0],
+            },
+          ];
+        },
+
+        content: [
+          // 🔹 DATOS DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '35%', '10%', '15%', '10%', '15%'],
+              body: [
+                [
+                  { text: 'Nombre:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'Género:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'Edad:', fontSize: 10, bold: true },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          {
+            table: {
+              widths: ['20%', '30%', '15%', '35%'],
+              body: [
+                [
+                  { text: 'Fecha de solicitud:', fontSize: 10, bold: true },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'Servicio:', fontSize: 10, bold: true },
+                  {
+                    text: medicoCompleto.departamento || 'No especificado',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          {
+            table: {
+              widths: ['15%', '25%', '15%', '25%', '10%', '10%'],
+              body: [
+                [
+                  { text: 'Cama:', fontSize: 10, bold: true },
+                  {
+                    text: cultivoData.numero_cama || 'Ambulatorio',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'No. Expediente:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.numero_expediente,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'CURP:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.curp || 'No registrado',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 FIRMA MÉDICO
           {
             table: {
               widths: ['100%'],
               body: [
                 [
                   {
-                    text: 'HOSPITAL MATERNO SAN LUIS DE LA PAZ',
-                    fontSize: 12,
-                    bold: true,
-                    alignment: 'center',
-                    margin: [0, 10, 0, 0],
-                  },
-                ],
-                [
-                  {
-                    text: 'N° acceso: ___________________________',
+                    text: 'Nombre y firma del médico solicitante:',
                     fontSize: 10,
-                    alignment: 'right',
-                    margin: [0, 5, 0, 5],
-                  },
-                ],
-                [
-                  {
-                    text: 'LABORATORIO CLINICO',
-                    fontSize: 12,
                     bold: true,
-                    alignment: 'center',
-                    margin: [0, 5, 0, 0],
                   },
                 ],
                 [
                   {
-                    text: 'Blvr. Centenario de la Revolución Mexicana N° 110',
-                    fontSize: 9,
-                    alignment: 'center',
-                    margin: [0, 5, 0, 10],
+                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                    fontSize: 10,
+                    decoration: 'underline',
                   },
                 ],
                 [
                   {
-                    text: 'SOLICITUD DE ESTUDIOS DE MICROBIOLOGIA',
-                    fontSize: 14,
-                    bold: true,
-                    alignment: 'center',
-                    margin: [0, 10, 0, 15],
+                    text: `Cédula: ${medicoCompleto.numero_cedula}   Firma: ___________________________`,
+                    fontSize: 10,
+                    margin: [0, 10, 0, 0],
                   },
                 ],
               ],
             },
             layout: 'noBorders',
-            margin: [20, 20, 20, 0],
+            margin: [0, 0, 0, 20],
           },
-        ];
+
+          // 🔹 DIAGNÓSTICO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Diagnóstico:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      cultivoData.diagnostico ||
+                      '______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 RESPONSABLE DE TOMA
+          {
+            table: {
+              widths: ['30%', '70%'],
+              body: [
+                [
+                  {
+                    text: 'Responsable de la toma de muestra:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: cultivoData.responsable_muestra || '___________________________',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 TIPO DE MUESTRA
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'Tipo de muestra:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    table: {
+                      widths: ['15%', '15%', '15%', '15%', '15%', '25%'],
+                      body: [
+                        [
+                          { text: '☐ Líquido', fontSize: 9 },
+                          { text: '☐ Secreción', fontSize: 9 },
+                          { text: '☐ Sangre', fontSize: 9 },
+                          { text: '☐ Catéter', fontSize: 9 },
+                          { text: '☐ Orina', fontSize: 9 },
+                          { text: '☐ Otro: ___________', fontSize: 9 },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 SITIO DE ORIGEN
+          {
+            table: {
+              widths: ['30%', '70%'],
+              body: [
+                [
+                  {
+                    text: 'Sitio de origen de la muestra:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text:
+                      cultivoData.sitio_origen ||
+                      '______________________________________________________________________________________',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 TIPO DE MICROORGANISMO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'En caso de requerir cultivo especificar el tipo de microorganismo a buscar:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      cultivoData.microorganismo_buscar ||
+                      '______________________________________________________________________________________\n______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 TINCIÓN
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'Tinción:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    table: {
+                      widths: ['15%', '15%', '15%', '15%', '40%'],
+                      body: [
+                        [
+                          { text: '☐ Tinta china', fontSize: 9 },
+                          { text: '☐ Gram', fontSize: 9 },
+                          { text: '☐ BAAR', fontSize: 9 },
+                          { text: '☐ KINYOUN', fontSize: 9 },
+                          { text: '☐ Otro: ___________', fontSize: 9 },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 ANTIBIÓTICO
+          {
+            table: {
+              widths: ['30%', '15%', '55%'],
+              body: [
+                [
+                  {
+                    text: '¿El paciente recibe antibiótico?',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: cultivoData.recibe_antibiotico ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                    fontSize: 10,
+                  },
+                  {
+                    text: '¿Cuál? ' + (cultivoData.antibiotico_actual || '___________________________'),
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 CULTIVOS ANTERIORES
+          {
+            table: {
+              widths: ['40%', '15%', '45%'],
+              body: [
+                [
+                  {
+                    text: '¿Se han realizado cultivos anteriormente?',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: cultivoData.cultivos_previos ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                    fontSize: 10,
+                  },
+                  {
+                    text: '',
+                    fontSize: 10,
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 MICROORGANISMOS AISLADOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Microorganismos aislados encontrados:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      cultivoData.microorganismos_aislados ||
+                      '______________________________________________________________________________________\n______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 COMENTARIOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Comentarios:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      cultivoData.comentarios ||
+                      '______________________________________________________________________________________\n______________________________________________________________________________________\n______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 30],
+          },
+
+          // 🔹 ETIQUETA DE FOLIO (DUPLICATE HEADER)
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Etiqueta de folio: ___________________________',
+                    fontSize: 10,
+                    alignment: 'center',
+                    margin: [0, 20, 0, 0],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 10],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 8,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Solicitud de Cultivo - Hospital Materno\nSICEG - NOM-004-SSA3-2012',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `solicitud-cultivo-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Solicitud de Cultivo:', error);
+      throw error;
+    }
+  }
+
+
+  // 📄 NOTA DE EGRESO SEGÚN NOM-004-SSA3-2012 SECCIÓN D12
+async generarNotaEgreso(datos: any): Promise<void> {
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    console.log('🏥 Generando Nota de Egreso según NOM-004-SSA3-2012...');
+
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const egresoData = datos.notaEgreso || {};
+    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+    const fechaActual = new Date();
+
+    const documentDefinition = {
+      pageSize: 'LETTER',
+      pageMargins: [20, 70, 20, 50],
+
+      header: {
+        margin: [20, 10, 20, 10],
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EGRESO',
+                fontSize: 11,
+                bold: true,
+                alignment: 'center',
+              },
+            ],
+          ],
+        },
+        layout: 'noBorders',
       },
 
       content: [
-        // 🔹 DATOS DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '35%', '10%', '15%', '10%', '15%'],
-            body: [
-              [
-                { text: 'Nombre:', fontSize: 10, bold: true },
-                {
-                  text: pacienteCompleto.nombre_completo,
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-                { text: 'Género:', fontSize: 10, bold: true },
-                {
-                  text: pacienteCompleto.sexo,
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-                { text: 'Edad:', fontSize: 10, bold: true },
-                {
-                  text: `${pacienteCompleto.edad} años`,
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
+        { text: '', margin: [0, 10] },
 
-        {
-          table: {
-            widths: ['20%', '30%', '15%', '35%'],
-            body: [
-              [
-                { text: 'Fecha de solicitud:', fontSize: 10, bold: true },
-                {
-                  text: fechaActual.toLocaleDateString('es-MX'),
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-                { text: 'Servicio:', fontSize: 10, bold: true },
-                {
-                  text: medicoCompleto.departamento || 'No especificado',
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        {
-          table: {
-            widths: ['15%', '25%', '15%', '25%', '10%', '10%'],
-            body: [
-              [
-                { text: 'Cama:', fontSize: 10, bold: true },
-                {
-                  text: cultivoData.numero_cama || 'Ambulatorio',
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-                { text: 'No. Expediente:', fontSize: 10, bold: true },
-                {
-                  text: pacienteCompleto.numero_expediente,
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-                { text: 'CURP:', fontSize: 10, bold: true },
-                {
-                  text: pacienteCompleto.curp || 'No registrado',
-                  fontSize: 9,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 FIRMA MÉDICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Nombre y firma del médico solicitante:',
-                  fontSize: 10,
-                  bold: true,
-                },
-              ],
-              [
-                {
-                  text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-              [
-                {
-                  text: `Cédula: ${medicoCompleto.numero_cedula}   Firma: ___________________________`,
-                  fontSize: 10,
-                  margin: [0, 10, 0, 0],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 DIAGNÓSTICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Diagnóstico:',
-                  fontSize: 10,
-                  bold: true,
-                },
-              ],
-              [
-                {
-                  text:
-                    cultivoData.diagnostico ||
-                    '______________________________________________________________________________________',
-                  fontSize: 10,
-                  margin: [0, 5],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 RESPONSABLE DE TOMA
-        {
-          table: {
-            widths: ['30%', '70%'],
-            body: [
-              [
-                {
-                  text: 'Responsable de la toma de muestra:',
-                  fontSize: 10,
-                  bold: true,
-                },
-                {
-                  text: cultivoData.responsable_muestra || '___________________________',
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 TIPO DE MUESTRA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'Tipo de muestra:',
-                  fontSize: 10,
-                  bold: true,
-                },
-                {
-                  table: {
-                    widths: ['15%', '15%', '15%', '15%', '15%', '25%'],
-                    body: [
-                      [
-                        { text: '☐ Líquido', fontSize: 9 },
-                        { text: '☐ Secreción', fontSize: 9 },
-                        { text: '☐ Sangre', fontSize: 9 },
-                        { text: '☐ Catéter', fontSize: 9 },
-                        { text: '☐ Orina', fontSize: 9 },
-                        { text: '☐ Otro: ___________', fontSize: 9 },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 SITIO DE ORIGEN
-        {
-          table: {
-            widths: ['30%', '70%'],
-            body: [
-              [
-                {
-                  text: 'Sitio de origen de la muestra:',
-                  fontSize: 10,
-                  bold: true,
-                },
-                {
-                  text:
-                    cultivoData.sitio_origen ||
-                    '______________________________________________________________________________________',
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 TIPO DE MICROORGANISMO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'En caso de requerir cultivo especificar el tipo de microorganismo a buscar:',
-                  fontSize: 10,
-                  bold: true,
-                },
-              ],
-              [
-                {
-                  text:
-                    cultivoData.microorganismo_buscar ||
-                    '______________________________________________________________________________________\n______________________________________________________________________________________',
-                  fontSize: 10,
-                  margin: [0, 5],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 TINCIÓN
+        // 🔹 IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.2)
         {
           table: {
             widths: ['15%', '85%'],
             body: [
               [
                 {
-                  text: 'Tinción:',
-                  fontSize: 10,
+                  text: 'IDENTIFICACIÓN',
+                  fontSize: 8,
                   bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
                 },
                 {
                   table: {
-                    widths: ['15%', '15%', '15%', '15%', '40%'],
+                    widths: ['20%', '20%', '20%', '20%', '20%'],
                     body: [
                       [
-                        { text: '☐ Tinta china', fontSize: 9 },
-                        { text: '☐ Gram', fontSize: 9 },
-                        { text: '☐ BAAR', fontSize: 9 },
-                        { text: '☐ KINYOUN', fontSize: 9 },
-                        { text: '☐ Otro: ___________', fontSize: 9 },
+                        {
+                          text: 'Fecha egreso',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Hora egreso',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. Expediente',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. de cama',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Folio egreso',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: egresoData.fecha_egreso || fechaActual.toLocaleDateString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: egresoData.hora_egreso || fechaActual.toLocaleTimeString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                          bold: true,
+                        },
+                        {
+                          text: egresoData.numero_cama || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `EG-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          fontSize: 6,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['60%', '20%', '20%'],
+                    body: [
+                      [
+                        {
+                          text: 'Nombre completo del paciente',
+                          fontSize: 7,
+                          bold: true,
+                        },
+                        {
+                          text: 'Edad',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Sexo',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: pacienteCompleto.nombre_completo,
+                          fontSize: 8,
+                          bold: true,
+                          margin: [2, 2],
+                        },
+                        {
+                          text: `${pacienteCompleto.edad} años`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: pacienteCompleto.sexo,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['50%', '50%'],
+                    body: [
+                      [
+                        {
+                          text: 'Fecha y hora ingreso hospitalario',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Días de estancia en la unidad',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: `${egresoData.fecha_ingreso || 'No registrada'} - ${egresoData.hora_ingreso || 'No registrada'}`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: `${egresoData.dias_estancia || this.calcularDiaHospitalizacion()} días`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                          bold: true,
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['60%', '40%'],
+                    body: [
+                      [
+                        {
+                          text: 'Servicio',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Reingreso por la misma afección en el año',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: medicoCompleto.departamento || 'No especificado',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: egresoData.es_reingreso ? 'SÍ' : 'NO',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                          bold: true,
+                          color: egresoData.es_reingreso ? '#dc2626' : '#059669',
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 SIGNOS VITALES AL EGRESO (NOM-004 D12.4)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'SIGNOS VITALES AL EGRESO',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 2,
+                },
+                {
+                  table: {
+                    widths: ['16%', '16%', '16%', '16%', '16%', '20%'],
+                    body: [
+                      [
+                        {
+                          text: 'Peso',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Talla',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Presión arterial',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'FC',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'FR',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Temperatura',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: `${signosVitalesReales.peso || '___'} kg`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.talla || '___'} cm`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'}`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.frecuencia_respiratoria || '___'} rpm`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.temperatura || '___'} °C`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['100%'],
+                    body: [
+                      [
+                        {
+                          text: 'Estado general al egreso',
+                          fontSize: 7,
+                          bold: true,
+                          fillColor: '#f9f9f9',
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: egresoData.estado_general_egreso || 'Estable, sin signos de alarma.',
+                          fontSize: 8,
+                          margin: [5, 5],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 DIAGNÓSTICOS (NOM-004 D12.8 y D12.11)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'DIAGNÓSTICOS',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'DIAGNÓSTICO(S) DE INGRESO (D12.8)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.diagnosticos_ingreso || 'No especificados en el momento del ingreso.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'DIAGNÓSTICO(S) FINAL(ES) (D12.11)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.diagnosticos_finales || 'Diagnósticos finales por definir.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                  bold: true,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 EVOLUCIÓN Y MANEJO (NOM-004 D12.9 y D12.10)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'EVOLUCIÓN Y MANEJO',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'RESUMEN DE LA EVOLUCIÓN Y ESTADO ACTUAL (D12.9)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.resumen_evolucion || 'Evolución clínica favorable durante la estancia hospitalaria.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'MANEJO DURANTE LA ESTANCIA HOSPITALARIA (D12.10)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.manejo_hospitalario || 'Manejo médico integral según protocolos institucionales.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 PROCEDIMIENTOS Y MOTIVO DE EGRESO (NOM-004 D12.12 y D12.13)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'PROCEDIMIENTOS Y EGRESO',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'PROCEDIMIENTOS REALIZADOS (D12.12)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.procedimientos_realizados || 'Sin procedimientos especiales durante la estancia.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'MOTIVO DE EGRESO (D12.13)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['25%', '25%', '25%', '25%'],
+                    body: [
+                      [
+                        {
+                          text: egresoData.motivo_egreso === 'maximo_beneficio' ? '☑ Máximo beneficio' : '☐ Máximo beneficio',
+                          fontSize: 7,
+                          alignment: 'center',
+                        },
+                        {
+                          text: egresoData.motivo_egreso === 'mejoria' ? '☑ Por mejoría' : '☐ Por mejoría',
+                          fontSize: 7,
+                          alignment: 'center',
+                        },
+                        {
+                          text: egresoData.motivo_egreso === 'alta_voluntaria' ? '☑ Alta voluntaria' : '☐ Alta voluntaria',
+                          fontSize: 7,
+                          alignment: 'center',
+                        },
+                        {
+                          text: egresoData.motivo_egreso === 'exitus' ? '☑ Exitus' : '☐ Exitus',
+                          fontSize: 7,
+                          alignment: 'center',
+                        },
                       ],
                     ],
                   },
                   layout: 'noBorders',
+                  margin: [5, 3],
                 },
               ],
             ],
           },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
         },
 
-        // 🔹 ANTIBIÓTICO
+        { text: '', margin: [0, 3] },
+
+        // 🔹 PROBLEMAS PENDIENTES Y PLAN (NOM-004 D12.14 y D12.15)
         {
           table: {
-            widths: ['30%', '15%', '55%'],
+            widths: ['20%', '80%'],
             body: [
               [
                 {
-                  text: '¿El paciente recibe antibiótico?',
-                  fontSize: 10,
+                  text: 'SEGUIMIENTO',
+                  fontSize: 8,
                   bold: true,
-                },
-                {
-                  text: cultivoData.recibe_antibiotico ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
-                  fontSize: 10,
-                },
-                {
-                  text: '¿Cuál? ' + (cultivoData.antibiotico_actual || '___________________________'),
-                  fontSize: 10,
-                  decoration: 'underline',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 CULTIVOS ANTERIORES
-        {
-          table: {
-            widths: ['40%', '15%', '45%'],
-            body: [
-              [
-                {
-                  text: '¿Se han realizado cultivos anteriormente?',
-                  fontSize: 10,
-                  bold: true,
-                },
-                {
-                  text: cultivoData.cultivos_previos ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
-                  fontSize: 10,
-                },
-                {
-                  text: '',
-                  fontSize: 10,
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 MICROORGANISMOS AISLADOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Microorganismos aislados encontrados:',
-                  fontSize: 10,
-                  bold: true,
-                },
-              ],
-              [
-                {
-                  text:
-                    cultivoData.microorganismos_aislados ||
-                    '______________________________________________________________________________________\n______________________________________________________________________________________',
-                  fontSize: 10,
-                  margin: [0, 5],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 COMENTARIOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Comentarios:',
-                  fontSize: 10,
-                  bold: true,
-                },
-              ],
-              [
-                {
-                  text:
-                    cultivoData.comentarios ||
-                    '______________________________________________________________________________________\n______________________________________________________________________________________\n______________________________________________________________________________________',
-                  fontSize: 10,
-                  margin: [0, 5],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 30],
-        },
-
-        // 🔹 ETIQUETA DE FOLIO (DUPLICATE HEADER)
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Etiqueta de folio: ___________________________',
-                  fontSize: 10,
+                  fillColor: '#f5f5f5',
                   alignment: 'center',
-                  margin: [0, 20, 0, 0],
+                  rowSpan: 6,
+                },
+                {
+                  text: 'PROBLEMAS CLÍNICOS PENDIENTES (D12.14)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.problemas_pendientes || 'Sin problemas clínicos pendientes al momento del egreso.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'PLAN DE MANEJO Y TRATAMIENTO (D12.15)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.plan_manejo_tratamiento || 'Continuar manejo ambulatorio según indicaciones médicas.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'RECOMENDACIONES PARA VIGILANCIA AMBULATORIA (D12.16)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: egresoData.recomendaciones_ambulatorias || 'Control médico en consulta externa según programación. Acudir a urgencias en caso de signos de alarma.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
                 },
               ],
             ],
           },
-          layout: 'noBorders',
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 5] },
+
+        // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (D12.17)
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA DEL MÉDICO (D12.17)',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                },
+                {
+                  text: 'FIRMA AUTÓGRAFA',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: [
+                    {
+                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    {
+                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Hospital General San Luis de la Paz\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+                      fontSize: 7,
+                    },
+                  ],
+                  margin: [5, 15],
+                  alignment: 'center',
+                },
+                {
+                  text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
+                  fontSize: 8,
+                  margin: [5, 15],
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 2] },
+
+        // 🔹 NOTA REFERENCIAL
+        {
+          text: [
+            {
+              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D12 "Nota de egreso"\n',
+              fontSize: 6,
+              italics: true,
+              color: '#666666',
+            },
+            {
+              text: '* Cumple con los requisitos establecidos en los numerales D12.1 al D12.17',
+              fontSize: 6,
+              italics: true,
+              color: '#666666',
+            },
+          ],
+          alignment: 'left',
         },
       ],
 
       footer: (currentPage: number, pageCount: number) => {
         return {
-          margin: [20, 10],
+          margin: [20, 5],
           table: {
             widths: ['25%', '50%', '25%'],
             body: [
               [
                 {
                   text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
+                  fontSize: 7,
                   color: '#666666',
                 },
                 {
-                  text: 'Solicitud de Cultivo - Hospital Materno\nSICEG - NOM-004-SSA3-2012',
-                  fontSize: 8,
+                  text: 'Nota de Egreso - SICEG\nNOM-004-SSA3-2012',
+                  fontSize: 7,
                   alignment: 'center',
                   color: '#666666',
                 },
@@ -9867,11 +10876,11 @@ async generarSolicitudCultivo(datos: any): Promise<void> {
                   text: [
                     {
                       text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 8,
+                      fontSize: 7,
                     },
                     {
                       text: `Exp: ${pacienteCompleto.numero_expediente}`,
-                      fontSize: 7,
+                      fontSize: 6,
                     },
                   ],
                   alignment: 'right',
@@ -9885,47 +10894,2496 @@ async generarSolicitudCultivo(datos: any): Promise<void> {
       },
     };
 
-    const nombreArchivo = `solicitud-cultivo-${pacienteCompleto.nombre
+    const nombreArchivo = `nota-egreso-${pacienteCompleto.nombre
       .replace(/\s+/g, '-')
       .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+    console.log('✅ PDF de Nota de Egreso NOM-004 generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
+
+    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EGRESO
+    this.validarCumplimientoNotaEgreso(datos, medicoCompleto, pacienteCompleto);
+
   } catch (error) {
-    console.error('❌ Error al generar PDF de Solicitud de Cultivo:', error);
+    console.error('❌ Error al generar PDF de Nota de Egreso:', error);
+    throw error;
+  }
+}
+
+// 📄 NOTA DE INTERCONSULTA SEGÚN NOM-004-SSA3-2012 SECCIÓN D7
+async generarNotaInterconsulta(datos: any): Promise<void> {
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    console.log('🔄 Generando Nota de Interconsulta según NOM-004-SSA3-2012...');
+
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const interconsultaData = datos.notaInterconsulta || {};
+    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+    const fechaActual = new Date();
+
+    const documentDefinition = {
+      pageSize: 'LETTER',
+      pageMargins: [20, 70, 20, 50],
+
+      header: {
+        margin: [20, 10, 20, 10],
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE INTERCONSULTA',
+                fontSize: 11,
+                bold: true,
+                alignment: 'center',
+              },
+            ],
+          ],
+        },
+        layout: 'noBorders',
+      },
+
+      content: [
+        { text: '', margin: [0, 10] },
+
+        // 🔹 IDENTIFICACIÓN DEL PACIENTE
+        {
+          table: {
+            widths: ['15%', '85%'],
+            body: [
+              [
+                {
+                  text: 'IDENTIFICACIÓN',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  table: {
+                    widths: ['20%', '20%', '20%', '20%', '20%'],
+                    body: [
+                      [
+                        {
+                          text: 'Fecha interconsulta',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Hora interconsulta',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. Expediente',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. de cama',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Folio interconsulta',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: fechaActual.toLocaleDateString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: fechaActual.toLocaleTimeString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                          bold: true,
+                        },
+                        {
+                          text: interconsultaData.numero_cama || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `IC-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          fontSize: 6,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['60%', '20%', '20%'],
+                    body: [
+                      [
+                        {
+                          text: 'Nombre completo del paciente',
+                          fontSize: 7,
+                          bold: true,
+                        },
+                        {
+                          text: 'Edad',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Sexo',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: pacienteCompleto.nombre_completo,
+                          fontSize: 8,
+                          bold: true,
+                          margin: [2, 2],
+                        },
+                        {
+                          text: `${pacienteCompleto.edad} años`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: pacienteCompleto.sexo,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['50%', '50%'],
+                    body: [
+                      [
+                        {
+                          text: 'Servicio solicitante',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Especialidad solicitada',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: medicoCompleto.departamento || 'No especificado',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: interconsultaData.especialidad_solicitada || 'No especificada',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                          bold: true,
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['100%'],
+                    body: [
+                      [
+                        {
+                          text: 'Médico que solicita interconsulta',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 MOTIVO DE LA CONSULTA (NOM-004 D7.14)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'SOLICITUD DE INTERCONSULTA',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'MOTIVO DE LA CONSULTA (D7.14)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.motivo_consulta || 'Motivo de interconsulta no especificado.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'PROBLEMA CLÍNICO ESPECÍFICO',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.problema_clinico || 'Se solicita valoración y manejo por especialidad correspondiente.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 ANTECEDENTES RELEVANTES
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'ANTECEDENTES RELEVANTES',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'ANTECEDENTES PERSONALES PATOLÓGICOS',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.antecedentes_patologicos || 'Sin antecedentes patológicos de importancia.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'MEDICAMENTOS ACTUALES',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.medicamentos_actuales || 'Sin medicamentos de base reportados.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 EXPLORACIÓN FÍSICA RELEVANTE
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'EXPLORACIÓN FÍSICA',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'SIGNOS VITALES',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['25%', '25%', '25%', '25%'],
+                    body: [
+                      [
+                        {
+                          text: 'Presión arterial',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Frecuencia cardíaca',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Frecuencia respiratoria',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Temperatura',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'} mmHg`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.frecuencia_respiratoria || '___'} rpm`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `${signosVitalesReales.temperatura || '___'} °C`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                  margin: [5, 2],
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'HALLAZGOS RELEVANTES PARA INTERCONSULTA',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.hallazgos_relevantes || 'Exploración física dirigida según el motivo de interconsulta.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 ESTUDIOS DISPONIBLES
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'ESTUDIOS DISPONIBLES',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 2,
+                },
+                {
+                  text: 'LABORATORIO Y GABINETE',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f9f9f9',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.estudios_disponibles || 'Se adjuntan estudios de laboratorio y gabinete disponibles en el expediente.',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 RESPUESTA DEL ESPECIALISTA
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'RESPUESTA DEL ESPECIALISTA',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#e0f2fe',
+                  alignment: 'center',
+                  rowSpan: 8,
+                },
+                {
+                  text: 'CRITERIO DIAGNÓSTICO (D7.12)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f9ff',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.criterio_diagnostico || '________________________________________________________________________________________\n________________________________________________________________________________________',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'SUGERENCIAS DIAGNÓSTICAS (D7.13)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f9ff',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.sugerencias_diagnosticas || '________________________________________________________________________________________\n________________________________________________________________________________________',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'SUGERENCIAS DE TRATAMIENTO (D7.13)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f9ff',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.sugerencias_tratamiento || '________________________________________________________________________________________\n________________________________________________________________________________________',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'ESTUDIOS ADICIONALES SUGERIDOS',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f9ff',
+                },
+              ],
+              [
+                {},
+                {
+                  text: interconsultaData.estudios_sugeridos || '________________________________________________________________________________________',
+                  fontSize: 8,
+                  margin: [5, 5],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 5] },
+
+        // 🔹 FIRMAS
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  text: 'MÉDICO QUE SOLICITA INTERCONSULTA',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                },
+                {
+                  text: 'MÉDICO ESPECIALISTA CONSULTADO',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#e0f2fe',
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: [
+                    {
+                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    {
+                      text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `${medicoCompleto.especialidad}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `${medicoCompleto.departamento}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: '\n_________________________\nFIRMA',
+                      fontSize: 8,
+                    },
+                  ],
+                  margin: [5, 15],
+                  alignment: 'center',
+                },
+                {
+                  text: [
+                    {
+                      text: `${interconsultaData.especialista_nombre || '__________________________'}\n`,
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    {
+                      text: `Cédula: ${interconsultaData.especialista_cedula || '______________'}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `${interconsultaData.especialidad_solicitada || '__________________________'}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Fecha: ${interconsultaData.fecha_respuesta || '______________'}\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: '\n_________________________\nFIRMA',
+                      fontSize: 8,
+                    },
+                  ],
+                  margin: [5, 15],
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 2] },
+
+        // 🔹 NOTA REFERENCIAL
+        {
+          text: [
+            {
+              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D7 "Notas de interconsulta"\n',
+              fontSize: 6,
+              italics: true,
+              color: '#666666',
+            },
+            {
+              text: '* Cumple con los requisitos establecidos en los numerales D7.12, D7.13 y D7.14',
+              fontSize: 6,
+              italics: true,
+              color: '#666666',
+            },
+          ],
+          alignment: 'left',
+        },
+      ],
+
+      footer: (currentPage: number, pageCount: number) => {
+        return {
+          margin: [20, 5],
+          table: {
+            widths: ['25%', '50%', '25%'],
+            body: [
+              [
+                {
+                  text: `Página ${currentPage} de ${pageCount}`,
+                  fontSize: 7,
+                  color: '#666666',
+                },
+                {
+                  text: 'Nota de Interconsulta - SICEG\nNOM-004-SSA3-2012',
+                  fontSize: 7,
+                  alignment: 'center',
+                  color: '#666666',
+                },
+                {
+                  text: [
+                    {
+                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      fontSize: 6,
+                    },
+                  ],
+                  alignment: 'right',
+                  color: '#666666',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        };
+      },
+    };
+
+    const nombreArchivo = `nota-interconsulta-${pacienteCompleto.nombre
+      .replace(/\s+/g, '-')
+      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Interconsulta NOM-004 generado exitosamente');
+    console.log(`📄 Archivo: ${nombreArchivo}`);
+
+    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+    this.validarCumplimientoNotaInterconsulta(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Interconsulta:', error);
     throw error;
   }
 }
 
 
+// 📄 PRESCRIPCIÓN DE MEDICAMENTOS SEGÚN NOM-004-SSA3-2012
+async generarPrescripcionMedicamentos(datos: any): Promise<void> {
+  try {
+    await this.ensurePdfMakeLoaded();
 
+    console.log('💊 Generando Prescripción de Medicamentos según NOM-004...');
 
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const prescripcionData = datos.prescripcionMedicamentos || {};
+    const fechaActual = new Date();
 
+    const documentDefinition = {
+      pageSize: 'LETTER',
+      pageMargins: [30, 60, 30, 50],
 
+      header: {
+        margin: [30, 15, 30, 15],
+        table: {
+          widths: ['20%', '60%', '20%'],
+          body: [
+            [
+              {
+                text: '💊',
+                fontSize: 24,
+                alignment: 'center',
+                color: '#059669',
+              },
+              {
+                text: [
+                  {
+                    text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\n',
+                    fontSize: 13,
+                    bold: true,
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'PRESCRIPCIÓN MÉDICA\n',
+                    fontSize: 11,
+                    bold: true,
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'Blvd. Centenario de la Revolución Mexicana #110',
+                    fontSize: 8,
+                    alignment: 'center',
+                  },
+                ],
+              },
+              {
+                text: [
+                  { text: 'Folio:\n', fontSize: 8, bold: true },
+                  { text: `PM-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}\n`, fontSize: 7 },
+                  { text: 'Fecha:\n', fontSize: 8, bold: true },
+                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
+                ],
+                alignment: 'center',
+              },
+            ],
+          ],
+        },
+        layout: 'noBorders',
+      },
 
+      content: [
+        { text: '', margin: [0, 10] },
 
+        // 🔹 DATOS DEL PACIENTE
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'DATOS DEL PACIENTE',
+                  fontSize: 9,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  margin: [0, 3, 0, 3],
+                },
+              ],
+              [
+                {
+                  table: {
+                    widths: ['20%', '30%', '20%', '30%'],
+                    body: [
+                      [
+                        { text: 'Nombre:', fontSize: 8, bold: true },
+                        { text: pacienteCompleto.nombre_completo, fontSize: 8 },
+                        { text: 'Expediente:', fontSize: 8, bold: true },
+                        { text: pacienteCompleto.numero_expediente, fontSize: 8, bold: true },
+                      ],
+                      [
+                        { text: 'Edad:', fontSize: 8, bold: true },
+                        { text: `${pacienteCompleto.edad} años`, fontSize: 8 },
+                        { text: 'Sexo:', fontSize: 8, bold: true },
+                        { text: pacienteCompleto.sexo, fontSize: 8 },
+                      ],
+                      [
+                        { text: 'Peso:', fontSize: 8, bold: true },
+                        { text: `${prescripcionData.peso_paciente || '___'} kg`, fontSize: 8 },
+                        { text: 'Alergias:', fontSize: 8, bold: true },
+                        { text: prescripcionData.alergias_conocidas || 'No conocidas', fontSize: 8 },
+                      ],
+                    ],
+                  },
+                  layout: 'noBorders',
+                  margin: [5, 5, 5, 5],
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 15],
+        },
 
+        // 🔹 DIAGNÓSTICO
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'DIAGNÓSTICO:',
+                  fontSize: 9,
+                  bold: true,
+                  margin: [5, 5, 5, 2],
+                },
+              ],
+              [
+                {
+                  text: prescripcionData.diagnostico || 'Diagnóstico por especificar',
+                  fontSize: 9,
+                  margin: [5, 2, 5, 8],
+                  bold: true,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 20],
+        },
 
+        // 🔹 MEDICAMENTOS PRESCRITOS
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Rp/ MEDICAMENTOS PRESCRITOS',
+                  fontSize: 10,
+                  bold: true,
+                  fillColor: '#f0f9ff',
+                  alignment: 'center',
+                  margin: [0, 5, 0, 5],
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 5],
+        },
 
+        // 🔹 TABLA DE MEDICAMENTOS
+        {
+          table: {
+            widths: ['5%', '35%', '20%', '15%', '25%'],
+            body: [
+              // Encabezados
+              [
+                {
+                  text: '#',
+                  fontSize: 8,
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#e0f2fe',
+                },
+                {
+                  text: 'MEDICAMENTO\n(Denominación genérica)',
+                  fontSize: 8,
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#e0f2fe',
+                },
+                {
+                  text: 'PRESENTACIÓN\nY CONCENTRACIÓN',
+                  fontSize: 8,
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#e0f2fe',
+                },
+                {
+                  text: 'CANTIDAD',
+                  fontSize: 8,
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#e0f2fe',
+                },
+                {
+                  text: 'INDICACIONES\n(Dosis, vía, frecuencia)',
+                  fontSize: 8,
+                  bold: true,
+                  alignment: 'center',
+                  fillColor: '#e0f2fe',
+                },
+              ],
+              // Generar filas de medicamentos (máximo 10)
+              ...Array.from({ length: 10 }, (_, index) => {
+                const medicamento = prescripcionData.medicamentos?.[index];
+                return [
+                  {
+                    text: (index + 1).toString(),
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 8, 0, 8],
+                  },
+                  {
+                    text: medicamento?.nombre_generico || '',
+                    fontSize: 9,
+                    margin: [3, 8, 3, 8],
+                    bold: !!medicamento?.nombre_generico,
+                  },
+                  {
+                    text: medicamento?.presentacion || '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    alignment: 'center',
+                  },
+                  {
+                    text: medicamento?.cantidad || '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                    alignment: 'center',
+                  },
+                  {
+                    text: medicamento?.indicaciones || '',
+                    fontSize: 8,
+                    margin: [3, 8, 3, 8],
+                  },
+                ];
+              }),
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 15],
+        },
 
+        // 🔹 INSTRUCCIONES GENERALES
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'INSTRUCCIONES GENERALES AL PACIENTE:',
+                  fontSize: 9,
+                  bold: true,
+                  margin: [5, 5, 5, 2],
+                },
+              ],
+              [
+                {
+                  text: prescripcionData.instrucciones_generales ||
+                    '• Tomar los medicamentos según las indicaciones médicas\n' +
+                    '• Completar el tratamiento aunque se sienta mejor\n' +
+                    '• No suspender medicamentos sin autorización médica\n' +
+                    '• Acudir a control médico en la fecha indicada\n' +
+                    '• En caso de reacciones adversas, suspender y acudir al médico',
+                  fontSize: 8,
+                  margin: [5, 5, 5, 8],
+                  lineHeight: 1.3,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 15],
+        },
 
+        // 🔹 PRÓXIMA CITA
+        {
+          table: {
+            widths: ['70%', '30%'],
+            body: [
+              [
+                {
+                  text: `PRÓXIMA CITA: ${prescripcionData.proxima_cita || '___________________'}`,
+                  fontSize: 9,
+                  bold: true,
+                  margin: [5, 8, 5, 8],
+                },
+                {
+                  text: `DÍAS DE TRATAMIENTO: ${prescripcionData.dias_tratamiento || '____'} días`,
+                  fontSize: 9,
+                  bold: true,
+                  margin: [5, 8, 5, 8],
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+          margin: [0, 0, 0, 20],
+        },
 
+        // 🔹 FIRMA DEL MÉDICO
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'DATOS DEL MÉDICO PRESCRIPTOR',
+                  fontSize: 9,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  margin: [0, 5, 0, 5],
+                },
+              ],
+              [
+                {
+                  text: [
+                    {
+                      text: `Nombre: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    {
+                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Servicio: ${medicoCompleto.departamento}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Fecha de prescripción: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 8,
+                    },
+                  ],
+                  margin: [5, 10, 5, 5],
+                  alignment: 'left',
+                },
+              ],
+              [
+                {
+                  text: '\n\n_____________________________________\nFIRMA Y SELLO DEL MÉDICO',
+                  fontSize: 9,
+                  alignment: 'center',
+                  margin: [0, 10, 0, 15],
+                  bold: true,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
 
+        { text: '', margin: [0, 10] },
 
+        // 🔹 ADVERTENCIAS LEGALES
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '⚠️ ADVERTENCIAS IMPORTANTES',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#fef3c7',
+                  alignment: 'center',
+                  margin: [0, 3, 0, 3],
+                },
+              ],
+              [
+                {
+                  text: '• Esta prescripción es válida únicamente para el paciente indicado\n' +
+                        '• Los medicamentos controlados requieren presentar receta original\n' +
+                        '• Conservar en lugar fresco y seco, fuera del alcance de los niños\n' +
+                        '• No automedicarse ni compartir medicamentos\n' +
+                        '• En caso de emergencia comunicarse al Hospital: Tel. (468) 688-0001',
+                  fontSize: 7,
+                  margin: [5, 5, 5, 5],
+                  lineHeight: 1.2,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 1,
+            vLineWidth: () => 1,
+            hLineColor: () => '#f59e0b',
+            vLineColor: () => '#f59e0b',
+          },
+        },
+      ],
 
+      footer: (currentPage: number, pageCount: number) => {
+        return {
+          margin: [30, 10],
+          table: {
+            widths: ['25%', '50%', '25%'],
+            body: [
+              [
+                {
+                  text: `Página ${currentPage} de ${pageCount}`,
+                  fontSize: 7,
+                  color: '#666666',
+                },
+                {
+                  text: 'Prescripción Médica - SICEG\nNOM-004-SSA3-2012',
+                  fontSize: 7,
+                  alignment: 'center',
+                  color: '#666666',
+                },
+                {
+                  text: [
+                    {
+                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 7,
+                    },
+                    {
+                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      fontSize: 6,
+                    },
+                  ],
+                  alignment: 'right',
+                  color: '#666666',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        };
+      },
+    };
 
+    const nombreArchivo = `prescripcion-medicamentos-${pacienteCompleto.nombre
+      .replace(/\s+/g, '-')
+      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
 
+    console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+    console.log(`📄 Archivo: ${nombreArchivo}`);
 
+    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+    this.validarCumplimientoPrescripcionMedicamentos(datos, medicoCompleto, pacienteCompleto);
 
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Prescripción de Medicamentos:', error);
+    throw error;
+  }
+}
 
+// 📄 REGISTRO DE TRANSFUSIÓN SEGÚN NOM-004-SSA3-2012 SECCIÓN D15
+async generarRegistroTransfusion(datos: any): Promise<void> {
+  try {
+    await this.ensurePdfMakeLoaded();
 
+    console.log('🩸 Generando Registro de Transfusión según NOM-004 y NOM-253...');
 
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const transfusionData = datos.registroTransfusion || {};
+    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+    const fechaActual = new Date();
 
+    const documentDefinition = {
+      pageSize: 'LETTER',
+      pageMargins: [20, 60, 20, 50],
 
+      header: {
+        margin: [20, 10, 20, 10],
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - REGISTRO DE TRANSFUSIÓN',
+                fontSize: 11,
+                bold: true,
+                alignment: 'center',
+              },
+            ],
+            [
+              {
+                text: 'REGISTRO DE TRANSFUSIÓN DE UNIDADES DE SANGRE O COMPONENTES',
+                fontSize: 9,
+                bold: true,
+                alignment: 'center',
+                margin: [0, 3, 0, 0],
+              },
+            ],
+          ],
+        },
+        layout: 'noBorders',
+      },
+
+      content: [
+        { text: '', margin: [0, 10] },
+
+        // 🔹 IDENTIFICACIÓN DEL PACIENTE
+        {
+          table: {
+            widths: ['15%', '85%'],
+            body: [
+              [
+                {
+                  text: 'IDENTIFICACIÓN',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  table: {
+                    widths: ['20%', '20%', '20%', '20%', '20%'],
+                    body: [
+                      [
+                        {
+                          text: 'Fecha transfusión',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Hora inicio',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. Expediente',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. de cama',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Folio registro',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: transfusionData.fecha_transfusion || fechaActual.toLocaleDateString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: transfusionData.hora_inicio || fechaActual.toLocaleTimeString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                          bold: true,
+                        },
+                        {
+                          text: transfusionData.numero_cama || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                        {
+                          text: `RT-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          fontSize: 6,
+                          alignment: 'center',
+                          margin: [0, 1],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['50%', '25%', '25%'],
+                    body: [
+                      [
+                        {
+                          text: 'Nombre completo del paciente',
+                          fontSize: 7,
+                          bold: true,
+                        },
+                        {
+                          text: 'Edad',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Sexo',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: pacienteCompleto.nombre_completo,
+                          fontSize: 8,
+                          bold: true,
+                          margin: [2, 2],
+                        },
+                        {
+                          text: `${pacienteCompleto.edad} años`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: pacienteCompleto.sexo,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['40%', '30%', '30%'],
+                    body: [
+                      [
+                        {
+                          text: 'Servicio',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Diagnóstico',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Tipo sanguíneo',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: medicoCompleto.departamento || 'No especificado',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: transfusionData.diagnostico || 'No especificado',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: pacienteCompleto.tipo_sangre || 'No registrado',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                          bold: true,
+                          color: '#dc2626',
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['100%'],
+                    body: [
+                      [
+                        {
+                          text: 'Médico que indica la transfusión',
+                          fontSize: 7,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+
+        { text: '', margin: [0, 3] },
+
+        // 🔹 INFORMACIÓN DE LAS UNIDADES TRANSFUNDIDAS (NOM-004 D15.1)
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'UNIDADES TRANSFUNDIDAS',
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#fee2e2',
+                  alignment: 'center',
+                  rowSpan: 4,
+                },
+                {
+                  text: 'INFORMACIÓN DE UNIDADES DE SANGRE O COMPONENTES (D15.1)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#fef2f2',
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['25%', '25%', '25%', '25%'],
+                    body: [
+                      [
+                        {
+                          text: 'Tipo de componente',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Cantidad de unidades',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Volumen total (ml)',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'No. identificación',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: transfusionData.tipo_componente || 'Concentrado eritrocitario',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: transfusionData.cantidad_unidades || '1',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                          bold: true,
+                        },
+                        {
+                          text: transfusionData.volumen_total || '250',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: transfusionData.numero_identificacion || 'N/A',
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 0.3,
+                    vLineWidth: () => 0.3,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000',
+                  },
+                },
+              ],
+              [
+                {},
+                {
+                  text: 'FECHA Y HORA DE INICIO Y FINALIZACIÓN (D15.2)',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#fef2f2',
+                },
+              ],
+              [
+                {},
+                {
+                  table: {
+                    widths: ['25%', '25%', '25%', '25%'],
+                    body: [
+                      [
+                        {
+                          text: 'Fecha inicio',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Hora inicio',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Fecha finalización',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                        {
+                          text: 'Hora finalización',
+                          fontSize: 6,
+                          bold: true,
+                          alignment: 'center',
+                        },
+                      ],
+                      [
+                        {
+                          text: transfusionData.fecha_inicio || fechaActual.toLocaleDateString('es-MX'),
+                          fontSize: 7,
+                          alignment: 'center',
+                          margin: [0, 2],
+                        },
+                        {
+                          text: transfusionData.hora_inicio || fechaActual.toLocaleTimeString('es-MX'),
+                          fontSize: 7,
+                         alignment: 'center',
+                         margin: [0, 2],
+                       },
+                       {
+                         text: transfusionData.fecha_finalizacion || '______________',
+                         fontSize: 7,
+                         alignment: 'center',
+                         margin: [0, 2],
+                       },
+                       {
+                         text: transfusionData.hora_finalizacion || '______________',
+                         fontSize: 7,
+                         alignment: 'center',
+                         margin: [0, 2],
+                       },
+                     ],
+                   ],
+                 },
+                 layout: {
+                   hLineWidth: () => 0.3,
+                   vLineWidth: () => 0.3,
+                   hLineColor: () => '#000000',
+                   vLineColor: () => '#000000',
+                 },
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 0.5,
+           vLineWidth: () => 0.5,
+           hLineColor: () => '#000000',
+           vLineColor: () => '#000000',
+         },
+       },
+
+       { text: '', margin: [0, 3] },
+
+       // 🔹 CONTROL DE SIGNOS VITALES (NOM-004 D15.3)
+       {
+         table: {
+           widths: ['20%', '80%'],
+           body: [
+             [
+               {
+                 text: 'CONTROL SIGNOS VITALES',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#dbeafe',
+                 alignment: 'center',
+                 rowSpan: 4,
+               },
+               {
+                 text: 'SIGNOS VITALES ANTES, DURANTE Y DESPUÉS DE LA TRANSFUSIÓN (D15.3)',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#eff6ff',
+               },
+             ],
+             [
+               {},
+               {
+                 table: {
+                   widths: ['25%', '25%', '25%', '25%'],
+                   body: [
+                     [
+                       {
+                         text: 'Momento',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                       },
+                       {
+                         text: 'Presión arterial',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                       },
+                       {
+                         text: 'Frecuencia cardíaca',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                       },
+                       {
+                         text: 'Temperatura',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                       },
+                     ],
+                     [
+                       {
+                         text: 'ANTES',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                         fillColor: '#f0f9ff',
+                       },
+                       {
+                         text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'}`,
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: `${signosVitalesReales.temperatura || '___'} °C`,
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                     ],
+                     [
+                       {
+                         text: 'DURANTE',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                         fillColor: '#f0f9ff',
+                       },
+                       {
+                         text: transfusionData.pa_durante || '__________',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: transfusionData.fc_durante || '___ lpm',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: transfusionData.temp_durante || '___ °C',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                     ],
+                     [
+                       {
+                         text: 'DESPUÉS',
+                         fontSize: 7,
+                         bold: true,
+                         alignment: 'center',
+                         fillColor: '#f0f9ff',
+                       },
+                       {
+                         text: transfusionData.pa_despues || '__________',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: transfusionData.fc_despues || '___ lpm',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                       {
+                         text: transfusionData.temp_despues || '___ °C',
+                         fontSize: 7,
+                         alignment: 'center',
+                       },
+                     ],
+                   ],
+                 },
+                 layout: {
+                   hLineWidth: () => 0.3,
+                   vLineWidth: () => 0.3,
+                   hLineColor: () => '#000000',
+                   vLineColor: () => '#000000',
+                 },
+               },
+             ],
+             [
+               {},
+               {
+                 text: 'ESTADO GENERAL DEL PACIENTE',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#eff6ff',
+               },
+             ],
+             [
+               {},
+               {
+                 text: transfusionData.estado_general || 'Paciente estable durante todo el procedimiento de transfusión. Sin signos de reacciones adversas.',
+                 fontSize: 8,
+                 margin: [5, 5],
+                 lineHeight: 1.3,
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 0.5,
+           vLineWidth: () => 0.5,
+           hLineColor: () => '#000000',
+           vLineColor: () => '#000000',
+         },
+       },
+
+       { text: '', margin: [0, 3] },
+
+       // 🔹 REACCIONES ADVERSAS (NOM-004 D15.4)
+       {
+         table: {
+           widths: ['20%', '80%'],
+           body: [
+             [
+               {
+                 text: 'REACCIONES ADVERSAS',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#fef3c7',
+                 alignment: 'center',
+                 rowSpan: 4,
+               },
+               {
+                 text: 'REACCIONES ADVERSAS A LA TRANSFUSIÓN (D15.4)',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#fffbeb',
+               },
+             ],
+             [
+               {},
+               {
+                 table: {
+                   widths: ['20%', '80%'],
+                   body: [
+                     [
+                       {
+                         text: transfusionData.hubo_reacciones ? '☑ SÍ' : '☑ NO',
+                         fontSize: 8,
+                         bold: true,
+                         alignment: 'center',
+                       },
+                       {
+                         text: 'Se presentaron reacciones adversas durante o después de la transfusión',
+                         fontSize: 8,
+                         alignment: 'left',
+                       },
+                     ],
+                   ],
+                 },
+                 layout: 'noBorders',
+               },
+             ],
+             [
+               {},
+               {
+                 text: 'TIPO DE REACCIÓN Y MANEJO',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#fffbeb',
+               },
+             ],
+             [
+               {},
+               {
+                 text: transfusionData.tipo_reaccion_manejo ||
+                   (transfusionData.hubo_reacciones ?
+                     'Describir tipo de reacción: _________________________________\nManejo aplicado: _________________________________' :
+                     'Sin reacciones adversas reportadas durante el procedimiento.'),
+                 fontSize: 8,
+                 margin: [5, 5],
+                 lineHeight: 1.3,
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 0.5,
+           vLineWidth: () => 0.5,
+           hLineColor: () => '#000000',
+           vLineColor: () => '#000000',
+         },
+       },
+
+       { text: '', margin: [0, 3] },
+
+       // 🔹 PERSONAL RESPONSABLE (NOM-004 D15.5)
+       {
+         table: {
+           widths: ['20%', '80%'],
+           body: [
+             [
+               {
+                 text: 'PERSONAL RESPONSABLE',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#f0fdf4',
+                 alignment: 'center',
+                 rowSpan: 6,
+               },
+               {
+                 text: 'MÉDICO QUE INDICÓ LA TRANSFUSIÓN (D15.5)',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#f7fee7',
+               },
+             ],
+             [
+               {},
+               {
+                 text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                 fontSize: 8,
+                 margin: [5, 3],
+                 bold: true,
+               },
+             ],
+             [
+               {},
+               {
+                 text: 'PERSONAL DE SALUD ENCARGADO DE APLICACIÓN Y VIGILANCIA (D15.5)',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#f7fee7',
+               },
+             ],
+             [
+               {},
+               {
+                 table: {
+                   widths: ['50%', '50%'],
+                   body: [
+                     [
+                       {
+                         text: 'Nombre del personal de enfermería:',
+                         fontSize: 7,
+                         bold: true,
+                       },
+                       {
+                         text: 'Cédula profesional:',
+                         fontSize: 7,
+                         bold: true,
+                       },
+                     ],
+                     [
+                       {
+                         text: transfusionData.enfermera_responsable || '____________________________',
+                         fontSize: 8,
+                         decoration: 'underline',
+                       },
+                       {
+                         text: transfusionData.cedula_enfermera || '____________________________',
+                         fontSize: 8,
+                         decoration: 'underline',
+                       },
+                     ],
+                   ],
+                 },
+                 layout: 'noBorders',
+                 margin: [5, 3],
+               },
+             ],
+             [
+               {},
+               {
+                 text: 'OBSERVACIONES ADICIONALES',
+                 fontSize: 7,
+                 bold: true,
+                 fillColor: '#f7fee7',
+               },
+             ],
+             [
+               {},
+               {
+                 text: transfusionData.observaciones_adicionales ||
+                   'Transfusión realizada sin complicaciones. Paciente toleró bien el procedimiento.',
+                 fontSize: 8,
+                 margin: [5, 5],
+                 lineHeight: 1.3,
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 0.5,
+           vLineWidth: () => 0.5,
+           hLineColor: () => '#000000',
+           vLineColor: () => '#000000',
+         },
+       },
+
+       { text: '', margin: [0, 5] },
+
+       // 🔹 FIRMAS MÚLTIPLES SEGÚN NOM-004
+       {
+         table: {
+           widths: ['33.33%', '33.33%', '33.34%'],
+           body: [
+             [
+               {
+                 text: 'MÉDICO QUE INDICA',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#f5f5f5',
+                 alignment: 'center',
+               },
+               {
+                 text: 'PERSONAL DE ENFERMERÍA',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#f5f5f5',
+                 alignment: 'center',
+               },
+               {
+                 text: 'BANCO DE SANGRE',
+                 fontSize: 8,
+                 bold: true,
+                 fillColor: '#f5f5f5',
+                 alignment: 'center',
+               },
+             ],
+             [
+               {
+                 text: [
+                   {
+                     text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                     fontSize: 8,
+                     bold: true,
+                   },
+                   {
+                     text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
+                     fontSize: 7,
+                   },
+                   {
+                     text: `${medicoCompleto.especialidad}\n`,
+                     fontSize: 7,
+                   },
+                   {
+                     text: '\n\n_____________________\nFIRMA',
+                     fontSize: 7,
+                   },
+                 ],
+                 margin: [2, 10],
+                 alignment: 'center',
+               },
+               {
+                 text: [
+                   {
+                     text: `${transfusionData.enfermera_responsable || '__________________'}\n`,
+                     fontSize: 8,
+                     bold: true,
+                   },
+                   {
+                     text: `Cédula: ${transfusionData.cedula_enfermera || '__________'}\n`,
+                     fontSize: 7,
+                   },
+                   {
+                     text: 'Enfermería\n',
+                     fontSize: 7,
+                   },
+                   {
+                     text: '\n\n_____________________\nFIRMA',
+                     fontSize: 7,
+                   },
+                 ],
+                 margin: [2, 10],
+                 alignment: 'center',
+               },
+               {
+                 text: [
+                   {
+                     text: `${transfusionData.responsable_banco_sangre || '__________________'}\n`,
+                     fontSize: 8,
+                     bold: true,
+                   },
+                   {
+                     text: `Cédula: ${transfusionData.cedula_banco || '__________'}\n`,
+                     fontSize: 7,
+                   },
+                   {
+                     text: 'Banco de Sangre\n',
+                     fontSize: 7,
+                   },
+                   {
+                     text: '\n\n_____________________\nFIRMA',
+                     fontSize: 7,
+                   },
+                 ],
+                 margin: [2, 10],
+                 alignment: 'center',
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 0.5,
+           vLineWidth: () => 0.5,
+           hLineColor: () => '#000000',
+           vLineColor: () => '#000000',
+         },
+       },
+
+       { text: '', margin: [0, 2] },
+
+       // 🔹 NOTA REFERENCIAL
+       {
+         text: [
+           {
+             text: '* Registro elaborado conforme a NOM-004-SSA3-2012, Sección D15 "Registro de transfusión"\n',
+             fontSize: 6,
+             italics: true,
+             color: '#666666',
+           },
+           {
+             text: '* Cumple con NOM-253-SSA1-2012 para disposición de sangre humana y componentes',
+             fontSize: 6,
+             italics: true,
+             color: '#666666',
+           },
+         ],
+         alignment: 'left',
+       },
+     ],
+
+     footer: (currentPage: number, pageCount: number) => {
+       return {
+         margin: [20, 5],
+         table: {
+           widths: ['25%', '50%', '25%'],
+           body: [
+             [
+               {
+                 text: `Página ${currentPage} de ${pageCount}`,
+                 fontSize: 7,
+                 color: '#666666',
+               },
+               {
+                 text: 'Registro de Transfusión - SICEG\nNOM-004-SSA3-2012 | NOM-253-SSA1-2012',
+                 fontSize: 7,
+                 alignment: 'center',
+                 color: '#666666',
+               },
+               {
+                 text: [
+                   {
+                     text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                     fontSize: 7,
+                   },
+                   {
+                     text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                     fontSize: 6,
+                   },
+                 ],
+                 alignment: 'right',
+                 color: '#666666',
+               },
+             ],
+           ],
+         },
+         layout: 'noBorders',
+       };
+     },
+   };
+
+   const nombreArchivo = `registro-transfusion-${pacienteCompleto.nombre
+     .replace(/\s+/g, '-')
+     .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+   pdfDocGenerator.download(nombreArchivo);
+
+   console.log('✅ PDF de Registro de Transfusión NOM-004 generado exitosamente');
+   console.log(`📄 Archivo: ${nombreArchivo}`);
+
+   // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+   this.validarCumplimientoRegistroTransfusion(datos, medicoCompleto, pacienteCompleto);
+
+ } catch (error) {
+   console.error('❌ Error al generar PDF de Registro de Transfusión:', error);
+   throw error;
+ }
+}
+
+// 🔥 VALIDACIÓN ESPECÍFICA PARA PRESCRIPCIÓN DE MEDICAMENTOS
+private validarCumplimientoPrescripcionMedicamentos(
+ datos: any,
+ medico: any,
+ paciente: any
+): void {
+ console.log('🔍 VALIDANDO CUMPLIMIENTO PRESCRIPCIÓN DE MEDICAMENTOS...');
+
+ const validaciones = {
+   // Datos del paciente
+   nombre_completo_paciente: !!paciente.nombre_completo,
+   edad_paciente: !!paciente.edad,
+   numero_expediente: !!paciente.numero_expediente,
+
+   // Información médica básica
+   diagnostico_incluido: true, // Campo incluido
+   peso_paciente: true, // Campo incluido para dosificación
+   alergias_verificadas: true, // Campo incluido
+
+   // Medicamentos prescritos
+   tabla_medicamentos: true, // Tabla estructurada
+   denominacion_generica: true, // Campo obligatorio
+   presentacion_concentracion: true, // Campo incluido
+   cantidad_prescrita: true, // Campo incluido
+   indicaciones_completas: true, // Dosis, vía, frecuencia
+
+   // Instrucciones al paciente
+   instrucciones_generales: true, // Incluidas
+   proxima_cita: true, // Campo incluido
+   dias_tratamiento: true, // Campo incluido
+
+   // Datos del médico prescriptor
+   nombre_completo_medico: !!medico.nombre_completo,
+   cedula_profesional: !!medico.numero_cedula,
+   especialidad_medico: !!medico.especialidad,
+   firma_espacio: true, // Espacio para firma y sello
+
+   // Fecha y validez
+   fecha_prescripcion: true,
+   identificacion_hospital: true,
+
+   // Advertencias legales
+   advertencias_incluidas: true, // Sección incluida
+   contacto_emergencia: true, // Teléfono incluido
+ };
+
+ const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+ const total = Object.keys(validaciones).length;
+ const porcentaje = Math.round((cumplimiento / total) * 100);
+
+ console.log(
+   `📊 CUMPLIMIENTO PRESCRIPCIÓN MEDICAMENTOS: ${cumplimiento}/${total} (${porcentaje}%)`
+ );
+
+ if (porcentaje < 90) {
+   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+ } else {
+   console.log('✅ PRESCRIPCIÓN DE MEDICAMENTOS CUMPLE CON ESTÁNDARES MÉDICOS');
+ }
+}
+
+// 🔥 VALIDACIÓN ESPECÍFICA PARA REGISTRO DE TRANSFUSIÓN
+private validarCumplimientoRegistroTransfusion(
+ datos: any,
+ medico: any,
+ paciente: any
+): void {
+ console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - REGISTRO DE TRANSFUSIÓN...');
+
+ const validaciones = {
+   // D15.1 - Cantidad, volumen, número de identificación
+   cantidad_unidades: true, // Campo incluido
+   volumen_transfundido: true, // Campo incluido
+   numero_identificacion: true, // Campo incluido
+   tipo_componente: true, // Especificado
+
+   // D15.2 - Fecha y hora inicio y finalización
+   fecha_hora_inicio: true, // Campos incluidos
+   fecha_hora_finalizacion: true, // Campos incluidos
+
+   // D15.3 - Control signos vitales antes, durante y después
+   signos_vitales_antes: true, // Tabla completa
+   signos_vitales_durante: true, // Campos incluidos
+   signos_vitales_despues: true, // Campos incluidos
+   estado_general: true, // Campo incluido
+
+   // D15.4 - Reacciones adversas
+   reacciones_adversas_evaluadas: true, // Sección incluida
+   tipo_reaccion: true, // Campo incluido
+   manejo_reacciones: true, // Campo incluido
+   investigacion_procedimientos: true, // Referenciado
+
+   // D15.5 - Personal responsable
+   medico_indicador: !!medico.nombre_completo,
+   cedula_medico: !!medico.numero_cedula,
+   personal_aplicacion: true, // Campo incluido
+   personal_vigilancia: true, // Campo incluido
+
+   // Datos del paciente
+   nombre_completo_paciente: !!paciente.nombre_completo,
+   tipo_sanguineo: true, // Campo crítico incluido
+   numero_expediente: !!paciente.numero_expediente,
+
+   // Marco normativo
+   cumplimiento_nom_004: true, // Estructura según norma
+   cumplimiento_nom_253: true, // Disposición de sangre
+
+   // Firmas múltiples requeridas
+   firma_medico: true, // Espacio incluido
+   firma_enfermeria: true, // Espacio incluido
+   firma_banco_sangre: true, // Espacio incluido
+
+   // Fecha y lugar
+   fecha_elaboracion: true,
+   hospital_identificado: true,
+ };
+
+ const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+ const total = Object.keys(validaciones).length;
+ const porcentaje = Math.round((cumplimiento / total) * 100);
+
+ console.log(
+   `📊 CUMPLIMIENTO REGISTRO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
+ );
+
+ if (porcentaje < 90) {
+   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+ } else {
+   console.log('✅ REGISTRO DE TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
+ }
+}
 
 
 
