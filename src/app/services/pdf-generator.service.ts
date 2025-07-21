@@ -4160,963 +4160,963 @@ private validarCumplimientoNotaInterconsulta(
     }
   }
 
-  // // 📄 NOTA DE EVOLUCIÓN  NOM-004-SSA3-2012
-  // async generarNotaEvolucion(datos: any): Promise<void> {
-  //   try {
-  //     await this.ensurePdfMakeLoaded();
+  // 📄 NOTA DE EVOLUCIÓN  NOM-004-SSA3-2012
+  async generarNotaEvolucion(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
 
-  //     console.log('📈 Generando Nota de Evolución según NOM-004...');
+      console.log('📈 Generando Nota de Evolución según NOM-004...');
 
-  //     const medicoCompleto = await this.obtenerDatosMedicoActual();
-  //     const pacienteCompleto = this.validarYFormatearDatosPaciente(
-  //       datos.paciente
-  //     );
-  //     const notaEvolucionData = datos.notaEvolucion || {};
-  //     const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-  //     const fechaActual = new Date();
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const notaEvolucionData = datos.notaEvolucion || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
 
-  //     const documentDefinition = {
-  //       pageSize: 'LETTER',
-  //       pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES OPTIMIZADOS
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES OPTIMIZADOS
 
-  //       header: {
-  //         margin: [20, 10, 20, 10],
-  //         table: {
-  //           widths: ['100%'],
-  //           body: [
-  //             [
-  //               {
-  //                 text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN',
-  //                 fontSize: 11,
-  //                 bold: true,
-  //                 alignment: 'center',
-  //               },
-  //             ],
-  //           ],
-  //         },
-  //         layout: 'noBorders',
-  //       },
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
 
-  //       content: [
-  //         // 🔹 SECCIÓN IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.9)
-  //         {
-  //           table: {
-  //             widths: ['15%', '85%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'IDENTIFICACIÓN',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 4,
-  //                 },
-  //                 {
-  //                   table: {
-  //                     widths: ['18%', '18%', '18%', '18%', '14%', '14%'],
-  //                     body: [
-  //                       [
-  //                         {
-  //                           text: 'Fecha evolución',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Hora evolución',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'No. Expediente',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'No. de cama',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Día estancia',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Folio nota',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                       ],
-  //                       [
-  //                         {
-  //                           text: fechaActual.toLocaleDateString('es-MX'),
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: fechaActual.toLocaleTimeString('es-MX'),
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: pacienteCompleto.numero_expediente || 'N/A',
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                           bold: true,
-  //                         },
-  //                         {
-  //                           text:
-  //                             notaEvolucionData.numero_cama || 'Sin asignar',
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `${this.calcularDiaHospitalizacion()}°`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `NE-${
-  //                             pacienteCompleto.numero_expediente
-  //                           }-${fechaActual.getFullYear()}`,
-  //                           fontSize: 6,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                       ],
-  //                     ],
-  //                   },
-  //                   layout: {
-  //                     hLineWidth: () => 0.3,
-  //                     vLineWidth: () => 0.3,
-  //                     hLineColor: () => '#000000',
-  //                     vLineColor: () => '#000000',
-  //                   },
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   table: {
-  //                     widths: ['60%', '20%', '20%'],
-  //                     body: [
-  //                       [
-  //                         {
-  //                           text: 'Nombre completo del paciente',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                         },
-  //                         {
-  //                           text: 'Edad',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Sexo',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                       ],
-  //                       [
-  //                         {
-  //                           text: pacienteCompleto.nombre_completo,
-  //                           fontSize: 8,
-  //                           bold: true,
-  //                           margin: [2, 2],
-  //                         },
-  //                         {
-  //                           text: `${pacienteCompleto.edad} años`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 2],
-  //                         },
-  //                         {
-  //                           text: pacienteCompleto.sexo,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 2],
-  //                         },
-  //                       ],
-  //                     ],
-  //                   },
-  //                   layout: {
-  //                     hLineWidth: () => 0.3,
-  //                     vLineWidth: () => 0.3,
-  //                     hLineColor: () => '#000000',
-  //                     vLineColor: () => '#000000',
-  //                   },
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   table: {
-  //                     widths: ['50%', '25%', '25%'],
-  //                     body: [
-  //                       [
-  //                         {
-  //                           text: 'Servicio hospitalario',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                         },
-  //                         {
-  //                           text: 'Diagnóstico ingreso',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Tipo de sangre',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                       ],
-  //                       [
-  //                         {
-  //                           text:
-  //                             medicoCompleto.departamento || 'No especificado',
-  //                           fontSize: 7,
-  //                           margin: [2, 2],
-  //                         },
-  //                         {
-  //                           text:
-  //                             notaEvolucionData.diagnostico_ingreso ||
-  //                             'Ver expediente',
-  //                           fontSize: 6,
-  //                           alignment: 'center',
-  //                           margin: [0, 2],
-  //                         },
-  //                         {
-  //                           text:
-  //                             pacienteCompleto.tipo_sangre || 'No registrado',
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 2],
-  //                           bold: true,
-  //                           color: '#dc2626',
-  //                         },
-  //                       ],
-  //                     ],
-  //                   },
-  //                   layout: {
-  //                     hLineWidth: () => 0.3,
-  //                     vLineWidth: () => 0.3,
-  //                     hLineColor: () => '#000000',
-  //                     vLineColor: () => '#000000',
-  //                   },
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   table: {
-  //                     widths: ['60%', '40%'],
-  //                     body: [
-  //                       [
-  //                         {
-  //                           text: 'Familiar responsable',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                         },
-  //                         {
-  //                           text: 'Teléfono de contacto',
-  //                           fontSize: 7,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                       ],
-  //                       [
-  //                         {
-  //                           text:
-  //                             pacienteCompleto.familiar_responsable ||
-  //                             'No registrado',
-  //                           fontSize: 7,
-  //                           margin: [2, 2],
-  //                         },
-  //                         {
-  //                           text:
-  //                             pacienteCompleto.telefono_familiar ||
-  //                             'No registrado',
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 2],
-  //                         },
-  //                       ],
-  //                     ],
-  //                   },
-  //                   layout: {
-  //                     hLineWidth: () => 0.3,
-  //                     vLineWidth: () => 0.3,
-  //                     hLineColor: () => '#000000',
-  //                     vLineColor: () => '#000000',
-  //                   },
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+        content: [
+          // 🔹 SECCIÓN IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.9)
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['18%', '18%', '18%', '18%', '14%', '14%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha evolución',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora evolución',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. de cama',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Día estancia',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio nota',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: pacienteCompleto.numero_expediente || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text:
+                              notaEvolucionData.numero_cama || 'Sin asignar',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${this.calcularDiaHospitalizacion()}°`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `NE-${
+                              pacienteCompleto.numero_expediente
+                            }-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['60%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio hospitalario',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Diagnóstico ingreso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo de sangre',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'No especificado',
+                            fontSize: 7,
+                            margin: [2, 2],
+                          },
+                          {
+                            text:
+                              notaEvolucionData.diagnostico_ingreso ||
+                              'Ver expediente',
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.tipo_sangre || 'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['60%', '40%'],
+                      body: [
+                        [
+                          {
+                            text: 'Familiar responsable',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Teléfono de contacto',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              pacienteCompleto.familiar_responsable ||
+                              'No registrado',
+                            fontSize: 7,
+                            margin: [2, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.telefono_familiar ||
+                              'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 NOTA DE EVOLUCIÓN SEGÚN NOM-004 (SECCIÓN 6.2)
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'NOTA DE EVOLUCIÓN',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 6,
-  //                 },
-  //                 {
-  //                   text: 'EVOLUCIÓN Y ACTUALIZACIÓN DEL CUADRO CLÍNICO (6.2.1)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.evolucion_analisis ||
-  //                     notaEvolucionData.sintomas_signos ||
-  //                     'Paciente en evolución clínica favorable. Sin cambios significativos en el cuadro clínico inicial.',
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text: 'SIGNOS VITALES SEGÚN SE CONSIDERE NECESARIO (6.2.2)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   table: {
-  //                     widths: ['20%', '20%', '20%', '20%', '20%'],
-  //                     body: [
-  //                       [
-  //                         {
-  //                           text: 'Presión arterial',
-  //                           fontSize: 6,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Frecuencia cardíaca',
-  //                           fontSize: 6,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Frecuencia respiratoria',
-  //                           fontSize: 6,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Temperatura',
-  //                           fontSize: 6,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                         {
-  //                           text: 'Saturación O2',
-  //                           fontSize: 6,
-  //                           bold: true,
-  //                           alignment: 'center',
-  //                         },
-  //                       ],
-  //                       [
-  //                         {
-  //                           text: `${
-  //                             signosVitalesReales.presion_arterial_sistolica ||
-  //                             '___'
-  //                           }/${
-  //                             signosVitalesReales.presion_arterial_diastolica ||
-  //                             '___'
-  //                           } mmHg`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `${
-  //                             signosVitalesReales.frecuencia_cardiaca || '___'
-  //                           } lpm`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `${
-  //                             signosVitalesReales.frecuencia_respiratoria ||
-  //                             '___'
-  //                           } rpm`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `${
-  //                             signosVitalesReales.temperatura || '___'
-  //                           } °C`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                         {
-  //                           text: `${
-  //                             signosVitalesReales.saturacion_oxigeno || '___'
-  //                           } %`,
-  //                           fontSize: 7,
-  //                           alignment: 'center',
-  //                           margin: [0, 1],
-  //                         },
-  //                       ],
-  //                     ],
-  //                   },
-  //                   layout: {
-  //                     hLineWidth: () => 0.3,
-  //                     vLineWidth: () => 0.3,
-  //                     hLineColor: () => '#000000',
-  //                     vLineColor: () => '#000000',
-  //                   },
-  //                   margin: [5, 2],
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text: 'SOMATOMETRÍA Y ESTADO NUTRICIONAL',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text: `Peso: ${
-  //                     signosVitalesReales.peso || '___'
-  //                   } kg | Talla: ${
-  //                     signosVitalesReales.talla || '___'
-  //                   } cm | Estado nutricional: ${
-  //                     notaEvolucionData.estado_nutricional ||
-  //                     'Adecuado para la edad'
-  //                   }`,
-  //                   fontSize: 7,
-  //                   margin: [5, 3],
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 NOTA DE EVOLUCIÓN SEGÚN NOM-004 (SECCIÓN 6.2)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'NOTA DE EVOLUCIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'EVOLUCIÓN Y ACTUALIZACIÓN DEL CUADRO CLÍNICO (6.2.1)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.evolucion_analisis ||
+                      notaEvolucionData.sintomas_signos ||
+                      'Paciente en evolución clínica favorable. Sin cambios significativos en el cuadro clínico inicial.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SIGNOS VITALES SEGÚN SE CONSIDERE NECESARIO (6.2.2)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Presión arterial',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia cardíaca',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia respiratoria',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Temperatura',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Saturación O2',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              signosVitalesReales.presion_arterial_sistolica ||
+                              '___'
+                            }/${
+                              signosVitalesReales.presion_arterial_diastolica ||
+                              '___'
+                            } mmHg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_cardiaca || '___'
+                            } lpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_respiratoria ||
+                              '___'
+                            } rpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.temperatura || '___'
+                            } °C`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.saturacion_oxigeno || '___'
+                            } %`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 2],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SOMATOMETRÍA Y ESTADO NUTRICIONAL',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: `Peso: ${
+                      signosVitalesReales.peso || '___'
+                    } kg | Talla: ${
+                      signosVitalesReales.talla || '___'
+                    } cm | Estado nutricional: ${
+                      notaEvolucionData.estado_nutricional ||
+                      'Adecuado para la edad'
+                    }`,
+                    fontSize: 7,
+                    margin: [5, 3],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 ESTUDIOS Y RESULTADOS (6.2.3)
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'ESTUDIOS Y RESULTADOS',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 2,
-  //                 },
-  //                 {
-  //                   text: 'RESULTADOS RELEVANTES DE ESTUDIOS DE SERVICIOS AUXILIARES (6.2.3)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.estudios_laboratorio_gabinete ||
-  //                     'Sin estudios nuevos solicitados. Resultados pendientes o no aplicables para la evolución actual.',
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 ESTUDIOS Y RESULTADOS (6.2.3)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTUDIOS Y RESULTADOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'RESULTADOS RELEVANTES DE ESTUDIOS DE SERVICIOS AUXILIARES (6.2.3)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.estudios_laboratorio_gabinete ||
+                      'Sin estudios nuevos solicitados. Resultados pendientes o no aplicables para la evolución actual.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 EXPLORACIÓN FÍSICA DIRIGIDA
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'EXPLORACIÓN FÍSICA',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 4,
-  //                 },
-  //                 {
-  //                   text: 'HABITUS EXTERIOR',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.habitus_exterior ||
-  //                     'Paciente consciente, orientado, cooperador. Facies no características, marcha conservada, actitud adecuada.',
-  //                   fontSize: 8,
-  //                   margin: [5, 3],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text: 'EXPLORACIÓN DIRIGIDA POR APARATOS',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     `Cardiovascular: ${
-  //                       notaEvolucionData.exploracion_cardiovascular ||
-  //                       'Ruidos cardíacos rítmicos, sin soplos'
-  //                     }\n` +
-  //                     `Respiratorio: ${
-  //                       notaEvolucionData.exploracion_respiratorio ||
-  //                       'Murmullo vesicular presente, sin ruidos agregados'
-  //                     }\n` +
-  //                     `Abdomen: ${
-  //                       notaEvolucionData.exploracion_abdomen ||
-  //                       'Blando, depresible, sin dolor'
-  //                     }\n` +
-  //                     `Neurológico: ${
-  //                       notaEvolucionData.exploracion_neurologico ||
-  //                       'Sin déficit motor ni sensitivo'
-  //                     }`,
-  //                   fontSize: 7,
-  //                   margin: [5, 3],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 EXPLORACIÓN FÍSICA DIRIGIDA
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EXPLORACIÓN FÍSICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'HABITUS EXTERIOR',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.habitus_exterior ||
+                      'Paciente consciente, orientado, cooperador. Facies no características, marcha conservada, actitud adecuada.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'EXPLORACIÓN DIRIGIDA POR APARATOS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      `Cardiovascular: ${
+                        notaEvolucionData.exploracion_cardiovascular ||
+                        'Ruidos cardíacos rítmicos, sin soplos'
+                      }\n` +
+                      `Respiratorio: ${
+                        notaEvolucionData.exploracion_respiratorio ||
+                        'Murmullo vesicular presente, sin ruidos agregados'
+                      }\n` +
+                      `Abdomen: ${
+                        notaEvolucionData.exploracion_abdomen ||
+                        'Blando, depresible, sin dolor'
+                      }\n` +
+                      `Neurológico: ${
+                        notaEvolucionData.exploracion_neurologico ||
+                        'Sin déficit motor ni sensitivo'
+                      }`,
+                    fontSize: 7,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 DIAGNÓSTICOS Y PROBLEMAS CLÍNICOS (6.2.4)
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'DIAGNÓSTICOS ACTUALES',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 2,
-  //                 },
-  //                 {
-  //                   text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (6.2.4)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.diagnosticos ||
-  //                     'Diagnósticos en seguimiento según nota de ingreso. Sin cambios en impresión diagnóstica.',
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                   bold: true,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 DIAGNÓSTICOS Y PROBLEMAS CLÍNICOS (6.2.4)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'DIAGNÓSTICOS ACTUALES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (6.2.4)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.diagnosticos ||
+                      'Diagnósticos en seguimiento según nota de ingreso. Sin cambios en impresión diagnóstica.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 PRONÓSTICO (6.2.5)
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'PRONÓSTICO',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                 },
-  //                 {
-  //                   text: `PRONÓSTICO (6.2.5): ${
-  //                     notaEvolucionData.pronostico ||
-  //                     'Favorable para la vida y función. Reservado a evolución clínica.'
-  //                   }`,
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                   bold: true,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 PRONÓSTICO (6.2.5)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PRONÓSTICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: `PRONÓSTICO (6.2.5): ${
+                      notaEvolucionData.pronostico ||
+                      'Favorable para la vida y función. Reservado a evolución clínica.'
+                    }`,
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)
-  //         {
-  //           table: {
-  //             widths: ['20%', '80%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'TRATAMIENTO E INDICACIONES',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                   rowSpan: 4,
-  //                 },
-  //                 {
-  //                   text: 'TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.plan_estudios_tratamiento ||
-  //                     'Continuar manejo actual. Vigilar evolución clínica. Medidas generales de soporte.',
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text: 'MEDICAMENTOS (DOSIS, VÍA, PERIODICIDAD)',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                 },
-  //               ],
-  //               [
-  //                 {},
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.indicaciones_medicas ||
-  //                     'Medicamentos según prescripción previa. Revisar esquema terapéutico en nota de ingreso.',
-  //                   fontSize: 8,
-  //                   margin: [5, 5],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'TRATAMIENTO E INDICACIONES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'TRATAMIENTO E INDICACIONES MÉDICAS (6.2.6)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.plan_estudios_tratamiento ||
+                      'Continuar manejo actual. Vigilar evolución clínica. Medidas generales de soporte.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MEDICAMENTOS (DOSIS, VÍA, PERIODICIDAD)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      notaEvolucionData.indicaciones_medicas ||
+                      'Medicamentos según prescripción previa. Revisar esquema terapéutico en nota de ingreso.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 3] },
+          { text: '', margin: [0, 3] },
 
-  //         // 🔹 INTERCONSULTAS Y PROCEDIMIENTOS
-  //         {
-  //           table: {
-  //             widths: ['100%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'INTERCONSULTAS Y PROCEDIMIENTOS',
-  //                   fontSize: 7,
-  //                   bold: true,
-  //                   fillColor: '#f9f9f9',
-  //                   alignment: 'center',
-  //                 },
-  //               ],
-  //               [
-  //                 {
-  //                   text:
-  //                     notaEvolucionData.interconsultas ||
-  //                     'Sin interconsultas programadas para esta evolución. Sin procedimientos especiales indicados.',
-  //                   fontSize: 8,
-  //                   margin: [10, 5],
-  //                   lineHeight: 1.3,
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 INTERCONSULTAS Y PROCEDIMIENTOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'INTERCONSULTAS Y PROCEDIMIENTOS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text:
+                      notaEvolucionData.interconsultas ||
+                      'Sin interconsultas programadas para esta evolución. Sin procedimientos especiales indicados.',
+                    fontSize: 8,
+                    margin: [10, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 5] },
+          { text: '', margin: [0, 5] },
 
-  //         // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (5.10)
-  //         {
-  //           table: {
-  //             widths: ['50%', '50%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                 },
-  //                 {
-  //                   text: 'FIRMA AUTÓGRAFA',
-  //                   fontSize: 8,
-  //                   bold: true,
-  //                   fillColor: '#f5f5f5',
-  //                   alignment: 'center',
-  //                 },
-  //               ],
-  //               [
-  //                 {
-  //                   text: [
-  //                     {
-  //                       text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-  //                       fontSize: 9,
-  //                       bold: true,
-  //                     },
-  //                     {
-  //                       text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-  //                       fontSize: 8,
-  //                     },
-  //                     {
-  //                       text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-  //                       fontSize: 8,
-  //                     },
-  //                     {
-  //                       text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
-  //                       fontSize: 8,
-  //                     },
-  //                     {
-  //                       text: `Hospital General San Luis de la Paz\n`,
-  //                       fontSize: 7,
-  //                     },
-  //                     {
-  //                       text: `Fecha: ${fechaActual.toLocaleDateString(
-  //                         'es-MX'
-  //                       )}\n`,
-  //                       fontSize: 7,
-  //                     },
-  //                     {
-  //                       text: `Hora: ${fechaActual.toLocaleTimeString(
-  //                         'es-MX'
-  //                       )}`,
-  //                       fontSize: 7,
-  //                     },
-  //                   ],
-  //                   margin: [5, 15],
-  //                   alignment: 'center',
-  //                 },
-  //                 {
-  //                   text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
-  //                   fontSize: 8,
-  //                   margin: [5, 15],
-  //                   alignment: 'center',
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: {
-  //             hLineWidth: () => 0.5,
-  //             vLineWidth: () => 0.5,
-  //             hLineColor: () => '#000000',
-  //             vLineColor: () => '#000000',
-  //           },
-  //         },
+          // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (5.10)
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  {
+                    text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'FIRMA AUTÓGRAFA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Hospital General San Luis de la Paz\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Fecha: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Hora: ${fechaActual.toLocaleTimeString(
+                          'es-MX'
+                        )}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                  {
+                    text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
+                    fontSize: 8,
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-  //         { text: '', margin: [0, 2] },
+          { text: '', margin: [0, 2] },
 
-  //         // 🔹 NOTA REFERENCIAL
-  //         {
-  //           text: [
-  //             {
-  //               text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 6.2 "Nota de evolución"\n',
-  //               fontSize: 6,
-  //               italics: true,
-  //               color: '#666666',
-  //             },
-  //             {
-  //               text: '* Cumple con los requisitos establecidos en los numerales 6.2.1 al 6.2.6',
-  //               fontSize: 6,
-  //               italics: true,
-  //               color: '#666666',
-  //             },
-  //           ],
-  //           alignment: 'left',
-  //         },
-  //       ],
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 6.2 "Nota de evolución"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos establecidos en los numerales 6.2.1 al 6.2.6',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
 
-  //       footer: (currentPage: number, pageCount: number) => {
-  //         return {
-  //           margin: [20, 5],
-  //           table: {
-  //             widths: ['25%', '50%', '25%'],
-  //             body: [
-  //               [
-  //                 {
-  //                   text: `Página ${currentPage} de ${pageCount}`,
-  //                   fontSize: 7,
-  //                   color: '#666666',
-  //                 },
-  //                 {
-  //                   text: 'Nota de Evolución - SICEG\nNOM-004-SSA3-2012',
-  //                   fontSize: 7,
-  //                   alignment: 'center',
-  //                   color: '#666666',
-  //                 },
-  //                 {
-  //                   text: [
-  //                     {
-  //                       text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-  //                       fontSize: 7,
-  //                     },
-  //                     {
-  //                       text: `Exp: ${pacienteCompleto.numero_expediente}`,
-  //                       fontSize: 6,
-  //                     },
-  //                   ],
-  //                   alignment: 'right',
-  //                   color: '#666666',
-  //                 },
-  //               ],
-  //             ],
-  //           },
-  //           layout: 'noBorders',
-  //         };
-  //       },
-  //     };
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota de Evolución - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
 
-  //     const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre
-  //       .replace(/\s+/g, '-')
-  //       .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+      const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
-  //     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-  //     pdfDocGenerator.download(nombreArchivo);
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
 
-  //     console.log('✅ PDF de Nota de Evolución NOM-004 generado exitosamente');
-  //     console.log(`📄 Archivo: ${nombreArchivo}`);
+      console.log('✅ PDF de Nota de Evolución NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
 
-  //     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EVOLUCIÓN
-  //     this.validarCumplimientoNotaEvolucion(
-  //       datos,
-  //       medicoCompleto,
-  //       pacienteCompleto
-  //     );
-  //   } catch (error) {
-  //     console.error('❌ Error al generar PDF de Nota de Evolución:', error);
-  //     throw error;
-  //   }
-  // }
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EVOLUCIÓN
+      this.validarCumplimientoNotaEvolucion(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota de Evolución:', error);
+      throw error;
+    }
+  }
 
   // 📄 NOTA DE CONSENTIMIENTO INFORMADO PARA PROCEDIMIENTOS SEGÚN NOM-004-SSA3-2012
   async generarNotaConsentimientoProcedimientos(datos: any): Promise<void> {
