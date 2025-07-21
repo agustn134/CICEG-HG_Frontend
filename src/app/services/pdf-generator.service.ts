@@ -8945,7 +8945,960 @@ private validarCumplimientoInformeDiario(
     }
   }
 
+// 📄 SOLICITUD DE IMAGENOLOGIA
+  async generarSolicitudImagenologia(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
 
+      console.log('📷 Generando Solicitud de Imagenología...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const solicitudData = datos.solicitudImagenologia || {};
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [40, 60, 40, 60],
+
+        header: {
+          margin: [40, 20, 40, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
+                  fontSize: 14,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: 'SOLICITUD DE IMAGENOLOGÍA',
+                  fontSize: 16,
+                  bold: true,
+                  alignment: 'center',
+                  margin: [0, 10, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 DATOS DEL PACIENTE
+          {
+            table: {
+              widths: ['30%', '35%', '15%', '20%'],
+              body: [
+                [
+                  { text: 'Nombre del (la) paciente:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'No. Expediente:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.numero_expediente,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          {
+            table: {
+              widths: ['15%', '35%', '15%', '35%'],
+              body: [
+                [
+                  { text: 'CURP:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.curp || 'No registrado',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
+                  { text: 'Servicio:', fontSize: 10, bold: true },
+                  {
+                    text: medicoCompleto.departamento || 'No especificado',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+                [
+                  { text: 'Cama:', fontSize: 10, bold: true },
+                  {
+                    text: solicitudData.numero_cama || 'Ambulatorio',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: '', fontSize: 10 },
+                  { text: '', fontSize: 10 },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          {
+            table: {
+              widths: ['25%', '20%', '15%', '20%', '20%'],
+              body: [
+                [
+                  { text: 'Fecha de nacimiento:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
+                  { text: 'Edad:', fontSize: 10, bold: true },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                  { text: 'Género:', fontSize: 10, bold: true },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 DIAGNÓSTICO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Diagnóstico con clave CIE 10:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      solicitudData.diagnostico_cie10 ||
+                      '_________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 INTERVENCIÓN CAUSES
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Intervención CAUSES:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      solicitudData.intervencion_causes ||
+                      '_________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 ESTUDIOS SOLICITADOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'ESTUDIOS SOLICITADOS:',
+                    fontSize: 11,
+                    bold: true,
+                    margin: [0, 5],
+                  },
+                ],
+                [
+                  {
+                    table: {
+                      widths: ['5%', '95%'],
+                      body: [
+                        [
+                          { text: '☐', fontSize: 12 },
+                          { text: 'Radiografía simple', fontSize: 10 },
+                        ],
+                        [
+                          { text: '☐', fontSize: 12 },
+                          { text: 'Ultrasonido', fontSize: 10 },
+                        ],
+                        [
+                          { text: '☐', fontSize: 12 },
+                          { text: 'Tomografía', fontSize: 10 },
+                        ],
+                        [
+                          { text: '☐', fontSize: 12 },
+                          { text: 'Resonancia magnética', fontSize: 10 },
+                        ],
+                        [
+                          { text: '☐', fontSize: 12 },
+                          {
+                            text: 'Otro: ____________________________________',
+                            fontSize: 10,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [10, 10, 10, 10],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 30],
+          },
+
+          // 🔹 ÁREA ESPECÍFICA
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Área específica a estudiar:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      solicitudData.area_estudio ||
+                      '______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 JUSTIFICACIÓN
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Justificación médica:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                ],
+                [
+                  {
+                    text:
+                      solicitudData.justificacion ||
+                      '______________________________________________________________________________________\n______________________________________________________________________________________',
+                    fontSize: 10,
+                    margin: [0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 30],
+          },
+
+          // 🔹 FIRMAS
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  {
+                    text: [
+                      { text: 'Médico que solicita:\n', fontSize: 10, bold: true },
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 10,
+                      },
+                      { text: `Cédula: ${medicoCompleto.numero_cedula}\n`, fontSize: 9 },
+                      { text: 'Firma: _________________________\n', fontSize: 10 },
+                      { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 9 },
+                    ],
+                    margin: [0, 10],
+                  },
+                  {
+                    text: [
+                      { text: 'Firma y hora que recibe (camillero):\n', fontSize: 10, bold: true },
+                      { text: 'Nombre: _________________________\n', fontSize: 10 },
+                      { text: 'Firma: _________________________\n', fontSize: 10 },
+                      { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 9 },
+                    ],
+                    margin: [0, 10],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20],
+          },
+
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  { text: '', fontSize: 10 },
+                  {
+                    text: [
+                      { text: 'Firma y hora que recibe (técnico rayos X):\n', fontSize: 10, bold: true },
+                      { text: 'Nombre: _________________________\n', fontSize: 10 },
+                      { text: 'Firma: _________________________\n', fontSize: 10 },
+                      { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 9 },
+                    ],
+                    margin: [0, 10],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [40, 20],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 8,
+                    color: '#000000',
+                  },
+                  {
+                    text: 'Solicitud de Imagenología - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#000000',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#000000',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `solicitud-imagenologia-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('✅ PDF de Solicitud de Imagenología generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
+      throw error;
+    }
+  }
+
+// 📄 SOLICITUD DE CULTIVO HOSPITAL MATERNO
+
+async generarSolicitudCultivo(datos: any): Promise<void> {
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    console.log('🧫 Generando Solicitud de Cultivo para Hospital Materno...');
+
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const cultivoData = datos.solicitudCultivo || {};
+    const fechaActual = new Date();
+
+    const documentDefinition = {
+      pageSize: 'LETTER',
+      pageMargins: [20, 40, 20, 40],
+
+      header: function(currentPage: number) {
+        return [
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'HOSPITAL MATERNO SAN LUIS DE LA PAZ',
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 10, 0, 0],
+                  },
+                ],
+                [
+                  {
+                    text: 'N° acceso: ___________________________',
+                    fontSize: 10,
+                    alignment: 'right',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+                [
+                  {
+                    text: 'LABORATORIO CLINICO',
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 0],
+                  },
+                ],
+                [
+                  {
+                    text: 'Blvr. Centenario de la Revolución Mexicana N° 110',
+                    fontSize: 9,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 10],
+                  },
+                ],
+                [
+                  {
+                    text: 'SOLICITUD DE ESTUDIOS DE MICROBIOLOGIA',
+                    fontSize: 14,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 10, 0, 15],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [20, 20, 20, 0],
+          },
+        ];
+      },
+
+      content: [
+        // 🔹 DATOS DEL PACIENTE
+        {
+          table: {
+            widths: ['15%', '35%', '10%', '15%', '10%', '15%'],
+            body: [
+              [
+                { text: 'Nombre:', fontSize: 10, bold: true },
+                {
+                  text: pacienteCompleto.nombre_completo,
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+                { text: 'Género:', fontSize: 10, bold: true },
+                {
+                  text: pacienteCompleto.sexo,
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+                { text: 'Edad:', fontSize: 10, bold: true },
+                {
+                  text: `${pacienteCompleto.edad} años`,
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        {
+          table: {
+            widths: ['20%', '30%', '15%', '35%'],
+            body: [
+              [
+                { text: 'Fecha de solicitud:', fontSize: 10, bold: true },
+                {
+                  text: fechaActual.toLocaleDateString('es-MX'),
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+                { text: 'Servicio:', fontSize: 10, bold: true },
+                {
+                  text: medicoCompleto.departamento || 'No especificado',
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        {
+          table: {
+            widths: ['15%', '25%', '15%', '25%', '10%', '10%'],
+            body: [
+              [
+                { text: 'Cama:', fontSize: 10, bold: true },
+                {
+                  text: cultivoData.numero_cama || 'Ambulatorio',
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+                { text: 'No. Expediente:', fontSize: 10, bold: true },
+                {
+                  text: pacienteCompleto.numero_expediente,
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+                { text: 'CURP:', fontSize: 10, bold: true },
+                {
+                  text: pacienteCompleto.curp || 'No registrado',
+                  fontSize: 9,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 FIRMA MÉDICO
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Nombre y firma del médico solicitante:',
+                  fontSize: 10,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+              [
+                {
+                  text: `Cédula: ${medicoCompleto.numero_cedula}   Firma: ___________________________`,
+                  fontSize: 10,
+                  margin: [0, 10, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 20],
+        },
+
+        // 🔹 DIAGNÓSTICO
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Diagnóstico:',
+                  fontSize: 10,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text:
+                    cultivoData.diagnostico ||
+                    '______________________________________________________________________________________',
+                  fontSize: 10,
+                  margin: [0, 5],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 20],
+        },
+
+        // 🔹 RESPONSABLE DE TOMA
+        {
+          table: {
+            widths: ['30%', '70%'],
+            body: [
+              [
+                {
+                  text: 'Responsable de la toma de muestra:',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  text: cultivoData.responsable_muestra || '___________________________',
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 20],
+        },
+
+        // 🔹 TIPO DE MUESTRA
+        {
+          table: {
+            widths: ['20%', '80%'],
+            body: [
+              [
+                {
+                  text: 'Tipo de muestra:',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  table: {
+                    widths: ['15%', '15%', '15%', '15%', '15%', '25%'],
+                    body: [
+                      [
+                        { text: '☐ Líquido', fontSize: 9 },
+                        { text: '☐ Secreción', fontSize: 9 },
+                        { text: '☐ Sangre', fontSize: 9 },
+                        { text: '☐ Catéter', fontSize: 9 },
+                        { text: '☐ Orina', fontSize: 9 },
+                        { text: '☐ Otro: ___________', fontSize: 9 },
+                      ],
+                    ],
+                  },
+                  layout: 'noBorders',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 SITIO DE ORIGEN
+        {
+          table: {
+            widths: ['30%', '70%'],
+            body: [
+              [
+                {
+                  text: 'Sitio de origen de la muestra:',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  text:
+                    cultivoData.sitio_origen ||
+                    '______________________________________________________________________________________',
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 TIPO DE MICROORGANISMO
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'En caso de requerir cultivo especificar el tipo de microorganismo a buscar:',
+                  fontSize: 10,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text:
+                    cultivoData.microorganismo_buscar ||
+                    '______________________________________________________________________________________\n______________________________________________________________________________________',
+                  fontSize: 10,
+                  margin: [0, 5],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 TINCIÓN
+        {
+          table: {
+            widths: ['15%', '85%'],
+            body: [
+              [
+                {
+                  text: 'Tinción:',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  table: {
+                    widths: ['15%', '15%', '15%', '15%', '40%'],
+                    body: [
+                      [
+                        { text: '☐ Tinta china', fontSize: 9 },
+                        { text: '☐ Gram', fontSize: 9 },
+                        { text: '☐ BAAR', fontSize: 9 },
+                        { text: '☐ KINYOUN', fontSize: 9 },
+                        { text: '☐ Otro: ___________', fontSize: 9 },
+                      ],
+                    ],
+                  },
+                  layout: 'noBorders',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 ANTIBIÓTICO
+        {
+          table: {
+            widths: ['30%', '15%', '55%'],
+            body: [
+              [
+                {
+                  text: '¿El paciente recibe antibiótico?',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  text: cultivoData.recibe_antibiotico ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                  fontSize: 10,
+                },
+                {
+                  text: '¿Cuál? ' + (cultivoData.antibiotico_actual || '___________________________'),
+                  fontSize: 10,
+                  decoration: 'underline',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 CULTIVOS ANTERIORES
+        {
+          table: {
+            widths: ['40%', '15%', '45%'],
+            body: [
+              [
+                {
+                  text: '¿Se han realizado cultivos anteriormente?',
+                  fontSize: 10,
+                  bold: true,
+                },
+                {
+                  text: cultivoData.cultivos_previos ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                  fontSize: 10,
+                },
+                {
+                  text: '',
+                  fontSize: 10,
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 MICROORGANISMOS AISLADOS
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Microorganismos aislados encontrados:',
+                  fontSize: 10,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text:
+                    cultivoData.microorganismos_aislados ||
+                    '______________________________________________________________________________________\n______________________________________________________________________________________',
+                  fontSize: 10,
+                  margin: [0, 5],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 15],
+        },
+
+        // 🔹 COMENTARIOS
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Comentarios:',
+                  fontSize: 10,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text:
+                    cultivoData.comentarios ||
+                    '______________________________________________________________________________________\n______________________________________________________________________________________\n______________________________________________________________________________________',
+                  fontSize: 10,
+                  margin: [0, 5],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+          margin: [0, 0, 0, 30],
+        },
+
+        // 🔹 ETIQUETA DE FOLIO (DUPLICATE HEADER)
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'Etiqueta de folio: ___________________________',
+                  fontSize: 10,
+                  alignment: 'center',
+                  margin: [0, 20, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+      ],
+
+      footer: (currentPage: number, pageCount: number) => {
+        return {
+          margin: [20, 10],
+          table: {
+            widths: ['25%', '50%', '25%'],
+            body: [
+              [
+                {
+                  text: `Página ${currentPage} de ${pageCount}`,
+                  fontSize: 8,
+                  color: '#666666',
+                },
+                {
+                  text: 'Solicitud de Cultivo - Hospital Materno\nSICEG - NOM-004-SSA3-2012',
+                  fontSize: 8,
+                  alignment: 'center',
+                  color: '#666666',
+                },
+                {
+                  text: [
+                    {
+                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                      fontSize: 8,
+                    },
+                    {
+                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      fontSize: 7,
+                    },
+                  ],
+                  alignment: 'right',
+                  color: '#666666',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        };
+      },
+    };
+
+    const nombreArchivo = `solicitud-cultivo-${pacienteCompleto.nombre
+      .replace(/\s+/g, '-')
+      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+    console.log(`📄 Archivo: ${nombreArchivo}`);
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Solicitud de Cultivo:', error);
+    throw error;
+  }
+}
 
 
 
