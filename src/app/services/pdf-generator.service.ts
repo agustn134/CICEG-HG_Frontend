@@ -144,6 +144,23 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
       case 'Hoja Quirófano':
         await this.generarHojaQuirofano(datos);
         break;
+      // Casos adicionales que se pueden usar temporalmente mientras se implementan los métodos específicos
+      case 'Referencia Traslado':
+        console.log('📄 Generando Referencia Traslado con datos generales');
+        await this.generarDocumentoGenerico('Referencia de Traslado', datos);
+        break;
+      case 'Control Crecimiento':
+        console.log('📄 Generando Control de Crecimiento con datos generales');
+        await this.generarDocumentoGenerico('Control de Crecimiento', datos);
+        break;
+      case 'Esquema Vacunación':
+        console.log('📄 Generando Esquema de Vacunación con datos generales');
+        await this.generarDocumentoGenerico('Esquema de Vacunación', datos);
+        break;
+      case 'Solicitud Gasometría':
+        console.log('📄 Generando Solicitud de Gasometría con datos generales');
+        await this.generarDocumentoGenerico('Solicitud de Gasometría', datos);
+        break;
       default:
         throw new Error(`Tipo de documento no soportado: ${tipoDocumento}`);
     }
@@ -7784,7 +7801,9 @@ private validarCumplimientoNotaPreoperatoria(
 
     const nombreArchivo = `consentimiento-tratamiento-medico-${pacienteCompleto.nombre
       .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+      .toLowerCase()}-${fechaActual.toISOString().split
+
+      ('T')[0]}.pdf`;
 
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
@@ -17746,101 +17765,290 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
  }
 }
 
-// 🔧 MÉTODO AUXILIAR PARA CALCULAR TOTAL ALDRETE
-private calcularTotalAldrete(postanestesicaData: any): number {
- const actividad = parseInt(postanestesicaData.aldrete_actividad) || 2;
- const respiracion = parseInt(postanestesicaData.aldrete_respiracion) || 2;
- const circulacion = parseInt(postanestesicaData.aldrete_circulacion) || 2;
- const conciencia = parseInt(postanestesicaData.aldrete_conciencia) || 2;
- const saturacion = parseInt(postanestesicaData.aldrete_saturacion) || 2;
+  // ==========================================
+  // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
+  // ==========================================
+  private obtenerNombreCompletoPersona(persona: any): string {
+    if (!persona) return 'N/A';
+    const nombre = persona.nombre || '';
+    const apellidoPaterno = persona.apellido_paterno || '';
+    const apellidoMaterno = persona.apellido_materno || '';
+    return `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+  }
 
- return actividad + respiracion + circulacion + conciencia + saturacion;
-}
+  private calcularEdadPersona(fechaNacimiento: string): string {
+    if (!fechaNacimiento) return 'N/A';
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    const edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const meses = hoy.getMonth() - nacimiento.getMonth();
+    
+    if (meses < 0 || (meses === 0 && hoy.getDate() < nacimiento.getDate())) {
+      return `${edad - 1} años`;
+    }
+    return `${edad} años`;
+  }
 
-// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTANESTÉSICA
-private validarCumplimientoNotaPostanestesica(
- datos: any,
- medico: any,
- paciente: any
-): void {
- console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...');
+  private formatearFecha(fecha: string): string {
+    if (!fecha) return 'N/A';
+    try {
+      const fechaObj = new Date(fecha);
+      return fechaObj.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch {
+      return 'N/A';
+    }
+  }
 
- const validaciones = {
-   // D11.12 - Medicamentos utilizados
-   medicamentos_utilizados: !!datos.notaPostanestesica?.medicamentos_utilizados,
+  // ==========================================
+  // MÉTODO GENÉRICO TEMPORAL PARA DOCUMENTOS FALTANTES
+  // ==========================================
+  async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promise<void> {
+    try {
+      if (!this.isLoaded) {
+        console.warn('📋 pdfMake aún no está cargado, usando archivo temporal');
+        return;
+      }
 
-   // D11.13 - Duración de la anestesia
-   duracion_anestesia: !!datos.notaPostanestesica?.duracion_anestesia,
-   tipo_anestesia: !!datos.notaPostanestesica?.tipo_anestesia,
+      const { paciente, medico, expediente } = datos;
 
-   // D11.14 - Incidentes y accidentes atribuibles a la anestesia
-   incidentes_accidentes_evaluados: true, // Sección incluida
+      const docDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [40, 60, 40, 60],
+        content: [
+          // Encabezado del Hospital
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
+            style: 'hospitalHeader',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: tipoDocumento.toUpperCase(),
+            style: 'documentTitle',
+            alignment: 'center',
+            margin: [0, 0, 0, 20]
+          },
 
-   // D11.15 - Cantidad de sangre o soluciones aplicadas
-   liquidos_administrados: true, // Campo incluido
-   balance_hidrico_reportado: true, // Sección incluida
-   hemoderivados_documentados: true, // Campo incluido
+          // Información del Paciente
+          {
+            text: 'DATOS DEL PACIENTE',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['25%', '25%', '25%', '25%'],
+              body: [
+                [
+                  { text: 'Nombre:', bold: true },
+                  { text: this.obtenerNombreCompletoPersona(paciente?.persona || paciente), fontSize: 10 },
+                  { text: 'Expediente:', bold: true },
+                  { text: expediente?.numero_expediente || 'N/A', fontSize: 10 }
+                ],
+                [
+                  { text: 'Fecha Nacimiento:', bold: true },
+                  { text: this.formatearFecha(paciente?.persona?.fecha_nacimiento || paciente?.fecha_nacimiento), fontSize: 10 },
+                  { text: 'Edad:', bold: true },
+                  { text: this.calcularEdadPersona(paciente?.persona?.fecha_nacimiento || paciente?.fecha_nacimiento), fontSize: 10 }
+                ]
+              ]
+            },
+            layout: 'lightHorizontalLines',
+            margin: [0, 0, 0, 20]
+          },
 
-   // D11.16 - Estado clínico del enfermo a su egreso de quirófano
-   estado_clinico_egreso: true, // Campo obligatorio incluido
-   signos_vitales_egreso: true, // Tabla completa incluida
-   evaluacion_neurológica: true, // Incluida en estado clínico
+          // Información del Médico
+          {
+            text: 'INFORMACIÓN MÉDICA',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['25%', '75%'],
+              body: [
+                [
+                  { text: 'Médico:', bold: true },
+                  { text: medico?.nombre_completo || 'No especificado', fontSize: 10 }
+                ],
+                [
+                  { text: 'Fecha:', bold: true },
+                  { text: this.formatearFecha(new Date().toISOString()), fontSize: 10 }
+                ]
+              ]
+            },
+            layout: 'lightHorizontalLines',
+            margin: [0, 0, 0, 20]
+          },
 
-   // D11.17 - Plan manejo y tratamiento inmediato
-   plan_tratamiento_inmediato: true, // Campo incluido
+          // Contenido del documento (placeholder)
+          {
+            text: `CONTENIDO DE ${tipoDocumento.toUpperCase()}`,
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: 'Este documento está en desarrollo. Los datos específicos se completarán cuando se implemente el formulario correspondiente.',
+            style: 'placeholder',
+            margin: [0, 0, 0, 20]
+          },
 
-   // Datos del paciente
-   nombre_completo_paciente: !!paciente.nombre_completo,
-   numero_expediente: !!paciente.numero_expediente,
-   edad_sexo: !!paciente.edad && !!paciente.sexo,
+          // Espacio para firmas
+          {
+            text: 'FIRMAS',
+            style: 'sectionHeader',
+            margin: [0, 30, 0, 20]
+          },
+          {
+            columns: [
+              {
+                text: [
+                  '_'.repeat(30) + '\n',
+                  'Firma del Médico\n',
+                  (medico?.nombre_completo || 'Dr. [Nombre]') + '\n',
+                  'Cédula Prof.: ' + (medico?.numero_cedula || '[Cédula]')
+                ],
+                alignment: 'center',
+                fontSize: 10
+              },
+              {
+                text: [
+                  '_'.repeat(30) + '\n',
+                  'Sello del Hospital'
+                ],
+                alignment: 'center',
+                fontSize: 10
+              }
+            ],
+            margin: [0, 0, 0, 20]
+          }
+        ],
+        
+        styles: {
+          hospitalHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#2c5282'
+          },
+          documentTitle: {
+            fontSize: 16,
+            bold: true,
+            color: '#2c5282'
+          },
+          sectionHeader: {
+            fontSize: 12,
+            bold: true,
+            color: '#2c5282'
+          },
+          placeholder: {
+            fontSize: 10,
+            italics: true,
+            color: '#666666'
+          }
+        },
 
-   // Datos del anestesiólogo
-   nombre_completo_anestesiologo: !!medico.nombre_completo,
-   cedula_profesional: !!medico.numero_cedula,
-   firma_espacio: true, // Espacio incluido
+        footer: function(currentPage: number, pageCount: number) {
+          return {
+            text: `${tipoDocumento} - Página ${currentPage} de ${pageCount}`,
+            alignment: 'center',
+            fontSize: 8,
+            margin: [0, 10, 0, 0]
+          };
+        }
+      };
 
-   // Información quirúrgica
-   procedimiento_identificado: true, // Campo incluido
-   fecha_cirugia: true, // Campo incluido
-   quirofano_identificado: true, // Campo incluido
+      this.pdfMake.createPdf(docDefinition).open();
+      console.log(`✅ ${tipoDocumento} generado exitosamente como documento temporal`);
 
-   // Escala de recuperación
-   escala_aldrete: true, // Incluida para evaluación objetiva
-   puntuacion_recuperacion: true, // Calculada automáticamente
+    } catch (error) {
+      console.error(`❌ Error al generar ${tipoDocumento}:`, error);
+      throw error;
+    }
+  }
 
-   // Fecha y lugar
-   fecha_elaboracion: true,
-   hospital_identificado: true,
- };
+  // 🔧 MÉTODO AUXILIAR PARA CALCULAR TOTAL ALDRETE - MOVIDO DENTRO DE LA CLASE
+  private calcularTotalAldrete(postanestesicaData: any): number {
+    const actividad = parseInt(postanestesicaData.aldrete_actividad) || 2;
+    const respiracion = parseInt(postanestesicaData.aldrete_respiracion) || 2;
+    const circulacion = parseInt(postanestesicaData.aldrete_circulacion) || 2;
+    const conciencia = parseInt(postanestesicaData.aldrete_conciencia) || 2;
+    const saturacion = parseInt(postanestesicaData.aldrete_saturacion) || 2;
 
- const cumplimiento = Object.values(validaciones).filter((v) => v).length;
- const total = Object.keys(validaciones).length;
- const porcentaje = Math.round((cumplimiento / total) * 100);
+    return actividad + respiracion + circulacion + conciencia + saturacion;
+  }
 
- console.log(
-   `📊 CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
- );
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTANESTÉSICA - MOVIDO DENTRO DE LA CLASE
+  private validarCumplimientoNotaPostanestesica(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...');
 
- if (porcentaje < 90) {
-   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
- } else {
-   console.log('✅ NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
- }
-}
+    const validaciones = {
+      // D11.12 - Medicamentos utilizados
+      medicamentos_utilizados: !!datos.notaPostanestesica?.medicamentos_utilizados,
 
+      // D11.13 - Duración de la anestesia
+      duracion_anestesia: !!datos.notaPostanestesica?.duracion_anestesia,
+      tipo_anestesia: !!datos.notaPostanestesica?.tipo_anestesia,
 
+      // D11.14 - Incidentes y accidentes atribuibles a la anestesia
+      incidentes_accidentes_evaluados: true, // Sección incluida
 
+      // D11.15 - Cantidad de sangre o soluciones aplicadas
+      liquidos_administrados: true, // Campo incluido
+      balance_hidrico_reportado: true, // Sección incluida
+      hemoderivados_documentados: true, // Campo incluido
 
+      // D11.16 - Estado clínico del enfermo a su egreso de quirófano
+      estado_clinico_egreso: true, // Campo obligatorio incluido
+      signos_vitales_egreso: true, // Tabla completa incluida
+      evaluacion_neurológica: true, // Incluida en estado clínico
 
+      // D11.17 - Plan manejo y tratamiento inmediato
+      plan_tratamiento_inmediato: true, // Campo incluido
 
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      numero_expediente: !!paciente.numero_expediente,
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
 
+      // Datos del anestesiólogo
+      nombre_completo_anestesiologo: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      firma_espacio: true, // Espacio incluido
 
+      // Información quirúrgica
+      procedimiento_identificado: true, // Campo incluido
+      fecha_cirugia: true, // Campo incluido
+      quirofano_identificado: true, // Campo incluido
 
+      // Escala de recuperación
+      escala_aldrete: true, // Incluida para evaluación objetiva
+      puntuacion_recuperacion: true, // Calculada automáticamente
 
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado: true,
+    };
 
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
 
+    console.log(
+      `📊 CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
 
-
-
-
+    if (porcentaje < 90) {
+      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('✅ NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
+    }
+  }
 }

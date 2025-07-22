@@ -473,6 +473,138 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       requiereQuirurgico: false,
       orden: 14,
     },
+    {
+      id: 'notaEgreso',
+      nombre: 'Nota de Egreso',
+      descripcion: 'Resumen final del tratamiento',
+      icono: 'fas fa-sign-out-alt',
+      color: 'green',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 15,
+    },
+    {
+      id: 'consentimientoProcedimientos',
+      nombre: 'Consentimiento Procedimientos',
+      descripcion: 'Autorización para procedimientos específicos',
+      icono: 'fas fa-hand-paper',
+      color: 'orange',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 16,
+    },
+    {
+      id: 'consentimientoHospitalizacion',
+      nombre: 'Consentimiento Hospitalización',
+      descripcion: 'Autorización para internamiento',
+      icono: 'fas fa-hospital',
+      color: 'blue',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 17,
+    },
+    {
+      id: 'consentimientoTransfusion',
+      nombre: 'Consentimiento Transfusión',
+      descripcion: 'Autorización para transfusión sanguínea',
+      icono: 'fas fa-tint',
+      color: 'red',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 18,
+    },
+    {
+      id: 'hojaAltaVoluntaria',
+      nombre: 'Hoja Alta Voluntaria',
+      descripcion: 'Documento de alta por decisión del paciente',
+      icono: 'fas fa-file-signature',
+      color: 'yellow',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 19,
+    },
+    {
+      id: 'hojaFrontalExpediente',
+      nombre: 'Hoja Frontal Expediente',
+      descripcion: 'Portada del expediente clínico',
+      icono: 'fas fa-folder',
+      color: 'gray',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 20,
+    },
+    {
+      id: 'solicitudLaboratorio',
+      nombre: 'Solicitud Laboratorio',
+      descripcion: 'Solicitud de estudios de laboratorio',
+      icono: 'fas fa-flask',
+      color: 'blue',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 21,
+    },
+    {
+      id: 'solicitudImagenologia',
+      nombre: 'Solicitud Imagenología',
+      descripcion: 'Solicitud de estudios de imagen',
+      icono: 'fas fa-x-ray',
+      color: 'purple',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 22,
+    },
+    {
+      id: 'solicitudCultivo',
+      nombre: 'Solicitud Cultivo',
+      descripcion: 'Solicitud de cultivos microbiológicos',
+      icono: 'fas fa-bacteria',
+      color: 'green',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 23,
+    },
+    {
+      id: 'prescripcionMedicamentos',
+      nombre: 'Prescripción Medicamentos',
+      descripcion: 'Receta médica de medicamentos',
+      icono: 'fas fa-pills',
+      color: 'indigo',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 24,
+    },
+    {
+      id: 'solicitudGasometria',
+      nombre: 'Solicitud Gasometría',
+      descripcion: 'Solicitud de gasometría arterial',
+      icono: 'fas fa-lungs',
+      color: 'teal',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 25,
+    },
   ];
 
 
@@ -504,7 +636,17 @@ getTituloDocumento(documento: any): string {
     'hojaFrontal': 'Hoja Frontal',
     'altaVoluntaria': 'Alta Voluntaria',
     'solicitudCultivo': 'Solicitud de Cultivo',
-    'solicitudGasometria': 'Solicitud de Gasometría'
+    'solicitudGasometria': 'Solicitud de Gasometría',
+    // Nuevos documentos
+    'notaEgreso': 'Nota de Egreso',
+    'consentimientoProcedimientos': 'Consentimiento Procedimientos',
+    'consentimientoHospitalizacion': 'Consentimiento Hospitalización',
+    'consentimientoTransfusion': 'Consentimiento Transfusión',
+    'hojaAltaVoluntaria': 'Hoja Alta Voluntaria',
+    'hojaFrontalExpediente': 'Hoja Frontal Expediente',
+    'solicitudLaboratorio': 'Solicitud Laboratorio',
+    'solicitudImagenologia': 'Solicitud Imagenología',
+    'prescripcionMedicamentos': 'Prescripción Medicamentos'
   };
 
   return titulos[documento.tipoDocumento] ||
@@ -524,7 +666,19 @@ getColorClaseDocumento(documento: any): string {
     'solicitudEstudio': 'bg-gray-50 text-gray-600',
     'referenciaTraslado': 'bg-amber-50 text-amber-600',
     'controlCrecimiento': 'bg-pink-50 text-pink-600',
-    'esquemaVacunacion': 'bg-emerald-50 text-emerald-600'
+    'esquemaVacunacion': 'bg-emerald-50 text-emerald-600',
+    // Nuevos documentos
+    'notaEgreso': 'bg-green-50 text-green-600',
+    'consentimientoProcedimientos': 'bg-orange-50 text-orange-600',
+    'consentimientoHospitalizacion': 'bg-blue-50 text-blue-600',
+    'consentimientoTransfusion': 'bg-red-50 text-red-600',
+    'hojaAltaVoluntaria': 'bg-yellow-50 text-yellow-600',
+    'hojaFrontalExpediente': 'bg-gray-50 text-gray-600',
+    'solicitudLaboratorio': 'bg-blue-50 text-blue-600',
+    'solicitudImagenologia': 'bg-purple-50 text-purple-600',
+    'solicitudCultivo': 'bg-green-50 text-green-600',
+    'prescripcionMedicamentos': 'bg-indigo-50 text-indigo-600',
+    'solicitudGasometria': 'bg-teal-50 text-teal-600'
   };
 
   return colores[documento.tipoDocumento] || 'bg-gray-50 text-gray-600';
@@ -2458,6 +2612,20 @@ this.error = `Error al procesar ${nombreFormulario}`;
       notaPostanestesica: 'Nota Postanestésica',
       controlCrecimiento: 'Control de Crecimiento',
       esquemaVacunacion: 'Esquema de Vacunación',
+      solicitudEstudio: 'Solicitud de Estudio',
+      referenciaTraslado: 'Referencia Traslado',
+      // Nuevos documentos
+      notaEgreso: 'Nota de Egreso',
+      consentimientoProcedimientos: 'Consentimiento Procedimientos',
+      consentimientoHospitalizacion: 'Consentimiento Hospitalización',
+      consentimientoTransfusion: 'Consentimiento Transfusión',
+      hojaAltaVoluntaria: 'Hoja Alta Voluntaria',
+      hojaFrontalExpediente: 'Hoja Frontal Expediente',
+      solicitudLaboratorio: 'Solicitud Laboratorio',
+      solicitudImagenologia: 'Solicitud Imagenología',
+      solicitudCultivo: 'Solicitud Cultivo',
+      prescripcionMedicamentos: 'Prescripción Medicamentos',
+      solicitudGasometria: 'Solicitud Gasometría'
     };
     return titulos[formulario] || formulario;
   }
@@ -3199,6 +3367,224 @@ resetearFormularioActual(): void {
                 this.signosVitalesForm.value.observaciones ||
                 'Sin observaciones específicas. Paciente estable.',
             },
+          });
+          break;
+
+        case 'Nota de Egreso':
+          await this.pdfGeneratorService.generarNotaEgreso({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaEgreso: {}, // No hay formulario específico de egreso implementado aún
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        case 'Nota de Interconsulta':
+          await this.pdfGeneratorService.generarNotaInterconsulta({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaInterconsulta: this.notaInterconsultaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        case 'Nota Preoperatoria':
+          await this.pdfGeneratorService.generarNotaPreoperatoria({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaPreoperatoria: this.notaPreoperatoriaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        case 'Nota Postoperatoria':
+          await this.pdfGeneratorService.generarNotaPostoperatoria({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaPostoperatoria: this.notaPostoperatoriaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        case 'Nota Preanestésica':
+          await this.pdfGeneratorService.generarNotaPreanestesica({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaPreanestesica: this.notaPreanestesicaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        case 'Nota Postanestésica':
+          await this.pdfGeneratorService.generarNotaPostanestesica({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            notaPostanestesica: this.notaPostanestesicaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+            guiaClinica: this.guiaClinicaSeleccionada,
+          });
+          break;
+
+        // Consentimientos Informados
+        case 'Consentimiento Procedimientos':
+          await this.pdfGeneratorService.generarNotaConsentimientoProcedimientos({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        case 'Consentimiento Hospitalización':
+          await this.pdfGeneratorService.generarConsentimientoHospitalizacion({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        case 'Consentimiento Referencia':
+          await this.pdfGeneratorService.generarConsentimientoReferenciaPacientes({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        case 'Consentimiento Transfusión':
+          await this.pdfGeneratorService.generarConsentimientoTransfusionSanguinea({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        case 'Consentimiento Tratamiento':
+          await this.pdfGeneratorService.generarConsentimientoTratamientoMedico({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        // Hojas y Documentos Especiales
+        case 'Hoja Alta Voluntaria':
+          await this.pdfGeneratorService.generarHojaAltaVoluntaria({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            altaVoluntaria: {}, // Se pueden agregar datos específicos
+          });
+          break;
+
+        case 'Hoja Frontal Expediente':
+          await this.pdfGeneratorService.generarHojaFrontalExpediente({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            hojaFrontal: {}, // Se pueden agregar datos específicos
+          });
+          break;
+
+        // Solicitudes de Estudios
+        case 'Solicitud Laboratorio':
+          await this.pdfGeneratorService.generarSolicitudLaboratorio({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            solicitud: this.solicitudEstudioForm?.value || {},
+          });
+          break;
+
+        case 'Solicitud Imagenología':
+          await this.pdfGeneratorService.generarSolicitudImagenologia({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            solicitud: this.solicitudEstudioForm?.value || {},
+          });
+          break;
+
+        case 'Solicitud Cultivo':
+          await this.pdfGeneratorService.generarSolicitudCultivo({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            solicitud: this.solicitudEstudioForm?.value || {},
+          });
+          break;
+
+        // Prescripciones y Referencias
+        case 'Prescripción Medicamentos':
+          await this.pdfGeneratorService.generarPrescripcionMedicamentos({
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            prescripcion: this.prescripcionForm?.value || {},
+          });
+          break;
+
+        case 'Referencia Traslado':
+          await this.pdfGeneratorService.generarDocumentoPDF('Referencia Traslado', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            referencia: this.referenciaForm?.value || {},
+          });
+          break;
+
+        // Documentos Pediátricos
+        case 'Control Crecimiento':
+          await this.pdfGeneratorService.generarDocumentoPDF('Control Crecimiento', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            control: this.controlCrecimientoForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
+          });
+          break;
+
+        case 'Esquema Vacunación':
+          await this.pdfGeneratorService.generarDocumentoPDF('Esquema Vacunación', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            esquema: this.esquemaVacunacionForm?.value || {},
+          });
+          break;
+
+        // Solicitudes Especiales
+        case 'Solicitud Gasometría':
+          await this.pdfGeneratorService.generarDocumentoPDF('Solicitud Gasometría', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            solicitud: this.solicitudEstudioForm?.value || {},
+          });
+          break;
+
+        // Consentimiento Informado genérico
+        case 'Consentimiento Informado':
+          await this.pdfGeneratorService.generarDocumentoPDF('Consentimiento Tratamiento', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            consentimientoTratamiento: this.consentimientoForm?.value || {},
           });
           break;
 
