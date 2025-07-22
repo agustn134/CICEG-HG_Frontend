@@ -245,49 +245,159 @@
     <!-- ==========================================
          NAVEGACIÓN DE TABS
          ========================================== -->
-    <div class="bg-white shadow rounded-lg mb-6">
-      <div class="border-b border-gray-200">
-        <nav class="flex space-x-8 px-6" aria-label="Tabs">
+<!-- ==========================================
+           NAVEGACIÓN DE TABS PRINCIPAL (CORREGIDA)
+           ========================================== -->
+      <div class="bg-white shadow rounded-lg mb-6">
+        <div class="border-b border-gray-200">
+          <nav class="flex space-x-8 px-6" aria-label="Tabs">
 
-          <!-- Tab: Vista General -->
-          <button (click)="cambiarTab('general')"
-            [class]="tabActiva === 'general' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
-            <i class="fas fa-tachometer-alt mr-2"></i>
-            Vista General
-          </button>
+            <!-- Tab: Vista General -->
+            <button (click)="cambiarTab('general')"
+              [class]="tabActiva === 'general' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              <i class="fas fa-tachometer-alt mr-2"></i>
+              Vista General
+            </button>
 
-          <!-- Tab: Crear Documentos -->
-          <button (click)="cambiarTab('crear')"
-            [class]="tabActiva === 'crear' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
-            <i class="fas fa-plus-circle mr-2"></i>
-            Crear Documentos
-            <span *ngIf="progresoFormularios.completados > 0"
-              class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-              {{progresoFormularios.completados}}/{{progresoFormularios.total}}
-            </span>
-          </button>
+            <!-- Tab: Crear Documentos -->
+            <button (click)="cambiarTab('crear')"
+              [class]="tabActiva === 'crear' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              <i class="fas fa-plus-circle mr-2"></i>
+              Crear Documentos
+              <span *ngIf="progresoFormularios.completados > 0"
+                class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                {{progresoFormularios.completados}}/{{progresoFormularios.total}}
+              </span>
+            </button>
 
-          <!-- Tab: Historial Clínico -->
-          <button (click)="cambiarTab('historial')"
-            [class]="tabActiva === 'historial' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
-            <i class="fas fa-history mr-2"></i>
-            Historial Clínico
-          </button>
+            <!-- Tab: Historial Clínico -->
+            <button (click)="cambiarTab('historial')"
+              [class]="tabActiva === 'historial' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              <i class="fas fa-history mr-2"></i>
+              Historial Clínico
+            </button>
 
-          <!-- Tab: Datos Clínicos -->
-          <button (click)="cambiarTab('datos')"
-            [class]="tabActiva === 'datos' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
-            <i class="fas fa-clipboard-list mr-2"></i>
-            Datos Clínicos
-          </button>
+            <!-- Tab: Datos Clínicos -->
+            <button (click)="cambiarTab('datos')"
+              [class]="tabActiva === 'datos' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              <i class="fas fa-clipboard-list mr-2"></i>
+              Datos Clínicos
+            </button>
 
-        </nav>
+          </nav>
+        </div>
       </div>
-    </div>
+
+      <!-- ==========================================
+           NAVEGACIÓN DE FORMULARIOS (SOLO EN TAB CREAR)
+           ========================================== -->
+      <div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
+        <div class="border-b border-gray-200">
+          <nav class="flex overflow-x-auto space-x-2 px-6 scrollbar-hide" aria-label="Formularios">
+
+            <!-- Signos Vitales -->
+            <button (click)="cambiarFormulario('signosVitales')"
+              [class]="formularioActivo === 'signosVitales' ? 'border-rose-500 text-rose-600 bg-rose-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i class="fas fa-heartbeat mr-2"></i>
+              Signos Vitales
+            </button>
+
+            <!-- Historia Clínica -->
+            <button (click)="cambiarFormulario('historiaClinica')"
+              [class]="formularioActivo === 'historiaClinica' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i [class]="esPacientePediatrico ? 'fas fa-baby mr-2' : 'fas fa-file-medical-alt mr-2'"></i>
+              {{ esPacientePediatrico ? 'Historia Pediátrica' : 'Historia Clínica' }}
+            </button>
+
+            <!-- Nota de Urgencias -->
+            <button (click)="cambiarFormulario('notaUrgencias')"
+              [class]="formularioActivo === 'notaUrgencias' ? 'border-red-500 text-red-600 bg-red-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i class="fas fa-ambulance mr-2"></i>
+              Urgencias
+            </button>
+
+            <!-- Nota de Evolución -->
+            <button (click)="cambiarFormulario('notaEvolucion')"
+              [class]="formularioActivo === 'notaEvolucion' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i class="fas fa-chart-line mr-2"></i>
+              Evolución (SOAP)
+            </button>
+
+            <!-- Consentimiento Informado -->
+            <button (click)="cambiarFormulario('consentimiento')"
+              [class]="formularioActivo === 'consentimiento' ? 'border-slate-500 text-slate-600 bg-slate-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i class="fas fa-file-signature mr-2"></i>
+              Consentimiento
+            </button>
+
+            <!-- Nota de Interconsulta -->
+            <button (click)="cambiarFormulario('notaInterconsulta')"
+              [class]="formularioActivo === 'notaInterconsulta' ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+              class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+              <i class="fas fa-user-md mr-2"></i>
+              Interconsulta
+            </button>
+
+            <!-- Documentos quirúrgicos (solo si es necesario) -->
+            <ng-container *ngIf="mostrarDocumentosQuirurgicos">
+              <button (click)="cambiarFormulario('notaPreoperatoria')"
+                [class]="formularioActivo === 'notaPreoperatoria' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-clipboard-check mr-2"></i>
+                Preoperatoria
+              </button>
+
+              <button (click)="cambiarFormulario('notaPreanestesica')"
+                [class]="formularioActivo === 'notaPreanestesica' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-syringe mr-2"></i>
+                Preanestésica
+              </button>
+
+              <button (click)="cambiarFormulario('notaPostoperatoria')"
+                [class]="formularioActivo === 'notaPostoperatoria' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-band-aid mr-2"></i>
+                Postoperatoria
+              </button>
+
+              <button (click)="cambiarFormulario('notaPostanestesica')"
+                [class]="formularioActivo === 'notaPostanestesica' ? 'border-teal-500 text-teal-600 bg-teal-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-heartbeat mr-2"></i>
+                Postanestésica
+              </button>
+            </ng-container>
+
+            <!-- Documentos pediátricos (solo si es pediátrico) -->
+            <ng-container *ngIf="esPacientePediatrico">
+              <button (click)="cambiarFormulario('controlCrecimiento')"
+                [class]="formularioActivo === 'controlCrecimiento' ? 'border-cyan-500 text-cyan-600 bg-cyan-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-chart-area mr-2"></i>
+                Control Crecimiento
+              </button>
+
+              <button (click)="cambiarFormulario('esquemaVacunacion')"
+                [class]="formularioActivo === 'esquemaVacunacion' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+                class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Vacunación
+              </button>
+            </ng-container>
+
+          </nav>
+        </div>
+      </div>
 
     <!-- ==========================================
          CONTENIDO DE TABS
@@ -469,135 +579,8 @@
         </div>
       </div>
 
-      <!-- Navegación de Formularios -->
-      <div class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Creación de Documentos Clínicos</h2>
-            <div class="flex items-center space-x-3">
-              <span class="text-sm text-gray-600">
-                Progreso: {{ progresoFormularios.completados }}/{{ progresoFormularios.total }}
-                ({{ progresoFormularios.porcentaje }}%)
-              </span>
-              <div class="w-32 bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  [style.width.%]="progresoFormularios.porcentaje">
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Progreso Visual -->
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex space-x-4">
 
-              <!-- Paso 1: Signos Vitales -->
-              <div class="flex items-center">
-                <button (click)="cambiarFormulario('signosVitales')"
-                  [class]="formularioEstado.signosVitales ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'signosVitales' ? 'bg-blue-500' : 'bg-gray-300')"
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
-                  <i *ngIf="formularioEstado.signosVitales" class="fas fa-check"></i>
-                  <span *ngIf="!formularioEstado.signosVitales">1</span>
-                </button>
-                <span class="ml-2 text-sm font-medium text-gray-700">Signos Vitales</span>
-                <i *ngIf="formularioEstado.signosVitales" class="fas fa-check-circle text-green-500 ml-1"></i>
-              </div>
-
-              <!-- Separador -->
-              <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
-
-              <!-- Paso 2: Historia Clínica -->
-              <div class="flex items-center">
-                <button (click)="cambiarFormulario('historiaClinica')" [disabled]="!formularioEstado.signosVitales"
-                  [class]="formularioEstado.historiaClinica ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'historiaClinica' ? 'bg-blue-500' : (formularioEstado.signosVitales ? 'bg-gray-400 hover:bg-gray-500' : 'bg-gray-300'))"
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed">
-                  <i *ngIf="formularioEstado.historiaClinica" class="fas fa-check"></i>
-                  <span *ngIf="!formularioEstado.historiaClinica">2</span>
-                </button>
-                <span class="ml-2 text-sm font-medium text-gray-700">Historia Clínica</span>
-                <i *ngIf="formularioEstado.historiaClinica" class="fas fa-check-circle text-green-500 ml-1"></i>
-              </div>
-
-              <!-- Separador -->
-              <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
-
-              <!-- Paso 3: Nota de Urgencias -->
-              <div class="flex items-center">
-                <button (click)="cambiarFormulario('notaUrgencias')"
-                  [class]="formularioEstado.notaUrgencias ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'notaUrgencias' ? 'bg-red-500' : 'bg-gray-400 hover:bg-gray-500')"
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
-                  <i *ngIf="formularioEstado.notaUrgencias" class="fas fa-check"></i>
-                  <span *ngIf="!formularioEstado.notaUrgencias">3</span>
-                </button>
-                <span class="ml-2 text-sm font-medium text-gray-700">Nota Urgencias</span>
-                <i *ngIf="formularioEstado.notaUrgencias" class="fas fa-check-circle text-green-500 ml-1"></i>
-              </div>
-
-              <!-- Separador -->
-              <div class="flex-1 border-t-2 border-gray-200 mt-4"></div>
-
-              <!-- Paso 4: Nota de Evolución -->
-              <div class="flex items-center">
-                <button (click)="cambiarFormulario('notaEvolucion')"
-                  [class]="formularioEstado.notaEvolucion ? 'bg-green-500 hover:bg-green-600' : (formularioActivo === 'notaEvolucion' ? 'bg-green-600' : 'bg-gray-400 hover:bg-gray-500')"
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium transition-all duration-200 hover:scale-105">
-                  <i *ngIf="formularioEstado.notaEvolucion" class="fas fa-check"></i>
-                  <span *ngIf="!formularioEstado.notaEvolucion">4</span>
-                </button>
-                <span class="ml-2 text-sm font-medium text-gray-700">Nota Evolución</span>
-                <i *ngIf="formularioEstado.notaEvolucion" class="fas fa-check-circle text-green-500 ml-1"></i>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Botones de navegación -->
-          <div class="flex space-x-2 justify-between">
-            <div class="flex space-x-2">
-              <button (click)="cambiarFormulario('signosVitales')"
-                [class]="formularioActivo === 'signosVitales' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                <i class="fas fa-heartbeat mr-1"></i>
-                Signos Vitales
-              </button>
-              <button (click)="cambiarFormulario('historiaClinica')"
-                [class]="formularioActivo === 'historiaClinica' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                [disabled]="!formularioEstado.signosVitales"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-file-medical-alt mr-1"></i>
-                Historia Clínica
-              </button>
-              <button (click)="cambiarFormulario('notaUrgencias')"
-                [class]="formularioActivo === 'notaUrgencias' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                <i class="fas fa-ambulance mr-1"></i>
-                Nota Urgencias
-              </button>
-              <button (click)="cambiarFormulario('notaEvolucion')"
-                [class]="formularioActivo === 'notaEvolucion' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                <i class="fas fa-chart-line mr-1"></i>
-                Nota Evolución
-              </button>
-            </div>
-
-            <!-- Botones de acción -->
-            <div class="flex space-x-2">
-              <button (click)="resetearFormularioActual()" [disabled]="!formularioEstado[formularioActivo]"
-                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm disabled:opacity-50">
-                <i class="fas fa-undo mr-1"></i>
-                Resetear
-              </button>
-
-              <button *ngIf="puedeFinalizarProceso" (click)="finalizarProceso()"
-                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium">
-                <i class="fas fa-check-double mr-1"></i>
-                Finalizar Proceso
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- ==========================================
           FORMULARIOS
@@ -907,21 +890,18 @@
 
                 <div class="relative">
                   <div class="flex">
-                    <<input type="text"
-       [(ngModel)]="filtroGuiaClinica"
-       [ngModelOptions]="{standalone: true}"
-       (input)="onGuiaClinicaInputChange($event)"
-       (focus)="toggleDropdownGuias()"
-       (click)="toggleDropdownGuias()"
-       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-       placeholder="Buscar guía clínica por nombre, código o área..."
-       [readonly]="!!guiaClinicaSeleccionada">
+                    <<input type="text" [(ngModel)]="filtroGuiaClinica" [ngModelOptions]="{standalone: true}"
+                      (input)="onGuiaClinicaInputChange($event)" (focus)="toggleDropdownGuias()"
+                      (click)="toggleDropdownGuias()"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Buscar guía clínica por nombre, código o área..."
+                      [readonly]="!!guiaClinicaSeleccionada">
 
 
-                    <button type="button" (click)="toggleDropdownGuias()"
-                      class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <i class="fas fa-search"></i>
-                    </button>
+                      <button type="button" (click)="toggleDropdownGuias()"
+                        class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search"></i>
+                      </button>
                   </div>
 
                   <!-- Información de la guía seleccionada -->
@@ -1131,16 +1111,12 @@
               <div class="relative">
                 <div class="flex">
                   <!-- 🔥 EN NOTA DE URGENCIAS (línea ~1500 aprox) -->
-<input type="text"
-       [ngModel]="filtroGuiaClinica"
-       (ngModelChange)="onGuiaClinicaInputChange($event)"
-       [ngModelOptions]="{standalone: true}"
-       (input)="onGuiaClinicaInputChange($any($event.target).value)"
-       (focus)="toggleDropdownGuias()"
-       (click)="toggleDropdownGuias()"
-       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-       placeholder="Buscar guía clínica por nombre, código o área..."
-       [readonly]="!!guiaClinicaSeleccionada">
+                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                    [ngModelOptions]="{standalone: true}" (input)="onGuiaClinicaInputChange($any($event.target).value)"
+                    (focus)="toggleDropdownGuias()" (click)="toggleDropdownGuias()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar guía clínica por nombre, código o área..."
+                    [readonly]="!!guiaClinicaSeleccionada">
 
                   <button type="button" (click)="toggleDropdownGuias()"
                     class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1352,16 +1328,12 @@
 
               <div class="relative">
                 <div class="flex">
-                  <input type="text"
-       [ngModel]="filtroGuiaClinica"
-       (ngModelChange)="onGuiaClinicaInputChange($event)"
-       [ngModelOptions]="{standalone: true}"
-       (input)="onGuiaClinicaInputChange($any($event.target).value)"
-       (focus)="toggleDropdownGuias()"
-       (click)="toggleDropdownGuias()"
-       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-       placeholder="Buscar guía clínica por nombre, código o área..."
-       [readonly]="!!guiaClinicaSeleccionada">
+                  <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                    [ngModelOptions]="{standalone: true}" (input)="onGuiaClinicaInputChange($any($event.target).value)"
+                    (focus)="toggleDropdownGuias()" (click)="toggleDropdownGuias()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar guía clínica por nombre, código o área..."
+                    [readonly]="!!guiaClinicaSeleccionada">
 
                   <button type="button" (click)="toggleDropdownGuias()"
                     class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1567,17 +1539,13 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>
-            <input type="date"
-       [(ngModel)]="filtroHistorial.fechaDesde"
-       [ngModelOptions]="{standalone: true}"
-       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date" [(ngModel)]="filtroHistorial.fechaDesde" [ngModelOptions]="{standalone: true}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>
-            <input type="date"
-       [(ngModel)]="filtroHistorial.fechaHasta"
-       [ngModelOptions]="{standalone: true}"
-       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date" [(ngModel)]="filtroHistorial.fechaHasta" [ngModelOptions]="{standalone: true}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
       </div>
