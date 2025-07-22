@@ -16697,19 +16697,6 @@ try {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // 📄 NOTA POSTANESTÉSICA SEGÚN NOM-004-SSA3-2012 SECCIÓN D11
 async generarNotaPostanestesica(datos: any): Promise<void> {
   try {
