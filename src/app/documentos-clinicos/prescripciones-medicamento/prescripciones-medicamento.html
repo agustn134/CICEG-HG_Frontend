@@ -545,8 +545,7 @@
              <div>
                <label class="block text-sm font-medium text-hospital-gray-700">Medicamento</label>
                <p class="mt-1 text-sm text-hospital-gray-900">
-                 {{ selectedPrescripcion.nombre_medicamento || 'ID: ' + selectedPrescripcion.id_medicamento }}
-               </p>
+{{ selectedPrescripcion.nombre_medicamento || selectedPrescripcion.medicamento || 'Prescripción ID: ' + selectedPrescripcion.id_prescripcion }}               </p>
              </div>
 
              <div>
@@ -568,10 +567,9 @@
            </div>
 
            <div class="space-y-4">
-             <div *ngIf="selectedPrescripcion.duracion">
-               <label class="block text-sm font-medium text-hospital-gray-700">Duración</label>
-               <p class="mt-1 text-sm text-hospital-gray-900">{{ selectedPrescripcion.duracion }}</p>
-             </div>
+             <div *ngIf="selectedPrescripcion.duracion || selectedPrescripcion.duracion_tratamiento">
+  <p class="mt-1 text-sm text-hospital-gray-900">{{ selectedPrescripcion.duracion || selectedPrescripcion.duracion_tratamiento }}</p>
+</div>
 
              <div>
                <label class="block text-sm font-medium text-hospital-gray-700">Fecha de Inicio</label>
@@ -626,10 +624,9 @@
                  {{ selectedPrescripcion.fecha_prescripcion | date:'dd/MM/yyyy HH:mm' }}
                </span>
              </div> -->
-             <div *ngIf="selectedPrescripcion.medico_prescriptor">
-               <span class="text-hospital-gray-500">Médico Prescriptor:</span>
-               <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.medico_prescriptor }}</span>
-             </div>
+             <div *ngIf="selectedPrescripcion.medico_prescriptor || selectedPrescripcion.id_medico_prescriptor">
+  <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.medico_prescriptor || 'Médico ID: ' + selectedPrescripcion.id_medico_prescriptor }}</span>
+</div>
              <!-- <div *ngIf="selectedPrescripcion.especialidad_medico">
                <span class="text-hospital-gray-500">Especialidad:</span>
                <span class="ml-2 text-hospital-gray-900">{{ selectedPrescripcion.especialidad_medico }}</span>
@@ -676,8 +673,7 @@
              </div>
              <div class="ml-3">
                <h3 class="text-sm font-semibold text-hospital-gray-900">
-                 {{ prescripcion.nombre_medicamento || 'Medicamento ID: ' + prescripcion.id_medicamento }}
-               </h3>
+{{ prescripcion.nombre_medicamento || prescripcion.medicamento || 'Prescripción ID: ' + prescripcion.id_prescripcion }}               </h3>
                <p class="text-xs text-hospital-gray-600">ID: {{ prescripcion.id_prescripcion }}</p>
              </div>
            </div>

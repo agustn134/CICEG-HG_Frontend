@@ -13,9 +13,13 @@ export class ConsentimientosInformados {
 
   constructor(private http: HttpClient) {}
 
+  // createConsentimiento(data: any): Observable<ApiResponse<any>> {
+  //   return this.http.post<ApiResponse<any>>(this.apiUrl, data);
+  // }
+
   createConsentimiento(data: any): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(this.apiUrl, data);
-  }
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, data);
+}
 
   getConsentimientos(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(this.apiUrl);

@@ -103,18 +103,19 @@ export class PrescripcionesMedicamento implements OnInit {
     });
 
     // Formulario para crear/editar prescripción
-    this.prescripcionForm = this.fb.group({
-      id_documento: [1, Validators.required], // Por ahora hardcodeado
-      id_medicamento: [1, Validators.required], // Por ahora hardcodeado
-      dosis: ['', [Validators.required, Validators.minLength(1)]],
-      via_administracion: ['Oral', Validators.required],
-      frecuencia: ['', Validators.required],
-      duracion: [''],
-      indicaciones_especiales: [''],
-      fecha_inicio: [this.getCurrentDate(), Validators.required],
-      fecha_fin: [''],
-      activo: [true]
-    });
+ this.prescripcionForm = this.fb.group({
+  id_documento: [1, Validators.required],
+  id_medicamento: [1], // Opcional
+  medicamento: ['', Validators.required], // Agregado como requerido
+  dosis: ['', [Validators.required, Validators.minLength(1)]],
+  via_administracion: ['ORAL', Validators.required],
+  frecuencia: ['', Validators.required],
+  duracion: [''], // Este será para duracion_tratamiento
+  indicaciones_especiales: [''],
+  fecha_inicio: [this.getCurrentDate(), Validators.required],
+  fecha_fin: [''],
+  activo: [true]
+});
   }
 
   // ==========================================
@@ -227,25 +228,44 @@ export class PrescripcionesMedicamento implements OnInit {
 
   // ==========================================
   // MÉTODOS PARA EDITAR PRESCRIPCIÓN
-  // ==========================================
-  openEditModal(prescripcion: PrescripcionMedicamento): void {
-    this.selectedPrescripcion = prescripcion;
+  // // ==========================================
+  // openEditModal(prescripcion: PrescripcionMedicamento): void {
+  //   this.selectedPrescripcion = prescripcion;
 
-    this.prescripcionForm.patchValue({
-      id_documento: prescripcion.id_documento,
-      id_medicamento: prescripcion.id_medicamento,
-      dosis: prescripcion.dosis,
-      via_administracion: prescripcion.via_administracion || 'Oral',
-      frecuencia: prescripcion.frecuencia,
-      duracion: prescripcion.duracion,
-      indicaciones_especiales: prescripcion.indicaciones_especiales,
-      fecha_inicio: prescripcion.fecha_inicio?.split('T')[0],
-      fecha_fin: prescripcion.fecha_fin?.split('T')[0],
-      activo: prescripcion.activo
-    });
+  //   this.prescripcionForm.patchValue({
+  //     id_documento: prescripcion.id_documento,
+  //     id_medicamento: prescripcion.id_medicamento,
+  //     dosis: prescripcion.dosis,
+  //     via_administracion: prescripcion.via_administracion || 'Oral',
+  //     frecuencia: prescripcion.frecuencia,
+  //     duracion: prescripcion.duracion,
+  //     indicaciones_especiales: prescripcion.indicaciones_especiales,
+  //     fecha_inicio: prescripcion.fecha_inicio?.split('T')[0],
+  //     fecha_fin: prescripcion.fecha_fin?.split('T')[0],
+  //     activo: prescripcion.activo
+  //   });
 
-    this.showEditModal = true;
-  }
+  //   this.showEditModal = true;
+  // }
+openEditModal(prescripcion: PrescripcionMedicamento): void {
+  this.selectedPrescripcion = prescripcion;
+
+  this.prescripcionForm.patchValue({
+    id_documento: prescripcion.id_documento,
+    id_medicamento: prescripcion.id_medicamento,
+    medicamento: prescripcion.medicamento, // Agregado
+    dosis: prescripcion.dosis,
+    via_administracion: prescripcion.via_administracion || 'ORAL',
+    frecuencia: prescripcion.frecuencia,
+    duracion: prescripcion.duracion || prescripcion.duracion_tratamiento, // Usar ambos campos
+    indicaciones_especiales: prescripcion.indicaciones_especiales,
+    fecha_inicio: prescripcion.fecha_inicio?.split('T')[0],
+    fecha_fin: prescripcion.fecha_fin?.split('T')[0],
+    activo: prescripcion.activo
+  });
+
+  this.showEditModal = true;
+}
 
   closeEditModal(): void {
     this.showEditModal = false;

@@ -1,8 +1,23 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {  ReactiveFormsModule,  FormBuilder,  FormGroup,  Validators,  FormsModule} from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {Subject,takeUntil,forkJoin,Observable,firstValueFrom,switchMap,catchError,of,} from 'rxjs';
+import {
+  Subject,
+  takeUntil,
+  forkJoin,
+  Observable,
+  firstValueFrom,
+  switchMap,
+  catchError,
+  of,
+} from 'rxjs';
 import { ExpedientesService } from '../../services/gestion-expedientes/expedientes';
 import { PacientesService } from '../../services/personas/pacientes';
 import { DocumentosService } from '../../services/documentos-clinicos/documentos';
@@ -17,10 +32,16 @@ import { PersonalMedicoService } from '../../services/personas/personal-medico';
 import { Paciente } from '../../models/paciente.model';
 import { Expediente } from '../../models/expediente.model';
 import { DocumentoClinico } from '../../models/documento-clinico.model';
-import {SignosVitales,CreateSignosVitalesDto,} from '../../models/signos-vitales.model';
+import {
+  SignosVitales,
+  CreateSignosVitalesDto,
+} from '../../models/signos-vitales.model';
 import { CreateHistoriaClinicaDto } from '../../models/historia-clinica.model';
 import { CreateNotaUrgenciasDto } from '../../models/nota-urgencias.model';
-import {CAMPOS_OBLIGATORIOS_NOM004,CreateNotaEvolucionDto,} from '../../models/nota-evolucion.model';
+import {
+  CAMPOS_OBLIGATORIOS_NOM004,
+  CreateNotaEvolucionDto,
+} from '../../models/nota-evolucion.model';
 import { TipoDocumento } from '../../models/tipo-documento.model';
 import { Servicio } from '../../models/servicio.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
@@ -28,7 +49,6 @@ import { AuthService } from '../../services/auth/auth.service';
 import { GuiasClinicasService } from '../../services/catalogos/guias-clinicas';
 import { GuiaClinica } from '../../models/guia-clinica.model';
 import { PdfGeneratorService } from '../../services/pdf-generator.service';
-
 import { ConsentimientosInformados } from '../../services/documentos-clinicos/consentimientos-informados';
 import { NotasPreoperatoria } from '../../services/documentos-clinicos/notas-preoperatoria';
 import { NotasPostoperatoria } from '../../services/documentos-clinicos/notas-postoperatoria';
@@ -36,16 +56,48 @@ import { NotasPreanestesica } from '../../services/documentos-clinicos/notas-pre
 import { NotasPostanestesica } from '../../services/documentos-clinicos/notas-postanestesica';
 import { NotasInterconsulta } from '../../services/documentos-clinicos/notas-interconsulta';
 
-
 import { ConsentimientoInformado } from '../../models/consentimiento-informado.model';
 import { NotaPreoperatoria } from '../../models/nota-preoperatoria.model';
 import { NotaPostoperatoria } from '../../models/nota-postoperatoria.model';
 import { NotaPreanestesica } from '../../models/nota-preanestesica.model';
 import { NotaPostanestesica } from '../../models/nota-postanestesica.model';
 import { NotaInterconsulta } from '../../models/nota-interconsulta.model';
+import { SolicitudesEstudio } from '../../services/documentos-clinicos/solicitudes-estudio';
+import { ReferenciasTraslado } from '../../services/documentos-clinicos/referencias-traslado';
+import { PrescripcionesMedicamentoService } from '../../services/documentos-clinicos/prescripciones-medicamento';
+import { ControlCrecimientoService } from '../../services/documentos-clinicos/controlcrecimientoService';
+import { EsquemaVacunacionService } from '../../services/documentos-clinicos/esquema-vacunacion';
+
+import { HojaFrontalService } from '../../services/documentos-clinicos/hoja-frontal';
+import { AltaVoluntariaService } from '../../services/documentos-clinicos/alta-voluntaria';
+import { CultivosService } from '../../services/documentos-clinicos/cultivos-service';
+import { GasometriaService } from '../../services/documentos-clinicos/gasometria';
 
 
+// AGREGAR ESTAS IMPORTACIONES A perfil-paciente.ts
+import { SolicitudEstudio, CreateSolicitudEstudioDto } from '../../models/solicitud-estudio.model';
+import { ReferenciaTraslado, CreateReferenciaTraladoDto } from '../../models/referencia-traslado.model';
+import { PrescripcionMedicamento, CreatePrescripcionMedicamentoDto } from '../../models/prescripcion-medicamento.model';
+import { ControlCrecimiento, CreateControlCrecimientoDto } from '../../models/control-crecimiento.model';
+import { EsquemaVacunacion, RegistroVacuna, CreateEsquemaVacunacionDto } from '../../models/esquema-vacunacion.model';
+import { HojaFrontal } from '../../models/hoja-frontal.model';
+import { AltaVoluntaria } from '../../models/alta-voluntaria.model';
+import { SolicitudCultivo } from '../../models/solicitud-cultivo.model';
+import { SolicitudGasometria } from '../../models/solicitud-gasometria.model';
 
+
+interface TipoDocumentoConfig {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  icono: string;
+  color: string;
+  requiereInternamiento: boolean;
+  soloAdultos: boolean;
+  soloPediatrico: boolean;
+  requiereQuirurgico: boolean;
+  orden: number;
+}
 
 interface PacienteCompleto {
   persona: {
@@ -64,6 +116,7 @@ interface PacienteCompleto {
     domicilio?: string;
     direccion?: string;
     calle?: string;
+
     numero_exterior?: string;
     numero_interior?: string;
     colonia?: string;
@@ -96,7 +149,6 @@ interface TipoDocumentoDisponible {
   activo: boolean;
 }
 
-
 interface FormularioEstado {
   signosVitales: boolean;
   historiaClinica: boolean;
@@ -110,18 +162,34 @@ interface FormularioEstado {
   notaInterconsulta: boolean;
   controlCrecimiento: boolean;
   esquemaVacunacion: boolean;
+  solicitudEstudio: boolean;
+  referenciaTraslado: boolean;
+  prescripcionMedicamento: boolean;
+  registroTransfusion: boolean;
+  notaEgreso: boolean;
 }
 
-
-
-// 🔥 DEFINIR TIPOS ESPECÍFICOS
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
-type FormularioActivo = 'signosVitales' | 'historiaClinica' | 'notaUrgencias' | 'notaEvolucion' |
-                       'consentimiento' | 'notaPreoperatoria' | 'notaPostoperatoria' |
-                       'notaPreanestesica' | 'notaPostanestesica' | 'notaInterconsulta' |
-                       'controlCrecimiento' | 'esquemaVacunacion';
 
-
+type FormularioActivo =
+  | 'signosVitales'
+  | 'historiaClinica'
+  | 'notaUrgencias'
+  | 'notaEvolucion'
+  | 'consentimiento'
+  | 'notaPreoperatoria'
+  | 'notaPostoperatoria'
+  | 'notaPreanestesica'
+  | 'notaPostanestesica'
+  | 'notaInterconsulta'
+  | 'controlCrecimiento'
+  | 'esquemaVacunacion'
+  | 'solicitudEstudio'
+  | 'referenciaTraslado'
+  | 'prescripcionMedicamento'
+  | 'registroTransfusion'
+  | 'notaEgreso'
+  | null;
 
 @Component({
   selector: 'app-perfil-paciente',
@@ -130,17 +198,10 @@ type FormularioActivo = 'signosVitales' | 'historiaClinica' | 'notaUrgencias' | 
   templateUrl: './perfil-paciente.html',
   styleUrl: './perfil-paciente.css',
 })
-
-
-
-
-
 export class PerfilPaciente implements OnInit, OnDestroy {
-
-
-
-
   private destroy$ = new Subject<void>();
+  private autoguardadoInterval: any;
+  private ultimoGuardadoLocal = Date.now();
   pacienteCompleto: PacienteCompleto | null = null;
   pacienteId: number | null = null;
   medicoActual: number | null = null;
@@ -151,42 +212,27 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   hayProblemasConexion = false;
   errorCritico: string | null = null;
   estadoAutoguardado: 'guardado' | 'guardando' | 'offline' | null = null;
-// 🔥 NUEVAS PROPIEDADES PARA PEDIATRÍA
   esPacientePediatrico: boolean = false;
   mostrarDocumentosQuirurgicos: boolean = false;
-
-  private autoguardadoInterval: any;
-  private ultimoGuardadoLocal = Date.now();
-
   success: string | null = null;
   signosVitalesForm: FormGroup;
   historiaClinicaForm: FormGroup;
   notaUrgenciasForm: FormGroup;
   notaEvolucionForm: FormGroup;
-
   consentimientoForm: FormGroup;
   notaPreoperatoriaForm: FormGroup;
   notaPostoperatoriaForm: FormGroup;
   notaPreanestesicaForm: FormGroup;
   notaPostanestesicaForm: FormGroup;
   notaInterconsultaForm: FormGroup;
+  solicitudEstudioForm!: FormGroup;
+  referenciaForm!: FormGroup;
+  prescripcionForm!: FormGroup;
+  controlCrecimientoForm!: FormGroup;
+  esquemaVacunacionForm!: FormGroup;
 
-
-
-//  // 🔥 CAMBIAR EL TIPO PARA PERMITIR MÚLTIPLES VALORES
-//   tabActiva: 'general' | 'crear' | 'historial' | 'datos' = 'general';
-
-//   // 🔥 TAMBIÉN CORREGIR formularioActivo
-//   formularioActivo: 'signosVitales' | 'historiaClinica' | 'notaUrgencias' | 'notaEvolucion' |
-//                    'consentimiento' | 'notaPreoperatoria' | 'notaPostoperatoria' |
-//                    'notaPreanestesica' | 'notaPostanestesica' | 'notaInterconsulta' |
-//                    'controlCrecimiento' | 'esquemaVacunacion' = 'signosVitales';
-
-
-// 🔥 USAR LOS TIPOS ESPECÍFICOS
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
-
   formularioEstado: FormularioEstado = {
     signosVitales: false,
     historiaClinica: false,
@@ -198,33 +244,18 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     notaPreanestesica: false,
     notaPostanestesica: false,
     notaInterconsulta: false,
-    // Pediátricos
     controlCrecimiento: false,
     esquemaVacunacion: false,
-    // [key: string]: boolean;
+    solicitudEstudio: false,
+    referenciaTraslado: false,
+    prescripcionMedicamento: false,
+    registroTransfusion: false,
+    notaEgreso: false,
   };
+
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
-  personalMedico: any[] = [];
-  servicios: Servicio[] = [];
-  documentoClinicoActual: number | null = null;
-
-
-  filtroHistorial: any = {
-    tipoDocumento: '',
-    fechaDesde: '',
-    fechaHasta: '',
-  };
-
-  timelineDocumentos: any[] = [];
-  historialInternamientos: any[] = [];
-  // Para el tab de datos clínicos
-  datosClinicosConsolidados: any = {};
-  resumenGeneral: any = {};
-  guiasClinicas: GuiaClinica[] = [];
-  guiasClinicasFiltradas: GuiaClinica[] = [];
-  guiaClinicaSeleccionada: GuiaClinica | null = null;
-  filtroGuiaClinica: string = '';
-  mostrarDropdownGuias: boolean = false;
+  documentosExistentes: { [key: string]: any } = {};
+  formularios: { [key: string]: FormGroup } = {};
 
   constructor(
     private authService: AuthService,
@@ -245,27 +276,970 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private guiasClinicasService: GuiasClinicasService,
     private pdfGeneratorService: PdfGeneratorService,
     private consentimientosService: ConsentimientosInformados,
-    private notasPreoperatoriasService: NotasPreoperatoria,
-    private notasPostoperatoriasService: NotasPostoperatoria,
-    private notasPreanestesicasService: NotasPreanestesica,
-    private notasPostanestesicasService: NotasPostanestesica,
+    private notasPreoperatoriaService: NotasPreoperatoria,
+    private notasPostoperatoriaService: NotasPostoperatoria,
+    private notasPreanestesicaService: NotasPreanestesica,
+    private notasPostanestesicaService: NotasPostanestesica,
     private notasInterconsultaService: NotasInterconsulta,
+    private solicitudesEstudioService: SolicitudesEstudio,
+    private referenciasTrasladoService: ReferenciasTraslado,
+    private prescripcionesMedicamentoService: PrescripcionesMedicamentoService,
+    private controlCrecimientoService: ControlCrecimientoService,
+    private esquemaVacunacionService: EsquemaVacunacionService,
+    private hojaFrontalService: HojaFrontalService,
+    private altaVoluntariaService: AltaVoluntariaService,
+    private cultivosService: CultivosService,
+    private gasometriaService: GasometriaService
   ) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
     this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
     this.notaEvolucionForm = this.initializeNotaEvolucionForm();
-
     this.consentimientoForm = this.initializeConsentimientoForm();
     this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
     this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
     this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
     this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
+    this.inicializarFormularios();
   }
-  get documentosDisponibles(): DocumentoClinico[] {
-    return this.pacienteCompleto?.documentos || [];
+
+  private documentosDisponibles: TipoDocumentoConfig[] = [
+    {
+      id: 'signosVitales',
+      nombre: 'Signos Vitales',
+      descripcion: 'Registro de constantes vitales del paciente',
+      icono: 'fas fa-heartbeat',
+      color: 'red',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 1,
+    },
+    {
+      id: 'historiaClinica',
+      nombre: 'Historia Clínica',
+      descripcion: 'Historia clínica completa del paciente',
+      icono: 'fas fa-file-medical',
+      color: 'blue',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 2,
+    },
+    {
+      id: 'notaUrgencias',
+      nombre: 'Nota de Urgencias',
+      descripcion: 'Nota inicial de atención en urgencias',
+      icono: 'fas fa-ambulance',
+      color: 'red',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 3,
+    },
+    {
+      id: 'notaEvolucion',
+      nombre: 'Nota de Evolución',
+      descripcion: 'Seguimiento de la evolución del paciente',
+      icono: 'fas fa-chart-line',
+      color: 'green',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 4,
+    },
+    {
+      id: 'notaPreoperatoria',
+      nombre: 'Nota Preoperatoria',
+      descripcion: 'Evaluación previa a cirugía',
+      icono: 'fas fa-procedures',
+      color: 'purple',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: true,
+      orden: 5,
+    },
+    {
+      id: 'notaPreanestesica',
+      nombre: 'Nota Preanestésica',
+      descripcion: 'Evaluación anestésica preoperatoria',
+      icono: 'fas fa-syringe',
+      color: 'indigo',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: true,
+      orden: 6,
+    },
+    {
+      id: 'notaPostoperatoria',
+      nombre: 'Nota Postoperatoria',
+      descripcion: 'Seguimiento posterior a cirugía',
+      icono: 'fas fa-band-aid',
+      color: 'teal',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: true,
+      orden: 7,
+    },
+    {
+      id: 'notaPostanestesica',
+      nombre: 'Nota Postanestésica',
+      descripcion: 'Recuperación post-anestésica',
+      icono: 'fas fa-bed',
+      color: 'cyan',
+      requiereInternamiento: true,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: true,
+      orden: 8,
+    },
+    {
+      id: 'controlCrecimiento',
+      nombre: 'Control de Crecimiento',
+      descripcion: 'Seguimiento del desarrollo pediátrico',
+      icono: 'fas fa-baby',
+      color: 'pink',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 9,
+    },
+    {
+      id: 'esquemaVacunacion',
+      nombre: 'Esquema de Vacunación',
+      descripcion: 'Registro de vacunas aplicadas',
+      icono: 'fas fa-shield-virus',
+      color: 'yellow',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 10,
+    },
+    {
+      id: 'consentimiento',
+      nombre: 'Consentimiento Informado',
+      descripcion: 'Autorización para procedimientos',
+      icono: 'fas fa-signature',
+      color: 'orange',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 11,
+    },
+    {
+      id: 'solicitudEstudio',
+      nombre: 'Solicitud de Estudio',
+      descripcion: 'Solicitud de laboratorio o imagen',
+      icono: 'fas fa-vial',
+      color: 'gray',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 12,
+    },
+    {
+      id: 'notaInterconsulta',
+      nombre: 'Nota de Interconsulta',
+      descripcion: 'Referencia a especialista',
+      icono: 'fas fa-user-md',
+      color: 'blue',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 13,
+    },
+    {
+      id: 'referenciaTraslado',
+      nombre: 'Referencia y Traslado',
+      descripcion: 'Traslado a otra unidad médica',
+      icono: 'fas fa-ambulance',
+      color: 'red',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: false,
+      requiereQuirurgico: false,
+      orden: 14,
+    },
+  ];
+
+
+  // Métodos para manejar documentos existentes
+getDocumentosExistentesArray(): any[] {
+  if (!this.documentosExistentes) return [];
+  return Object.keys(this.documentosExistentes).map(key => ({
+    ...this.documentosExistentes[key],
+    tipoDocumento: key
+  }));
+}
+
+getTituloDocumento(documento: any): string {
+  const titulos: { [key: string]: string } = {
+    'historiaClinica': this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
+    'signosVitales': 'Signos Vitales',
+    'notaUrgencias': 'Nota de Urgencias',
+    'notaEvolucion': 'Nota de Evolución',
+    'consentimiento': 'Consentimiento Informado',
+    'notaInterconsulta': 'Nota de Interconsulta',
+    'notaPreoperatoria': 'Nota Preoperatoria',
+    'notaPostoperatoria': 'Nota Postoperatoria',
+    'notaPreanestesica': 'Nota Preanestésica',
+    'notaPostanestesica': 'Nota Postanestésica',
+    'solicitudEstudio': 'Solicitud de Estudio',
+    'referenciaTraslado': 'Referencia y Traslado',
+    'controlCrecimiento': 'Control de Crecimiento',
+    'esquemaVacunacion': 'Esquema de Vacunación',
+    'hojaFrontal': 'Hoja Frontal',
+    'altaVoluntaria': 'Alta Voluntaria',
+    'solicitudCultivo': 'Solicitud de Cultivo',
+    'solicitudGasometria': 'Solicitud de Gasometría'
+  };
+
+  return titulos[documento.tipoDocumento] ||
+         documento.nombre_tipo_documento ||
+         documento.tipo_documento?.nombre ||
+         'Documento Clínico';
+}
+
+getColorClaseDocumento(documento: any): string {
+  const colores: { [key: string]: string } = {
+    'historiaClinica': 'bg-blue-50 text-blue-600',
+    'signosVitales': 'bg-red-50 text-red-600',
+    'notaUrgencias': 'bg-red-50 text-red-600',
+    'notaEvolucion': 'bg-green-50 text-green-600',
+    'consentimiento': 'bg-orange-50 text-orange-600',
+    'notaInterconsulta': 'bg-purple-50 text-purple-600',
+    'solicitudEstudio': 'bg-gray-50 text-gray-600',
+    'referenciaTraslado': 'bg-amber-50 text-amber-600',
+    'controlCrecimiento': 'bg-pink-50 text-pink-600',
+    'esquemaVacunacion': 'bg-emerald-50 text-emerald-600'
+  };
+
+  return colores[documento.tipoDocumento] || 'bg-gray-50 text-gray-600';
+}
+
+getIconoDocumento(documento: any): string {
+  const iconos: { [key: string]: string } = {
+    'historiaClinica': 'fas fa-file-medical-alt',
+    'signosVitales': 'fas fa-heartbeat',
+    'notaUrgencias': 'fas fa-ambulance',
+    'notaEvolucion': 'fas fa-chart-line',
+    'consentimiento': 'fas fa-file-signature',
+    'notaInterconsulta': 'fas fa-user-md',
+    'notaPreoperatoria': 'fas fa-procedures',
+    'notaPostoperatoria': 'fas fa-band-aid',
+    'notaPreanestesica': 'fas fa-syringe',
+    'notaPostanestesica': 'fas fa-bed',
+    'solicitudEstudio': 'fas fa-vial',
+    'referenciaTraslado': 'fas fa-ambulance',
+    'controlCrecimiento': 'fas fa-baby',
+    'esquemaVacunacion': 'fas fa-shield-virus',
+    'hojaFrontal': 'fas fa-file-alt',
+    'altaVoluntaria': 'fas fa-sign-out-alt',
+    'solicitudCultivo': 'fas fa-microscope',
+    'solicitudGasometria': 'fas fa-lungs'
+  };
+
+  return iconos[documento.tipoDocumento] || 'fas fa-file-alt';
+}
+
+getClaseEstadoDocumento(estado: string): string {
+  const clases: { [key: string]: string } = {
+    'Activo': 'bg-green-100 text-green-800',
+    'ACTIVO': 'bg-green-100 text-green-800',
+    'Inactivo': 'bg-gray-100 text-gray-800',
+    'INACTIVO': 'bg-gray-100 text-gray-800',
+    'Pendiente': 'bg-yellow-100 text-yellow-800',
+    'PENDIENTE': 'bg-yellow-100 text-yellow-800',
+    'Borrador': 'bg-blue-100 text-blue-800',
+    'BORRADOR': 'bg-blue-100 text-blue-800'
+  };
+
+  return clases[estado] || 'bg-gray-100 text-gray-800';
+}
+
+// Métodos para acciones de documentos
+verDocumento(documento: any): void {
+  console.log('Ver documento:', documento);
+  // Aquí puedes implementar la lógica para ver el documento
+  // Por ejemplo, abrir un modal con los detalles
+}
+
+generarPDFDocumento(documento: any): void {
+  const titulo = this.getTituloDocumento(documento);
+  this.generarPDF(titulo);
+}
+
+// editarDocumento(documento: any): void {
+//   console.log('Editar documento:', documento);
+//   // Aquí puedes implementar la lógica para editar
+//   // Por ejemplo, cambiar al tab crear y cargar los datos
+//   this.tabActiva = 'crear';
+//   this.formularioActivo = documento.tipoDocumento as FormularioActivo;
+
+//   // Cargar datos en el formulario correspondiente
+//   this.cargarDatosEnFormulario(documento);
+// }
+
+private cargarDatosEnFormulario(documento: any): void {
+  switch (documento.tipoDocumento) {
+    case 'historiaClinica':
+      if (this.historiaClinicaForm) {
+        this.historiaClinicaForm.patchValue(documento);
+      }
+      break;
+    case 'signosVitales':
+      if (this.signosVitalesForm) {
+        this.signosVitalesForm.patchValue(documento);
+      }
+      break;
+    case 'notaUrgencias':
+      if (this.notaUrgenciasForm) {
+        this.notaUrgenciasForm.patchValue(documento);
+      }
+      break;
+    case 'notaEvolucion':
+      if (this.notaEvolucionForm) {
+        this.notaEvolucionForm.patchValue(documento);
+      }
+      break;
+    // Agregar más casos según necesites
+    default:
+      console.warn('Tipo de documento no soportado para edición:', documento.tipoDocumento);
   }
+}
+
+// Hacer público el getter de documentosDisponibles
+get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
+  return this.documentosDisponibles;
+}
+
+
+//   get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
+//   return this.documentosDisponibles;
+// }
+
+  getEstadoDocumento(tipoDoc: string): 'crear' | 'editar' | 'pdf' | 'no_disponible' {
+  const documentoExiste = this.documentosExistentes[tipoDoc];
+  if (documentoExiste) {
+    if (this.documentoTieneDatosCompletos(tipoDoc)) {
+      return 'pdf';
+    } else {
+      return 'editar';
+    }
+  }
+  if (this.formularioActivo !== null && this.puedeCrearDocumento(tipoDoc)) {
+    return 'crear';
+  }
+  return 'no_disponible';
+}
+
+  private documentoTieneDatosCompletos(tipoDoc: string): boolean {
+    const documento = this.documentosExistentes[tipoDoc];
+    if (!documento) return false;
+
+    switch (tipoDoc) {
+      case 'consentimiento':
+        return !!(
+          documento.procedimiento &&
+          documento.riesgos &&
+          documento.acepta_procedimiento
+        );
+
+      case 'historiaClinica':
+        return !!(
+          documento.motivo_consulta &&
+          documento.diagnosticos &&
+          documento.plan_diagnostico_terapeutico
+        );
+
+      case 'notaPreoperatoria':
+        return !!(
+          documento.diagnostico_preoperatorio &&
+          documento.cirugia_programada &&
+          documento.riesgo_quirurgico
+        );
+
+      case 'solicitudEstudio':
+        return !!(
+          documento.tipo_estudio &&
+          documento.estudios_solicitados &&
+          documento.indicacion_clinica
+        );
+
+      default:
+        return true;
+    }
+  }
+
+  private puedeCrearDocumento(tipoDoc: string): boolean {
+    const config = this.documentosDisponibles.find((d) => d.id === tipoDoc);
+    if (!config) return false;
+    if (
+      config.requiereInternamiento &&
+      !this.pacienteCompleto?.ultimoInternamiento
+    ) {
+      return false;
+    }
+
+    if (config.requiereQuirurgico && !this.mostrarDocumentosQuirurgicos) {
+      return false;
+    }
+
+    if (config.soloPediatrico && !this.esPacientePediatrico) {
+      return false;
+    }
+
+    if (config.soloAdultos && this.esPacientePediatrico) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private async cargarDocumentosDelPaciente(): Promise<void> {
+    try {
+      if (!this.pacienteCompleto?.expediente?.id_expediente) return;
+      const response = await firstValueFrom(
+        this.documentosService.getDocumentosByExpediente(
+          this.pacienteCompleto.expediente.id_expediente
+        )
+      );
+
+      if (response.success && response.data) {
+        this.documentosExistentes = {};
+        for (const doc of response.data) {
+          const tipoDocumento = this.mapearTipoDocumento(doc);
+          if (tipoDocumento) {
+            this.documentosExistentes[tipoDocumento] = doc;
+            if (this.formularioEstado.hasOwnProperty(tipoDocumento)) {
+              (this.formularioEstado as any)[tipoDocumento] = true;
+            }
+          }
+        }
+      }
+
+      console.log(
+        '📋 Documentos existentes cargados:',
+        this.documentosExistentes
+      );
+    } catch (error) {
+      console.error('❌ Error al cargar documentos existentes:', error);
+    }
+  }
+
+  // 🔥 MAPEAR TIPO DE DOCUMENTO DEL BACKEND AL FRONTEND
+  private mapearTipoDocumento(documento: any): string | null {
+    // Mapear según el nombre del tipo de documento
+    const mapeo: { [key: string]: string } = {
+      'Historia Clínica': 'historiaClinica',
+      'Signos Vitales': 'signosVitales',
+      'Nota de Urgencias': 'notaUrgencias',
+      'Nota de Evolución': 'notaEvolucion',
+      'Consentimiento Informado': 'consentimiento',
+      'Nota Preoperatoria': 'notaPreoperatoria',
+      'Nota Postoperatoria': 'notaPostoperatoria',
+      'Nota Preanestésica': 'notaPreanestesica',
+      'Nota Postanestésica': 'notaPostanestesica',
+      'Nota de Interconsulta': 'notaInterconsulta',
+      'Solicitud de Estudio': 'solicitudEstudio',
+      'Referencia y Traslado': 'referenciaTraslado',
+      'Control de Crecimiento': 'controlCrecimiento',
+      'Esquema de Vacunación': 'esquemaVacunacion',
+    };
+
+    return mapeo[documento.tipo_documento?.nombre] || null;
+  }
+
+  documentosDisponiblesFiltrados: TipoDocumentoConfig[] = [];
+
+  //   private inicializarFormularios(): void {
+  //     this.signosVitalesForm = this.fb.group({
+  //       temperatura: ['', [Validators.required]],
+  //       presion_arterial_sistolica: ['', [Validators.required]],
+  //       presion_arterial_diastolica: ['', [Validators.required]],
+  //       frecuencia_cardiaca: ['', [Validators.required]],
+  //       frecuencia_respiratoria: ['', [Validators.required]],
+  //       saturacion_oxigeno: [''],
+  //       peso: [''],
+  //       talla: [''],
+  //       imc: [''],
+  //       glucosa: [''],
+  //       observaciones: [''],
+  //     });
+
+  //     this.historiaClinicaForm = this.fb.group({
+  //       motivo_consulta: ['', [Validators.required]],
+  //       antecedentes_heredo_familiares: [''],
+  //       antecedentes_personales_patologicos: [''],
+  //       antecedentes_personales_no_patologicos: [''],
+  //       padecimiento_actual: ['', [Validators.required]],
+  //       interrogatorio_aparatos_sistemas: [''],
+  //       exploracion_fisica: ['', [Validators.required]],
+  //       diagnosticos: ['', [Validators.required]],
+  //       plan_diagnostico_terapeutico: ['', [Validators.required]],
+  //       pronostico: [''],
+  //     });
+
+  //     this.solicitudEstudioForm = this.fb.group({
+  //       tipo_estudio: ['', [Validators.required]],
+  //       estudios_solicitados: ['', [Validators.required]],
+  //       indicacion_clinica: ['', [Validators.required]],
+  //       datos_clinicos_relevantes: [''],
+  //       urgencia_estudio: ['rutina', [Validators.required]],
+  //       informacion_adicional: [''],
+  //     });
+
+  //     this.referenciaForm = this.fb.group({
+  //       unidad_destino: ['', [Validators.required]],
+  //       motivo_referencia: ['', [Validators.required]],
+  //       resumen_caso: ['', [Validators.required]],
+  //       tratamiento_actual: [''],
+  //       estudios_realizados: [''],
+  //       recomendaciones: [''],
+  //       urgencia_traslado: ['', [Validators.required]],
+  //       medio_transporte: ['', [Validators.required]],
+  //     });
+
+  //     this.controlCrecimientoForm = this.fb.group({
+  //       peso_actual: ['', [Validators.required]],
+  //       talla_actual: ['', [Validators.required]],
+  //       perimetro_cefalico: [''],
+  //       percentil_peso: [''],
+  //       percentil_talla: [''],
+  //       desarrollo_psicomotor: [''],
+  //       alimentacion_actual: [''],
+  //       vacunas_esquema: [''],
+  //       observaciones_desarrollo: [''],
+  //     });
+
+  //     this.esquemaVacunacionForm = this.fb.group({
+  //       vacuna_aplicada: ['', [Validators.required]],
+  //       dosis_numero: ['', [Validators.required]],
+  //       fecha_aplicacion: ['', [Validators.required]],
+  //       lote_vacuna: [''],
+  //       reacciones_adversas: [''],
+  //       proxima_cita: [''],
+  //       observaciones_vacunacion: [''],
+  //     });
+
+  //     this.prescripcionForm = this.fb.group({
+  //       medicamento: ['', [Validators.required]],
+  //       dosis: ['', [Validators.required]],
+  //       via_administracion: ['', [Validators.required]],
+  //       frecuencia: ['', [Validators.required]],
+  //       duracion_dias: ['', [Validators.required]],
+  //       indicaciones_especiales: [''],
+  //     });
+
+  //     this.formularios = {
+  //       signosVitales: this.signosVitalesForm,
+  //       historiaClinica: this.historiaClinicaForm,
+  //       notaUrgencias: this.notaUrgenciasForm,
+  //       notaEvolucion: this.notaEvolucionForm,
+  //       consentimiento: this.consentimientoForm,
+  //       notaPreoperatoria: this.notaPreoperatoriaForm,
+  //       notaPostoperatoria: this.notaPostoperatoriaForm,
+  //       notaPreanestesica: this.notaPreanestesicaForm,
+  //       notaPostanestesica: this.notaPostanestesicaForm,
+  //       notaInterconsulta: this.notaInterconsultaForm,
+  //       solicitudEstudio: this.solicitudEstudioForm,
+  //       prescripcion: this.prescripcionForm,
+  //       referenciaTraslado: this.referenciaForm,
+  //       controlCrecimiento: this.controlCrecimientoForm,
+  //       esquemaVacunacion: this.esquemaVacunacionForm,
+
+  //     };
+
+  // }
+
+  private inicializarFormularios(): void {
+    // Formularios clínicos principales
+    this.signosVitalesForm = this.initializeSignosVitalesForm();
+    this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
+    this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
+    this.notaEvolucionForm = this.initializeNotaEvolucionForm();
+
+    // Formularios de consentimiento y procedimientos
+    this.consentimientoForm = this.initializeConsentimientoForm();
+    this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
+    this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
+    this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
+    this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
+
+    // Formularios adicionales
+    this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
+    this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
+    this.prescripcionForm = this.initializePrescripcionForm();
+    this.referenciaForm = this.initializeReferenciaForm();
+    this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
+    this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
+
+    console.log(
+      '✅ Todos los formularios han sido inicializados correctamente.'
+    );
+  }
+
+  private ejecutarSiFormularioValido(callback: (form: Exclude<FormularioActivo, null>) => void): void {
+  if (this.formularioActivo !== null) {
+    // callback(this.formularioActivo);
+      this.formularioEstado[this.formularioActivo] = true;
+
+  }
+}
+
+  async guardarDocumento(tipoDocumento: string): Promise<void> {
+    try {
+      this.isCreatingDocument = true;
+      let response: any;
+      let datosFormulario: any;
+      switch (tipoDocumento) {
+        case 'signosVitales':
+          datosFormulario = this.prepararDatosSignosVitales();
+          response = await this.signosVitalesService.createSignosVitales(
+            datosFormulario
+          );
+          break;
+
+        case 'historiaClinica':
+          datosFormulario = this.prepararDatosHistoriaClinica();
+          response = await this.historiasClinicasService.createHistoriaClinica(
+            datosFormulario
+          );
+          break;
+
+        case 'notaUrgencias':
+          datosFormulario = this.prepararDatosNotaUrgencias();
+          response = await this.notasUrgenciasService.createNotaUrgencias(
+            datosFormulario
+          );
+          break;
+
+        case 'notaEvolucion':
+          datosFormulario = this.prepararDatosNotaEvolucion();
+          response = await this.notaEvolucionService.createNotaEvolucion(
+            datosFormulario
+          );
+          break;
+
+        case 'notaPreoperatoria':
+          datosFormulario = this.prepararDatosNotaPreoperatoria();
+          response =
+            await this.notasPreoperatoriaService.createNotaPreoperatoria(
+              datosFormulario
+            );
+          break;
+
+        case 'notaPreanestesica':
+          datosFormulario = this.prepararDatosNotaPreanestesica();
+          response =
+            await this.notasPreanestesicaService.createNotaPreanestesica(
+              datosFormulario
+            );
+          break;
+
+        case 'notaPostoperatoria':
+          datosFormulario = this.prepararDatosNotaPostoperatoria();
+          response =
+            await this.notasPostoperatoriaService.createNotaPostoperatoria(
+              datosFormulario
+            );
+          break;
+
+        case 'notaPostanestesica':
+          datosFormulario = this.prepararDatosNotaPostanestesica();
+          response =
+            await this.notasPostanestesicaService.createNotaPostanestesica(
+              datosFormulario
+            );
+          break;
+
+        case 'notaInterconsulta':
+          datosFormulario = this.prepararDatosNotaInterconsulta();
+          response =
+            await this.notasInterconsultaService.createNotaInterconsulta(
+              datosFormulario
+            );
+          break;
+
+        case 'consentimiento':
+          datosFormulario = this.prepararDatosConsentimiento();
+          response = await firstValueFrom(
+            this.consentimientosService.createConsentimiento(datosFormulario)
+          );
+          break;
+
+        case 'solicitudEstudio':
+          datosFormulario = this.prepararDatosSolicitudEstudio();
+          response = await firstValueFrom(
+            this.solicitudesEstudioService.createSolicitud(datosFormulario)
+          );
+          break;
+
+        case 'referenciaTraslado':
+          datosFormulario = this.prepararDatosReferencia();
+          response = await firstValueFrom(
+            this.referenciasTrasladoService.createReferencia(datosFormulario)
+          );
+          break;
+
+        default:
+          throw new Error(`Tipo de documento no soportado: ${tipoDocumento}`);
+      }
+
+      if (response.success) {
+        console.log(`✅ ${tipoDocumento} guardado exitosamente`);
+        await this.cargarDocumentosDelPaciente();
+        this.formularioActivo = null;
+      }
+    } catch (error) {
+      const nombreFormulario = this.formularioActivo
+  ? this.getTituloFormulario(this.formularioActivo)
+  : 'documento';
+this.error = `Error al procesar ${nombreFormulario}`;
+    } finally {
+      this.isCreatingDocument = false;
+    }
+  }
+
+  // 1. ✅ Preparar Signos Vitales
+  private prepararDatosSignosVitales(): any {
+    return {
+      ...this.signosVitalesForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 2. ✅ Preparar Historia Clínica
+  private prepararDatosHistoriaClinica(): any {
+    return {
+      ...this.historiaClinicaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_creacion: new Date().toISOString(),
+    };
+  }
+
+  // 3. ✅ Preparar Nota de Urgencias
+  private prepararDatosNotaUrgencias(): any {
+    return {
+      ...this.notaUrgenciasForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 4. ✅ Preparar Nota de Evolución
+  private prepararDatosNotaEvolucion(): any {
+    return {
+      ...this.notaEvolucionForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 5. ✅ Preparar Nota Preoperatoria
+  private prepararDatosNotaPreoperatoria(): any {
+    return {
+      ...this.notaPreoperatoriaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 6. ✅ Preparar Nota Preanestésica
+  private prepararDatosNotaPreanestesica(): any {
+    return {
+      ...this.notaPreanestesicaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 7. ✅ Preparar Nota Postoperatoria
+  private prepararDatosNotaPostoperatoria(): any {
+    return {
+      ...this.notaPostoperatoriaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 8. ✅ Preparar Nota Postanestésica
+  private prepararDatosNotaPostanestesica(): any {
+    return {
+      ...this.notaPostanestesicaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 9. ✅ Preparar Nota de Interconsulta
+  private prepararDatosNotaInterconsulta(): any {
+    return {
+      ...this.notaInterconsultaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_registro: new Date().toISOString(),
+    };
+  }
+
+  // 10. ✅ Preparar Consentimiento Informado
+  private prepararDatosConsentimiento(): any {
+    return {
+      ...this.consentimientoForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_consentimiento: new Date().toISOString(),
+    };
+  }
+
+  // 11. ✅ Preparar Solicitud de Estudio
+  private prepararDatosSolicitudEstudio(): any {
+    return {
+      ...this.solicitudEstudioForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_solicitud: new Date().toISOString(),
+    };
+  }
+
+  // 12. ✅ Preparar Referencia o Traslado
+  private prepararDatosReferencia(): any {
+    return {
+      ...this.referenciaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_referencia: new Date().toISOString(),
+    };
+  }
+
+  // 13. ✅ Preparar Prescripción de Medicamentos
+  private prepararDatosPrescripcion(): any {
+    return {
+      ...this.prescripcionForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_prescripcion: new Date().toISOString(),
+    };
+  }
+
+  // 14. ✅ Preparar Control de Crecimiento (pediatría)
+  private prepararDatosControlCrecimiento(): any {
+    return {
+      ...this.controlCrecimientoForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_control: new Date().toISOString(),
+    };
+  }
+
+  // 15. ✅ Preparar Esquema de Vacunación
+  private prepararDatosEsquemaVacunacion(): any {
+    return {
+      ...this.esquemaVacunacionForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_actualizacion: new Date().toISOString(),
+    };
+  }
+
+  // private prepararDatosSolicitudEstudio(): any {
+  //   return {
+  //     ...this.solicitudEstudioForm.value,
+  //     id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+  //     id_paciente: this.pacienteId,
+  //     id_personal_medico: this.medicoActual,
+  //     fecha_solicitud: new Date().toISOString(),
+  //   };
+  // }
+
+  // private prepararDatosReferencia(): any {
+  //   return {
+  //     ...this.referenciaForm.value,
+  //     id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+  //     id_paciente: this.pacienteId,
+  //     id_personal_medico: this.medicoActual,
+  //     fecha_referencia: new Date().toISOString(),
+  //   };
+  // }
+
+  // private prepararDatosPrescripcion(): any {
+  //   return {
+  //     ...this.prescripcionForm.value,
+  //     id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+  //     id_paciente: this.pacienteId,
+  //     id_medico_prescribe: this.medicoActual,
+  //     fecha_prescripcion: new Date().toISOString(),
+  //   };
+  // }
+
+  // private prepararDatosControlCrecimiento(): any {
+  //   return {
+  //     ...this.controlCrecimientoForm.value,
+  //     id_paciente: this.pacienteId,
+  //     id_personal_medico: this.medicoActual,
+  //     fecha_control: new Date().toISOString(),
+  //     edad_meses: this.calcularEdadEnMeses(),
+  //     percentiles: this.calcularPercentiles(),
+  //   };
+  // }
+
+  personalMedico: any[] = [];
+  servicios: Servicio[] = [];
+  documentoClinicoActual: number | null = null;
+
+  filtroHistorial: any = {
+    tipoDocumento: '',
+    fechaDesde: '',
+    fechaHasta: '',
+  };
+
+  timelineDocumentos: any[] = [];
+  historialInternamientos: any[] = [];
+  datosClinicosConsolidados: any = {};
+  resumenGeneral: any = {};
+  guiasClinicas: GuiaClinica[] = [];
+  guiasClinicasFiltradas: GuiaClinica[] = [];
+  guiaClinicaSeleccionada: GuiaClinica | null = null;
+  filtroGuiaClinica: string = '';
+  mostrarDropdownGuias: boolean = false;
+
   get tieneDocumentos(): boolean {
     return this.documentosDisponibles.length > 0;
   }
@@ -281,11 +1255,11 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       console.log('✅ Persona existe');
       console.log('📝 Nombre:', this.pacienteCompleto.persona.nombre);
       console.log(
-        '📝 Apellido paterno:',
+        'Apellido paterno:',
         this.pacienteCompleto.persona.apellido_paterno
       );
       console.log(
-        '📝 Apellido materno:',
+        'Apellido materno:',
         this.pacienteCompleto.persona.apellido_materno
       );
     } else {
@@ -294,27 +1268,19 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // 1. Suscripción a parámetros de ruta
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
         this.pacienteId = parseInt(id, 10);
-        this.initializeComponent();
+        this.inicializarFlujoPaciente(); // ← Encapsula toda la lógica inicial
       } else {
         this.error = 'ID de paciente no válido';
         this.isLoading = false;
       }
     });
 
-    setTimeout(() => {
-      this.debugPacienteCompleto();
-    }, 2000);
-
-    this.iniciarAutoguardado();
-
-    setTimeout(() => {
-      this.recuperarDatosLocales();
-    }, 1000);
-
+    // 2. Escuchar cambios de conexión
     window.addEventListener('online', () => {
       this.hayProblemasConexion = false;
       this.verificarConexion();
@@ -325,127 +1291,424 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       this.estadoAutoguardado = 'offline';
     });
 
+    // 3. Obtener médico actual
     this.authService.currentUser$.subscribe((user) => {
       if (user && user.tipo_usuario === 'medico') {
         this.medicoActual = user.id;
       }
     });
+  }
 
-    this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.pacienteId = parseInt(id, 10);
-        this.initializeComponent();
-      } else {
-        this.error = 'ID de paciente no válido';
-        this.isLoading = false;
-      }
-    });
+  // Método auxiliar para organizar el flujo de carga del paciente
+  private inicializarFlujoPaciente(): void {
+    // Paso 1: Inicializar todos los formularios ANTES de cualquier operación
+    this.inicializarFormularios();
 
+    // Paso 2: Intentar recuperar datos guardados localmente (requiere formularios inicializados)
+    this.recuperarDatosLocales();
+
+    // Paso 3: Cargar datos del paciente y expediente
+    this.initializeComponent();
+
+    // Paso 4: Cargar datos adicionales del sistema
     this.cargarGuiasClinicas();
     this.determinarTipoPaciente();
+    this.configurarDocumentosDisponibles();
+
+    // Paso 5: Iniciar autoguardado (una sola vez)
+    this.iniciarAutoguardado();
+
+    // ✅ Opcional: Debug (solo en desarrollo)
+    setTimeout(() => {
+      this.debugPacienteCompleto();
+    }, 2000);
   }
 
   ngOnDestroy(): void {
-    // Limpiar autoguardado
+    // 1. Detener autoguardado
     if (this.autoguardadoInterval) {
       clearInterval(this.autoguardadoInterval);
     }
 
-    // Guardar antes de salir
+    // 2. Guardar estado local antes de salir
     this.guardarLocalmenteFormulario();
 
-    // Tu código existente...
+    // 3. Completar Subject para desuscribirse
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  private configurarDocumentosDisponibles(): void {
+    let documentosBase = [...this.documentosDisponibles];
 
-  // 🔥 MÉTODO PARA DETERMINAR TIPO DE PACIENTE
+    if (this.esPacientePediatrico) {
+      documentosBase = documentosBase.map((doc) => {
+        if (doc.id === 'historiaClinica') {
+          return {
+            ...doc,
+            nombre: 'Historia Clínica Pediátrica',
+            descripcion:
+              'Historia clínica especializada para pacientes pediátricos',
+          };
+        }
+        return doc;
+      });
+
+      const docsPediatricos = ['controlCrecimiento', 'esquemaVacunacion'];
+      docsPediatricos.forEach((docId) => {
+        if (!documentosBase.find((d) => d.id === docId)) {
+          documentosBase.push(this.obtenerConfigDocumentoPediatrico(docId));
+        }
+      });
+    } else {
+      documentosBase = documentosBase.filter(
+        (doc) => !['controlCrecimiento', 'esquemaVacunacion'].includes(doc.id)
+      );
+    }
+
+    this.documentosDisponiblesFiltrados = documentosBase.sort(
+      (a, b) => a.orden - b.orden
+    );
+  }
   private determinarTipoPaciente(): void {
     if (this.pacienteCompleto?.persona?.fecha_nacimiento) {
-      const edad = this.calcularEdad(this.pacienteCompleto.persona.fecha_nacimiento);
+      const edad = this.calcularEdad(
+        this.pacienteCompleto.persona.fecha_nacimiento
+      );
       const esPediatricoAnterior = this.esPacientePediatrico;
-
       this.esPacientePediatrico = edad < 18;
-
-      console.log(`👶 Paciente ${this.esPacientePediatrico ? 'PEDIÁTRICO' : 'ADULTO'} (${edad} años)`);
-
-      // Determinar si mostrar documentos quirúrgicos
+      console.log(
+        `Paciente ${
+          this.esPacientePediatrico ? 'PEDIÁTRICO' : 'ADULTO'
+        } (${edad} años)`
+      );
       this.evaluarDocumentosQuirurgicos();
-
-      // Si cambió el tipo, ajustar formularios
       if (esPediatricoAnterior !== this.esPacientePediatrico) {
         this.ajustarFormulariosPorEdad();
       }
     }
   }
 
-
-// 🔥 EVALUAR SI MOSTRAR DOCUMENTOS QUIRÚRGICOS
   private evaluarDocumentosQuirurgicos(): void {
     // Lógica para determinar si el paciente requiere documentos quirúrgicos
     // Puedes basarlo en diagnósticos, servicios, internamiento, etc.
     this.mostrarDocumentosQuirurgicos =
-      this.pacienteCompleto?.ultimoInternamiento?.requiere_cirugia ||
-      false; // Por ahora false, se puede activar según necesidades
+      this.pacienteCompleto?.ultimoInternamiento?.requiere_cirugia || false; // Por ahora false, se puede activar según necesidades
   }
 
-  // 🔥 AJUSTAR FORMULARIOS SEGÚN EDAD
   private ajustarFormulariosPorEdad(): void {
     if (this.esPacientePediatrico) {
-      console.log('🔄 Ajustando formularios para paciente pediátrico');
-      // Aquí puedes agregar campos específicos pediátricos
+      console.log('Ajustando formularios para paciente pediátrico');
       this.agregarCamposPediatricos();
     } else {
-      console.log('🔄 Ajustando formularios para paciente adulto');
-      // Formularios estándar de adulto
+      console.log('Ajustando formularios para paciente adulto');
     }
   }
 
- // 🔥 AGREGAR CAMPOS PEDIÁTRICOS A FORMULARIOS
   private agregarCamposPediatricos(): void {
-    // Actualizar historia clínica para pediatría
     this.historiaClinicaForm = this.fb.group({
       ...this.historiaClinicaForm.controls,
-
-      // 🔥 CAMPOS ESPECÍFICOS PEDIÁTRICOS
-      // Datos de padres
       nombre_madre: [''],
       edad_madre: [''],
       ocupacion_madre: [''],
       nombre_padre: [''],
       edad_padre: [''],
       ocupacion_padre: [''],
-
-      // Antecedentes perinatales
       embarazo_planeado: [false],
       tipo_parto: [''],
       peso_nacimiento: [''],
       talla_nacimiento: [''],
-
-      // Desarrollo psicomotor
       sostuvo_cabeza_meses: [''],
       se_sento_meses: [''],
       camino_meses: [''],
       primeras_palabras_meses: [''],
-
-      // Alimentación
       lactancia_materna: [false],
       lactancia_duracion_meses: [''],
-
-      // Somatometría actual
       peso_actual: [''],
       talla_actual: [''],
       perimetro_cefalico: [''],
     });
   }
 
+  onDocumentoClick(documento: TipoDocumentoConfig): void {
+    const estado = this.getEstadoDocumento(documento.id);
 
+    switch (estado) {
+      case 'crear':
+        this.activarFormulario(documento.id);
+        break;
+      case 'editar':
+        this.editarDocumento(documento.id);
+        break;
+      case 'pdf':
+        this.generarPDFDirecto(documento.id);
+        break;
+      case 'no_disponible':
+        this.mostrarMensajeNoDisponible(documento);
+        break;
+    }
+  }
 
+  activarFormulario(tipoDoc: string): void {
+    if (this.esFormularioValido(tipoDoc)) {
+      this.formularioActivo = tipoDoc as FormularioActivo;
+      this.tabActiva = 'crear';
+    }
+  }
 
+  private mostrarMensajeError(mensaje: string): void {
+    this.error = mensaje;
+    this.mostrarError = true;
+    setTimeout(() => {
+      this.mostrarError = false;
+    }, 5000);
+  }
+  private flujoDocumentalHospitalario = {
+    ingreso: [
+      'hojaFrontal',
+      'historiaClinica',
+      'consentimientoHospitalizacion',
+    ],
+    urgencias: ['notaUrgencias', 'signosVitales'],
+    hospitalizacion: [
+      'notaEvolucion',
+      'indicacionesMedicas',
+      'prescripcionMedicamento',
+    ],
+    estudios: ['solicitudLaboratorio', 'solicitudRadiologia'],
+    interconsulta: ['notaInterconsulta', 'referenciaTraslado'],
+    quirurgico: [
+      'notaPreoperatoria',
+      'notaPreanestesica',
+      'consentimientoProcedimiento',
+    ],
+    egreso: ['notaEgreso', 'altaVoluntaria'],
+  };
 
-  // 🔥 MÉTODO PARA CARGAR GUÍAS CLÍNICAS
+  private validarDocumentoNOM004(tipoDocumento: string): boolean {
+    const camposObligatoriosNOM004: { [key: string]: string[] } = {
+      historiaClinica: [
+        'tipo_nombre_domicilio_establecimiento',
+        'nombre_sexo_edad_domicilio_paciente',
+        'antecedentes_heredo_familiares',
+        'antecedentes_personales_patologicos',
+        'padecimiento_actual',
+        'exploracion_fisica',
+        'resultados_estudios',
+        'diagnosticos',
+        'pronostico',
+      ],
+      notaEvolucion: [
+        'evolucion_estado_actual',
+        'signos_vitales',
+        'resultados_estudios_gabinete',
+        'diagnosticos',
+        'tratamiento_indicaciones',
+      ],
+    };
+
+    return this.validarCamposObligatorios(
+      tipoDocumento,
+      camposObligatoriosNOM004[tipoDocumento] || []
+    );
+  }
+
+  editarDocumento(tipoDoc: string): void {
+  const documento = this.documentosExistentes[tipoDoc];
+  if (!documento) return;
+  const formulario = this.formularios[tipoDoc];
+  if (formulario) {
+    formulario.patchValue(documento);
+    if (this.formularioActivo !== null) {
+      this.activarFormulario(this.formularioActivo);
+    }
+  }
+}
+
+  async generarPDFDirecto(tipoDoc: string): Promise<void> {
+    const documento = this.documentosExistentes[tipoDoc];
+    if (!documento) {
+      this.error = 'No hay datos para generar PDF';
+      return;
+    }
+
+    try {
+      await this.generarPDF(this.getTituloFormulario(tipoDoc));
+    } catch (error) {
+      console.error('Error al generar PDF:', error);
+      this.error = 'Error al generar PDF';
+    }
+  }
+
+  mostrarMensajeNoDisponible(documento: TipoDocumentoConfig): void {
+    let mensaje = `${documento.nombre} no está disponible.`;
+
+    if (documento.requiereInternamiento) {
+      mensaje += ' Requiere que el paciente esté internado.';
+    }
+
+    if (documento.requiereQuirurgico) {
+      mensaje += ' Solo disponible para procedimientos quirúrgicos.';
+    }
+
+    if (documento.soloPediatrico && !this.esPacientePediatrico) {
+      mensaje += ' Solo disponible para pacientes pediátricos.';
+    }
+
+    this.error = mensaje;
+    setTimeout(() => (this.error = null), 4000);
+  }
+
+  private calcularEdadEnMeses(): number {
+    const fechaNacimiento = this.pacienteCompleto?.persona?.fecha_nacimiento;
+    if (!fechaNacimiento) return 0;
+
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+
+    let meses = (hoy.getFullYear() - nacimiento.getFullYear()) * 12;
+    meses += hoy.getMonth() - nacimiento.getMonth();
+
+    if (hoy.getDate() < nacimiento.getDate()) {
+      meses--;
+    }
+
+    return Math.max(0, meses);
+  }
+
+  private calcularPercentiles(): any {
+    return {
+      peso: 50,
+      talla: 50,
+      perimetro_cefalico: 50,
+    };
+  }
+
+  private obtenerConfigDocumentoPediatrico(docId: string): TipoDocumentoConfig {
+    const configuracionesPediatricas: { [key: string]: TipoDocumentoConfig } = {
+      controlCrecimiento: {
+        id: 'controlCrecimiento',
+        nombre: 'Control de Crecimiento',
+        descripcion: 'Seguimiento del desarrollo pediátrico',
+        icono: 'fas fa-baby',
+        color: 'pink',
+        requiereInternamiento: false,
+        soloAdultos: false,
+        soloPediatrico: true,
+        requiereQuirurgico: false,
+        orden: 50,
+      },
+      esquemaVacunacion: {
+        id: 'esquemaVacunacion',
+        nombre: 'Esquema de Vacunación',
+        descripcion: 'Registro de vacunas aplicadas',
+        icono: 'fas fa-shield-virus',
+        color: 'yellow',
+        requiereInternamiento: false,
+        soloAdultos: false,
+        soloPediatrico: true,
+        requiereQuirurgico: false,
+        orden: 51,
+      },
+    };
+
+    return (
+      configuracionesPediatricas[docId] || {
+        id: docId,
+        nombre: docId,
+        descripcion: '',
+        icono: 'fas fa-file',
+        color: 'gray',
+        requiereInternamiento: false,
+        soloAdultos: false,
+        soloPediatrico: true,
+        requiereQuirurgico: false,
+        orden: 99,
+      }
+    );
+  }
+
+  private validarCamposObligatorios(
+    tipoDocumento: string,
+    campos: string[]
+  ): boolean {
+    const formulario = this.formularios[tipoDocumento];
+    if (!formulario) return false;
+
+    return campos.every((campo) => {
+      const control = formulario.get(campo);
+      return control && control.value && control.valid;
+    });
+  }
+
+  getClasesTarjetaDocumento(documento: TipoDocumentoConfig): string {
+    const estado = this.getEstadoDocumento(documento.id);
+    const baseClasses =
+      'bg-white rounded-lg border transition-all cursor-pointer';
+
+    switch (estado) {
+      case 'pdf':
+        return `${baseClasses} border-green-300 hover:border-green-400 hover:shadow-md`;
+      case 'editar':
+        return `${baseClasses} border-yellow-300 hover:border-yellow-400 hover:shadow-md`;
+      case 'crear':
+        return `${baseClasses} border-blue-300 hover:border-blue-400 hover:shadow-md`;
+      case 'no_disponible':
+        return `${baseClasses} border-gray-200 opacity-50 cursor-not-allowed`;
+      default:
+        return `${baseClasses} border-gray-200`;
+    }
+  }
+
+  getClasesBotonAccion(documento: TipoDocumentoConfig): string {
+    const estado = this.getEstadoDocumento(documento.id);
+    const baseClasses =
+      'px-3 py-1 rounded text-sm font-medium flex items-center space-x-1';
+
+    switch (estado) {
+      case 'pdf':
+        return `${baseClasses} bg-green-600 text-white hover:bg-green-700`;
+      case 'editar':
+        return `${baseClasses} bg-yellow-600 text-white hover:bg-yellow-700`;
+      case 'crear':
+        return `${baseClasses} bg-blue-600 text-white hover:bg-blue-700`;
+      default:
+        return `${baseClasses} bg-gray-400 text-gray-600 cursor-not-allowed`;
+    }
+  }
+
+  getIconoAccion(documento: TipoDocumentoConfig): string {
+    const estado = this.getEstadoDocumento(documento.id);
+
+    switch (estado) {
+      case 'pdf':
+        return 'fas fa-file-pdf';
+      case 'editar':
+        return 'fas fa-edit';
+      case 'crear':
+        return 'fas fa-plus';
+      default:
+        return 'fas fa-ban';
+    }
+  }
+
+  getTextoAccion(documento: TipoDocumentoConfig): string {
+    const estado = this.getEstadoDocumento(documento.id);
+
+    switch (estado) {
+      case 'pdf':
+        return 'Ver PDF';
+      case 'editar':
+        return 'Editar';
+      case 'crear':
+        return 'Crear';
+      case 'no_disponible':
+        return 'No disponible';
+      default:
+        return '';
+    }
+  }
+
   private async cargarGuiasClinicas(): Promise<void> {
     try {
       const response = await this.guiasClinicasService.getAll({ activo: true });
@@ -458,7 +1721,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO PARA FILTRAR GUÍAS POR ÁREA
   private filtrarGuiasPorArea(area: string): GuiaClinica[] {
     if (!area) return this.guiasClinicas;
 
@@ -469,7 +1731,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     );
   }
 
-  // 🔥 MÉTODO PARA BUSCAR GUÍAS CLÍNICAS
   buscarGuiaClinica(event: Event): void {
     const target = event.target as HTMLInputElement;
     const termino = target?.value || '';
@@ -480,7 +1741,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       this.guiasClinicasFiltradas = [...this.guiasClinicas];
       return;
     }
-
     this.guiasClinicasFiltradas = this.guiasClinicas.filter(
       (guia) =>
         guia.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
@@ -489,7 +1749,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     );
   }
 
-  // 🔥 AGREGAR MÉTODO ALTERNATIVO MÁS SEGURO
   buscarGuiaClinicaPorTermino(termino: string): void {
     this.filtroGuiaClinica = termino;
 
@@ -506,7 +1765,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     );
   }
 
-  // 🔥 MÉTODO PARA MANEJAR EVENTOS DE INPUT DE FORMA SEGURA
   onInputGuiaClinica(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input && input.value !== undefined) {
@@ -514,18 +1772,14 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO PARA MANEJAR CAMBIOS EN NGMODEL
   onGuiaClinicaInputChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input?.value || '';
-
     this.filtroGuiaClinica = value;
-
     if (!value) {
       this.guiasClinicasFiltradas = [...this.guiasClinicas];
       return;
     }
-
     this.guiasClinicasFiltradas = this.guiasClinicas.filter(
       (guia) =>
         guia.nombre?.toLowerCase().includes(value.toLowerCase()) ||
@@ -534,19 +1788,14 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     );
   }
 
-  // 🔥 MÉTODO SEGURO PARA SELECCIONAR GUÍA CLÍNICA
   seleccionarGuiaClinica(guia: GuiaClinica | null): void {
     if (!guia) return;
-
     this.guiaClinicaSeleccionada = guia;
     this.filtroGuiaClinica = guia.nombre || '';
     this.mostrarDropdownGuias = false;
-
-    // Actualizar el formulario activo con la guía seleccionada
     this.actualizarFormularioConGuia(guia);
   }
 
-  // 🔥 MÉTODO PARA ACTUALIZAR EL FORMULARIO CON LA GUÍA SELECCIONADA
   private actualizarFormularioConGuia(guia: GuiaClinica): void {
     switch (this.formularioActivo) {
       case 'historiaClinica':
@@ -560,7 +1809,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         });
         break;
       case 'notaEvolucion':
-        // La nota de evolución también puede tener guía diagnóstica
         this.notaEvolucionForm.patchValue({
           id_guia_diagnostico: guia.id_guia_diagnostico,
         });
@@ -568,13 +1816,10 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO SEGURO PARA LIMPIAR GUÍA CLÍNICA
   limpiarGuiaClinica(): void {
     this.guiaClinicaSeleccionada = null;
     this.filtroGuiaClinica = '';
     this.mostrarDropdownGuias = false;
-
-    // Limpiar del formulario activo
     switch (this.formularioActivo) {
       case 'historiaClinica':
         this.historiaClinicaForm.patchValue({
@@ -594,7 +1839,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO PARA MOSTRAR/OCULTAR DROPDOWN
   toggleDropdownGuias(): void {
     this.mostrarDropdownGuias = !this.mostrarDropdownGuias;
     if (this.mostrarDropdownGuias) {
@@ -602,12 +1846,10 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO PARA TRACKBY EN NGFOR (MEJORA PERFORMANCE)
   trackByGuiaId(index: number, guia: GuiaClinica): number {
     return guia.id_guia_diagnostico;
   }
 
-  // 🔥 MÉTODO PARA CERRAR DROPDOWN AL HACER CLICK FUERA
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
     const target = event.target as HTMLElement;
@@ -618,18 +1860,14 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
-  // 🔥 MÉTODO SEGURO PARA OBTENER VALOR DE EVENTO
   private getEventValue(event: Event): string {
     const target = event.target as HTMLInputElement;
     return target?.value || '';
   }
 
-  // 🔥 MÉTODO PARA VALIDAR GUÍA CLÍNICA SELECCIONADA
   get esGuiaClinicaValida(): boolean {
     return !!this.guiaClinicaSeleccionada?.id_guia_diagnostico;
   }
-
-  // 🔥 MÉTODO PARA OBTENER TEXTO DEL FILTRO DE FORMA SEGURA
   get textoFiltroGuia(): string {
     return this.filtroGuiaClinica || '';
   }
@@ -638,6 +1876,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     this.isLoading = true;
     this.error = null;
     this.medicoActual = 9;
+
     forkJoin({
       paciente: this.cargarDatosPaciente(),
       catalogos: this.cargarCatalogos(),
@@ -709,7 +1948,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       plan_diagnostico: [''],
       plan_terapeutico: ['', Validators.required],
       pronostico: ['', Validators.required],
-      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
+      id_guia_diagnostico: [null],
     });
   }
   private initializeNotaUrgenciasForm(): FormGroup {
@@ -723,12 +1962,11 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       diagnostico: ['', Validators.required],
       plan_tratamiento: ['', Validators.required],
       pronostico: ['', Validators.required],
-      id_guia_diagnostico: [null], // 🔥 AGREGAR ESTE CAMPO
+      id_guia_diagnostico: [null],
     });
   }
   private initializeNotaEvolucionForm(): FormGroup {
     return this.fb.group({
-      // 🔥 CAMPOS OBLIGATORIOS SEGÚN NOM-004-SSA3-2012
       sintomas_signos: ['', [Validators.required, Validators.minLength(10)]],
       habitus_exterior: ['', [Validators.required, Validators.minLength(5)]],
       estado_nutricional: ['', [Validators.required, Validators.minLength(5)]],
@@ -743,13 +1981,9 @@ export class PerfilPaciente implements OnInit, OnDestroy {
         [Validators.required, Validators.minLength(10)],
       ],
       pronostico: ['', [Validators.required, Validators.minLength(5)]],
-
-      // 🔥 CAMPOS OPCIONALES MEJORADOS
       id_guia_diagnostico: [null],
       dias_hospitalizacion: [null, [Validators.min(0), Validators.max(365)]],
       fecha_ultimo_ingreso: [''],
-
-      // Signos vitales en nota de evolución
       temperatura: [null, [Validators.min(30), Validators.max(45)]],
       frecuencia_cardiaca: [null, [Validators.min(30), Validators.max(250)]],
       frecuencia_respiratoria: [null, [Validators.min(8), Validators.max(60)]],
@@ -764,8 +1998,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       saturacion_oxigeno: [null, [Validators.min(50), Validators.max(100)]],
       peso_actual: [null, [Validators.min(0.5), Validators.max(300)]],
       talla_actual: [null, [Validators.min(30), Validators.max(250)]],
-
-      // Exploración física detallada
       exploracion_cabeza: [''],
       exploracion_cuello: [''],
       exploracion_torax: [''],
@@ -774,15 +2006,12 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       exploracion_columna: [''],
       exploracion_genitales: [''],
       exploracion_neurologico: [''],
-
-      // Campos adicionales
       diagnosticos_guias: [''],
       interconsultas: ['No se solicitaron interconsultas en esta evolución'],
       indicaciones_medicas: [''],
       observaciones_adicionales: [''],
     });
   }
-
 
   private initializeConsentimientoForm(): FormGroup {
     return this.fb.group({
@@ -832,6 +2061,85 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       servicio_solicitado: ['', Validators.required],
       motivo_interconsulta: ['', Validators.required],
       resumen_clinico: ['', Validators.required],
+    });
+  }
+
+  private initializeSolicitudEstudioForm(): FormGroup {
+    return this.fb.group({
+      tipo_estudio: ['', [Validators.required]],
+      descripcion: ['', [Validators.required, Validators.minLength(10)]],
+      indicaciones: [''],
+      fecha_solicitud: [
+        new Date().toISOString().split('T')[0],
+        [Validators.required],
+      ],
+      prioridad: ['normal', [Validators.required]], // 'baja', 'normal', 'alta', 'urgente'
+      medico_solicitante: [''],
+      diagnostico_presuntivo: [''],
+      id_guia_clinica: [''],
+    });
+  }
+
+  private initializePrescripcionForm(): FormGroup {
+    return this.fb.group({
+      medicamentos: this.fb.array([]), // Se maneja como FormArray
+      indicaciones_generales: [''],
+      duracion_tratamiento_dias: [null, [Validators.min(1)]],
+      frecuencia: [''],
+      via_administracion: [''],
+      fecha_inicio: [new Date().toISOString().split('T')[0]],
+      medico_prescriptor: [''],
+    });
+  }
+
+  private initializeReferenciaForm(): FormGroup {
+    return this.fb.group({
+      institucion_destino: ['', [Validators.required]],
+      medico_destino: [''],
+      especialidad: [''],
+      motivo_referencia: ['', [Validators.required, Validators.minLength(20)]],
+      estado_paciente: ['', [Validators.required]],
+      datos_clinicos_relevantes: [''],
+      contacto_institucion: [''],
+      fecha_referencia: [new Date().toISOString().split('T')[0]],
+      tipo_referencia: ['segunda_opinion', [Validators.required]], // 'traslado', 'consulta_especializada'
+    });
+  }
+
+  private initializeControlCrecimientoForm(): FormGroup {
+    return this.fb.group({
+      peso: [
+        '',
+        [Validators.required, Validators.min(0.1), Validators.max(200)],
+      ],
+      talla: [
+        '',
+        [Validators.required, Validators.min(20), Validators.max(250)],
+      ],
+      imc: [''],
+      percentil_peso: ['', [Validators.min(1), Validators.max(99)]],
+      percentil_talla: ['', [Validators.min(1), Validators.max(99)]],
+      percentil_imc: ['', [Validators.min(1), Validators.max(99)]],
+      circunferencia_cefalica: ['', [Validators.min(0), Validators.max(70)]], // común en pediatría
+      fecha_control: [
+        new Date().toISOString().split('T')[0],
+        [Validators.required],
+      ],
+      observaciones: [''],
+    });
+  }
+
+  private initializeEsquemaVacunacionForm(): FormGroup {
+    return this.fb.group({
+      vacunas: this.fb.array([]), // Cada vacuna es un grupo con nombre, fecha, dosis, estado
+      observaciones: [''],
+      estado_general: ['completo', [Validators.required]], // 'completo', 'incompleto', 'pendiente'
+      proximas_citas: this.fb.array([
+        this.fb.group({
+          vacuna: [''],
+          fecha_programada: [''],
+        }),
+      ]),
     });
   }
 
@@ -922,236 +2230,224 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   }
 
   private tieneFormularioActivo(): boolean {
-    const formularios = [
-      'signosVitales',
-      'historiaClinica',
-      'notaUrgencias',
-      'notaEvolucion',
-    ];
-    return formularios.includes(this.formularioActivo);
-  }
+  const formularios = ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion'];
+  return this.formularioActivo !== null && formularios.includes(this.formularioActivo);
+}
 
-
-async guardarFormularioActivo(): Promise<void> {
+  async guardarFormularioActivo(): Promise<void> {
     if (this.isCreatingDocument) return;
 
     this.isCreatingDocument = true;
     this.error = null;
     this.success = null;
 
-  try {
-    switch (this.formularioActivo) {
-      case 'signosVitales':
-        await this.guardarSignosVitales();
-        this.formularioEstado['signosVitales'] = true; // ✅ CORREGIDO
-        this.success = 'Signos Vitales guardados correctamente';
-        break;
+    try {
+      switch (this.formularioActivo) {
+        case 'signosVitales':
+          await this.guardarSignosVitales();
+          this.formularioEstado['signosVitales'] = true;
+          this.success = 'Signos Vitales guardados correctamente';
+          break;
 
-      case 'historiaClinica':
-        await this.guardarHistoriaClinica();
-        this.formularioEstado['historiaClinica'] = true; // ✅ CORREGIDO
-        this.success = this.esPacientePediatrico ?
-          'Historia Clínica Pediátrica guardada correctamente' :
-          'Historia Clínica guardada correctamente';
-        break;
+        case 'historiaClinica':
+          await this.guardarHistoriaClinica();
+          this.formularioEstado['historiaClinica'] = true;
+          this.success = this.esPacientePediatrico
+            ? 'Historia Clínica Pediátrica guardada correctamente'
+            : 'Historia Clínica guardada correctamente';
+          break;
 
-      case 'notaUrgencias':
-        await this.guardarNotaUrgencias();
-        this.formularioEstado['notaUrgencias'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaUrgencias':
+          await this.guardarNotaUrgencias();
+          this.formularioEstado['notaUrgencias'] = true;
+          break;
 
-      case 'notaEvolucion':
-        await this.guardarNotaEvolucion();
-        this.formularioEstado['notaEvolucion'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaEvolucion':
+          await this.guardarNotaEvolucion();
+          this.formularioEstado['notaEvolucion'] = true;
+          break;
 
-      case 'consentimiento':
-        await this.guardarConsentimiento();
-        this.formularioEstado['consentimiento'] = true; // ✅ CORREGIDO
-        break;
+        case 'consentimiento':
+          await this.guardarConsentimiento();
+          this.formularioEstado['consentimiento'] = true;
+          break;
 
-      case 'notaPreoperatoria':
-        await this.guardarNotaPreoperatoria();
-        this.formularioEstado['notaPreoperatoria'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaPreoperatoria':
+          await this.guardarNotaPreoperatoria();
+          this.formularioEstado['notaPreoperatoria'] = true;
+          break;
 
-      case 'notaPostoperatoria':
-        await this.guardarNotaPostoperatoria();
-        this.formularioEstado['notaPostoperatoria'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaPostoperatoria':
+          await this.guardarNotaPostoperatoria();
+          this.formularioEstado['notaPostoperatoria'] = true;
+          break;
 
-      case 'notaPreanestesica':
-        await this.guardarNotaPreanestesica();
-        this.formularioEstado['notaPreanestesica'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaPreanestesica':
+          await this.guardarNotaPreanestesica();
+          this.formularioEstado['notaPreanestesica'] = true;
+          break;
 
-      case 'notaPostanestesica':
-        await this.guardarNotaPostanestesica();
-        this.formularioEstado['notaPostanestesica'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaPostanestesica':
+          await this.guardarNotaPostanestesica();
+          this.formularioEstado['notaPostanestesica'] = true;
+          break;
 
-      case 'notaInterconsulta':
-        await this.guardarNotaInterconsulta();
-        this.formularioEstado['notaInterconsulta'] = true; // ✅ CORREGIDO
-        break;
+        case 'notaInterconsulta':
+          await this.guardarNotaInterconsulta();
+          this.formularioEstado['notaInterconsulta'] = true;
+          break;
 
-      case 'controlCrecimiento':
-        await this.guardarControlCrecimiento();
-        this.formularioEstado['controlCrecimiento'] = true; // ✅ CORREGIDO
-        break;
+        case 'controlCrecimiento':
+          await this.guardarControlCrecimiento();
+          this.formularioEstado['controlCrecimiento'] = true;
+          break;
 
-      case 'esquemaVacunacion':
-        await this.guardarEsquemaVacunacion();
-        this.formularioEstado['esquemaVacunacion'] = true; // ✅ CORREGIDO
-        break;
+        case 'esquemaVacunacion':
+          await this.guardarEsquemaVacunacion();
+          this.formularioEstado['esquemaVacunacion'] = true;
+          break;
 
-      default:
-        throw new Error('Tipo de formulario no válido');
-    }
-
-      // 🔥 MOSTRAR CONFIRMACIÓN DE PDF
-      if (this.formularioActivo !== 'signosVitales') {
-        setTimeout(() => {
-          this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
-        }, 1000);
+        default:
+          throw new Error('Tipo de formulario no válido');
       }
 
-      // Limpiar datos locales
+      if (
+        this.formularioActivo !== 'signosVitales' &&
+        this.formularioActivo !== null
+      ) {
+        this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
+      }
+
       localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
-
-      console.log('✅ Formulario completado:', this.formularioActivo);
-
-      // Recargar datos del paciente
-      this.cargarDatosPaciente().subscribe((data) => {
-        this.construirPacienteCompleto(data);
-      });
-
-    } catch (error: any) {
-      console.error(`❌ Error al guardar ${this.formularioActivo}:`, error);
-      this.error = `Error al procesar ${this.getTituloFormulario(this.formularioActivo)}`;
-      this.manejarError(error, 'guardar formulario');
-    } finally {
-      this.isCreatingDocument = false;
+    console.log('✅ Formulario completado:', this.formularioActivo);
+    this.cargarDatosPaciente().subscribe((data) => {
+      this.construirPacienteCompleto(data);
+    });
+  } catch (error: any) {
+    console.error(
+      `❌ Error al guardar ${this.formularioActivo ?? 'desconocido'}:`,
+      error
+    );
+    if (this.formularioActivo !== null) {
+      this.formularioEstado[this.formularioActivo] = true;
+    } else {
+      this.error = 'Error al procesar un formulario no especificado';
     }
+    this.manejarError(error, 'guardar formulario');
+  } finally {
+    this.isCreatingDocument = false;
   }
+}
 
-
-    // 🔥 MÉTODOS PLACEHOLDER PARA DOCUMENTOS PEDIÁTRICOS
   private async guardarControlCrecimiento(): Promise<void> {
-    // TODO: Implementar cuando tengas el servicio
     console.log('🔄 Guardando Control de Crecimiento...');
-    // Placeholder por ahora
   }
 
   private async guardarEsquemaVacunacion(): Promise<void> {
-    // TODO: Implementar cuando tengas el servicio
     console.log('🔄 Guardando Esquema de Vacunación...');
-    // Placeholder por ahora
   }
 
- // En perfil-paciente.ts - CORREGIR MÉTODOS DE GUARDADO:
-
-private async guardarConsentimiento(): Promise<void> {
-  if(!this.consentimientoForm.valid) {
-    throw new Error('Formulario de consentimiento informado inválido');
+  private async guardarConsentimiento(): Promise<void> {
+    if (!this.consentimientoForm.valid) {
+      throw new Error('Formulario de consentimiento informado inválido');
+    }
+    const payload = {
+      ...this.consentimientoForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
+    await firstValueFrom(
+      this.consentimientosService.createConsentimiento(payload)
+    );
   }
 
-  const payload = {
-    ...this.consentimientoForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
+  private async guardarNotaPreoperatoria(): Promise<void> {
+    if (!this.notaPreoperatoriaForm.valid) {
+      throw new Error('Formulario de nota preoperatoria inválido');
+    }
 
-  // ✅ USAR EL MÉTODO CORRECTO (probablemente createConsentimiento o similar)
-  await firstValueFrom(this.consentimientosService.createConsentimiento(payload));
-}
+    const payload = {
+      ...this.notaPreoperatoriaForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
 
-private async guardarNotaPreoperatoria(): Promise<void> {
-  if(!this.notaPreoperatoriaForm.valid) {
-    throw new Error('Formulario de nota preoperatoria inválido');
+    await firstValueFrom(
+      this.notasPreoperatoriaService.createNotaPreoperatoria(payload)
+    );
   }
 
-  const payload = {
-    ...this.notaPreoperatoriaForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
+  private async guardarNotaPostoperatoria(): Promise<void> {
+    if (!this.notaPostoperatoriaForm.valid) {
+      throw new Error('Formulario de nota postoperatoria inválido');
+    }
 
-  // ✅ USAR EL MÉTODO CORRECTO
-  await firstValueFrom(this.notasPreoperatoriasService.createNotaPreoperatoria(payload));
-}
+    const payload = {
+      ...this.notaPostoperatoriaForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
 
-private async guardarNotaPostoperatoria(): Promise<void> {
-  if(!this.notaPostoperatoriaForm.valid) {
-    throw new Error('Formulario de nota postoperatoria inválido');
+    await firstValueFrom(
+      this.notasPostoperatoriaService.createNotaPostoperatoria(payload)
+    );
   }
 
-  const payload = {
-    ...this.notaPostoperatoriaForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
+  private async guardarNotaPreanestesica(): Promise<void> {
+    if (!this.notaPreanestesicaForm.valid) {
+      throw new Error('Formulario de nota preanestésica inválido');
+    }
 
-  // ✅ USAR EL MÉTODO CORRECTO
-  await firstValueFrom(this.notasPostoperatoriasService.createNotaPostoperatoria(payload));
-}
+    const payload = {
+      ...this.notaPreanestesicaForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
 
-private async guardarNotaPreanestesica(): Promise<void> {
-  if(!this.notaPreanestesicaForm.valid) {
-    throw new Error('Formulario de nota preanestésica inválido');
+    await firstValueFrom(
+      this.notasPreanestesicaService.createNotaPreanestesica(payload)
+    );
   }
 
-  const payload = {
-    ...this.notaPreanestesicaForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
+  private async guardarNotaPostanestesica(): Promise<void> {
+    if (!this.notaPostanestesicaForm.valid) {
+      throw new Error('Formulario de nota postanestésica inválido');
+    }
 
-  // ✅ USAR EL MÉTODO CORRECTO
-  await firstValueFrom(this.notasPreanestesicasService.createNotaPreanestesica(payload));
-}
+    const payload = {
+      ...this.notaPostanestesicaForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
 
-private async guardarNotaPostanestesica(): Promise<void> {
-  if(!this.notaPostanestesicaForm.valid) {
-    throw new Error('Formulario de nota postanestésica inválido');
+    await firstValueFrom(
+      this.notasPostanestesicaService.createNotaPostanestesica(payload)
+    );
   }
 
-  const payload = {
-    ...this.notaPostanestesicaForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
-
-  // ✅ USAR EL MÉTODO CORRECTO
-  await firstValueFrom(this.notasPostanestesicasService.createNotaPostanestesica(payload));
-}
-
-private async guardarNotaInterconsulta(): Promise<void> {
-  if(!this.notaInterconsultaForm.valid) {
-    throw new Error('Formulario de nota de interconsulta inválido');
+  private async guardarNotaInterconsulta(): Promise<void> {
+    if (!this.notaInterconsultaForm.valid) {
+      throw new Error('Formulario de nota de interconsulta inválido');
+    }
+    const payload = {
+      ...this.notaInterconsultaForm.value,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+    };
+    await firstValueFrom(
+      this.notasInterconsultaService.createNotaInterconsulta(payload)
+    );
   }
-
-  const payload = {
-    ...this.notaInterconsultaForm.value,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-  };
-
-  // ✅ USAR EL MÉTODO CORRECTO
-  await firstValueFrom(this.notasInterconsultaService.createNotaInterconsulta(payload));
-}
-
 
   private avanzarAlSiguientePaso(): void {
     console.log(`✅ Formulario ${this.formularioActivo} completado`);
   }
-
-
-// 🔥 ACTUALIZAR MÉTODO PARA OBTENER TÍTULO
   private getTituloFormulario(formulario: string): string {
     const titulos: { [key: string]: string } = {
       signosVitales: 'Signos Vitales',
-      historiaClinica: this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
+      historiaClinica: this.esPacientePediatrico
+        ? 'Historia Clínica Pediátrica'
+        : 'Historia Clínica',
       notaUrgencias: 'Nota de Urgencias',
       notaEvolucion: 'Nota de Evolución',
       consentimiento: 'Consentimiento Informado',
@@ -1166,98 +2462,72 @@ private async guardarNotaInterconsulta(): Promise<void> {
     return titulos[formulario] || formulario;
   }
 
-
-// cambiarTab(tab: string): void {
-//   const tabsValidas: ('general' | 'crear' | 'historial' | 'datos')[] = ['general', 'crear', 'historial', 'datos'];
-
-//   if (tabsValidas.includes(tab as any)) {
-//     this.tabActiva = tab as 'general' | 'crear' | 'historial' | 'datos';
-//   } else {
-//     console.warn(`Tab no válida: ${tab}`);
-//     this.tabActiva = 'general'; // fallback
-//   }
-
-//   // Cargar datos específicos según el tab
-//   if (this.tabActiva === 'historial') {
-//     this.cargarHistorialClinico();
-//   } else if (this.tabActiva === 'datos') {
-//     this.cargarDatosClinicosConsolidados();
-//   } else if (this.tabActiva === 'general') {
-//     this.cargarResumenGeneral();
-//   }
-// }
-// 🔥 CORREGIR EL MÉTODO cambiarTab
   cambiarTab(tab: string): void {
-  // ✅ Validar que el tab es válido
-  const tabsValidas: TabActiva[] = ['general', 'crear', 'historial', 'datos'];
-
-  if (tabsValidas.includes(tab as TabActiva)) {
-    this.tabActiva = tab as TabActiva;
-  } else {
-    console.warn(`Tab no válida: ${tab}`);
-    this.tabActiva = 'general'; // fallback
+    const tabsValidas: TabActiva[] = ['general', 'crear', 'historial', 'datos'];
+    if (tabsValidas.includes(tab as TabActiva)) {
+      this.tabActiva = tab as TabActiva;
+    } else {
+      console.warn(`Tab no válida: ${tab}`);
+      this.tabActiva = 'general'; // fallback
+    }
+    if (this.tabActiva === 'historial') {
+      this.cargarHistorialClinico();
+    } else if (this.tabActiva === 'datos') {
+      this.cargarDatosClinicosConsolidados();
+    } else if (this.tabActiva === 'general') {
+      this.cargarResumenGeneral();
+    }
   }
 
-  // Cargar datos específicos según el tab
-  if (this.tabActiva === 'historial') {
-    this.cargarHistorialClinico();
-  } else if (this.tabActiva === 'datos') {
-    this.cargarDatosClinicosConsolidados();
-  } else if (this.tabActiva === 'general') {
-    this.cargarResumenGeneral();
+  eliminarBorrador(): void {
+    if (confirm('¿Está seguro de que desea eliminar el borrador guardado?')) {
+      localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+      this.success = 'Borrador eliminado correctamente';
+
+      // Resetear formularios
+      this.signosVitalesForm.reset();
+      this.historiaClinicaForm.reset();
+      this.notaUrgenciasForm.reset();
+      this.notaEvolucionForm.reset();
+
+      // Reiniciar estado de todos los formularios (¡completo!)
+      this.formularioEstado = {
+        signosVitales: false,
+        historiaClinica: false,
+        notaUrgencias: false,
+        notaEvolucion: false,
+        consentimiento: false,
+        notaPreoperatoria: false,
+        notaPostoperatoria: false,
+        notaPreanestesica: false,
+        notaPostanestesica: false,
+        notaInterconsulta: false,
+        controlCrecimiento: false,
+        esquemaVacunacion: false,
+        solicitudEstudio: false,
+        referenciaTraslado: false,
+        prescripcionMedicamento: false,
+        registroTransfusion: false,
+        notaEgreso: false,
+      };
+
+      setTimeout(() => {
+        this.success = null;
+      }, 3000);
+    }
   }
-  // Si es 'crear', no hacer nada especial - mantener el formulario actual
-}
-
-
-eliminarBorrador(): void {
-  if (confirm('¿Está seguro de que desea eliminar el borrador guardado?')) {
-    localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
-    this.success = 'Borrador eliminado correctamente';
-
-    // Resetear formularios
-    this.signosVitalesForm.reset();
-    this.historiaClinicaForm.reset();
-    this.notaUrgenciasForm.reset();
-    this.notaEvolucionForm.reset();
-
-    // ✅ RESETEAR ESTADOS CON TODOS LOS CAMPOS REQUERIDOS
-    this.formularioEstado = {
-      signosVitales: false,
-      historiaClinica: false,
-      notaUrgencias: false,
-      notaEvolucion: false,
-      // 🔥 AGREGAR TODOS LOS CAMPOS FALTANTES
-      consentimiento: false,
-      notaPreoperatoria: false,
-      notaPostoperatoria: false,
-      notaPreanestesica: false,
-      notaPostanestesica: false,
-      notaInterconsulta: false,
-      controlCrecimiento: false,
-      esquemaVacunacion: false,
-    };
-
-    setTimeout(() => {
-      this.success = null;
-    }, 3000);
-  }
-}
 
   private cargarHistorialClinico(): void {
     // Cargar timeline de documentos
     this.timelineDocumentos = this.documentosDisponibles.map((doc) => ({
-      titulo: doc.nombre_tipo_documento || 'Documento Clínico',
-      fecha: doc.fecha_elaboracion,
-      descripcion: `Documento creado por ${
-        doc.medico_responsable || 'Sistema'
-      }`,
-      icono: this.getIconoTipoDocumento(doc.nombre_tipo_documento || ''),
-      color: this.getColorTipoDocumento(doc.nombre_tipo_documento || ''),
-      estado: doc.estado || 'Activo',
+      titulo: doc.nombre || 'Documento Clínico',
+      fecha: new Date().toISOString(),
+      descripcion: `Documento tipo ${doc.nombre}`,
+      icono: doc.icono,
+      color: doc.color,
+      estado: 'Activo',
     }));
 
-    // Cargar historial de internamientos (simulado)
     this.historialInternamientos = [
       // Aquí irían los datos reales de internamientos
       // Por ahora dejamos array vacío
@@ -1265,7 +2535,6 @@ eliminarBorrador(): void {
   }
 
   private cargarDatosClinicosConsolidados(): void {
-    // Consolidar datos de todas las historias clínicas
     this.datosClinicosConsolidados = {
       alergias: this.extraerAlergias(),
       medicamentosActuales: this.extraerMedicamentos(),
@@ -1284,31 +2553,24 @@ eliminarBorrador(): void {
   }
 
   private extraerAlergias(): string[] {
-    // Extraer alergias de las historias clínicas
     const alergias: string[] = [];
-    // Lógica para extraer alergias de los documentos
     return alergias;
   }
 
   private extraerMedicamentos(): any[] {
-    // Extraer medicamentos actuales
     return [];
   }
 
   private extraerDiagnosticos(): any[] {
-    // Extraer diagnósticos activos
     return [];
   }
 
   private extraerAntecedentes(): any[] {
-    // Extraer antecedentes relevantes
     return [];
   }
 
   private identificarAlertasMedicas(): string[] {
     const alertas: string[] = [];
-
-    // Revisar signos vitales críticos
     const ultimosSignos = this.signosVitalesDisponibles[0];
     if (ultimosSignos) {
       if (ultimosSignos.temperatura && ultimosSignos.temperatura > 38.5) {
@@ -1331,19 +2593,25 @@ eliminarBorrador(): void {
     return alertas;
   }
 
-
-// 🔥 CORREGIR cambiarFormulario para tipos específicos
   cambiarFormulario(tipoFormulario: string): void {
     if (this.formularioActivo === tipoFormulario) return;
 
-    console.log(`🔄 Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`);
-
-    // ✅ Validar que el formulario sea válido
+    console.log(
+      `🔄 Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`
+    );
     const formulariosValidos: FormularioActivo[] = [
-      'signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion',
-      'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria',
-      'notaPreanestesica', 'notaPostanestesica', 'notaInterconsulta',
-      'controlCrecimiento', 'esquemaVacunacion'
+      'signosVitales',
+      'historiaClinica',
+      'notaUrgencias',
+      'notaEvolucion',
+      'consentimiento',
+      'notaPreoperatoria',
+      'notaPostoperatoria',
+      'notaPreanestesica',
+      'notaPostanestesica',
+      'notaInterconsulta',
+      'controlCrecimiento',
+      'esquemaVacunacion',
     ];
 
     if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
@@ -1378,124 +2646,119 @@ eliminarBorrador(): void {
     }
   }
 
-//   resetearFormularioActual(): void {
-//   if (
-//     confirm(
-//       `¿Está seguro de que desea resetear ${this.getTituloFormulario(
-//         this.formularioActivo
-//       )}?`
-//     )
-//   ) {
-//     switch (this.formularioActivo) {
-//       case 'signosVitales':
-//         this.signosVitalesForm.reset();
-//         break;
-//       case 'historiaClinica':
-//         this.historiaClinicaForm.reset();
-//         break;
-//       case 'notaUrgencias':
-//         this.notaUrgenciasForm.reset();
-//         break;
-//       case 'notaEvolucion':
-//         this.notaEvolucionForm.reset();
-//         break;
-//       // 🔥 AGREGAR CASOS PARA NUEVOS FORMULARIOS
-//       case 'consentimiento':
-//         this.consentimientoForm.reset();
-//         break;
-//       case 'notaPreoperatoria':
-//         this.notaPreoperatoriaForm.reset();
-//         break;
-//       case 'notaPostoperatoria':
-//         this.notaPostoperatoriaForm.reset();
-//         break;
-//       case 'notaPreanestesica':
-//         this.notaPreanestesicaForm.reset();
-//         break;
-//       case 'notaPostanestesica':
-//         this.notaPostanestesicaForm.reset();
-//         break;
-//       case 'notaInterconsulta':
-//         this.notaInterconsultaForm.reset();
-//         break;
-//       case 'controlCrecimiento':
-//         // TODO: Reset cuando implementes el formulario
-//         console.log('Reseteando control crecimiento');
-//         break;
-//       case 'esquemaVacunacion':
-//         // TODO: Reset cuando implementes el formulario
-//         console.log('Reseteando esquema vacunación');
-//         break;
-//     }
+  // resetearFormularioActual(): void {
+  //   if (
+  //     confirm(
+  //       `¿Está seguro de que desea resetear ${this.getTituloFormulario(
+  //         this.formularioActivo
+  //       )}?`
+  //     )
+  //   ) {
+  //     switch (this.formularioActivo) {
+  //       case 'signosVitales':
+  //         this.signosVitalesForm.reset();
+  //         break;
+  //       case 'historiaClinica':
+  //         this.historiaClinicaForm.reset();
+  //         break;
+  //       case 'notaUrgencias':
+  //         this.notaUrgenciasForm.reset();
+  //         break;
+  //       case 'notaEvolucion':
+  //         this.notaEvolucionForm.reset();
+  //         break;
+  //       case 'consentimiento':
+  //         this.consentimientoForm.reset();
+  //         break;
+  //       case 'notaPreoperatoria':
+  //         this.notaPreoperatoriaForm.reset();
+  //         break;
+  //       case 'notaPostoperatoria':
+  //         this.notaPostoperatoriaForm.reset();
+  //         break;
+  //       case 'notaPreanestesica':
+  //         this.notaPreanestesicaForm.reset();
+  //         break;
+  //       case 'notaPostanestesica':
+  //         this.notaPostanestesicaForm.reset();
+  //         break;
+  //       case 'notaInterconsulta':
+  //         this.notaInterconsultaForm.reset();
+  //         break;
+  //       case 'controlCrecimiento':
+  //         console.log('Reseteando control crecimiento');
+  //         break;
+  //       case 'esquemaVacunacion':
+  //         console.log('Reseteando esquema vacunación');
+  //         break;
+  //     }
+  //     (this.formularioEstado as any)[this.formularioActivo] = false;
+  //     this.success = `Formulario ${this.getTituloFormulario(
+  //       this.formularioActivo
+  //     )} reseteado`;
+  //   }
+  // }
 
-//     // ✅ USAR BRACKET NOTATION PARA EVITAR ERRORES DE TIPO
-//     (this.formularioEstado as any)[this.formularioActivo] = false;
-
-//     this.success = `Formulario ${this.getTituloFormulario(
-//       this.formularioActivo
-//     )} reseteado`;
-//   }
-// }
-
-
-  // 🔥 CORREGIR OTROS MÉTODOS CON TIPOS SEGUROS
-  resetearFormularioActual(): void {
-    if (
-      confirm(
-        `¿Está seguro de que desea resetear ${this.getTituloFormulario(
-          this.formularioActivo
-        )}?`
-      )
-    ) {
-      switch (this.formularioActivo) {
-        case 'signosVitales':
-          this.signosVitalesForm.reset();
-          break;
-        case 'historiaClinica':
-          this.historiaClinicaForm.reset();
-          break;
-        case 'notaUrgencias':
-          this.notaUrgenciasForm.reset();
-          break;
-        case 'notaEvolucion':
-          this.notaEvolucionForm.reset();
-          break;
-        case 'consentimiento':
-          this.consentimientoForm.reset();
-          break;
-        case 'notaPreoperatoria':
-          this.notaPreoperatoriaForm.reset();
-          break;
-        case 'notaPostoperatoria':
-          this.notaPostoperatoriaForm.reset();
-          break;
-        case 'notaPreanestesica':
-          this.notaPreanestesicaForm.reset();
-          break;
-        case 'notaPostanestesica':
-          this.notaPostanestesicaForm.reset();
-          break;
-        case 'notaInterconsulta':
-          this.notaInterconsultaForm.reset();
-          break;
-        case 'controlCrecimiento':
-          // TODO: Reset cuando implementes el formulario
-          console.log('Reseteando control crecimiento');
-          break;
-        case 'esquemaVacunacion':
-          // TODO: Reset cuando implementes el formulario
-          console.log('Reseteando esquema vacunación');
-          break;
-      }
-
-      // ✅ USAR BRACKET NOTATION PARA EVITAR ERRORES DE TIPO
-      (this.formularioEstado as any)[this.formularioActivo] = false;
-
-      this.success = `Formulario ${this.getTituloFormulario(
-        this.formularioActivo
-      )} reseteado`;
-    }
+resetearFormularioActual(): void {
+  if (this.formularioActivo === null) {
+    this.error = 'No hay un formulario activo para resetear.';
+    return;
   }
+
+  if (
+    confirm(
+      `¿Está seguro de que desea resetear ${this.getTituloFormulario(
+        this.formularioActivo
+      )}?`
+    )
+  ) {
+    switch (this.formularioActivo) {
+      case 'signosVitales':
+        this.signosVitalesForm.reset();
+        break;
+      case 'historiaClinica':
+        this.historiaClinicaForm.reset();
+        break;
+      case 'notaUrgencias':
+        this.notaUrgenciasForm.reset();
+        break;
+      case 'notaEvolucion':
+        this.notaEvolucionForm.reset();
+        break;
+      case 'consentimiento':
+        this.consentimientoForm.reset();
+        break;
+      case 'notaPreoperatoria':
+        this.notaPreoperatoriaForm.reset();
+        break;
+      case 'notaPostoperatoria':
+        this.notaPostoperatoriaForm.reset();
+        break;
+      case 'notaPreanestesica':
+        this.notaPreanestesicaForm.reset();
+        break;
+      case 'notaPostanestesica':
+        this.notaPostanestesicaForm.reset();
+        break;
+      case 'notaInterconsulta':
+        this.notaInterconsultaForm.reset();
+        break;
+      case 'controlCrecimiento':
+        this.controlCrecimientoForm.reset();
+        break;
+      case 'esquemaVacunacion':
+        this.esquemaVacunacionForm.reset();
+        break;
+      default:
+        console.warn(`Formulario no reconocido: ${this.formularioActivo}`);
+        return;
+    }
+    this.formularioEstado[this.formularioActivo] = false;
+    this.success = `Formulario ${this.getTituloFormulario(
+      this.formularioActivo
+    )} reseteado`;
+  }
+}
 
 
   get progresoFormularios(): {
@@ -1602,7 +2865,6 @@ eliminarBorrador(): void {
     );
     console.log('🔍 Estado de formularios:', this.formularioEstado);
 
-    // Verificar o crear documento clínico padre
     if (!this.documentoClinicoActual) {
       if (
         this.signosVitalesDisponibles &&
@@ -1624,7 +2886,6 @@ eliminarBorrador(): void {
       }
     }
 
-    // Preparar datos de la historia clínica
     const historiaData: CreateHistoriaClinicaDto = {
       id_documento: this.documentoClinicoActual!,
       id_guia_diagnostico:
@@ -1674,15 +2935,10 @@ eliminarBorrador(): void {
       console.log('✅ Historia clínica guardada exitosamente:', response);
     } catch (error: any) {
       console.error('❌ Error al guardar historia clínica:', error);
-
-      // 🔥 MANEJO ESPECÍFICO PARA DIFERENTES TIPOS DE ERROR
       if (error?.status === 409) {
         console.log('⚠️ Historia clínica ya existe para este documento');
         console.log('ℹ️ El documento ya tiene una historia clínica asociada');
-
-        // 🎯 NO LANZAR ERROR - permitir que continúe el flujo
-        // El PDF se puede generar con los datos del formulario
-        return; // Salir sin error para continuar con PDF
+        return;
       } else if (error?.status === 400) {
         console.error(
           '❌ Error de validación en el servidor:',
@@ -1701,7 +2957,6 @@ eliminarBorrador(): void {
         console.error('❌ Error de conexión');
         throw new Error('Error de conexión. Verifica tu red');
       } else {
-        // Error desconocido
         console.error('❌ Error desconocido:', error);
         throw new Error(
           `Error inesperado: ${error?.message || 'Error desconocido'}`
@@ -1750,36 +3005,26 @@ eliminarBorrador(): void {
 
   private async guardarNotaEvolucion(): Promise<void> {
     if (!this.notaEvolucionForm.valid) {
-      // 🔥 VALIDACIÓN ESPECÍFICA CON CAMPOS NOM-004
       const errores = this.validarFormularioNOM004();
       throw new Error(`Formulario inválido: ${errores.join(', ')}`);
     }
-
     const tipoNotaEvolucion = this.tiposDocumentosDisponibles.find(
       (t) => t.nombre === 'Nota de Evolución'
     );
-
     if (!tipoNotaEvolucion) {
       throw new Error('Tipo de documento de evolución no encontrado');
     }
-
     const documentoEvolucion = await this.crearDocumentoEspecifico(
       tipoNotaEvolucion.id_tipo_documento
     );
-
-    // 🔥 DATOS COMPLETOS SEGÚN TU MODELO ACTUALIZADO
     const notaData: CreateNotaEvolucionDto = {
       id_documento: documentoEvolucion.id_documento,
       id_guia_diagnostico:
         this.notaEvolucionForm.value.id_guia_diagnostico || null,
-
-      // Datos de hospitalización
       dias_hospitalizacion:
         this.notaEvolucionForm.value.dias_hospitalizacion || null,
       fecha_ultimo_ingreso:
         this.notaEvolucionForm.value.fecha_ultimo_ingreso || null,
-
-      // Signos vitales actuales
       temperatura: this.notaEvolucionForm.value.temperatura || null,
       frecuencia_cardiaca:
         this.notaEvolucionForm.value.frecuencia_cardiaca || null,
@@ -1793,8 +3038,6 @@ eliminarBorrador(): void {
         this.notaEvolucionForm.value.saturacion_oxigeno || null,
       peso_actual: this.notaEvolucionForm.value.peso_actual || null,
       talla_actual: this.notaEvolucionForm.value.talla_actual || null,
-
-      // Campos obligatorios NOM-004
       sintomas_signos: this.notaEvolucionForm.value.sintomas_signos,
       habitus_exterior: this.notaEvolucionForm.value.habitus_exterior,
       estado_nutricional: this.notaEvolucionForm.value.estado_nutricional,
@@ -1805,8 +3048,6 @@ eliminarBorrador(): void {
       plan_estudios_tratamiento:
         this.notaEvolucionForm.value.plan_estudios_tratamiento,
       pronostico: this.notaEvolucionForm.value.pronostico,
-
-      // Exploración física detallada
       exploracion_cabeza: this.notaEvolucionForm.value.exploracion_cabeza || '',
       exploracion_cuello: this.notaEvolucionForm.value.exploracion_cuello || '',
       exploracion_torax: this.notaEvolucionForm.value.exploracion_torax || '',
@@ -1820,8 +3061,6 @@ eliminarBorrador(): void {
         this.notaEvolucionForm.value.exploracion_genitales || '',
       exploracion_neurologico:
         this.notaEvolucionForm.value.exploracion_neurologico || '',
-
-      // Campos adicionales
       diagnosticos_guias: this.notaEvolucionForm.value.diagnosticos_guias || '',
       interconsultas:
         this.notaEvolucionForm.value.interconsultas ||
@@ -1841,104 +3080,12 @@ eliminarBorrador(): void {
     console.log('✅ Nota de evolución guardada exitosamente:', response);
   }
 
-
-
-  // private async guardarConsentimiento(): Promise<void> {
-  //   if(!this.consentimientoForm.valid) {
-  //     throw new Error('Formulario de consentimiento informado inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.consentimientoForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.consentimientosService.create(payload));
-  // }
-
-  // private async guardarNotaPreoperatoria(): Promise<void> {
-  //   if(!this.notaPreoperatoriaForm.valid) {
-  //     throw new Error('Formulario de nota preoperatoria inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.notaPreoperatoriaForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.notasPreoperatoriasService.create(payload));
-  // }
-
-  // private async guardarNotaPostoperatoria(): Promise<void> {
-  //   if(!this.notaPostoperatoriaForm.valid) {
-  //     throw new Error('Formulario de nota postoperatoria inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.notaPostoperatoriaForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.notasPostoperatoriasService.create(payload));
-  // }
-
-  // private async guardarNotaPreanestesica(): Promise<void> {
-  //   if(!this.notaPreanestesicaForm.valid) {
-  //     throw new Error('Formulario de nota preanestésica inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.notaPreanestesicaForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.notasPreanestesicasService.create(payload));
-  // }
-
-  // private async guardarNotaPostanestesica(): Promise<void> {
-  //   if(!this.notaPostanestesicaForm.valid) {
-  //     throw new Error('Formulario de nota postanestésica inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.notaPostanestesicaForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.notasPostanestesicasService.create(payload));
-  // }
-
-  // private async guardarNotaInterconsulta(): Promise<void> {
-  //   if(!this.notaInterconsultaForm.valid) {
-  //     throw new Error('Formulario de nota de interconsulta inválido');
-  //   }
-
-  //   const payload = {
-  //     ...this.notaInterconsultaForm.value,
-  //     id_paciente: this.pacienteId,
-  //     id_personal_medico: this.medicoActual,
-  //   };
-
-  //   await firstValueFrom(this.notasInterconsultaService.create(payload));
-  // }
-
-
-
-
-
-  // 🔥 MÉTODO NUEVO PARA VALIDAR SEGÚN NOM-004
   private validarFormularioNOM004(): string[] {
     const errores: string[] = [];
     const form = this.notaEvolucionForm;
 
-    // Validar campos obligatorios NOM-004
     CAMPOS_OBLIGATORIOS_NOM004.forEach((campo) => {
-      if (campo === 'id_documento') return; // Se maneja automáticamente
+      if (campo === 'id_documento') return;
 
       const control = form.get(campo);
       if (
@@ -1949,7 +3096,6 @@ eliminarBorrador(): void {
       }
     });
 
-    // Validar longitud mínima para campos críticos
     const camposConLongitud = [
       { campo: 'sintomas_signos', minimo: 10 },
       { campo: 'evolucion_analisis', minimo: 10 },
@@ -1969,7 +3115,6 @@ eliminarBorrador(): void {
     return errores;
   }
 
-  // 🔥 MÉTODO PARA VALIDAR DATOS ANTES DE ENVÍO
   private validarDatosNOM004(): {
     valido: boolean;
     errores: string[];
@@ -1980,27 +3125,15 @@ eliminarBorrador(): void {
     return this.notaEvolucionService.validarDatosNOM004(datos);
   }
 
-  // En perfil-paciente.ts, actualizar el método generarPDF:
   async generarPDF(tipoDocumento: string): Promise<void> {
     try {
       console.log(`🔥 Generando PDF para: ${tipoDocumento}`);
       this.isCreatingDocument = true;
-
-      // 🔥 OBTENER DATOS COMPLETOS DEL MÉDICO ACTUAL
       const medicoCompleto = await this.obtenerDatosMedicoCompleto();
-
-      // 🔥 PREPARAR DATOS DEL PACIENTE CON ESTRUCTURA MEJORADA
       const datosPacienteEstructurados = {
-        // ✅ INCLUIR DATOS DIRECTOS DEL PACIENTE
         ...this.pacienteCompleto,
-
-        // ✅ ASEGURAR QUE LOS DATOS DE PERSONA ESTÉN DISPONIBLES
         persona: this.pacienteCompleto?.persona || this.pacienteCompleto,
-
-        // ✅ EXPEDIENTE
         expediente: this.pacienteCompleto?.expediente,
-
-        // ✅ SIGNOS VITALES HISTÓRICOS SI EXISTEN
         signosVitalesDisponibles: this.pacienteCompleto?.signosVitales || [],
       };
 
@@ -2028,7 +3161,7 @@ eliminarBorrador(): void {
               // ✅ ACCESO CORRECTO A LUGAR DE NACIMIENTO
               lugar_nacimiento: this.extraerLugarNacimiento(),
             },
-            signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES DEL FORMULARIO ACTUAL
+            signosVitales: this.signosVitalesForm.value,
             guiaClinica: this.guiaClinicaSeleccionada,
           });
           break;
@@ -2039,7 +3172,7 @@ eliminarBorrador(): void {
             medico: medicoCompleto,
             expediente: this.pacienteCompleto?.expediente,
             notaEvolucion: this.notaEvolucionForm.value,
-            signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES ACTUALES
+            signosVitales: this.signosVitalesForm.value,
             guiaClinica: this.guiaClinicaSeleccionada,
           });
           break;
@@ -2050,7 +3183,7 @@ eliminarBorrador(): void {
             medico: medicoCompleto,
             expediente: this.pacienteCompleto?.expediente,
             notaUrgencias: this.notaUrgenciasForm.value,
-            signosVitales: this.signosVitalesForm.value, // ✅ SIGNOS VITALES ACTUALES
+            signosVitales: this.signosVitalesForm.value,
             guiaClinica: this.guiaClinicaSeleccionada,
           });
           break;
@@ -2062,7 +3195,6 @@ eliminarBorrador(): void {
             expediente: this.pacienteCompleto?.expediente,
             signosVitales: {
               ...this.signosVitalesForm.value,
-              // ✅ INCLUIR OBSERVACIONES ADICIONALES SI EXISTEN
               observaciones:
                 this.signosVitalesForm.value.observaciones ||
                 'Sin observaciones específicas. Paciente estable.',
@@ -2075,25 +3207,19 @@ eliminarBorrador(): void {
           throw new Error(`Tipo de documento "${tipoDocumento}" no es válido`);
       }
 
-      // ✅ MENSAJE DE ÉXITO MEJORADO
       this.success = `✅ PDF de ${tipoDocumento} generado exitosamente`;
       console.log(`✅ PDF de ${tipoDocumento} creado correctamente`);
-
-      // 🔥 OPCIONAL: LIMPIAR MENSAJE DESPUÉS DE 5 SEGUNDOS
       setTimeout(() => {
         this.success = '';
       }, 5000);
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
-
-      // 🔥 MENSAJE DE ERROR MÁS ESPECÍFICO
       if (error instanceof Error) {
         this.error = `Error al generar PDF: ${error.message}`;
       } else {
         this.error = 'Error al generar el PDF. Por favor intente nuevamente.';
       }
 
-      // 🔥 OPCIONAL: LIMPIAR ERROR DESPUÉS DE 8 SEGUNDOS
       setTimeout(() => {
         this.error = '';
       }, 8000);
@@ -2102,39 +3228,30 @@ eliminarBorrador(): void {
     }
   }
 
-  // 🔥 MÉTODO AUXILIAR PARA EXTRAER DIRECCIÓN COMPLETA
   private extraerDireccionCompleta(): string {
     const persona = this.pacienteCompleto?.persona;
     const personaInfo = this.personaInfo;
-
     if (!persona && !personaInfo) return 'Sin dirección registrada';
-
-    // Helper para acceso seguro a propiedades
     const getProperty = (obj: any, prop: string): any => {
       return obj?.[prop] || null;
     };
 
-    // Usar el objeto persona principal o personaInfo como fallback
     const datosPersona = persona || personaInfo;
 
     const partes = [
       getProperty(datosPersona, 'domicilio') ||
         getProperty(datosPersona, 'direccion') ||
         getProperty(datosPersona, 'calle'),
-
       getProperty(datosPersona, 'numero_exterior')
         ? `#${getProperty(datosPersona, 'numero_exterior')}`
         : '',
-
       getProperty(datosPersona, 'numero_interior')
         ? `Int. ${getProperty(datosPersona, 'numero_interior')}`
         : '',
-
       getProperty(datosPersona, 'colonia'),
       getProperty(datosPersona, 'municipio') ||
         getProperty(datosPersona, 'ciudad'),
       getProperty(datosPersona, 'estado'),
-
       getProperty(datosPersona, 'codigo_postal')
         ? `C.P. ${getProperty(datosPersona, 'codigo_postal')}`
         : '',
@@ -2146,7 +3263,6 @@ eliminarBorrador(): void {
   }
 
   private extraerLugarNacimiento(): string {
-    // ✅ USAR MÉTODO MEJORADO CON HELPERS
     const objetos = [
       this.pacienteCompleto?.persona,
       this.personaInfo,
@@ -2170,17 +3286,12 @@ eliminarBorrador(): void {
 
   private construirPacienteCompleto(data: any): void {
     console.log('🔍 Datos recibidos para construir paciente completo:', data);
-
-    // ✅ ACCESO SEGURO A LOS DATOS CON TYPE ASSERTION
     const pacienteData = (data.paciente?.data as any) || {};
-
     this.pacienteCompleto = {
-      // ✅ ESTRUCTURA MEJORADA - acceso seguro a persona
       persona: pacienteData.persona || pacienteData['persona'] || pacienteData,
 
       paciente: {
         ...pacienteData,
-        // ✅ ASEGURAR QUE TENGA ACCESO A PERSONA
         persona: pacienteData.persona || pacienteData['persona'],
       } as Paciente & { persona?: any; [key: string]: any },
 
@@ -2200,7 +3311,6 @@ eliminarBorrador(): void {
     this.preLlenarFormularios();
   }
 
-  // 🔥 MÉTODO HELPER ESPECÍFICO PARA FECHAS
   private obtenerFechaNacimiento(): string | null {
     const objetos = [
       this.pacienteCompleto?.persona,
@@ -2218,7 +3328,6 @@ eliminarBorrador(): void {
     return null;
   }
 
-  // 🔥 MÉTODO NUEVO PARA OBTENER DATOS COMPLETOS DEL MÉDICO
   private async obtenerDatosMedicoCompleto(): Promise<any> {
     try {
       if (!this.medicoActual) {
@@ -2249,8 +3358,6 @@ eliminarBorrador(): void {
           departamento: medico.departamento,
         };
       }
-
-      // Fallback con datos del usuario autenticado
       const usuarioActual = this.authService.getCurrentUser();
       return {
         id_personal_medico: this.medicoActual,
@@ -2263,8 +3370,6 @@ eliminarBorrador(): void {
       };
     } catch (error) {
       console.error('❌ Error al obtener datos del médico:', error);
-
-      // Fallback básico
       return {
         id_personal_medico: this.medicoActual || 0,
         nombre_completo: 'Médico no identificado',
@@ -2276,15 +3381,12 @@ eliminarBorrador(): void {
     }
   }
 
-
   mostrarConfirmacionPDF(tipoDocumento: string): void {
-    // ❌ No mostrar confirmación para signos vitales
     if (tipoDocumento === 'Signos Vitales') {
       console.log('PDF de signos vitales desactivado por ahora');
       return;
     }
 
-    // ✅ Mostrar confirmación para otros documentos
     if (
       confirm(
         `✅ ${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`
@@ -2394,7 +3496,6 @@ eliminarBorrador(): void {
     return colores[nombre] || 'gray';
   }
 
-
   private requiereInternamiento(nombre: string): boolean {
     const requiereInternamiento = [
       'Nota de Evolución',
@@ -2406,14 +3507,10 @@ eliminarBorrador(): void {
   }
 
   calcularEdad(fechaNacimiento?: string): number {
-    // ✅ USAR MÉTODOS HELPER PARA ACCESO SEGURO
     let fecha = fechaNacimiento;
-
     if (!fecha) {
-      // Buscar fecha de nacimiento usando métodos seguros
       const persona = this.pacienteCompleto?.persona;
       const personaInfo = this.personaInfo;
-
       fecha =
         this.getNestedProperty(persona, 'fecha_nacimiento') ||
         this.getNestedProperty(personaInfo, 'fecha_nacimiento') ||
@@ -2457,7 +3554,6 @@ eliminarBorrador(): void {
     const persona = this.pacienteCompleto?.persona;
     const personaInfo = this.personaInfo;
 
-    // ✅ BUSCAR EN MÚLTIPLES UBICACIONES DE FORMA SEGURA
     const objetos = [
       persona,
       personaInfo,
@@ -2468,15 +3564,12 @@ eliminarBorrador(): void {
     let apellidoPaterno = '';
     let apellidoMaterno = '';
 
-    // Buscar nombre en todos los objetos posibles
     for (const obj of objetos) {
       if (!nombre) nombre = this.getNestedProperty(obj, 'nombre') || '';
       if (!apellidoPaterno)
         apellidoPaterno = this.getNestedProperty(obj, 'apellido_paterno') || '';
       if (!apellidoMaterno)
         apellidoMaterno = this.getNestedProperty(obj, 'apellido_materno') || '';
-
-      // Si ya tenemos todos los datos, salir del bucle
       if (nombre && apellidoPaterno && apellidoMaterno) break;
     }
 
@@ -2487,15 +3580,9 @@ eliminarBorrador(): void {
   }
 
   get personaInfo(): any {
-    // ✅ ACCESO SEGURO CON MÚLTIPLES FALLBACKS
     const pacienteCompleto = this.pacienteCompleto;
-
     if (!pacienteCompleto) return {};
-
-    // ✅ USAR TYPE ASSERTION Y ACCESO SEGURO
     const pacienteData = pacienteCompleto.paciente as any;
-
-    // Intentar diferentes rutas de acceso
     return (
       pacienteCompleto.persona ||
       pacienteCompleto['persona'] ||
@@ -2520,46 +3607,47 @@ eliminarBorrador(): void {
   }
 
   get formularioActualValido(): boolean {
-  switch (this.formularioActivo) {
-    case 'signosVitales':
-      return this.signosVitalesForm.valid;
-    case 'historiaClinica':
-      return this.historiaClinicaForm.valid;
-    case 'notaUrgencias':
-      return this.notaUrgenciasForm.valid;
-    case 'notaEvolucion':
-      return this.notaEvolucionForm.valid;
-    // 🔥 AGREGAR NUEVOS FORMULARIOS
-    case 'consentimiento':
-      return this.consentimientoForm.valid;
-    case 'notaPreoperatoria':
-      return this.notaPreoperatoriaForm.valid;
-    case 'notaPostoperatoria':
-      return this.notaPostoperatoriaForm.valid;
-    case 'notaPreanestesica':
-      return this.notaPreanestesicaForm.valid;
-    case 'notaPostanestesica':
-      return this.notaPostanestesicaForm.valid;
-    case 'notaInterconsulta':
-      return this.notaInterconsultaForm.valid;
-    case 'controlCrecimiento':
-      return true; // TODO: implementar cuando tengas el formulario
-    case 'esquemaVacunacion':
-      return true; // TODO: implementar cuando tengas el formulario
-    default:
-      return false;
+    switch (this.formularioActivo) {
+      case 'signosVitales':
+        return this.signosVitalesForm.valid;
+      case 'historiaClinica':
+        return this.historiaClinicaForm.valid;
+      case 'notaUrgencias':
+        return this.notaUrgenciasForm.valid;
+      case 'notaEvolucion':
+        return this.notaEvolucionForm.valid;
+      case 'consentimiento':
+        return this.consentimientoForm.valid;
+      case 'notaPreoperatoria':
+        return this.notaPreoperatoriaForm.valid;
+      case 'notaPostoperatoria':
+        return this.notaPostoperatoriaForm.valid;
+      case 'notaPreanestesica':
+        return this.notaPreanestesicaForm.valid;
+      case 'notaPostanestesica':
+        return this.notaPostanestesicaForm.valid;
+      case 'notaInterconsulta':
+        return this.notaInterconsultaForm.valid;
+      case 'controlCrecimiento':
+        return true;
+      case 'esquemaVacunacion':
+        return true;
+      default:
+        return false;
+    }
   }
-}
 
   // get puedeAvanzar(): boolean {
-  //   return (
-  //     this.formularioEstado[this.formularioActivo] ||
-  //     this.formularioActualValido
-  //   );
+  //   const estadoFormulario = (this.formularioEstado as any)[
+  //     this.formularioActivo
+  //   ];
+  //   return estadoFormulario || this.formularioActualValido;
   // }
 get puedeAvanzar(): boolean {
-  // ✅ USAR BRACKET NOTATION PARA ACCESO SEGURO
-  const estadoFormulario = (this.formularioEstado as any)[this.formularioActivo];
+  if (this.formularioActivo === null) {
+    return false;
+  }
+  const estadoFormulario = this.formularioEstado[this.formularioActivo];
   return estadoFormulario || this.formularioActualValido;
 }
 
@@ -2582,7 +3670,6 @@ get puedeAvanzar(): boolean {
     this.initializeComponent();
   }
 
-  // 🔥 MÉTODO HELPER PARA BUSCAR EN MÚLTIPLES OBJETOS
   private findPropertyInObjects(objects: any[], property: string): any {
     for (const obj of objects) {
       if (!obj) continue;
@@ -2595,7 +3682,6 @@ get puedeAvanzar(): boolean {
     return null;
   }
 
-  // 🔥 TYPE GUARDS PARA VALIDACIÓN SEGURA
   private esObjetoValido(obj: any): boolean {
     return obj && typeof obj === 'object' && !Array.isArray(obj);
   }
@@ -2604,11 +3690,8 @@ get puedeAvanzar(): boolean {
     return this.esObjetoValido(obj) && (prop in obj || obj[prop] !== undefined);
   }
 
-  // 🔥 MÉTODO MEJORADO CON TYPE GUARDS
   private getNestedProperty(obj: any, path: string): any {
     if (!this.esObjetoValido(obj)) return null;
-
-    // Intentar acceso directo primero
     if (this.tienePropiedad(obj, path)) {
       return obj[path];
     }
@@ -2616,30 +3699,37 @@ get puedeAvanzar(): boolean {
     return null;
   }
 
-
-  // 🔥 MÉTODO HELPER PARA VALIDAR TIPOS DE FORMULARIO
-private esFormularioValido(formulario: string): formulario is typeof this.formularioActivo {
-  const formulariosValidos = [
-    'signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion',
-    'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria',
-    'notaPreanestesica', 'notaPostanestesica', 'notaInterconsulta',
-    'controlCrecimiento', 'esquemaVacunacion'
+  private esFormularioValido(
+  formulario: string | null
+): formulario is FormularioActivo {
+  if (formulario === null) {
+    return false;
+  }
+  const formulariosValidos: FormularioActivo[] = [
+    'signosVitales',
+    'historiaClinica',
+    'notaUrgencias',
+    'notaEvolucion',
+    'consentimiento',
+    'notaPreoperatoria',
+    'notaPostoperatoria',
+    'notaPreanestesica',
+    'notaPostanestesica',
+    'notaInterconsulta',
+    'controlCrecimiento',
+    'esquemaVacunacion',
   ];
-  return formulariosValidos.includes(formulario);
+  return formulariosValidos.includes(formulario as FormularioActivo);
 }
 
-// 🔥 MÉTODO HELPER PARA VALIDAR TABS
-private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'datos' {
-  return ['general', 'crear', 'historial', 'datos'].includes(tab);
-}
+  private esTabValida(
+    tab: string
+  ): tab is 'general' | 'crear' | 'historial' | 'datos' {
+    return ['general', 'crear', 'historial', 'datos'].includes(tab);
+  }
 
-  /**
-   * Maneja errores de forma inteligente sin interrumpir el trabajo
-   */
   private manejarError(error: any, contexto: string): void {
     console.error(` Error en ${contexto}:`, error);
-
-    // Clasificar el tipo de error
     const tipoError = this.clasificarError(error);
 
     switch (tipoError) {
@@ -2660,9 +3750,6 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
     }
   }
 
-  /**
-   * Clasifica el error para manejo específico
-   */
   private clasificarError(
     error: any
   ): 'conexion' | 'validacion' | 'permisos' | 'critico' | 'general' {
@@ -2676,47 +3763,29 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
     return 'general';
   }
 
-  /**
-   * Error de conexión - No interrumpe el trabajo
-   */
   private manejarErrorConexion(error: any, contexto: string): void {
     this.hayProblemasConexion = true;
     this.estadoAutoguardado = 'offline';
-
-    // Guardar localmente para no perder datos
     this.guardarLocalmenteFormulario();
-
-    // Mostrar toast discreto
     this.error =
       'Problema de conexión detectado. Tus datos se guardan localmente.';
     this.mostrarError = true;
-
-    // Auto-ocultar después de 5 segundos
     setTimeout(() => {
       this.mostrarError = false;
     }, 5000);
 
-    // Intentar reconectar cada 30 segundos
     this.iniciarReconexionAutomatica();
   }
 
-  /**
-   * Error de validación - Mostrar en contexto
-   */
   private manejarErrorValidacion(error: any, contexto: string): void {
     const mensaje = this.extraerMensajeValidacion(error);
     this.error = `Error de validación: ${mensaje}`;
     this.mostrarError = true;
-
-    // Auto-ocultar después de 7 segundos
     setTimeout(() => {
       this.mostrarError = false;
     }, 7000);
   }
 
-  /**
-   * Error de permisos - Manejo específico
-   */
   private manejarErrorPermisos(error: any, contexto: string): void {
     this.guardarLocalmenteFormulario();
 
@@ -2730,8 +3799,6 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
 
     this.error = mensaje;
     this.mostrarError = true;
-
-    // Para errores de permisos, mostrar más tiempo
     setTimeout(() => {
       this.mostrarError = false;
     }, 10000);
@@ -2745,9 +3812,6 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
     }
   }
 
-  /**
-   * Error crítico - Requiere atención pero preserva trabajo
-   */
   private manejarErrorCritico(error: any, contexto: string): void {
     this.guardarLocalmenteFormulario();
     this.errorCritico = `Error crítico en ${contexto}: ${
@@ -2755,9 +3819,6 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
     }`;
   }
 
-  /**
-   * Error general - Manejo suave
-   */
   private manejarErrorGeneral(error: any, contexto: string): void {
     this.error = `Error en ${contexto}. Tus datos están seguros.`;
     this.mostrarError = true;
@@ -2767,101 +3828,82 @@ private esTabValida(tab: string): tab is 'general' | 'crear' | 'historial' | 'da
     }, 4000);
   }
 
-  // ==========================================
-  // AUTOGUARDADO LOCAL Y RECUPERACIÓN
-  // ==========================================
+  private guardarLocalmenteFormulario(): void {
+    try {
+      const datosFormulario = {
+        formularioActivo: this.formularioActivo,
+        signosVitales: this.signosVitalesForm.value,
+        historiaClinica: this.historiaClinicaForm.value,
+        notaUrgencias: this.notaUrgenciasForm.value,
+        notaEvolucion: this.notaEvolucionForm.value,
+        consentimiento: this.consentimientoForm.value,
+        notaPreoperatoria: this.notaPreoperatoriaForm.value,
+        notaPostoperatoria: this.notaPostoperatoriaForm.value,
+        notaPreanestesica: this.notaPreanestesicaForm.value,
+        notaPostanestesica: this.notaPostanestesicaForm.value,
+        notaInterconsulta: this.notaInterconsultaForm.value,
+        formularioEstado: this.formularioEstado,
+        timestamp: Date.now(),
+        pacienteId: this.pacienteId,
+      };
 
-  /**
- * Guarda el formulario actual en localStorage
- */
-private guardarLocalmenteFormulario(): void {
-  try {
-    const datosFormulario = {
-      formularioActivo: this.formularioActivo,
-      signosVitales: this.signosVitalesForm.value,
-      historiaClinica: this.historiaClinicaForm.value,
-      notaUrgencias: this.notaUrgenciasForm.value,
-      notaEvolucion: this.notaEvolucionForm.value,
-      // 🔥 AGREGAR NUEVOS FORMULARIOS
-      consentimiento: this.consentimientoForm.value,
-      notaPreoperatoria: this.notaPreoperatoriaForm.value,
-      notaPostoperatoria: this.notaPostoperatoriaForm.value,
-      notaPreanestesica: this.notaPreanestesicaForm.value,
-      notaPostanestesica: this.notaPostanestesicaForm.value,
-      notaInterconsulta: this.notaInterconsultaForm.value,
-      formularioEstado: this.formularioEstado,
-      timestamp: Date.now(),
-      pacienteId: this.pacienteId,
-    };
+      localStorage.setItem(
+        `perfil_paciente_${this.pacienteId}`,
+        JSON.stringify(datosFormulario)
+      );
+      this.ultimoGuardadoLocal = Date.now();
 
-    localStorage.setItem(
-      `perfil_paciente_${this.pacienteId}`,
-      JSON.stringify(datosFormulario)
-    );
-    this.ultimoGuardadoLocal = Date.now();
-
-    console.log('💾 Datos guardados localmente');
-  } catch (error) {
-    console.warn('No se pudo guardar localmente:', error);
+      console.log('Datos guardados localmente');
+    } catch (error) {
+      console.warn('No se pudo guardar localmente:', error);
+    }
   }
-}
 
-  /**
- * Recupera datos del formulario desde localStorage
- */
-private recuperarDatosLocales(): boolean {
-  try {
-    const datosGuardados = localStorage.getItem(
-      `perfil_paciente_${this.pacienteId}`
-    );
-    if (!datosGuardados) return false;
+  private recuperarDatosLocales(): boolean {
+    try {
+      const datosGuardados = localStorage.getItem(
+        `perfil_paciente_${this.pacienteId}`
+      );
+      if (!datosGuardados) return false;
 
-    const datos = JSON.parse(datosGuardados);
-    const tiempoTranscurrido = Date.now() - datos.timestamp;
+      const datos = JSON.parse(datosGuardados);
+      const tiempoTranscurrido = Date.now() - datos.timestamp;
 
-    // Solo recuperar si son datos recientes (menos de 24 horas)
-    if (tiempoTranscurrido > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+      if (tiempoTranscurrido > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
+        return false;
+      }
+
+      this.signosVitalesForm.patchValue(datos.signosVitales || {});
+      this.historiaClinicaForm.patchValue(datos.historiaClinica || {});
+      this.notaUrgenciasForm.patchValue(datos.notaUrgencias || {});
+      this.notaEvolucionForm.patchValue(datos.notaEvolucion || {});
+      this.consentimientoForm.patchValue(datos.consentimiento || {});
+      this.notaPreoperatoriaForm.patchValue(datos.notaPreoperatoria || {});
+      this.notaPostoperatoriaForm.patchValue(datos.notaPostoperatoria || {});
+      this.notaPreanestesicaForm.patchValue(datos.notaPreanestesica || {});
+      this.notaPostanestesicaForm.patchValue(datos.notaPostanestesica || {});
+      this.notaInterconsultaForm.patchValue(datos.notaInterconsulta || {});
+
+      this.formularioEstado = datos.formularioEstado || this.formularioEstado;
+
+      if (this.esFormularioValido(datos.formularioActivo)) {
+        this.formularioActivo = datos.formularioActivo;
+      }
+
+      this.success = 'Datos recuperados desde tu última sesión 📁';
+
+      setTimeout(() => {
+        this.success = null;
+      }, 5000);
+
+      return true;
+    } catch (error) {
+      console.warn('Error al recuperar datos locales:', error);
       return false;
     }
-
-    // Restaurar formularios
-    this.signosVitalesForm.patchValue(datos.signosVitales || {});
-    this.historiaClinicaForm.patchValue(datos.historiaClinica || {});
-    this.notaUrgenciasForm.patchValue(datos.notaUrgencias || {});
-    this.notaEvolucionForm.patchValue(datos.notaEvolucion || {});
-
-    // 🔥 RESTAURAR NUEVOS FORMULARIOS
-    this.consentimientoForm.patchValue(datos.consentimiento || {});
-    this.notaPreoperatoriaForm.patchValue(datos.notaPreoperatoria || {});
-    this.notaPostoperatoriaForm.patchValue(datos.notaPostoperatoria || {});
-    this.notaPreanestesicaForm.patchValue(datos.notaPreanestesica || {});
-    this.notaPostanestesicaForm.patchValue(datos.notaPostanestesica || {});
-    this.notaInterconsultaForm.patchValue(datos.notaInterconsulta || {});
-
-    this.formularioEstado = datos.formularioEstado || this.formularioEstado;
-
-    // ✅ VALIDAR EL FORMULARIO ACTIVO ANTES DE ASIGNARLO
-    if (this.esFormularioValido(datos.formularioActivo)) {
-      this.formularioActivo = datos.formularioActivo;
-    }
-
-    this.success = 'Datos recuperados desde tu última sesión 📁';
-
-    setTimeout(() => {
-      this.success = null;
-    }, 5000);
-
-    return true;
-  } catch (error) {
-    console.warn('Error al recuperar datos locales:', error);
-    return false;
   }
-}
 
-  /**
-   * Inicia autoguardado cada 30 segundos
-   */
   private iniciarAutoguardado(): void {
     this.autoguardadoInterval = setInterval(() => {
       if (this.hayFormularioCambiado()) {
@@ -2875,29 +3917,27 @@ private recuperarDatosLocales(): boolean {
     }, 30000);
   }
 
-  /**
-   * Verifica si hay cambios en el formulario
-   */
   private hayFormularioCambiado(): boolean {
-    return (
-      this.signosVitalesForm.dirty ||
-      this.historiaClinicaForm.dirty ||
-      this.notaUrgenciasForm.dirty ||
-      this.notaEvolucionForm.dirty
-    );
+    return [
+      this.signosVitalesForm,
+      this.historiaClinicaForm,
+      this.notaUrgenciasForm,
+      this.notaEvolucionForm,
+      this.consentimientoForm,
+      this.notaPreoperatoriaForm,
+      this.notaPostoperatoriaForm,
+      this.notaPreanestesicaForm,
+      this.notaPostanestesicaForm,
+      this.notaInterconsultaForm,
+      this.solicitudEstudioForm,
+      this.referenciaForm,
+      this.controlCrecimientoForm,
+      this.esquemaVacunacionForm,
+    ].some((form) => form?.dirty);
   }
 
-  // ==========================================
-  // MÉTODOS PÚBLICOS PARA EL TEMPLATE
-  // ==========================================
-
-  /**
-   * Intenta reconectar y reenviar datos
-   */
   intentarDeNuevo(): void {
     this.estadoAutoguardado = 'guardando';
-
-    // Verificar conexión
     if (navigator.onLine) {
       this.verificarConexion();
     } else {
@@ -2906,19 +3946,12 @@ private recuperarDatosLocales(): boolean {
     }
   }
 
-  /**
-   * Oculta el error y permite continuar trabajando
-   */
   ocultarError(): void {
     this.mostrarError = false;
     this.error = null;
   }
 
-  /**
-   * Verifica el estado de la conexión
-   */
   verificarConexion(): void {
-    // Ping simple al servidor
     this.expedientesService
       .getExpedienteByPacienteId(this.pacienteId!)
       .pipe(takeUntil(this.destroy$))
@@ -2939,24 +3972,15 @@ private recuperarDatosLocales(): boolean {
       });
   }
 
-  /**
-   * Recarga la página preservando datos
-   */
   recargarPagina(): void {
     this.guardarLocalmenteFormulario();
     window.location.reload();
   }
 
-  /**
-   * Cierra error crítico y continúa
-   */
   cerrarErrorCritico(): void {
     this.errorCritico = null;
   }
 
-  /**
-   * Inicia reconexión automática
-   */
   private iniciarReconexionAutomatica(): void {
     const intentarReconectar = () => {
       if (this.hayProblemasConexion && navigator.onLine) {
@@ -2964,13 +3988,9 @@ private recuperarDatosLocales(): boolean {
       }
     };
 
-    // Intentar cada 30 segundos
     setInterval(intentarReconectar, 30000);
   }
 
-  /**
-   * Extrae mensaje de error de validación
-   */
   private extraerMensajeValidacion(error: any): string {
     if (error?.error?.message) return error.error.message;
     if (error?.error?.errors) return error.error.errors.join(', ');

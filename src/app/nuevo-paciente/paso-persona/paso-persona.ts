@@ -110,7 +110,25 @@ export class PasoPersona implements OnInit, OnDestroy {
       estado: ['', [Validators.maxLength(50)]],
       codigo_postal: ['', [Validators.pattern(/^\d{5}$/)]],
       curp: ['', [Validators.required, Validators.pattern(/^[A-Z]{1}[AEIOU]{1}[A-Z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[HM]{1}(AS|BC|BS|CC|CS|CH|CL|CM|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[0-9A-Z]{1}[0-9]{1}$/)]],
-      religion: ['']
+      religion: [''],
+
+
+      // 🔥 CAMPOS ADICIONALES PARA PEDIATRÍA (opcionales)
+    nombre_madre: [''],
+    apellidos_madre: [''],
+    telefono_madre: [''],
+    ocupacion_madre: [''],
+
+    nombre_padre: [''],
+    apellidos_padre: [''],
+    telefono_padre: [''],
+    ocupacion_padre: [''],
+
+    // Para el tutor legal si no son los padres
+    nombre_tutor: [''],
+    parentesco_tutor: [''],
+    telefono_tutor: ['']
+
     });
   }
 
@@ -291,83 +309,6 @@ export class PasoPersona implements OnInit, OnDestroy {
       this.scrollToFirstError();
     }
   }
-
-  // private saveAndContinue(): void {
-  //   this.isLoading.set(true);
-  //   this.autoGuardadoStatus.set('Guardando datos del paciente...');
-
-  //   try {
-  //     // Preparar datos del formulario
-  //     const formData = this.personaForm.value as DatosPersona;
-
-  //     console.log('Guardando datos de persona:', formData);
-
-  //     // Actualizar datos en el wizard state
-  //     this.wizardStateService.updatePersonaData(formData);
-
-  //     // Marcar paso como completado
-  //     this.wizardStateService.markStepAsCompleted(WizardStep.PERSONA);
-
-  //     // Simular guardado en backend (aquí iría la llamada real al API)
-  //     // TODO: Reemplazar con llamada real al PersonasService
-  //     setTimeout(() => {
-  //       this.isLoading.set(false);
-  //       this.autoGuardadoStatus.set('✓ Datos guardados exitosamente');
-
-  //       console.log('Datos guardados, navegando al siguiente paso');
-
-  //       // Navegar al siguiente paso
-  //       this.wizardStateService.goToNextStep();
-
-  //       // Limpiar mensaje después de 3 segundos
-  //       setTimeout(() => {
-  //         this.autoGuardadoStatus.set('');
-  //       }, 3000);
-  //     }, 1500);
-
-  //   } catch (error) {
-  //     console.error('Error al guardar datos de persona:', error);
-  //     this.isLoading.set(false);
-  //     this.autoGuardadoStatus.set('❌ Error al guardar datos');
-
-  //     // Limpiar mensaje de error después de 5 segundos
-  //     setTimeout(() => {
-  //       this.autoGuardadoStatus.set('');
-  //     }, 5000);
-  //   }
-  // }
-
-  // guardarBorrador(): void {
-  //   if (!this.isLoading() && this.personaForm.dirty) {
-  //     this.autoGuardadoStatus.set('Guardando borrador...');
-
-  //     try {
-  //       const formData = this.personaForm.value as Partial<DatosPersona>;
-  //       console.log('Guardando borrador:', formData);
-
-  //       this.wizardStateService.updatePersonaData(formData);
-
-  //       // Simular guardado de borrador
-  //       setTimeout(() => {
-  //         this.autoGuardadoStatus.set('✓ Borrador guardado');
-
-  //         // Limpiar mensaje después de 3 segundos
-  //         setTimeout(() => {
-  //           this.autoGuardadoStatus.set('');
-  //         }, 3000);
-  //       }, 800);
-
-  //     } catch (error) {
-  //       console.error('Error al guardar borrador:', error);
-  //       this.autoGuardadoStatus.set('❌ Error al guardar borrador');
-
-  //       setTimeout(() => {
-  //         this.autoGuardadoStatus.set('');
-  //       }, 5000);
-  //     }
-  //   }
-  // }
-
 
 
 
