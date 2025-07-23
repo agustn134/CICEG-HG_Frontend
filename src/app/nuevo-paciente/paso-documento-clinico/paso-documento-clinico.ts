@@ -114,7 +114,7 @@
 //           this.tiposDocumento = tipos
 //             .map(tipo => this.mapTipoDocumentoToLocal(tipo))
 //             .filter(tipo => tipo !== null) as TipoDocumento[]; // Filtrar valores null y hacer type assertion
-//           console.log('✅ Tipos de documento cargados:', this.tiposDocumento.length);
+//           console.log('  Tipos de documento cargados:', this.tiposDocumento.length);
 //         },
 //         error: (error) => {
 //           console.error('❌ Error al cargar tipos de documento:', error);
@@ -127,7 +127,7 @@
 //   private mapTipoDocumentoToLocal(tipoBackend: any): TipoDocumento | null {
 //     // Validar que tenemos los datos mínimos necesarios
 //     if (!tipoBackend || !tipoBackend.nombre) {
-//       console.warn('⚠️ Tipo de documento inválido:', tipoBackend);
+//       console.warn('  Tipo de documento inválido:', tipoBackend);
 //       return null;
 //     }
 
@@ -291,13 +291,13 @@
 //         es_inicial: false
 //       }
 //     ];
-//     console.log('⚠️ Usando tipos de documento de fallback');
+//     console.log('  Usando tipos de documento de fallback');
 //   }
 
 //   private loadExistingData(): void {
 //     const currentState = this.wizardStateService.getCurrentState();
 
-//     console.log('🔍 Estado actual del wizard:', currentState);
+//     console.log('  Estado actual del wizard:', currentState);
 
 //     // Cargar datos de pasos anteriores
 //     this.resumenPersona = currentState.datosPersona;
@@ -343,7 +343,7 @@
 //   private validatePreviousSteps(): void {
 //     const currentState = this.wizardStateService.getCurrentState();
 
-//     console.log('🔍 Validando pasos anteriores...');
+//     console.log('  Validando pasos anteriores...');
 
 //     // Verificar que existen todos los IDs necesarios
 //     if (!currentState.id_persona_creada) {
@@ -367,7 +367,7 @@
 //       return;
 //     }
 
-//     console.log('✅ Validación exitosa. IDs encontrados:', {
+//     console.log('  Validación exitosa. IDs encontrados:', {
 //       persona: currentState.id_persona_creada,
 //       paciente: currentState.id_paciente_creado,
 //       expediente: currentState.id_expediente_creado
@@ -564,7 +564,7 @@
 //       // Llamada real al backend
 //       this.documentosService.createDocumentoClinico(documentoData).subscribe({
 //         next: (response) => {
-//           console.log('✅ Respuesta del backend (documento creado):', response);
+//           console.log('  Respuesta del backend (documento creado):', response);
 
 //           if (response.success && response.data) {
 //             // Actualizar datos en el wizard state
@@ -596,10 +596,10 @@
 //             // Actualizar UI
 //             this.isLoading = false;
 //             this.estadoProceso = 'completado';
-//             this.autoGuardadoStatus = '✅ Documento clínico creado exitosamente';
+//             this.autoGuardadoStatus = '  Documento clínico creado exitosamente';
 
-//             console.log('✅ Documento creado con ID:', response.data.id_documento);
-//             console.log('✅ Tipo documento:', this.tipoSeleccionado!.nombre);
+//             console.log('  Documento creado con ID:', response.data.id_documento);
+//             console.log('  Tipo documento:', this.tipoSeleccionado!.nombre);
 
 //             // Navegar al siguiente paso después de una breve pausa
 //             setTimeout(() => {
@@ -683,9 +683,9 @@
 //       this.wizardStateService.markStepAsCompleted(WizardStep.DOCUMENTO_CLINICO);
 
 //       this.isLoading = false;
-//       this.autoGuardadoStatus = '✅ Selección guardada exitosamente';
+//       this.autoGuardadoStatus = '  Selección guardada exitosamente';
 
-//       console.log('✅ Selección guardada:', datosDocumento);
+//       console.log('  Selección guardada:', datosDocumento);
 
 //       // Navegar al siguiente paso
 //       setTimeout(() => {
@@ -959,7 +959,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
             .map(tipo => this.mapTipoDocumentoToLocal(tipo))
             .filter(tipo => tipo !== null) as TipoDocumento[];
 
-          console.log('✅ Tipos de documento mapeados:', this.tiposDocumento.length);
+          console.log('  Tipos de documento mapeados:', this.tiposDocumento.length);
           console.log('📋 Lista final de tipos:', this.tiposDocumento);
         },
         error: (error) => {
@@ -975,12 +975,12 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
 
     // Validar que tenemos los datos mínimos necesarios
     if (!tipoBackend) {
-      console.warn('⚠️ Tipo de documento es null/undefined');
+      console.warn('  Tipo de documento es null/undefined');
       return null;
     }
 
     if (!tipoBackend.nombre && !tipoBackend.label) {
-      console.warn('⚠️ Tipo de documento sin nombre:', tipoBackend);
+      console.warn('  Tipo de documento sin nombre:', tipoBackend);
       return null;
     }
 
@@ -989,7 +989,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
     const idTipo = tipoBackend.id_tipo_documento || tipoBackend.id || tipoBackend.value;
 
     if (!idTipo) {
-      console.warn('⚠️ Tipo de documento sin ID:', tipoBackend);
+      console.warn('  Tipo de documento sin ID:', tipoBackend);
       return null;
     }
 
@@ -1104,7 +1104,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
       es_inicial: tipoBackend.es_inicial ?? documentosIniciales.includes(nombreTipo)
     };
 
-    console.log('✅ Tipo mapeado correctamente:', tipoDocumentoMapeado);
+    console.log('  Tipo mapeado correctamente:', tipoDocumentoMapeado);
     return tipoDocumentoMapeado;
   }
 
@@ -1156,13 +1156,13 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
         es_inicial: false
       }
     ];
-    console.log('⚠️ Usando tipos de documento de fallback');
+    console.log('  Usando tipos de documento de fallback');
   }
 
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Estado actual del wizard:', currentState);
+    console.log('  Estado actual del wizard:', currentState);
 
     // Cargar datos de pasos anteriores
     this.resumenPersona = currentState.datosPersona;
@@ -1208,7 +1208,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
   private validatePreviousSteps(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Validando pasos anteriores...');
+    console.log('  Validando pasos anteriores...');
 
     // Verificar que existen todos los IDs necesarios
     if (!currentState.id_persona_creada) {
@@ -1232,7 +1232,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✅ Validación exitosa. IDs encontrados:', {
+    console.log('  Validación exitosa. IDs encontrados:', {
       persona: currentState.id_persona_creada,
       paciente: currentState.id_paciente_creado,
       expediente: currentState.id_expediente_creado
@@ -1429,7 +1429,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
       // Llamada real al backend
       this.documentosService.createDocumentoClinico(documentoData).subscribe({
         next: (response) => {
-          console.log('✅ Respuesta del backend (documento creado):', response);
+          console.log('  Respuesta del backend (documento creado):', response);
 
           if (response.success && response.data) {
             // Actualizar datos en el wizard state
@@ -1461,10 +1461,10 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
             // Actualizar UI
             this.isLoading = false;
             this.estadoProceso = 'completado';
-            this.autoGuardadoStatus = '✅ Documento clínico creado exitosamente';
+            this.autoGuardadoStatus = '  Documento clínico creado exitosamente';
 
-            console.log('✅ Documento creado con ID:', response.data.id_documento);
-            console.log('✅ Tipo documento:', this.tipoSeleccionado!.nombre);
+            console.log('  Documento creado con ID:', response.data.id_documento);
+            console.log('  Tipo documento:', this.tipoSeleccionado!.nombre);
 
             // Navegar al siguiente paso después de una breve pausa
             setTimeout(() => {
@@ -1548,9 +1548,9 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
       this.wizardStateService.markStepAsCompleted(WizardStep.DOCUMENTO_CLINICO);
 
       this.isLoading = false;
-      this.autoGuardadoStatus = '✅ Selección guardada exitosamente';
+      this.autoGuardadoStatus = '  Selección guardada exitosamente';
 
-      console.log('✅ Selección guardada:', datosDocumento);
+      console.log('  Selección guardada:', datosDocumento);
 
       // Navegar al siguiente paso
       setTimeout(() => {

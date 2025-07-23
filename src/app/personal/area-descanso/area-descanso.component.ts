@@ -253,7 +253,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
       this.obtenerNuevaFrase(),
       this.obtenerNuevaImagen(),
     ]).then(() => {
-      console.log('✅ Contenido inicial cargado completamente');
+      console.log('  Contenido inicial cargado completamente');
     }).catch(error => {
       console.error('❌ Error cargando contenido inicial:', error);
     });
@@ -567,11 +567,11 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad(): void {
-    console.log('✅ Imagen cargada correctamente');
+    console.log('  Imagen cargada correctamente');
   }
 
   onImageError(): void {
-    console.warn('⚠️ Error cargando imagen, usando fallback');
+    console.warn('  Error cargando imagen, usando fallback');
     this.currentImage = {
       id: 'fallback',
       url: '/assets/images/fallback-zen.jpg',

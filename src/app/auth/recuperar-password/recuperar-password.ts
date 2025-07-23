@@ -67,7 +67,7 @@ export class RecuperarPassword implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Respuesta del servidor:', response);
+          console.log('  Respuesta del servidor:', response);
 
           if (response.success) {
             this.emailEnviado = true;

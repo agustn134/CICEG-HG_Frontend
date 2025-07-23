@@ -139,7 +139,7 @@ export class Dashboard implements OnInit, OnDestroy {
       alertas: of(this.obtenerAlertas())
     }).subscribe({
       next: (datos) => {
-        console.log('✅ Datos del dashboard cargados:', datos);
+        console.log('  Datos del dashboard cargados:', datos);
         this.procesarEstadisticas(datos.estadisticasPacientes);
         this.recentActivities = datos.actividadReciente as ActividadReciente[];
         this.urgentAlerts = datos.alertas as AlertaUrgente[];

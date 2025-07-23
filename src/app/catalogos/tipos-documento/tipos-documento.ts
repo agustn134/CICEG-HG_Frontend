@@ -249,7 +249,7 @@ export class TiposDocumento implements OnInit {
     });
   }
 
-  // ✅ MÉTODO CORREGIDO - Usar Observables en lugar de async/await
+  //   MÉTODO CORREGIDO - Usar Observables en lugar de async/await
   loadTiposDocumento(): void {
     this.isLoading = true;
     this.error = null;
@@ -271,7 +271,7 @@ export class TiposDocumento implements OnInit {
     });
   }
 
-  // ✅ MÉTODO CORREGIDO - Usar Observables en lugar de async/await
+  //   MÉTODO CORREGIDO - Usar Observables en lugar de async/await
   onSubmit(): void {
     if (this.tiposDocumentoForm.invalid) {
       this.markFormGroupTouched();
@@ -325,7 +325,7 @@ export class TiposDocumento implements OnInit {
     this.clearMessages();
   }
 
-  // ✅ MÉTODO CORREGIDO - Usar Observables en lugar de async/await
+  //   MÉTODO CORREGIDO - Usar Observables en lugar de async/await
   deleteTipoDocumento(id: number): void {
     if (!confirm('¿Está seguro de eliminar este tipo de documento?')) {
       return;

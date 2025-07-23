@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import { PersonalMedicoService, MedicoConPacientes, PacienteAtendido } from '../../services/personas/personal-medico'; // ✅ Cambiar ruta
+import { PersonalMedicoService, MedicoConPacientes, PacienteAtendido } from '../../services/personas/personal-medico'; //   Cambiar ruta
 
 @Component({
   selector: 'app-perfil-medico',
@@ -50,7 +50,7 @@ export class PerfilMedico implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.medicoCompleto = response.data || null; // ✅ Cambiar esto
+            this.medicoCompleto = response.data || null; //   Cambiar esto
           } else {
             this.error = response.message || 'Error al cargar el perfil médico';
           }

@@ -191,7 +191,7 @@ export const routes: Routes = [
           { path: 'pacientes-list', component: Pacientes },
           { path: 'personal-medico', component: PersonalMedicoComponent },
 
-          // ✅ RUTA CORREGIDA: Perfil de Paciente
+          //   RUTA CORREGIDA: Perfil de Paciente
           {
             path: 'perfil-paciente/:id',
             component: PerfilPaciente,

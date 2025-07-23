@@ -40,7 +40,7 @@ export class SignosVitalesComponent implements OnInit {
   medicoActual: number | null = null;
   edadPaciente: number = 25; // Por defecto adulto
 
-   // ✅ Inicializar como arrays vacíos
+   //   Inicializar como arrays vacíos
   tiposSignosVitales: { value: TipoSignoVital; label: string; }[] = [];
   periodosGraficas: { value: number; label: string; }[] = [];
 
@@ -53,7 +53,7 @@ export class SignosVitalesComponent implements OnInit {
   this.signosVitalesForm = this.createMainForm();
   this.filtrosForm = this.createFiltersForm();
 
-  // ✅ Ahora el servicio ya está disponible
+  //   Ahora el servicio ya está disponible
   this.tiposSignosVitales = this.signosVitalesService.getTiposSignosVitales();
   this.periodosGraficas = this.signosVitalesService.getPeriodosGraficas();
 }

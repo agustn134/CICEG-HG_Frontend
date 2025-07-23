@@ -165,7 +165,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
         throw new Error(`Tipo de documento no soportado: ${tipoDocumento}`);
     }
 
-    console.log(`✅ PDF ${tipoDocumento} generado exitosamente`);
+    console.log(`  PDF ${tipoDocumento} generado exitosamente`);
 
   } catch (error) {
     console.error(`❌ Error generando PDF ${tipoDocumento}:`, error);
@@ -257,21 +257,21 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
   }
 
   private validarYFormatearDatosPaciente(datosPaciente: any): any {
-    console.log('🔍 Datos recibidos del paciente:', datosPaciente);
+    console.log('  Datos recibidos del paciente:', datosPaciente);
 
     let pacienteInfo = null;
     let expedienteInfo = null;
 
     // 1. Si los datos vienen directamente del wizard (paso persona)
     if (datosPaciente?.persona) {
-      console.log('✅ Datos encontrados en datosPaciente.persona');
+      console.log('  Datos encontrados en datosPaciente.persona');
       pacienteInfo = datosPaciente.persona;
       expedienteInfo = datosPaciente.expediente;
     }
 
     // 2. Si vienen anidados en paciente.persona.persona
     else if (datosPaciente?.paciente?.persona?.persona) {
-      console.log('✅ Datos encontrados en estructura anidada');
+      console.log('  Datos encontrados en estructura anidada');
       pacienteInfo = datosPaciente.paciente.persona.persona;
       expedienteInfo =
         datosPaciente.paciente?.expediente || datosPaciente.expediente;
@@ -279,27 +279,27 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
 
     // 3. Si vienen en paciente.persona
     else if (datosPaciente?.paciente?.persona) {
-      console.log('✅ Datos encontrados en paciente.persona');
+      console.log('  Datos encontrados en paciente.persona');
       pacienteInfo = datosPaciente.paciente.persona;
       expedienteInfo = datosPaciente.expediente;
     }
 
     // 4. Si los datos están directamente en paciente
     else if (datosPaciente?.paciente) {
-      console.log('✅ Datos encontrados directamente en paciente');
+      console.log('  Datos encontrados directamente en paciente');
       pacienteInfo = datosPaciente.paciente;
       expedienteInfo = datosPaciente.expediente;
     }
 
     // 5. Si vienen del formData del wizard directamente
     else if (datosPaciente?.nombre || datosPaciente?.apellido_paterno) {
-      console.log('✅ Datos encontrados directamente en el objeto raíz');
+      console.log('  Datos encontrados directamente en el objeto raíz');
       pacienteInfo = datosPaciente;
       expedienteInfo = datosPaciente.expediente;
     }
 
-    console.log('✅ Datos extraídos del paciente:', pacienteInfo);
-    console.log('✅ Datos del expediente:', expedienteInfo);
+    console.log('  Datos extraídos del paciente:', pacienteInfo);
+    console.log('  Datos del expediente:', expedienteInfo);
 
     return {
       // Información personal
@@ -384,7 +384,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
   }
 
   private obtenerSignosVitalesReales(datos: any): any {
-    console.log('🔍 Buscando signos vitales en los datos recibidos...');
+    console.log('  Buscando signos vitales en los datos recibidos...');
 
     let signosVitales = {
       peso: null as number | null,
@@ -486,7 +486,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004-SSA3-2012...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004-SSA3-2012...');
 
     const validaciones = {
       // 5.2 Datos generales obligatorios
@@ -541,13 +541,13 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
       const faltantes = Object.entries(validaciones)
         .filter(([_, valor]) => !valor)
         .map(([campo, _]) => campo);
       console.warn('📋 Campos faltantes:', faltantes);
     } else {
-      console.log('✅ CUMPLIMIENTO NORMATIVO SATISFACTORIO');
+      console.log('  CUMPLIMIENTO NORMATIVO SATISFACTORIO');
     }
   }
 
@@ -576,7 +576,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
 
   // 🔥 MÉTODO MEJORADO PARA OBTENER DATOS DE PADRES
   private obtenerDatosPadres(datos: any): DatosPadres {
-    console.log('🔍 Buscando datos de padres para Historia Clínica...');
+    console.log('  Buscando datos de padres para Historia Clínica...');
 
     const datosPadres: DatosPadres = {
       nombre_padre: 'No registrado',
@@ -620,7 +620,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
   }
 
   private obtenerGuiaClinicaSeleccionada(datos: any): GuiaClinicaData {
-    console.log('🔍 Buscando guía clínica seleccionada...');
+    console.log('  Buscando guía clínica seleccionada...');
 
     const guiaClinica: GuiaClinicaData = {
       codigo: null,
@@ -632,7 +632,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
 
     // 1. Buscar en datos.guiaClinica (pasada desde el componente)
     if (datos.guiaClinica) {
-      console.log('✅ Encontrada guía clínica en datos.guiaClinica');
+      console.log('  Encontrada guía clínica en datos.guiaClinica');
       guiaClinica.codigo = datos.guiaClinica.codigo || null;
       guiaClinica.nombre = datos.guiaClinica.nombre || null;
       guiaClinica.area = datos.guiaClinica.area || null;
@@ -678,7 +678,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
       };
 
       this.isLoaded = true;
-      console.log('✅ PDFMake cargado correctamente');
+      console.log('  PDFMake cargado correctamente');
     } catch (error) {
       console.error('❌ Error al cargar PDFMake:', error);
       this.isLoaded = true;
@@ -698,6 +698,14 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     // En implementación real se calcularía desde la fecha de ingreso
     return 1;
   }
+
+  private obtenerNumeroExpedientePreferido(expediente: any): string {
+  // Priorizar número administrativo sobre el del sistema
+  return expediente?.numero_expediente_administrativo ||
+         expediente?.numero_expediente ||
+         'Sin número';
+}
+
 
   // 📄 SIGNOS VITALES CON DATOS COMPLETOS
   async generarSignosVitales(datos: any): Promise<void> {
@@ -755,7 +763,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
                   text: [
                     { text: 'Folio:\n', fontSize: 8, bold: true },
                     {
-                      text: `SV-${pacienteCompleto.numero_expediente}\n`,
+                      text: `SV-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}\n`,
                       fontSize: 8,
                     },
                     { text: 'Hora:\n', fontSize: 8, bold: true },
@@ -805,7 +813,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
                   {},
                   {
                     text: `Expediente: ${
-                      pacienteCompleto.numero_expediente
+                      this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
                     } | Fecha de registro: ${fechaActual.toLocaleDateString(
                       'es-MX'
                     )}`,
@@ -1265,7 +1273,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
       )}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
       this.pdfMake.createPdf(documentDefinition).download(nombreArchivo);
-      console.log('✅ PDF de Signos Vitales generado exitosamente');
+      console.log('  PDF de Signos Vitales generado exitosamente');
     } catch (error) {
       console.error('❌ Error al generar PDF de Signos Vitales:', error);
       throw error;
@@ -1359,7 +1367,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     paciente: any
   ): void {
     console.log(
-      '🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 7 - NOTA DE URGENCIAS...'
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 7 - NOTA DE URGENCIAS...'
     );
 
     const validaciones = {
@@ -1401,9 +1409,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ NOTA DE URGENCIAS CUMPLE CON NOM-004 SECCIÓN 7');
+      console.log('  NOTA DE URGENCIAS CUMPLE CON NOM-004 SECCIÓN 7');
     }
   }
 
@@ -1414,7 +1422,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     paciente: any
   ): void {
     console.log(
-      '🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 6.2 - NOTA DE EVOLUCIÓN...'
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 6.2 - NOTA DE EVOLUCIÓN...'
     );
 
     const validaciones = {
@@ -1461,9 +1469,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ NOTA DE EVOLUCIÓN CUMPLE CON NOM-004 SECCIÓN 6.2');
+      console.log('  NOTA DE EVOLUCIÓN CUMPLE CON NOM-004 SECCIÓN 6.2');
     }
   }
 
@@ -1474,7 +1482,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     paciente: any
   ): void {
     console.log(
-      '🔍 VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO INFORMADO...'
+      '  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO INFORMADO...'
     );
 
     const validaciones = {
@@ -1517,9 +1525,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ CONSENTIMIENTO INFORMADO CUMPLE CON ESTÁNDARES LEGALES');
+      console.log('  CONSENTIMIENTO INFORMADO CUMPLE CON ESTÁNDARES LEGALES');
     }
   }
 
@@ -1529,7 +1537,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO HOSPITALIZACIÓN...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO HOSPITALIZACIÓN...');
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1572,9 +1580,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ CONSENTIMIENTO HOSPITALIZACIÓN CUMPLE CON ESTÁNDARES LEGALES');
+      console.log('  CONSENTIMIENTO HOSPITALIZACIÓN CUMPLE CON ESTÁNDARES LEGALES');
     }
   }
 
@@ -1584,7 +1592,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO REFERENCIA...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO REFERENCIA...');
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1632,9 +1640,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ CONSENTIMIENTO REFERENCIA CUMPLE CON ESTÁNDARES ADMINISTRATIVOS');
+      console.log('  CONSENTIMIENTO REFERENCIA CUMPLE CON ESTÁNDARES ADMINISTRATIVOS');
     }
   }
 
@@ -1645,7 +1653,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - CONSENTIMIENTO TRANSFUSIÓN...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - CONSENTIMIENTO TRANSFUSIÓN...');
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1712,9 +1720,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ CONSENTIMIENTO TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
+      console.log('  CONSENTIMIENTO TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
     }
   }
 
@@ -1725,7 +1733,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO TRATAMIENTO MÉDICO...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO TRATAMIENTO MÉDICO...');
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1779,9 +1787,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ CONSENTIMIENTO TRATAMIENTO CUMPLE CON NOM-004');
+      console.log('  CONSENTIMIENTO TRATAMIENTO CUMPLE CON NOM-004');
     }
   }
 
@@ -1791,7 +1799,7 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE ALTA VOLUNTARIA...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE ALTA VOLUNTARIA...');
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1855,9 +1863,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ HOJA DE ALTA VOLUNTARIA CUMPLE CON NOM-004');
+      console.log('  HOJA DE ALTA VOLUNTARIA CUMPLE CON NOM-004');
     }
   }
 
@@ -1868,7 +1876,7 @@ private validarCumplimientoInformeDiario(
   medico: any,
   paciente: any
 ): void {
-  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE INFORME DIARIO...');
+  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE INFORME DIARIO...');
 
   const validaciones = {
     // Datos del paciente (5.9)
@@ -1922,9 +1930,9 @@ private validarCumplimientoInformeDiario(
   );
 
   if (porcentaje < 90) {
-    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
   } else {
-    console.log('✅ HOJA DE INFORME DIARIO CUMPLE CON NOM-004');
+    console.log('  HOJA DE INFORME DIARIO CUMPLE CON NOM-004');
   }
 }
 
@@ -1935,7 +1943,7 @@ private validarCumplimientoNotaEgreso(
   medico: any,
   paciente: any
 ): void {
-  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D12 - NOTA DE EGRESO...');
+  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D12 - NOTA DE EGRESO...');
 
   const validaciones = {
     // D12.1 - Nombre del paciente
@@ -2006,9 +2014,9 @@ private validarCumplimientoNotaEgreso(
  );
 
  if (porcentaje < 90) {
-   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
  } else {
-   console.log('✅ NOTA DE EGRESO CUMPLE CON NOM-004 SECCIÓN D12');
+   console.log('  NOTA DE EGRESO CUMPLE CON NOM-004 SECCIÓN D12');
  }
 }
 
@@ -2018,7 +2026,7 @@ private validarCumplimientoNotaInterconsulta(
   medico: any,
   paciente: any
 ): void {
-  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D7 - NOTA DE INTERCONSULTA...');
+  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D7 - NOTA DE INTERCONSULTA...');
 
   const validaciones = {
     // Datos del paciente (5.9)
@@ -2062,9 +2070,9 @@ private validarCumplimientoNotaInterconsulta(
   );
 
   if (porcentaje < 90) {
-    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
   } else {
-    console.log('✅ NOTA DE INTERCONSULTA CUMPLE CON NOM-004 SECCIÓN D7');
+    console.log('  NOTA DE INTERCONSULTA CUMPLE CON NOM-004 SECCIÓN D7');
   }
 }
 
@@ -2075,7 +2083,7 @@ private validarCumplimientoPrescripcionMedicamentos(
  medico: any,
  paciente: any
 ): void {
- console.log('🔍 VALIDANDO CUMPLIMIENTO PRESCRIPCIÓN DE MEDICAMENTOS...');
+ console.log('  VALIDANDO CUMPLIMIENTO PRESCRIPCIÓN DE MEDICAMENTOS...');
 
  const validaciones = {
    // Datos del paciente
@@ -2124,9 +2132,9 @@ private validarCumplimientoPrescripcionMedicamentos(
  );
 
  if (porcentaje < 90) {
-   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
  } else {
-   console.log('✅ PRESCRIPCIÓN DE MEDICAMENTOS CUMPLE CON ESTÁNDARES MÉDICOS');
+   console.log('  PRESCRIPCIÓN DE MEDICAMENTOS CUMPLE CON ESTÁNDARES MÉDICOS');
  }
 }
 
@@ -2136,7 +2144,7 @@ private validarCumplimientoRegistroTransfusion(
  medico: any,
  paciente: any
 ): void {
- console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - REGISTRO DE TRANSFUSIÓN...');
+ console.log('  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - REGISTRO DE TRANSFUSIÓN...');
 
  const validaciones = {
    // D15.1 - Cantidad, volumen, número de identificación
@@ -2195,9 +2203,9 @@ private validarCumplimientoRegistroTransfusion(
  );
 
  if (porcentaje < 90) {
-   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
  } else {
-   console.log('✅ REGISTRO DE TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
+   console.log('  REGISTRO DE TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
  }
 }
 
@@ -2207,7 +2215,7 @@ private validarCumplimientoNotaPostoperatoria(
   medico: any,
   paciente: any
 ): void {
-  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.8 - NOTA POSTOPERATORIA...');
+  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.8 - NOTA POSTOPERATORIA...');
 
   const validaciones = {
     // 8.8.1 - Diagnóstico preoperatorio
@@ -2294,9 +2302,9 @@ private validarCumplimientoNotaPostoperatoria(
   );
 
   if (porcentaje < 90) {
-    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
   } else {
-    console.log('✅ NOTA POSTOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.8');
+    console.log('  NOTA POSTOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.8');
   }
 }
 
@@ -2306,7 +2314,7 @@ private validarCumplimientoNotaPreoperatoria(
   medico: any,
   paciente: any
 ): void {
-  console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.5 - NOTA PREOPERATORIA...');
+  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.5 - NOTA PREOPERATORIA...');
 
   const validaciones = {
     // 8.5.1 - Fecha de la cirugía
@@ -2364,9 +2372,9 @@ private validarCumplimientoNotaPreoperatoria(
   );
 
   if (porcentaje < 90) {
-    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
   } else {
-    console.log('✅ NOTA PREOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.5');
+    console.log('  NOTA PREOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.5');
   }
 }
 
@@ -2487,7 +2495,7 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 2],
                           },
                           {
-                            text: pacienteCompleto.numero_expediente || 'N/A',
+                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 2],
@@ -3704,7 +3712,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 6,
                       },
                     ],
@@ -3727,7 +3735,7 @@ private validarCumplimientoNotaPreoperatoria(
       pdfDocGenerator.download(nombreArchivo);
 
       console.log(
-        '✅ PDF de Historia Clínica Pediátrica NOM-004 completo generado exitosamente'
+        '  PDF de Historia Clínica Pediátrica NOM-004 completo generado exitosamente'
       );
       console.log(`📄 Archivo: ${nombreArchivo}`);
       console.log('📋 Cumplimiento NOM-004-SSA3-2012: 100%');
@@ -3760,10 +3768,10 @@ private validarCumplimientoNotaPreoperatoria(
 
       const documentDefinition = {
         pageSize: 'LETTER',
-        pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES REDUCIDOS PARA APROVECHAR MEJOR LA HOJA
+        pageMargins: [20, 70, 20, 50], //   MÁRGENES REDUCIDOS PARA APROVECHAR MEJOR LA HOJA
 
         header: {
-          margin: [20, 10, 20, 10], // ✅ HEADER MÁS COMPACTO
+          margin: [20, 10, 20, 10], //   HEADER MÁS COMPACTO
           table: {
             widths: ['100%'],
             body: [
@@ -3793,7 +3801,7 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                     fillColor: '#f5f5f5',
                     alignment: 'center',
-                    rowSpan: 4, // ✅ CORREGIDO: 4 filas exactas
+                    rowSpan: 4, //   CORREGIDO: 4 filas exactas
                   },
                   {
                     table: {
@@ -3845,7 +3853,7 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: pacienteCompleto.numero_expediente || 'N/A',
+                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 1],
@@ -3859,7 +3867,7 @@ private validarCumplimientoNotaPreoperatoria(
                           },
                           {
                             text: `NU-${
-                              pacienteCompleto.numero_expediente
+                              this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
                             }-${fechaActual.getFullYear()}`,
                             fontSize: 6,
                             alignment: 'center',
@@ -4041,7 +4049,7 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                     fillColor: '#f5f5f5',
                     alignment: 'center',
-                    rowSpan: 8, // ✅ CORREGIDO: 8 filas exactas
+                    rowSpan: 8, //   CORREGIDO: 8 filas exactas
                   },
                   {
                     text: 'MOTIVO DE LA ATENCIÓN (7.1.3)',
@@ -4219,7 +4227,7 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                     fillColor: '#f5f5f5',
                     alignment: 'center',
-                    rowSpan: 2, // ✅ CORREGIDO: 2 filas exactas
+                    rowSpan: 2, //   CORREGIDO: 2 filas exactas
                   },
                   {
                     text: 'EXPLORACIÓN FÍSICA DIRIGIDA',
@@ -4263,7 +4271,7 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                     fillColor: '#f5f5f5',
                     alignment: 'center',
-                    rowSpan: 4, // ✅ CORREGIDO: 4 filas exactas
+                    rowSpan: 4, //   CORREGIDO: 4 filas exactas
                   },
                   {
                     text: 'RESULTADOS DE ESTUDIOS DE SERVICIOS AUXILIARES DE DIAGNÓSTICO (7.1.5)',
@@ -4328,7 +4336,7 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                     fillColor: '#f5f5f5',
                     alignment: 'center',
-                    rowSpan: 4, // ✅ CORREGIDO: 4 filas exactas
+                    rowSpan: 4, //   CORREGIDO: 4 filas exactas
                   },
                   {
                     text: 'TRATAMIENTO ADMINISTRADO (7.1.7)',
@@ -4551,7 +4559,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 6,
                       },
                     ],
@@ -4573,7 +4581,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Nota de Urgencias NOM-004 generado exitosamente');
+      console.log('  PDF de Nota de Urgencias NOM-004 generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA URGENCIAS
@@ -4605,7 +4613,7 @@ private validarCumplimientoNotaPreoperatoria(
 
       const documentDefinition = {
         pageSize: 'LETTER',
-        pageMargins: [20, 70, 20, 50], // ✅ MÁRGENES OPTIMIZADOS
+        pageMargins: [20, 70, 20, 50], //   MÁRGENES OPTIMIZADOS
 
         header: {
           margin: [20, 10, 20, 10],
@@ -4696,7 +4704,7 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: pacienteCompleto.numero_expediente || 'N/A',
+                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 1],
@@ -4717,7 +4725,7 @@ private validarCumplimientoNotaPreoperatoria(
                           },
                           {
                             text: `NE-${
-                              pacienteCompleto.numero_expediente
+                              this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
                             }-${fechaActual.getFullYear()}`,
                             fontSize: 6,
                             alignment: 'center',
@@ -5509,7 +5517,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 6,
                       },
                     ],
@@ -5531,7 +5539,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Nota de Evolución NOM-004 generado exitosamente');
+      console.log('  PDF de Nota de Evolución NOM-004 generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EVOLUCIÓN
@@ -5645,7 +5653,7 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'Expediente:', fontSize: 9, bold: true },
                   {
-                    text: pacienteCompleto.numero_expediente,
+                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
                     fontSize: 9,
                     decoration: 'underline',
                   },
@@ -6015,7 +6023,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -6038,7 +6046,7 @@ private validarCumplimientoNotaPreoperatoria(
       pdfDocGenerator.download(nombreArchivo);
 
       console.log(
-        '✅ PDF de Consentimiento Informado para Procedimientos generado exitosamente'
+        '  PDF de Consentimiento Informado para Procedimientos generado exitosamente'
       );
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
@@ -6095,7 +6103,7 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: 'Sexo:', fontSize: 9, bold: true },
                   { text: pacienteCompleto.sexo, fontSize: 9, decoration: 'underline' },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 9, decoration: 'underline' },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
                 ],
                 [
                   { text: 'F. Nacimiento:', fontSize: 8, bold: true },
@@ -6419,7 +6427,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -6441,7 +6449,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Consentimiento Informado para Hospitalización generado exitosamente');
+      console.log('  PDF de Consentimiento Informado para Hospitalización generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -6566,7 +6574,7 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: 'Nombre del (la) paciente:', fontSize: 10, bold: true },
                   { text: pacienteCompleto.nombre_completo, fontSize: 10, decoration: 'underline' },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 10, decoration: 'underline' },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 10, decoration: 'underline' },
                 ],
               ],
             },
@@ -6815,7 +6823,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -6837,7 +6845,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Consentimiento Informado para Referencia de Pacientes generado exitosamente');
+      console.log('  PDF de Consentimiento Informado para Referencia de Pacientes generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -6917,7 +6925,7 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: 'F. Nacimiento:', fontSize: 9, bold: true },
                   { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 9, decoration: 'underline' },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 9, decoration: 'underline' },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
                 ],
                 [
                   { text: 'Cama:', fontSize: 9, bold: true },
@@ -7268,7 +7276,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -7290,7 +7298,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Consentimiento Informado para Transfusión Sanguínea generado exitosamente');
+      console.log('  PDF de Consentimiento Informado para Transfusión Sanguínea generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -7436,7 +7444,7 @@ private validarCumplimientoNotaPreoperatoria(
                       bold: true,
                     },
                     {
-                      text: pacienteCompleto.numero_expediente,
+                      text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
                       fontSize: 9,
                     },
                     {
@@ -7784,7 +7792,7 @@ private validarCumplimientoNotaPreoperatoria(
                       fontSize: 8,
                     },
                     {
-                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                       fontSize: 7,
                     },
                   ],
@@ -7808,7 +7816,7 @@ private validarCumplimientoNotaPreoperatoria(
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento Informado para Tratamiento Médico generado exitosamente');
+    console.log('  PDF de Consentimiento Informado para Tratamiento Médico generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
 
     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -7876,7 +7884,7 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: 'Sexo:', fontSize: 9, bold: true },
                   { text: pacienteCompleto.sexo, fontSize: 9, decoration: 'underline' },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 9, decoration: 'underline' },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
                 ],
                 [
                   { text: 'F. Nacimiento:', fontSize: 8, bold: true },
@@ -8259,7 +8267,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -8281,7 +8289,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Hoja de Alta Voluntaria generado exitosamente');
+      console.log('  PDF de Hoja de Alta Voluntaria generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -8341,7 +8349,7 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: 'Nombre del paciente:', fontSize: 9, bold: true },
                   { text: pacienteCompleto.nombre_completo, fontSize: 9, decoration: 'underline' },
                   { text: 'No. de expediente:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 9, decoration: 'underline' },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
                 ],
                 [
                   { text: 'Fecha de Nacimiento:', fontSize: 9, bold: true },
@@ -8564,7 +8572,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -8586,7 +8594,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Hoja de Informe Diario generado exitosamente');
+      console.log('  PDF de Hoja de Informe Diario generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -8642,7 +8650,7 @@ private validarCumplimientoNotaPreoperatoria(
                     border: [false, false, false, true],
                   },
                   {
-                    text: pacienteCompleto.numero_expediente,
+                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
                     fontSize: 9,
                     border: [false, false, false, true],
                   },
@@ -8957,7 +8965,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -8979,7 +8987,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+      console.log('  PDF de Hoja Frontal de Expediente generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
       console.log('ℹ️ Nota: Este es un formato básico que probablemente se llene a mano');
 
@@ -9079,7 +9087,7 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   { text: 'NÚMERO DE EXPEDIENTE:', fontSize: 8, bold: true },
-                  { text: pacienteCompleto.numero_expediente, fontSize: 8 },
+                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 8 },
                   { text: 'No CAUSAS:', fontSize: 8, bold: true },
                   { text: laboratorioData.numero_causas || '', fontSize: 8 },
                 ],
@@ -9480,7 +9488,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 6,
                       },
                     ],
@@ -9502,7 +9510,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Solicitud de Laboratorio generado exitosamente');
+      console.log('  PDF de Solicitud de Laboratorio generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
     } catch (error) {
@@ -9571,7 +9579,7 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
                   {
-                    text: pacienteCompleto.numero_expediente,
+                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -9894,7 +9902,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -9916,7 +9924,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Solicitud de Imagenología generado exitosamente');
+      console.log('  PDF de Solicitud de Imagenología generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
     } catch (error) {
       console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
@@ -10067,7 +10075,7 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
                   {
-                    text: pacienteCompleto.numero_expediente,
+                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -10436,7 +10444,7 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                         fontSize: 7,
                       },
                     ],
@@ -10458,7 +10466,7 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+      console.log('  PDF de Solicitud de Cultivo generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
     } catch (error) {
       console.error('❌ Error al generar PDF de Solicitud de Cultivo:', error);
@@ -10569,7 +10577,7 @@ async generarNotaEgreso(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -10582,7 +10590,7 @@ async generarNotaEgreso(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: `EG-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          text: `EG-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
                           fontSize: 6,
                           alignment: 'center',
                           margin: [0, 1],
@@ -11309,7 +11317,7 @@ async generarNotaEgreso(datos: any): Promise<void> {
                       fontSize: 7,
                     },
                     {
-                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                       fontSize: 6,
                     },
                   ],
@@ -11331,7 +11339,7 @@ async generarNotaEgreso(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Egreso NOM-004 generado exitosamente');
+    console.log('  PDF de Nota de Egreso NOM-004 generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
 
     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EGRESO
@@ -11445,7 +11453,7 @@ async generarNotaInterconsulta(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -11458,7 +11466,7 @@ async generarNotaInterconsulta(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: `IC-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          text: `IC-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
                           fontSize: 6,
                           alignment: 'center',
                           margin: [0, 1],
@@ -12134,7 +12142,7 @@ async generarNotaInterconsulta(datos: any): Promise<void> {
                       fontSize: 7,
                     },
                     {
-                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                       fontSize: 6,
                     },
                   ],
@@ -12156,7 +12164,7 @@ async generarNotaInterconsulta(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Interconsulta NOM-004 generado exitosamente');
+    console.log('  PDF de Nota de Interconsulta NOM-004 generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
 
     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -12221,7 +12229,7 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
               {
                 text: [
                   { text: 'Folio:\n', fontSize: 8, bold: true },
-                  { text: `PM-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}\n`, fontSize: 7 },
+                  { text: `PM-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}\n`, fontSize: 7 },
                   { text: 'Fecha:\n', fontSize: 8, bold: true },
                   { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
                 ],
@@ -12260,7 +12268,7 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
                         { text: 'Nombre:', fontSize: 8, bold: true },
                         { text: pacienteCompleto.nombre_completo, fontSize: 8 },
                         { text: 'Expediente:', fontSize: 8, bold: true },
-                        { text: pacienteCompleto.numero_expediente, fontSize: 8, bold: true },
+                        { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 8, bold: true },
                       ],
                       [
                         { text: 'Edad:', fontSize: 8, bold: true },
@@ -12578,7 +12586,7 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
             body: [
               [
                 {
-                  text: '⚠️ ADVERTENCIAS IMPORTANTES',
+                  text: '  ADVERTENCIAS IMPORTANTES',
                   fontSize: 8,
                   bold: true,
                   fillColor: '#fef3c7',
@@ -12634,7 +12642,7 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
                       fontSize: 7,
                     },
                     {
-                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                       fontSize: 6,
                     },
                   ],
@@ -12656,7 +12664,7 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+    console.log('  PDF de Prescripción de Medicamentos generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
 
     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -12779,7 +12787,7 @@ async generarRegistroTransfusion(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -12792,7 +12800,7 @@ async generarRegistroTransfusion(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: `RT-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          text: `RT-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
                           fontSize: 6,
                           alignment: 'center',
                           margin: [0, 1],
@@ -13649,7 +13657,7 @@ async generarRegistroTransfusion(datos: any): Promise<void> {
                      fontSize: 7,
                    },
                    {
-                     text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                      fontSize: 6,
                    },
                  ],
@@ -13671,7 +13679,7 @@ async generarRegistroTransfusion(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Registro de Transfusión NOM-004 generado exitosamente');
+   console.log('  PDF de Registro de Transfusión NOM-004 generado exitosamente');
    console.log(`📄 Archivo: ${nombreArchivo}`);
 
    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -13787,7 +13795,7 @@ async generarNotaPreoperatoria(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -13800,7 +13808,7 @@ async generarNotaPreoperatoria(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: `NPO-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          text: `NPO-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
                           fontSize: 6,
                           alignment: 'center',
                           margin: [0, 1],
@@ -14488,7 +14496,7 @@ async generarNotaPreoperatoria(datos: any): Promise<void> {
                       fontSize: 7,
                     },
                     {
-                      text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                       fontSize: 6,
                     },
                   ],
@@ -14510,7 +14518,7 @@ async generarNotaPreoperatoria(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota Preoperatoria NOM-004 generado exitosamente');
+    console.log('  PDF de Nota Preoperatoria NOM-004 generado exitosamente');
     console.log(`📄 Archivo: ${nombreArchivo}`);
 
     // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -14626,7 +14634,7 @@ async generarNotaPostoperatoria(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                         text: pacienteCompleto.numero_expediente || 'N/A',
+                         text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                          fontSize: 7,
                          alignment: 'center',
                          margin: [0, 1],
@@ -15511,7 +15519,7 @@ async generarNotaPostoperatoria(datos: any): Promise<void> {
                      fontSize: 7,
                    },
                    {
-                     text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                      fontSize: 6,
                    },
                  ],
@@ -15533,7 +15541,7 @@ async generarNotaPostoperatoria(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Nota Postoperatoria NOM-004 generado exitosamente');
+   console.log('  PDF de Nota Postoperatoria NOM-004 generado exitosamente');
    console.log(`📄 Archivo: ${nombreArchivo}`);
 
    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -15649,7 +15657,7 @@ async generarNotaPreanestesica(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -16482,7 +16490,7 @@ async generarNotaPreanestesica(datos: any): Promise<void> {
                     fontSize: 7,
                   },
                   {
-                    text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                     fontSize: 6,
                   },
                 ],
@@ -16504,7 +16512,7 @@ async generarNotaPreanestesica(datos: any): Promise<void> {
   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
   pdfDocGenerator.download(nombreArchivo);
 
-  console.log('✅ PDF de Nota Preanestésica NOM-004 generado exitosamente');
+  console.log('  PDF de Nota Preanestésica NOM-004 generado exitosamente');
   console.log(`📄 Archivo: ${nombreArchivo}`);
 
 } catch (error) {
@@ -16561,7 +16569,7 @@ try {
               { text: 'Paciente:', fontSize: 9, bold: true },
               { text: pacienteCompleto.nombre_completo, fontSize: 9 },
               { text: 'Expediente:', fontSize: 9, bold: true },
-              { text: pacienteCompleto.numero_expediente, fontSize: 9, bold: true },
+              { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, bold: true },
             ],
             [
               { text: 'Procedimiento:', fontSize: 9, bold: true },
@@ -16706,7 +16714,7 @@ try {
   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
   pdfDocGenerator.download(nombreArchivo);
 
-  console.log('✅ PDF de Hoja de Quirófano generado exitosamente');
+  console.log('  PDF de Hoja de Quirófano generado exitosamente');
 
 } catch (error) {
   console.error('❌ Error al generar PDF de Hoja de Quirófano:', error);
@@ -16819,7 +16827,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: pacienteCompleto.numero_expediente || 'N/A',
+                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
                           fontSize: 7,
                           alignment: 'center',
                           margin: [0, 1],
@@ -16832,7 +16840,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
                           margin: [0, 1],
                         },
                         {
-                          text: `NPA-${pacienteCompleto.numero_expediente}-${fechaActual.getFullYear()}`,
+                          text: `NPA-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
                           fontSize: 6,
                           alignment: 'center',
                           margin: [0, 1],
@@ -17731,7 +17739,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
                      fontSize: 7,
                    },
                    {
-                     text: `Exp: ${pacienteCompleto.numero_expediente}`,
+                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
                      fontSize: 6,
                    },
                  ],
@@ -17753,7 +17761,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Nota Postanestésica NOM-004 generado exitosamente');
+   console.log('  PDF de Nota Postanestésica NOM-004 generado exitosamente');
    console.log(`📄 Archivo: ${nombreArchivo}`);
 
    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
@@ -17782,7 +17790,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
     const nacimiento = new Date(fechaNacimiento);
     const edad = hoy.getFullYear() - nacimiento.getFullYear();
     const meses = hoy.getMonth() - nacimiento.getMonth();
-    
+
     if (meses < 0 || (meses === 0 && hoy.getDate() < nacimiento.getDate())) {
       return `${edad - 1} años`;
     }
@@ -17927,7 +17935,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
             margin: [0, 0, 0, 20]
           }
         ],
-        
+
         styles: {
           hospitalHeader: {
             fontSize: 14,
@@ -17962,7 +17970,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
       };
 
       this.pdfMake.createPdf(docDefinition).open();
-      console.log(`✅ ${tipoDocumento} generado exitosamente como documento temporal`);
+      console.log(`  ${tipoDocumento} generado exitosamente como documento temporal`);
 
     } catch (error) {
       console.error(`❌ Error al generar ${tipoDocumento}:`, error);
@@ -17987,7 +17995,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...');
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...');
 
     const validaciones = {
       // D11.12 - Medicamentos utilizados
@@ -18046,9 +18054,9 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
     );
 
     if (porcentaje < 90) {
-      console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 90%');
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('✅ NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
+      console.log('  NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
     }
   }
 }

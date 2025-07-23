@@ -30,7 +30,7 @@ import { ServiciosService } from '../../services/catalogos/servicios';
 import { TiposDocumentoService } from '../../services/catalogos/tipos-documento';
 import { PersonalMedicoService } from '../../services/personas/personal-medico';
 import { Paciente } from '../../models/paciente.model';
-import { Expediente } from '../../models/expediente.model';
+import { Expediente, UpdateExpedienteDto } from '../../models/expediente.model';
 import { DocumentoClinico } from '../../models/documento-clinico.model';
 import {
   SignosVitales,
@@ -256,6 +256,11 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
   documentosExistentes: { [key: string]: any } = {};
   formularios: { [key: string]: FormGroup } = {};
+
+
+  mostrarModalEditarExpediente = false;
+numeroAdministrativoTemporal = '';
+
 
   constructor(
     private authService: AuthService,
@@ -617,6 +622,29 @@ getDocumentosExistentesArray(): any[] {
   }));
 }
 
+
+abrirModalEditarExpediente(): void {
+  this.numeroAdministrativoTemporal =
+    this.pacienteCompleto?.expediente?.numero_expediente_administrativo || '';
+  this.mostrarModalEditarExpediente = true;
+}
+
+cancelarEditarExpediente(): void {
+  this.mostrarModalEditarExpediente = false;
+  this.numeroAdministrativoTemporal = '';
+}
+
+async guardarNumeroAdministrativo(): Promise<void> {
+  try {
+    await this.actualizarNumeroAdministrativo(this.numeroAdministrativoTemporal);
+    this.mostrarModalEditarExpediente = false;
+    this.numeroAdministrativoTemporal = '';
+  } catch (error) {
+    // El error ya se maneja en actualizarNumeroAdministrativo
+  }
+}
+
+
 getTituloDocumento(documento: any): string {
   const titulos: { [key: string]: string } = {
     'historiaClinica': this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
@@ -894,7 +922,104 @@ get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
     }
   }
 
-  // 🔥 MAPEAR TIPO DE DOCUMENTO DEL BACKEND AL FRONTEND
+
+  obtenerNumeroExpedientePreferido(): string {
+  if (!this.pacienteCompleto?.expediente) return 'Sin expediente';
+
+  const expediente = this.pacienteCompleto.expediente;
+  return expediente.numero_expediente_administrativo ||
+         expediente.numero_expediente ||
+         'Sin número';
+}
+
+// - MÉTODO PARA ACTUALIZAR NÚMERO ADMINISTRATIVO
+async actualizarNumeroAdministrativo(nuevoNumero: string): Promise<void> {
+  if (!this.pacienteCompleto?.expediente?.id_expediente) {
+    throw new Error('No hay expediente válido');
+  }
+
+  try {
+    //   DEBUG COMPLETO
+    const usuario = this.authService.getCurrentUser();
+    console.log('  Usuario completo del AuthService:', usuario);
+    console.log('  Propiedades del usuario:', Object.keys(usuario || {}));
+    console.log('  ID usuario:', usuario?.id);
+    console.log('  ID referencia:', usuario?.id_referencia);
+    console.log('  Tipo usuario:', usuario?.tipo_usuario);
+    console.log('  medicoActual (this.medicoActual):', this.medicoActual);
+
+    // 🔧 Determinar qué ID usar
+    let medicoId: number | undefined;
+
+    if (usuario?.tipo_usuario === 'medico') {
+      // Intentar usar id_referencia primero, luego id como fallback
+      medicoId = usuario.id_referencia || usuario.id;
+      console.log('- Usando ID del usuario médico:', medicoId);
+    } else if (this.medicoActual) {
+      medicoId = this.medicoActual;
+      console.log('- Usando medicoActual:', medicoId);
+    }
+
+    const updateData: any = {
+      numero_expediente_administrativo: nuevoNumero.trim() || undefined
+    };
+
+    // Solo agregar ID del médico si lo tenemos
+    if (medicoId) {
+      updateData.id_medico_modificador = medicoId;
+      console.log('- Enviando con id_medico_modificador:', medicoId);
+    } else {
+      console.warn('  No se encontró ID de médico válido');
+    }
+
+    console.log('📤 Datos finales a enviar:', updateData);
+
+    const response = await firstValueFrom(
+      this.expedientesService.update(
+        this.pacienteCompleto.expediente.id_expediente,
+        updateData
+      )
+    );
+
+    // Actualizar el objeto local
+    if (this.pacienteCompleto.expediente) {
+      this.pacienteCompleto.expediente.numero_expediente_administrativo =
+        nuevoNumero.trim() || undefined;
+    }
+
+    this.success = 'Número de expediente administrativo actualizado correctamente';
+    console.log('- Número administrativo actualizado:', nuevoNumero);
+
+  } catch (error) {
+    console.error('❌ Error al actualizar número administrativo:', error);
+    this.error = 'Error al actualizar el número administrativo';
+    throw error;
+  }
+}
+
+// 🔧 AGREGAR ESTE MÉTODO SI NO EXISTE
+private obtenerIdMedicoActual(): number | undefined {
+  // Intentar obtener del servicio de autenticación
+  const usuario = this.authService.getCurrentUser();
+  console.log('  Verificando usuario en obtenerIdMedicoActual:', usuario);
+
+  if (usuario?.tipo_usuario === 'medico' && usuario?.id_referencia) {
+    console.log('- Médico obtenido del usuario autenticado:', usuario.id_referencia);
+    return usuario.id_referencia;
+  }
+
+  // Fallback: usar this.medicoActual si está disponible
+  if (this.medicoActual) {
+    console.log('- Médico obtenido de medicoActual:', this.medicoActual);
+    return this.medicoActual;
+  }
+
+  console.warn('  No se pudo obtener ID del médico');
+  return undefined;
+}
+
+
+  // - MAPEAR TIPO DE DOCUMENTO DEL BACKEND AL FRONTEND
   private mapearTipoDocumento(documento: any): string | null {
     // Mapear según el nombre del tipo de documento
     const mapeo: { [key: string]: string } = {
@@ -1042,7 +1167,7 @@ get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
     this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
 
     console.log(
-      '✅ Todos los formularios han sido inicializados correctamente.'
+      '- Todos los formularios han sido inicializados correctamente.'
     );
   }
 
@@ -1154,7 +1279,7 @@ get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
       }
 
       if (response.success) {
-        console.log(`✅ ${tipoDocumento} guardado exitosamente`);
+        console.log(`- ${tipoDocumento} guardado exitosamente`);
         await this.cargarDocumentosDelPaciente();
         this.formularioActivo = null;
       }
@@ -1168,7 +1293,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     }
   }
 
-  // 1. ✅ Preparar Signos Vitales
+  // 1. - Preparar Signos Vitales
   private prepararDatosSignosVitales(): any {
     return {
       ...this.signosVitalesForm.value,
@@ -1179,7 +1304,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 2. ✅ Preparar Historia Clínica
+  // 2. - Preparar Historia Clínica
   private prepararDatosHistoriaClinica(): any {
     return {
       ...this.historiaClinicaForm.value,
@@ -1190,7 +1315,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 3. ✅ Preparar Nota de Urgencias
+  // 3. - Preparar Nota de Urgencias
   private prepararDatosNotaUrgencias(): any {
     return {
       ...this.notaUrgenciasForm.value,
@@ -1201,7 +1326,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 4. ✅ Preparar Nota de Evolución
+  // 4. - Preparar Nota de Evolución
   private prepararDatosNotaEvolucion(): any {
     return {
       ...this.notaEvolucionForm.value,
@@ -1212,7 +1337,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 5. ✅ Preparar Nota Preoperatoria
+  // 5. - Preparar Nota Preoperatoria
   private prepararDatosNotaPreoperatoria(): any {
     return {
       ...this.notaPreoperatoriaForm.value,
@@ -1223,7 +1348,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 6. ✅ Preparar Nota Preanestésica
+  // 6. - Preparar Nota Preanestésica
   private prepararDatosNotaPreanestesica(): any {
     return {
       ...this.notaPreanestesicaForm.value,
@@ -1234,7 +1359,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 7. ✅ Preparar Nota Postoperatoria
+  // 7. - Preparar Nota Postoperatoria
   private prepararDatosNotaPostoperatoria(): any {
     return {
       ...this.notaPostoperatoriaForm.value,
@@ -1245,7 +1370,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 8. ✅ Preparar Nota Postanestésica
+  // 8. - Preparar Nota Postanestésica
   private prepararDatosNotaPostanestesica(): any {
     return {
       ...this.notaPostanestesicaForm.value,
@@ -1256,7 +1381,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 9. ✅ Preparar Nota de Interconsulta
+  // 9. - Preparar Nota de Interconsulta
   private prepararDatosNotaInterconsulta(): any {
     return {
       ...this.notaInterconsultaForm.value,
@@ -1267,7 +1392,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 10. ✅ Preparar Consentimiento Informado
+  // 10. - Preparar Consentimiento Informado
   private prepararDatosConsentimiento(): any {
     return {
       ...this.consentimientoForm.value,
@@ -1278,7 +1403,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 11. ✅ Preparar Solicitud de Estudio
+  // 11. - Preparar Solicitud de Estudio
   private prepararDatosSolicitudEstudio(): any {
     return {
       ...this.solicitudEstudioForm.value,
@@ -1289,7 +1414,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 12. ✅ Preparar Referencia o Traslado
+  // 12. - Preparar Referencia o Traslado
   private prepararDatosReferencia(): any {
     return {
       ...this.referenciaForm.value,
@@ -1300,7 +1425,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 13. ✅ Preparar Prescripción de Medicamentos
+  // 13. - Preparar Prescripción de Medicamentos
   private prepararDatosPrescripcion(): any {
     return {
       ...this.prescripcionForm.value,
@@ -1311,7 +1436,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 14. ✅ Preparar Control de Crecimiento (pediatría)
+  // 14. - Preparar Control de Crecimiento (pediatría)
   private prepararDatosControlCrecimiento(): any {
     return {
       ...this.controlCrecimientoForm.value,
@@ -1322,7 +1447,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-  // 15. ✅ Preparar Esquema de Vacunación
+  // 15. - Preparar Esquema de Vacunación
   private prepararDatosEsquemaVacunacion(): any {
     return {
       ...this.esquemaVacunacionForm.value,
@@ -1402,11 +1527,11 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   debugPacienteCompleto(): void {
-    console.log('🔍 DEBUG pacienteCompleto completo:', this.pacienteCompleto);
-    console.log('🔍 DEBUG persona:', this.pacienteCompleto?.persona);
-    console.log('🔍 DEBUG paciente:', this.pacienteCompleto?.paciente);
+    console.log('  DEBUG pacienteCompleto completo:', this.pacienteCompleto);
+    console.log('  DEBUG persona:', this.pacienteCompleto?.persona);
+    console.log('  DEBUG paciente:', this.pacienteCompleto?.paciente);
     if (this.pacienteCompleto?.persona) {
-      console.log('✅ Persona existe');
+      console.log('- Persona existe');
       console.log('📝 Nombre:', this.pacienteCompleto.persona.nombre);
       console.log(
         'Apellido paterno:',
@@ -1472,7 +1597,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
     // Paso 5: Iniciar autoguardado (una sola vez)
     this.iniciarAutoguardado();
 
-    // ✅ Opcional: Debug (solo en desarrollo)
+    // - Opcional: Debug (solo en desarrollo)
     setTimeout(() => {
       this.debugPacienteCompleto();
     }, 2000);
@@ -2041,7 +2166,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
           this.construirPacienteCompleto(data.paciente);
           this.procesarCatalogos(data.catalogos);
           this.isLoading = false;
-          console.log('✅ Componente inicializado correctamente');
+          console.log('- Componente inicializado correctamente');
           console.log('🏥 Datos del paciente:', this.pacienteCompleto);
           console.log('📋 Catálogos cargados:', data.catalogos);
         },
@@ -2473,7 +2598,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
       }
 
       localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
-    console.log('✅ Formulario completado:', this.formularioActivo);
+    console.log('- Formulario completado:', this.formularioActivo);
     this.cargarDatosPaciente().subscribe((data) => {
       this.construirPacienteCompleto(data);
     });
@@ -2502,17 +2627,74 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   private async guardarConsentimiento(): Promise<void> {
+    console.log('🔄 Guardando consentimiento informado...');
+    
     if (!this.consentimientoForm.valid) {
+      console.error('❌ Formulario de consentimiento informado inválido');
+      console.log('🔍 Errores del formulario:', this.consentimientoForm.errors);
       throw new Error('Formulario de consentimiento informado inválido');
     }
-    const payload = {
-      ...this.consentimientoForm.value,
-      id_paciente: this.pacienteId,
-      id_personal_medico: this.medicoActual,
-    };
-    await firstValueFrom(
-      this.consentimientosService.createConsentimiento(payload)
+
+    // ✅ PASO 1: Buscar el tipo de documento de consentimiento informado
+    const tipoConsentimiento = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Consentimiento Informado' || 
+             t.nombre === 'Consentimientos Informados' ||
+             t.nombre.toLowerCase().includes('consentimiento')
     );
+    
+    if (!tipoConsentimiento) {
+      console.error('❌ Tipo de documento de consentimiento no encontrado');
+      console.log('🔍 Tipos disponibles:', this.tiposDocumentosDisponibles.map(t => t.nombre));
+      throw new Error('Tipo de documento de consentimiento informado no encontrado');
+    }
+
+    console.log('✅ Tipo de documento encontrado:', tipoConsentimiento);
+
+    // ✅ PASO 2: Crear el documento específico
+    const documentoConsentimiento = await this.crearDocumentoEspecifico(
+      tipoConsentimiento.id_tipo_documento
+    );
+
+    console.log('✅ Documento específico creado:', documentoConsentimiento);
+
+    // ✅ PASO 3: Crear el consentimiento informado con el id_documento
+    const consentimientoData = {
+      id_documento: documentoConsentimiento.id_documento,
+      tipo_consentimiento: this.consentimientoForm.value.tipo_consentimiento || 'General',
+      procedimiento_autorizado: this.consentimientoForm.value.procedimiento_autorizado || '',
+      riesgos_explicados: this.consentimientoForm.value.riesgos_explicados || '',
+      alternativas_explicadas: this.consentimientoForm.value.alternativas_explicadas || '',
+      autorizacion_procedimientos: this.consentimientoForm.value.autorizacion_procedimientos || false,
+      autorizacion_anestesia: this.consentimientoForm.value.autorizacion_anestesia || false,
+      firma_paciente: this.consentimientoForm.value.firma_paciente || false,
+      firma_responsable: this.consentimientoForm.value.firma_responsable || false,
+      nombre_responsable: this.consentimientoForm.value.nombre_responsable || '',
+      parentesco_responsable: this.consentimientoForm.value.parentesco_responsable || '',
+      testigos: this.consentimientoForm.value.testigos || [],
+      fecha_consentimiento: this.consentimientoForm.value.fecha_consentimiento || new Date().toISOString(),
+    };
+
+    console.log('🚀 Datos del consentimiento a enviar:', consentimientoData);
+    console.log('🔍 Campos verificados:');
+    console.log('  - id_documento:', consentimientoData.id_documento);
+    console.log('  - tipo_consentimiento:', consentimientoData.tipo_consentimiento);
+    console.log('  - procedimiento_autorizado:', consentimientoData.procedimiento_autorizado);
+    console.log('  - riesgos_explicados:', consentimientoData.riesgos_explicados);
+
+    try {
+      const response = await firstValueFrom(
+        this.consentimientosService.createConsentimiento(consentimientoData)
+      );
+      console.log('✅ Consentimiento informado guardado exitosamente:', response);
+    } catch (error: any) {
+      console.error('❌ Error al guardar consentimiento informado:', error);
+      console.error('📋 Detalles del error:', {
+        status: error?.status,
+        message: error?.message,
+        error: error?.error
+      });
+      throw error;
+    }
   }
 
   private async guardarNotaPreoperatoria(): Promise<void> {
@@ -2594,7 +2776,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   private avanzarAlSiguientePaso(): void {
-    console.log(`✅ Formulario ${this.formularioActivo} completado`);
+    console.log(`- Formulario ${this.formularioActivo} completado`);
   }
   private getTituloFormulario(formulario: string): string {
     const titulos: { [key: string]: string } = {
@@ -2712,13 +2894,63 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   private cargarResumenGeneral(): void {
+    // Obtener documentos reales ordenados por fecha
+    const documentosReales = this.pacienteCompleto?.documentos || [];
+    const documentosRecientes = documentosReales
+      .sort((a: any, b: any) => {
+        const fechaA = new Date(a.fecha_elaboracion || a.created_at || 0);
+        const fechaB = new Date(b.fecha_elaboracion || b.created_at || 0);
+        return fechaB.getTime() - fechaA.getTime();
+      })
+      .slice(0, 5);
+
+    // Obtener signos vitales ordenados por fecha
+    const signosRecientes = this.signosVitalesDisponibles
+      .sort((a: any, b: any) => {
+        const fechaA = new Date(a.fecha_toma || a.created_at || 0);
+        const fechaB = new Date(b.fecha_toma || b.created_at || 0);
+        return fechaB.getTime() - fechaA.getTime();
+      })
+      .slice(0, 5);
+
     this.resumenGeneral = {
       alertasMedicas: this.identificarAlertasMedicas(),
       ultimoInternamiento: this.pacienteCompleto?.ultimoInternamiento || null,
-      signosVitalesRecientes: this.signosVitalesDisponibles.slice(0, 5),
-      documentosRecientes: this.documentosDisponibles.slice(0, 5),
+      signosVitalesRecientes: signosRecientes,
+      documentosRecientes: documentosRecientes,
     };
+
+    console.log('📊 Resumen general cargado:', this.resumenGeneral);
   }
+
+  // Método para refrescar la vista general
+  refrescarVistaGeneral(): void {
+    console.log('🔄 Refrescando vista general...');
+    this.cargarResumenGeneral();
+  }
+
+  // Método para obtener estado de salud general
+  getEstadoSaludGeneral(): { nivel: 'critico' | 'precaucion' | 'normal'; mensaje: string } {
+  const alertas: string[] = this.resumenGeneral?.alertasMedicas || [];
+
+  // 🔧 Verificar alertas críticas
+  const tieneAlertaCritica = alertas.some((alerta: string) =>
+    alerta.toLowerCase().includes('crítica') ||
+    alerta.toLowerCase().includes('critica') ||
+    alerta.toLowerCase().includes('hipotermia') ||
+    alerta.toLowerCase().includes('hipoxemia')
+  );
+
+  if (tieneAlertaCritica) {
+    return { nivel: 'critico', mensaje: 'Requiere atención médica inmediata' };
+  }
+
+  if (alertas.length > 0) {
+    return { nivel: 'precaucion', mensaje: 'Requiere monitoreo médico' };
+  }
+
+  return { nivel: 'normal', mensaje: 'Signos vitales dentro de parámetros normales' };
+}
 
   private extraerAlergias(): string[] {
     const alergias: string[] = [];
@@ -2737,25 +2969,67 @@ this.error = `Error al procesar ${nombreFormulario}`;
     return [];
   }
 
-  private identificarAlertasMedicas(): string[] {
+  private identificarAlertasMedicas(alerta?: any): string[] {
     const alertas: string[] = [];
     const ultimosSignos = this.signosVitalesDisponibles[0];
+
     if (ultimosSignos) {
-      if (ultimosSignos.temperatura && ultimosSignos.temperatura > 38.5) {
-        alertas.push('Temperatura elevada');
+      // Alertas de temperatura
+      if (ultimosSignos.temperatura) {
+        if (ultimosSignos.temperatura > 38.5) {
+          alertas.push('🌡️ Fiebre alta (>38.5°C)');
+        } else if (ultimosSignos.temperatura < 35) {
+          alertas.push('🌡️ Hipotermia (<35°C)');
+        }
       }
-      if (
-        ultimosSignos.presion_arterial_sistolica &&
-        ultimosSignos.presion_arterial_sistolica > 140
-      ) {
-        alertas.push('Presión arterial alta');
+
+      // Alertas de presión arterial
+      if (ultimosSignos.presion_arterial_sistolica && ultimosSignos.presion_arterial_diastolica) {
+        if (ultimosSignos.presion_arterial_sistolica > 140 || ultimosSignos.presion_arterial_diastolica > 90) {
+          alertas.push('   Hipertensión arterial');
+        } else if (ultimosSignos.presion_arterial_sistolica < 90 || ultimosSignos.presion_arterial_diastolica < 60) {
+          alertas.push('   Hipotensión arterial');
+        }
       }
-      if (
-        ultimosSignos.frecuencia_cardiaca &&
-        ultimosSignos.frecuencia_cardiaca > 100
-      ) {
-        alertas.push('Taquicardia');
+
+      // Alertas de frecuencia cardíaca
+      if (ultimosSignos.frecuencia_cardiaca) {
+        if (ultimosSignos.frecuencia_cardiaca > 100) {
+          alertas.push('  Taquicardia (>100 lpm)');
+        } else if (ultimosSignos.frecuencia_cardiaca < 60) {
+          alertas.push('  Bradicardia (<60 lpm)');
+        }
       }
+
+      // Alertas de saturación de oxígeno
+      if (ultimosSignos.saturacion_oxigeno) {
+        if (ultimosSignos.saturacion_oxigeno < 90) {
+          alertas.push('🫁 Hipoxemia crítica (<90%)');
+        } else if (ultimosSignos.saturacion_oxigeno < 95) {
+          alertas.push('🫁 Saturación baja (<95%)');
+        }
+      }
+
+      // Alertas de frecuencia respiratoria
+      if (ultimosSignos.frecuencia_respiratoria) {
+        if (ultimosSignos.frecuencia_respiratoria > 24) {
+          alertas.push('🫁 Taquipnea (>24 rpm)');
+        } else if (ultimosSignos.frecuencia_respiratoria < 12) {
+          alertas.push('🫁 Bradipnea (<12 rpm)');
+        }
+      }
+    }
+
+    // Verificar si hay signos vitales recientes
+    const ahora = new Date();
+    const hace24Horas = new Date(ahora.getTime() - 24 * 60 * 60 * 1000);
+    const signosRecientes = this.signosVitalesDisponibles.filter(signo => {
+      const fechaSigno = new Date(signo.fecha_toma || signo.created_at || 0);
+      return fechaSigno > hace24Horas;
+    });
+
+    if (signosRecientes.length === 0) {
+      alertas.push('  Sin signos vitales en las últimas 24 horas');
     }
 
     return alertas;
@@ -3028,10 +3302,10 @@ resetearFormularioActual(): void {
     }
 
     console.log(
-      '🔍 Estado del documentoClinicoActual:',
+      '  Estado del documentoClinicoActual:',
       this.documentoClinicoActual
     );
-    console.log('🔍 Estado de formularios:', this.formularioEstado);
+    console.log('  Estado de formularios:', this.formularioEstado);
 
     if (!this.documentoClinicoActual) {
       if (
@@ -3042,7 +3316,7 @@ resetearFormularioActual(): void {
         if (ultimoSigno.id_documento) {
           this.documentoClinicoActual = ultimoSigno.id_documento;
           console.log(
-            '✅ Documento clínico obtenido de signos vitales:',
+            '- Documento clínico obtenido de signos vitales:',
             this.documentoClinicoActual
           );
         }
@@ -3100,11 +3374,11 @@ resetearFormularioActual(): void {
         this.historiasClinicasService.createHistoriaClinica(historiaData)
       );
 
-      console.log('✅ Historia clínica guardada exitosamente:', response);
+      console.log('- Historia clínica guardada exitosamente:', response);
     } catch (error: any) {
       console.error('❌ Error al guardar historia clínica:', error);
       if (error?.status === 409) {
-        console.log('⚠️ Historia clínica ya existe para este documento');
+        console.log('  Historia clínica ya existe para este documento');
         console.log('ℹ️ El documento ya tiene una historia clínica asociada');
         return;
       } else if (error?.status === 400) {
@@ -3168,7 +3442,7 @@ resetearFormularioActual(): void {
     const response = await firstValueFrom(
       this.notasUrgenciasService.createNotaUrgencias(notaData)
     );
-    console.log('✅ Nota de urgencias guardada:', response);
+    console.log('- Nota de urgencias guardada:', response);
   }
 
   private async guardarNotaEvolucion(): Promise<void> {
@@ -3239,13 +3513,13 @@ resetearFormularioActual(): void {
         this.notaEvolucionForm.value.observaciones_adicionales || '',
     };
 
-    console.log('🔥 Enviando nota de evolución completa al backend:', notaData);
+    console.log('- Enviando nota de evolución completa al backend:', notaData);
 
     const response = await firstValueFrom(
       this.notaEvolucionService.createNotaEvolucion(notaData)
     );
 
-    console.log('✅ Nota de evolución guardada exitosamente:', response);
+    console.log('- Nota de evolución guardada exitosamente:', response);
   }
 
   private validarFormularioNOM004(): string[] {
@@ -3295,7 +3569,7 @@ resetearFormularioActual(): void {
 
   async generarPDF(tipoDocumento: string): Promise<void> {
     try {
-      console.log(`🔥 Generando PDF para: ${tipoDocumento}`);
+      console.log(`- Generando PDF para: ${tipoDocumento}`);
       this.isCreatingDocument = true;
       const medicoCompleto = await this.obtenerDatosMedicoCompleto();
       const datosPacienteEstructurados = {
@@ -3326,7 +3600,7 @@ resetearFormularioActual(): void {
             expediente: this.pacienteCompleto?.expediente,
             historiaClinica: {
               ...this.historiaClinicaForm.value,
-              // ✅ ACCESO CORRECTO A LUGAR DE NACIMIENTO
+              // - ACCESO CORRECTO A LUGAR DE NACIMIENTO
               lugar_nacimiento: this.extraerLugarNacimiento(),
             },
             signosVitales: this.signosVitalesForm.value,
@@ -3589,17 +3863,17 @@ resetearFormularioActual(): void {
           break;
 
         default:
-          console.warn('⚠️ Tipo de documento no soportado:', tipoDocumento);
+          console.warn('Tipo de documento no soportado:', tipoDocumento);
           throw new Error(`Tipo de documento "${tipoDocumento}" no es válido`);
       }
 
-      this.success = `✅ PDF de ${tipoDocumento} generado exitosamente`;
-      console.log(`✅ PDF de ${tipoDocumento} creado correctamente`);
+      this.success = `PDF de ${tipoDocumento} generado exitosamente`;
+      console.log(`PDF de ${tipoDocumento} creado correctamente`);
       setTimeout(() => {
         this.success = '';
       }, 5000);
     } catch (error) {
-      console.error('❌ Error al generar PDF:', error);
+      console.error(' Error al generar PDF:', error);
       if (error instanceof Error) {
         this.error = `Error al generar PDF: ${error.message}`;
       } else {
@@ -3671,7 +3945,7 @@ resetearFormularioActual(): void {
   }
 
   private construirPacienteCompleto(data: any): void {
-    console.log('🔍 Datos recibidos para construir paciente completo:', data);
+    console.log('  Datos recibidos para construir paciente completo:', data);
     const pacienteData = (data.paciente?.data as any) || {};
     this.pacienteCompleto = {
       persona: pacienteData.persona || pacienteData['persona'] || pacienteData,
@@ -3691,8 +3965,8 @@ resetearFormularioActual(): void {
         : [],
     };
 
-    console.log('✅ Paciente completo construido:', this.pacienteCompleto);
-    console.log('✅ Persona info:', this.pacienteCompleto.persona);
+    console.log('- Paciente completo construido:', this.pacienteCompleto);
+    console.log('- Persona info:', this.pacienteCompleto.persona);
 
     this.preLlenarFormularios();
   }
@@ -3775,7 +4049,7 @@ resetearFormularioActual(): void {
 
     if (
       confirm(
-        `✅ ${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`
+        `${tipoDocumento} guardado correctamente.\n\n¿Desea generar el PDF ahora?`
       )
     ) {
       this.generarPDF(tipoDocumento);

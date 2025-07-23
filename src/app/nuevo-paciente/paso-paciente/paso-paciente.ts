@@ -99,7 +99,7 @@ export class PasoPaciente implements OnInit, OnDestroy {
   //     .subscribe({
   //       next: (tipos) => {
   //         this.tiposSangre = tipos;
-  //         console.log('✅ Tipos de sangre cargados:', tipos);
+  //         console.log('  Tipos de sangre cargados:', tipos);
   //       },
   //       error: (error) => {
   //         console.error('❌ Error cargando tipos de sangre:', error);
@@ -139,12 +139,12 @@ export class PasoPaciente implements OnInit, OnDestroy {
 private loadCatalogos(): void {
   console.log('🔄 Iniciando carga de catálogos...');
 
-  // ✅ CORRECCIÓN: Cargar tipos de sangre con mapeo correcto
+  //   CORRECCIÓN: Cargar tipos de sangre con mapeo correcto
   this.catalogoService.getTiposSangre()
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (tipos) => {
-        console.log('✅ Tipos de sangre desde backend:', tipos);
+        console.log('  Tipos de sangre desde backend:', tipos);
 
         // 🔧 MAPEAR la respuesta del backend al formato esperado
         this.tiposSangre = tipos.map((tipo: any) => ({
@@ -240,7 +240,7 @@ private loadCatalogos(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
     console.log(
-      '🔍 Validando paso anterior. Estado actual del wizard:',
+      '  Validando paso anterior. Estado actual del wizard:',
       currentState
     );
 
@@ -275,7 +275,7 @@ private loadCatalogos(): void {
     }
 
     console.log(
-      '✅ Validación del paso anterior exitosa. ID Persona:',
+      '  Validación del paso anterior exitosa. ID Persona:',
       currentState.id_persona_creada
     );
   }
@@ -375,7 +375,7 @@ private loadCatalogos(): void {
   //     // Llamada real al backend
   //     this.pacientesService.createPaciente(createPacienteDto).subscribe({
   //       next: (response) => {
-  //         console.log('✅ Respuesta del backend (paciente creado):', response);
+  //         console.log('  Respuesta del backend (paciente creado):', response);
 
   //         if (response.success && response.data) {
   //           // Actualizar datos en el wizard state
@@ -397,9 +397,9 @@ private loadCatalogos(): void {
 
   //           // Actualizar UI
   //           this.isLoading = false;
-  //           this.autoGuardadoStatus = '✅ Información médica registrada exitosamente';
+  //           this.autoGuardadoStatus = '  Información médica registrada exitosamente';
 
-  //           console.log('✅ Paciente creado con ID:', response.data.id_paciente);
+  //           console.log('  Paciente creado con ID:', response.data.id_paciente);
   //           console.log('➡️ Navegando al siguiente paso...');
 
   //           // Navegar al siguiente paso después de una breve pausa
@@ -476,7 +476,7 @@ private loadCatalogos(): void {
       const formData = this.pacienteForm.value;
       console.log('🔄 Datos del formulario paciente:', formData);
 
-      // ✅ CORRECCIÓN: Buscar el nombre del tipo de sangre seleccionado
+      //   CORRECCIÓN: Buscar el nombre del tipo de sangre seleccionado
       const tipoSangreSeleccionado = this.tiposSangre.find(
         (tipo) => tipo.value === formData.tipo_sangre
       );
@@ -513,13 +513,13 @@ private loadCatalogos(): void {
       // Llamada real al backend
       this.pacientesService.createPaciente(createPacienteDto).subscribe({
         next: (response) => {
-          console.log('✅ Respuesta del backend (paciente creado):', response);
+          console.log('  Respuesta del backend (paciente creado):', response);
 
           if (response.success && response.data) {
-            // ✅ CORRECCIÓN: Incluir el nombre del tipo de sangre en los datos guardados
+            //   CORRECCIÓN: Incluir el nombre del tipo de sangre en los datos guardados
             const datosPacienteCompletos: Partial<DatosPaciente> = {
               ...formData,
-              tipo_sangre_nombre: tipoSangreNombre, // ✅ Agregar nombre para el resumen
+              tipo_sangre_nombre: tipoSangreNombre, //   Agregar nombre para el resumen
               id_persona: idPersona,
               id_paciente: response.data.id_paciente,
             };
@@ -537,14 +537,14 @@ private loadCatalogos(): void {
             // Actualizar UI
             this.isLoading = false;
             this.autoGuardadoStatus =
-              '✅ Información médica registrada exitosamente';
+              '  Información médica registrada exitosamente';
 
             console.log(
-              '✅ Paciente creado con ID:',
+              '  Paciente creado con ID:',
               response.data.id_paciente
             );
             console.log(
-              '✅ Datos guardados con tipo de sangre:',
+              '  Datos guardados con tipo de sangre:',
               datosPacienteCompletos
             );
 
@@ -611,7 +611,7 @@ private loadCatalogos(): void {
 
       const formData = this.pacienteForm.value as Partial<DatosPaciente>;
 
-      // ✅ CORRECCIÓN: Incluir nombre del tipo de sangre en el borrador también
+      //   CORRECCIÓN: Incluir nombre del tipo de sangre en el borrador también
       const tipoSangreSeleccionado = this.tiposSangre.find(
         (tipo) => tipo.value === formData.tipo_sangre
       );

@@ -486,7 +486,7 @@ initializeWizard(): void {
   // Establecer estado inicial limpio
   const cleanInitialState: WizardState = {
     currentStep: WizardStep.INICIO,
-    completedSteps: [], // ✅ Array vacío = ningún paso completado
+    completedSteps: [], //   Array vacío = ningún paso completado
     estado: EstadoWizard.INICIANDO,
 
     datosPersona: {},
@@ -507,12 +507,12 @@ initializeWizard(): void {
 
     fechaInicio: new Date().toISOString(),
     ultimaActualizacion: new Date().toISOString(),
-    progreso: 0 // ✅ 0% de progreso
+    progreso: 0 //   0% de progreso
   };
 
   this.updateState(cleanInitialState);
 
-  console.log('✅ Wizard inicializado con estado limpio:', cleanInitialState);
+  console.log('  Wizard inicializado con estado limpio:', cleanInitialState);
 }
 
 /** Verificar si el wizard necesita inicialización */

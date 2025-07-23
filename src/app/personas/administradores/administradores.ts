@@ -430,7 +430,7 @@ private crearAdministrador(formData: any): void {
     .pipe(
       switchMap(personaResponse => {
         if (personaResponse.success && personaResponse.data) {
-          console.log('✅ Persona creada con ID:', personaResponse.data.id_persona);
+          console.log('  Persona creada con ID:', personaResponse.data.id_persona);
 
           // 🔥 SEGUNDO: Crear el administrador con el id_persona obtenido
           const createAdminDto: CreateAdministradorDto = {
@@ -493,7 +493,7 @@ private actualizarAdministrador(formData: any): void {
       .pipe(
         switchMap(personaResponse => {
           if (personaResponse.success) {
-            console.log('✅ Persona actualizada');
+            console.log('  Persona actualizada');
 
             // 🔥 SEGUNDO: Actualizar el administrador
             const updateAdminDto: UpdateAdministradorDto = {

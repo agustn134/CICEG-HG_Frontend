@@ -81,7 +81,7 @@ export interface DatosExpediente {
   id_paciente?: number;
   id_expediente?: number;
   numero_expediente?: string;
-  numero_expediente_administrativo?: string; // ✅ AGREGAR ESTE CAMPO
+  numero_expediente_administrativo?: string | null;
   estado?: string;
   notas_administrativas?: string;
   crear_historia_clinica?: boolean;

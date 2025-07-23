@@ -76,7 +76,7 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Estado actual del wizard (paso llenar):', currentState);
+    console.log('  Estado actual del wizard (paso llenar):', currentState);
 
     // Cargar datos de pasos anteriores
     this.resumenPersona = currentState.datosPersona;
@@ -104,7 +104,7 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
   private validatePreviousSteps(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Validando pasos anteriores...');
+    console.log('  Validando pasos anteriores...');
 
     // Verificar que existen todos los IDs necesarios
     if (!currentState.id_expediente_creado) {
@@ -121,7 +121,7 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✅ Validación exitosa. Documento:', {
+    console.log('  Validación exitosa. Documento:', {
       expediente: currentState.id_expediente_creado,
       documento: currentState.id_documento_creado,
       tipo: currentState.datosDocumento.tipo_documento
@@ -362,12 +362,12 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
       setTimeout(() => {
         this.isLoading = false;
         this.estadoProceso = 'completado';
-        this.autoGuardadoStatus = '✅ Documento guardado exitosamente';
+        this.autoGuardadoStatus = '  Documento guardado exitosamente';
 
         // Marcar paso como completado
         this.wizardStateService.markStepAsCompleted(WizardStep.LLENAR_DOCUMENTO);
 
-        console.log('✅ Documento completado:', formData);
+        console.log('  Documento completado:', formData);
 
         // Navegar al resumen después de una breve pausa
         setTimeout(() => {

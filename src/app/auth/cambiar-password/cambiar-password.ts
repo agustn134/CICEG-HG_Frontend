@@ -98,7 +98,7 @@ export class CambiarPassword implements OnInit, OnDestroy {
   this.passwordResetService.success$
     .pipe(takeUntil(this.destroy$))
     .subscribe(success => {
-      console.log('✅ Success state changed:', success);
+      console.log('  Success state changed:', success);
       this.successMessage = success;
     });
   }
@@ -109,13 +109,13 @@ export class CambiarPassword implements OnInit, OnDestroy {
   }
 
   private validarToken(): void {
-    console.log('🔍 Validando token:', this.token);
+    console.log('  Validando token:', this.token);
 
     this.passwordResetService.validateToken(this.token)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Token válido:', response);
+          console.log('  Token válido:', response);
 
           if (response.success && response.data) {
             this.tokenValidado = true;
@@ -159,7 +159,7 @@ export class CambiarPassword implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Respuesta del servidor:', response);
+          console.log('  Respuesta del servidor:', response);
 
           if (response.success) {
             this.passwordChanged = true;

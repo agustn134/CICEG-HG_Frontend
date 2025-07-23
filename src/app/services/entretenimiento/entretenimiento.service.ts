@@ -96,7 +96,7 @@ export class EntretenimientoService {
 
   private isPlayingSubject = new BehaviorSubject<boolean>(false);
   public isPlaying$ = this.isPlayingSubject.asObservable();
-// ✅ AGREGAR ESTA PROPIEDAD QUE FALTA
+//   AGREGAR ESTA PROPIEDAD QUE FALTA
   private medicalCategories: MedicalCategory[] = [
     {
       id: 'anatomia',
@@ -151,7 +151,7 @@ export class EntretenimientoService {
       id: 'patologia',
       name: 'Patología',
       description: 'Enfermedades y trastornos',
-      icon: '🔍',
+      icon: ' ',
       color: '#FD79A8'
     }
   ];

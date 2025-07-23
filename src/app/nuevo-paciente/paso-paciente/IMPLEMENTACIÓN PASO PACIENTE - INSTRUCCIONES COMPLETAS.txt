@@ -22,39 +22,39 @@
 
 ## 🔧 FUNCIONALIDADES IMPLEMENTADAS
 
-### ✅ **FORMULARIO REACTIVO COMPLETO**
+###   **FORMULARIO REACTIVO COMPLETO**
 - **Campos obligatorios:** Tipo de sangre, transfusiones, familiar responsable, parentesco, teléfono familiar
 - **Campos opcionales:** Alergias, ocupación, escolaridad, lugar de nacimiento
 - **Validaciones específicas:** Teléfonos de 10 dígitos, validaciones condicionales
 - **Campo condicional:** Detalles de transfusiones solo aparece si selecciona "Sí"
 
-### ✅ **INTEGRACIÓN CON WIZARD STATE**
+###   **INTEGRACIÓN CON WIZARD STATE**
 - **Carga datos anteriores:** Muestra resumen de datos personales del paso anterior
 - **Validación de navegación:** Verifica que el paso anterior esté completado
 - **Auto-guardado:** Cada 30 segundos automáticamente
 - **Navegación inteligente:** Botones anterior/siguiente funcionales
 
-### ✅ **CATÁLOGOS INTEGRADOS**
+###   **CATÁLOGOS INTEGRADOS**
 - **Tipos de sangre:** A+, A-, B+, B-, AB+, AB-, O+, O-, Desconocido
 - **Parentescos:** Padre, Madre, Esposo(a), Hijo(a), Hermano(a), etc.
 - **Niveles de escolaridad:** Sin estudios hasta Posgrado
 - **Fallback automático:** Si falla la conexión, usa datos estáticos
 
-### ✅ **VALIDACIONES MÉDICAS**
+###   **VALIDACIONES MÉDICAS**
 - **Tipo de sangre:** Obligatorio de catálogo
 - **Transfusiones:** Radio buttons Sí/No obligatorio
 - **Detalles transfusiones:** Obligatorio solo si selecciona "Sí" (mínimo 10 caracteres)
 - **Familiar responsable:** Obligatorio, mínimo 3 caracteres
 - **Teléfono familiar:** Obligatorio, exactamente 10 dígitos mexicanos
 
-### ✅ **UX/UI MODERNA**
+###   **UX/UI MODERNA**
 - **Resumen del paciente:** Muestra datos del paso anterior en card azul
 - **Barra de progreso:** 33.3% (paso 2 de 6)
 - **Formulario en secciones:** Información médica, contacto emergencia, datos adicionales
 - **Estados visuales:** Loading, errores, validaciones en tiempo real
 - **Responsive design:** Funciona en móvil y desktop
 
-### ✅ **MANEJO DE ERRORES**
+###   **MANEJO DE ERRORES**
 - **Validación de paso anterior:** Redirige si falta información
 - **Campos requeridos:** Marcados visualmente con *
 - **Mensajes de error:** Específicos por campo y tipo de error
@@ -66,7 +66,7 @@
 1. Usuario llega desde: /app/nuevo-paciente/persona
 2. Verifica: ¿Existen datos personales válidos?
    - ❌ NO → Redirige a paso anterior con alerta
-   - ✅ SÍ → Continúa
+   -   SÍ → Continúa
 3. Muestra: Resumen de datos personales del paso anterior
 4. Formulario: 3 secciones (médica, emergencia, adicional)
 5. Validación: Campos obligatorios + validaciones específicas
@@ -148,7 +148,7 @@ npm install @angular/forms
 
 ## 📊 ESTADO ESPERADO DESPUÉS DE IMPLEMENTAR
 
-### ✅ **LO QUE DEBERÍA FUNCIONAR:**
+###   **LO QUE DEBERÍA FUNCIONAR:**
 1. **Navegación completa:** Inicio → Persona → Paciente
 2. **Formulario funcional:** Todos los campos y validaciones
 3. **Auto-guardado:** Cada 30 segundos en sessionStorage
@@ -165,12 +165,12 @@ Después de probar que este paso funciona correctamente:
 
 Una vez implementado correctamente, tendrás:
 
-- ✅ **Wizard completo de 2 pasos funcionales**
-- ✅ **Formularios reactivos con validaciones médicas**
-- ✅ **Estado persistente entre pasos**
-- ✅ **UI moderna y responsive**
-- ✅ **Catálogos con fallback automático**
-- ✅ **Auto-guardado funcional**
-- ✅ **Navegación inteligente entre pasos**
+-   **Wizard completo de 2 pasos funcionales**
+-   **Formularios reactivos con validaciones médicas**
+-   **Estado persistente entre pasos**
+-   **UI moderna y responsive**
+-   **Catálogos con fallback automático**
+-   **Auto-guardado funcional**
+-   **Navegación inteligente entre pasos**
 
 **¡El sistema ya tiene una base sólida para el registro de pacientes!** 🚀

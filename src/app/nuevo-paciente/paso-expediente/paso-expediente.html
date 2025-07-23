@@ -25,7 +25,7 @@
     <!-- Status de guardado -->
     <div *ngIf="autoGuardadoStatus" class="mt-3 p-3 rounded-md"
          [ngClass]="{
-           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('✅'),
+           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes(' '),
            'bg-blue-50 border border-blue-200 text-blue-800': autoGuardadoStatus.includes('Creando'),
            'bg-red-50 border border-red-200 text-red-800': autoGuardadoStatus.includes('❌')
          }">
@@ -302,7 +302,7 @@
           <p class="text-green-800">
             <strong>Número del Sistema:</strong> {{ expedienteCreado.numero_expediente }}
           </p>
-          <!-- ✅ MOSTRAR NÚMERO ADMINISTRATIVO SI EXISTE -->
+          <!--   MOSTRAR NÚMERO ADMINISTRATIVO SI EXISTE -->
           <p *ngIf="expedienteCreado.numero_expediente_administrativo" class="text-green-800">
             <strong>Número Administrativo:</strong> {{ expedienteCreado.numero_expediente_administrativo }}
           </p>

@@ -27,13 +27,15 @@ export class HttpConfigInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         // Log de errores para desarrollo
         if (API_CONFIG.BASE_URL.includes('localhost')) {
-          console.error('HTTP Error intercepted:', {
+          console.error('HttpConfigInterceptor - Error intercepted:', {
             status: error.status,
             message: error.message,
-            url: error.url
+            url: error.url,
+            note: 'Error logged without causing redirections'
           });
         }
 
+        // NO manejar redirecciones aquí - dejar que el ErrorInterceptor se encargue
         return throwError(() => error);
       })
     );

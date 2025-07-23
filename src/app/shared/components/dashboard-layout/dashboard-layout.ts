@@ -7,11 +7,12 @@ import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService, Usuario } from '../../../services/auth/auth.service';
 import { ConfirmationModalComponent } from "../confirmation-modal/confirmation-modal";
+import { ErrorNotificationsComponent } from '../error-notifications/error-notifications.component';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ModernSidebarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, RouterOutlet, ModernSidebarComponent, ConfirmationModalComponent, ErrorNotificationsComponent],
   template: `
     <div class="min-h-screen bg-gray-50">
       <!-- Modern Sidebar -->
@@ -358,7 +359,11 @@ import { ConfirmationModalComponent } from "../confirmation-modal/confirmation-m
         </footer>
       </main>
 
- <app-confirmation-modal
+      <!-- Error Notifications -->
+      <app-error-notifications></app-error-notifications>
+
+      <!-- Confirmation Modal -->
+      <app-confirmation-modal
         [isOpen]="showLogoutModal"
         title="Cerrar Sesión"
         message="¿Está seguro que desea cerrar sesión del sistema? Se perderá cualquier trabajo no guardado."
@@ -497,8 +502,8 @@ showLogoutModal = false;
   testLogout(): void {
     console.log('🧪 Probando logout directamente...');
     try {
-      this.authService.logout();
-      console.log('✅ Logout directo exitoso');
+      this.authService.logout(true); // Explícitamente redirigir
+      console.log('  Logout directo exitoso');
     } catch (error) {
       console.error('❌ Error en logout directo:', error);
     }
@@ -569,15 +574,17 @@ private handleProfileClick(): void {
 
   // Agregar estos nuevos métodos
   confirmLogout(): void {
-    console.log('✅ Logout confirmado por el usuario');
+    console.log('  Logout confirmado por el usuario');
     this.showLogoutModal = false;
 
     try {
-      this.authService.logout();
-      console.log('✅ Sesión cerrada exitosamente');
-      this.router.navigate(['/login']);
+      this.authService.logout(true); // Explícitamente redirigir
+      console.log('  Sesión cerrada exitosamente');
+      // No necesitamos router.navigate aquí porque logout ya lo hace
     } catch (error) {
       console.error('❌ Error durante el logout:', error);
+      // Fallback: redirigir manualmente si el logout falla
+      this.router.navigate(['/login']);
     }
   }
 

@@ -5,8 +5,9 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AuthInterceptor } from '../app/interceptors/auth-interceptor';
+import { ErrorInterceptor } from '../app/interceptors/error.interceptor';
 
-// ✅ Importa desde @ng-icons/core
+//   Importa desde @ng-icons/core
 import { provideIcons } from '@ng-icons/core';
 import {
   heroCog6Tooth,
@@ -28,13 +29,19 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    // ✅ Proveedor del interceptor corregido
+    //   Interceptor de autenticación
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
     },
-    // ✅ Registro de iconos
+    //   Interceptor de manejo de errores (DEBE IR DESPUÉS del AuthInterceptor)
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    },
+    //   Registro de iconos
     provideIcons({
       heroCog6Tooth,
       heroPhoto,

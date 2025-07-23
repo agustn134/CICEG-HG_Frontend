@@ -143,7 +143,7 @@ export class Servicios implements OnInit, OnDestroy {
           if (response.success && response.data) {
             this.servicios.unshift(response.data);
             this.cerrarModal();
-            console.log('✅ Servicio creado exitosamente');
+            console.log('  Servicio creado exitosamente');
           } else {
             this.error = response.message || 'Error al crear servicio';
           }
@@ -184,7 +184,7 @@ export class Servicios implements OnInit, OnDestroy {
               this.servicios[index] = response.data;
             }
             this.cerrarModal();
-            console.log('✅ Servicio actualizado exitosamente');
+            console.log('  Servicio actualizado exitosamente');
           } else {
             this.error = response.message || 'Error al actualizar servicio';
           }
@@ -214,7 +214,7 @@ export class Servicios implements OnInit, OnDestroy {
           if (response.success) {
             this.servicios = this.servicios.filter(s => s.id_servicio !== this.servicioSeleccionado!.id_servicio);
             this.cerrarConfirmacion();
-            console.log('✅ Servicio eliminado exitosamente');
+            console.log('  Servicio eliminado exitosamente');
           } else {
             this.error = response.message || 'Error al eliminar servicio';
           }

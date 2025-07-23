@@ -163,7 +163,7 @@ export class PasswordResetService {
   public setSuccess(message: string | null): void {
     this.successSubject.next(message);
     if (message) {
-      console.log('✅ Éxito en PasswordResetService:', message);
+      console.log('  Éxito en PasswordResetService:', message);
     }
   }
 

@@ -68,7 +68,7 @@ private initializeForm(): void {
   this.expedienteForm = this.fb.group({
     numero_expediente: [''], // Opcional, se puede generar automáticamente
     numero_expediente_administrativo: ['', [
-      // ✅ VALIDADOR PERSONALIZADO PARA FORMATO LIBRE
+      //   VALIDADOR PERSONALIZADO PARA FORMATO LIBRE
       (control: any) => {
         if (!control.value) return null; // Opcional
 
@@ -86,7 +86,7 @@ private initializeForm(): void {
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Estado actual del wizard:', currentState);
+    console.log('  Estado actual del wizard:', currentState);
 
     // Cargar datos de pasos anteriores
     this.resumenPersona = currentState.datosPersona;
@@ -126,7 +126,7 @@ private initializeForm(): void {
   private validatePreviousSteps(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Validando pasos anteriores...');
+    console.log('  Validando pasos anteriores...');
 
     // Verificar que existen datos de persona
     if (!currentState.datosPersona || Object.keys(currentState.datosPersona).length === 0) {
@@ -160,7 +160,7 @@ private initializeForm(): void {
       return;
     }
 
-    console.log('✅ Validación exitosa. IDs encontrados:', {
+    console.log('  Validación exitosa. IDs encontrados:', {
       persona: currentState.id_persona_creada,
       paciente: currentState.id_paciente_creado
     });
@@ -185,7 +185,7 @@ private initializeForm(): void {
     return age;
   }
 
-  // ✅ MÉTODO RENOMBRADO Y CORREGIDO
+  //   MÉTODO RENOMBRADO Y CORREGIDO
   private generarNumeroExpediente(): string {
     const year = new Date().getFullYear();
     const timestamp = Date.now();
@@ -193,7 +193,7 @@ private initializeForm(): void {
     return `HG-${year}-${String(timestamp).slice(-6)}${String(random).padStart(4, '0')}`;
   }
 
-  // ✅ NUEVO MÉTODO CORREGIDO
+  //   NUEVO MÉTODO CORREGIDO
   async generateNumeroExpediente(): Promise<void> {
     try {
       this.expedientesService.generateNumeroExpediente().subscribe({
@@ -202,7 +202,7 @@ private initializeForm(): void {
             this.expedienteForm.patchValue({
               numero_expediente: response.data.numero_expediente
             });
-            console.log('✅ Número generado:', response.data.numero_expediente);
+            console.log('  Número generado:', response.data.numero_expediente);
           }
         },
         error: (error: any) => {
@@ -226,7 +226,7 @@ private initializeForm(): void {
   // ACCIONES CON BACKEND - MÉTODO PRINCIPAL CORREGIDO
   // ==========================================
 
-// ✅ MÉTODO PRINCIPAL CORREGIDO Y SIMPLIFICADO
+//   MÉTODO PRINCIPAL CORREGIDO Y SIMPLIFICADO
 
 
 
@@ -262,7 +262,7 @@ crearExpediente(): void {
     const expedienteData: CreateExpedienteDto = {
       id_paciente: idPaciente,
       numero_expediente: formData.numero_expediente || this.generarNumeroExpediente(),
-      numero_expediente_administrativo: formData.numero_expediente_administrativo?.trim() || null, // ✅ NUEVO CAMPO
+      numero_expediente_administrativo: formData.numero_expediente_administrativo?.trim() || null,
       fecha_apertura: formData.fecha_apertura || new Date().toISOString(),
       estado: formData.estado || 'Activo',
       notas_administrativas: formData.notas_administrativas || 'Expediente creado mediante wizard',
@@ -275,7 +275,7 @@ crearExpediente(): void {
     // Llamada real al backend
     this.expedientesService.createExpediente(expedienteData).subscribe({
       next: (response: ApiResponse<Expediente>) => {
-        console.log('✅ Respuesta del backend (expediente creado):', response);
+        console.log('  Respuesta del backend (expediente creado):', response);
 
         if (response.success && response.data) {
           // Actualizar datos en el wizard state
@@ -283,7 +283,7 @@ crearExpediente(): void {
             id_paciente: idPaciente,
             id_expediente: response.data.id_expediente,
             numero_expediente: response.data.numero_expediente,
-            numero_expediente_administrativo: response.data.numero_expediente_administrativo, // ✅ NUEVO CAMPO
+            numero_expediente_administrativo: response.data.numero_expediente_administrativo, //   NUEVO CAMPO
             estado: response.data.estado,
             notas_administrativas: formData.notas_administrativas,
             crear_historia_clinica: formData.crear_historia_clinica,
@@ -304,7 +304,7 @@ crearExpediente(): void {
           this.expedienteCreado = {
             id_expediente: response.data.id_expediente,
             numero_expediente: response.data.numero_expediente,
-            numero_expediente_administrativo: response.data.numero_expediente_administrativo, // ✅ NUEVO CAMPO
+            numero_expediente_administrativo: response.data.numero_expediente_administrativo, //   NUEVO CAMPO
             fecha_apertura: response.data.fecha_apertura,
             estado: response.data.estado,
             historia_clinica_creada: formData.crear_historia_clinica
@@ -313,11 +313,11 @@ crearExpediente(): void {
           // Actualizar UI
           this.isLoading = false;
           this.estadoProceso = 'completado';
-          this.autoGuardadoStatus = '✅ Expediente creado exitosamente';
+          this.autoGuardadoStatus = '  Expediente creado exitosamente';
 
-          console.log('✅ Expediente creado con ID:', response.data.id_expediente);
-          console.log('✅ Número de expediente:', response.data.numero_expediente);
-          console.log('✅ Número administrativo:', response.data.numero_expediente_administrativo);
+          console.log('  Expediente creado con ID:', response.data.id_expediente);
+          console.log('  Número de expediente:', response.data.numero_expediente);
+          console.log('  Número administrativo:', response.data.numero_expediente_administrativo);
 
           // 🔥 REDIRIGIR AL PERFIL DEL PACIENTE después de crear expediente
           setTimeout(() => {
@@ -356,7 +356,7 @@ crearExpediente(): void {
   }
 }
 
-// // ✅ NUEVO MÉTODO: Validar número administrativo
+// //   NUEVO MÉTODO: Validar número administrativo
 // validarNumeroAdministrativo(numero: string): boolean {
 //   if (!numero) return true; // Es opcional
 
@@ -365,7 +365,7 @@ crearExpediente(): void {
 //   return patron.test(numero);
 // }
 
-// ✅ MÉTODO ACTUALIZADO: Validar número administrativo con formato libre
+//   MÉTODO ACTUALIZADO: Validar número administrativo con formato libre
 validarNumeroAdministrativo(numero: string): boolean {
   if (!numero) return true; // Es opcional
 
@@ -381,7 +381,7 @@ validarNumeroAdministrativo(numero: string): boolean {
 
 
 
-// // ✅ MÉTODO CORREGIDO: Verificar disponibilidad del número administrativo
+// //   MÉTODO CORREGIDO: Verificar disponibilidad del número administrativo
 // verificarDisponibilidadNumero(): void {
 //   const numero = this.expedienteForm.get('numero_expediente_administrativo')?.value;
 
@@ -401,7 +401,7 @@ validarNumeroAdministrativo(numero: string): boolean {
 //     }
 //   }
 // }
-// ✅ MÉTODO ACTUALIZADO: Verificar solo formato básico (sin verificar duplicados en backend por ahora)
+//   MÉTODO ACTUALIZADO: Verificar solo formato básico (sin verificar duplicados en backend por ahora)
 verificarDisponibilidadNumero(): void {
   const numero = this.expedienteForm.get('numero_expediente_administrativo')?.value;
 
@@ -425,7 +425,7 @@ verificarDisponibilidadNumero(): void {
   }
 }
 
-// ✅ MÉTODO PARA OBTENER EJEMPLOS
+//   MÉTODO PARA OBTENER EJEMPLOS
 obtenerEjemplosFormato(): string[] {
   return [
     '2025-001',
@@ -441,7 +441,7 @@ obtenerEjemplosFormato(): string[] {
 
 
 
-  // ✅ NUEVO MÉTODO: Redirigir al perfil del paciente
+  //   NUEVO MÉTODO: Redirigir al perfil del paciente
   private irAPerfilPaciente(idPaciente: number): void {
     console.log('🔄 Redirigiendo al perfil del paciente ID:', idPaciente);
 
@@ -487,7 +487,7 @@ obtenerEjemplosFormato(): string[] {
     this.wizardStateService.goToPreviousStep();
   }
 
-  // ✅ MÉTODO CONTINUAR CORREGIDO para ir al perfil
+  //   MÉTODO CONTINUAR CORREGIDO para ir al perfil
   continuar(): void {
     console.log('➡️ Continuando al perfil del paciente');
 

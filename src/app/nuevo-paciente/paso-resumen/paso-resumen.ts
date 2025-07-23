@@ -68,7 +68,7 @@ export class PasoResumen implements OnInit, OnDestroy {
   private loadResumenCompleto(): void {
     const currentState = this.wizardStateService.getCurrentState();
 
-    console.log('🔍 Estado final del wizard:', currentState);
+    console.log('  Estado final del wizard:', currentState);
 
     // Construir resumen completo
     this.resumen = {
@@ -98,7 +98,7 @@ export class PasoResumen implements OnInit, OnDestroy {
     );
 
     console.log('📋 Resumen completo:', this.resumen);
-    console.log('✅ Expediente completo:', this.expedienteCompleto);
+    console.log('  Expediente completo:', this.expedienteCompleto);
   }
 
   private validateWizard(): void {
@@ -118,7 +118,7 @@ export class PasoResumen implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✅ Validación exitosa del wizard completo');
+    console.log('  Validación exitosa del wizard completo');
     this.estadoProceso = 'mostrando';
   }
 

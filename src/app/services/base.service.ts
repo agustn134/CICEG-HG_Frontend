@@ -298,6 +298,7 @@ export abstract class BaseService<T = any> {
 
   /**
    * Manejo centralizado de errores HTTP
+   * IMPORTANTE: No causa redirecciones automáticas, solo procesa y re-lanza el error
    */
   private handleError = (error: HttpErrorResponse): Observable<never> => {
     let errorMessage = 'Ha ocurrido un error inesperado';
@@ -317,9 +318,11 @@ export abstract class BaseService<T = any> {
           break;
         case 401:
           errorMessage = 'No autorizado. Por favor, inicie sesión nuevamente';
+          // NO redirigir aquí - el ErrorInterceptor se encarga de eso
           break;
         case 403:
           errorMessage = 'No tiene permisos para realizar esta acción';
+          // NO redirigir aquí - mantener al usuario en la página actual
           break;
         case 404:
           errorMessage = 'Recurso no encontrado';
@@ -331,10 +334,17 @@ export abstract class BaseService<T = any> {
           errorMessage = error.error?.message || 'Datos de entrada inválidos';
           break;
         case 500:
-          errorMessage = 'Error interno del servidor. Intente más tarde';
+          errorMessage = 'Error interno del servidor. Por favor, intente nuevamente';
+          // NO redirigir para errores 500 - mantener al usuario en la página actual
+          break;
+        case 502:
+          errorMessage = 'Error de conexión con el servidor';
           break;
         case 503:
           errorMessage = 'Servicio no disponible temporalmente';
+          break;
+        case 504:
+          errorMessage = 'Tiempo de espera agotado';
           break;
         default:
           errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
@@ -343,19 +353,23 @@ export abstract class BaseService<T = any> {
 
     // Log detallado para desarrollo
     if (API_CONFIG.BASE_URL.includes('localhost')) {
-      console.error('Error detallado:', {
+      console.error('BaseService - Error detallado:', {
         code: errorCode,
         message: errorMessage,
         status: error.status,
         error: error.error,
-        url: error.url
+        url: error.url,
+        note: 'Error procesado sin redirección automática'
       });
     }
 
+    // IMPORTANTE: Solo lanzar el error, NO hacer redirecciones aquí
+    // Las redirecciones se manejan en el ErrorInterceptor según el tipo de error
     return throwError(() => ({
       code: errorCode,
       message: errorMessage,
-      originalError: error
+      originalError: error,
+      shouldRedirect: false // Indicar que no se debe redirigir automáticamente
     }));
   };
 

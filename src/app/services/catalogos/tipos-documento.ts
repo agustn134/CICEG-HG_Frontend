@@ -18,7 +18,7 @@ export class TiposDocumentoService {
   // ==========================================
 
   /**
-   * Obtener todos los tipos de documento - ✅ RETORNA OBSERVABLE
+   * Obtener todos los tipos de documento -   RETORNA OBSERVABLE
    */
   getAll(filters?: TipoDocumentoFilters): Observable<ApiResponse<TipoDocumento[]>> {
     let params = new HttpParams();
@@ -54,7 +54,7 @@ export class TiposDocumentoService {
   }
 
   /**
-   * Obtener un tipo de documento por ID - ✅ RETORNA OBSERVABLE
+   * Obtener un tipo de documento por ID -   RETORNA OBSERVABLE
    */
   getById(id: number): Observable<ApiResponse<TipoDocumento>> {
     return this.http.get<ApiResponse<TipoDocumento>>(`${this.API_URL}/${id}`).pipe(
@@ -64,7 +64,7 @@ export class TiposDocumentoService {
   }
 
   /**
-   * Crear un nuevo tipo de documento - ✅ RETORNA OBSERVABLE
+   * Crear un nuevo tipo de documento -   RETORNA OBSERVABLE
    */
   create(tipoDocumento: CreateTipoDocumentoDto): Observable<ApiResponse<TipoDocumento>> {
     return this.http.post<ApiResponse<TipoDocumento>>(this.API_URL, tipoDocumento).pipe(
@@ -73,7 +73,7 @@ export class TiposDocumentoService {
   }
 
   /**
-   * Actualizar un tipo de documento existente - ✅ RETORNA OBSERVABLE
+   * Actualizar un tipo de documento existente -   RETORNA OBSERVABLE
    */
   update(id: number, tipoDocumento: Partial<CreateTipoDocumentoDto>): Observable<ApiResponse<TipoDocumento>> {
     return this.http.put<ApiResponse<TipoDocumento>>(`${this.API_URL}/${id}`, tipoDocumento).pipe(
@@ -82,7 +82,7 @@ export class TiposDocumentoService {
   }
 
   /**
-   * Eliminar un tipo de documento - ✅ RETORNA OBSERVABLE
+   * Eliminar un tipo de documento -   RETORNA OBSERVABLE
    */
   delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.API_URL}/${id}`).pipe(

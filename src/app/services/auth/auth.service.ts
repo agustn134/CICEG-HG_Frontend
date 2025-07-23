@@ -20,6 +20,7 @@ export interface Usuario {
   cargo?: string;
   departamento?: string;
   nivel_acceso?: string;
+    id_referencia?: number;  //   AGREGAR ESTA LÍNEA
 }
 
 export interface LoginResponse {
@@ -95,25 +96,31 @@ export class AuthService {
 
 
 
-logout(): void {
-  console.log('🔄 AuthService.logout() iniciado');
+logout(shouldRedirect: boolean = true): void {
+  console.log('🔄 AuthService.logout() iniciado, shouldRedirect:', shouldRedirect);
   try {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
-    console.log('✅ localStorage limpiado');
+    console.log('  localStorage limpiado');
 
     this.tokenSubject.next(null);
     this.currentUserSubject.next(null);
-    console.log('✅ Subjects limpiados');
+    console.log('  Subjects limpiados');
 
-    // Forzar redirección incluso si hay errores en la navegación
-    this.router.navigate(['/login']).then(() => {
-      window.location.reload(); // Opcional: asegurar limpieza completa
-    });
-    console.log('✅ Redirección completada');
+    // Solo redirigir si se especifica explícitamente
+    if (shouldRedirect) {
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload(); // Opcional: asegurar limpieza completa
+      });
+      console.log('  Redirección completada');
+    } else {
+      console.log('  Logout completado sin redirección');
+    }
   } catch (error) {
     console.error('❌ Error en AuthService.logout():', error);
-    this.router.navigate(['/login']);
+    if (shouldRedirect) {
+      this.router.navigate(['/login']);
+    }
   }
 }
 

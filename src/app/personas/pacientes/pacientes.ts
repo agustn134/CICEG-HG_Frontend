@@ -135,7 +135,7 @@ export class Pacientes implements OnInit, OnDestroy {
         next: (response: ApiResponse<Paciente[]>) => {
           if (response.success && response.data) {
             this.pacientes = response.data;
-            console.log(`✅ ${this.pacientes.length} pacientes cargados`);
+            console.log(`  ${this.pacientes.length} pacientes cargados`);
           }
         },
         error: (error) => {
@@ -155,7 +155,7 @@ export class Pacientes implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.warn('⚠️ No se pudieron cargar las estadísticas:', error);
+          console.warn('  No se pudieron cargar las estadísticas:', error);
         }
       });
   }
@@ -182,7 +182,7 @@ export class Pacientes implements OnInit, OnDestroy {
       buscar: this.textoBusqueda || undefined
     };
 
-    console.log('🔍 Aplicando filtros:', this.filtrosAplicados);
+    console.log('  Aplicando filtros:', this.filtrosAplicados);
     this.cargarPacientes();
   }
 

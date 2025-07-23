@@ -94,7 +94,7 @@ export class WizardLayout implements OnInit, OnDestroy {
         !currentState.currentStep ||
         !currentState.completedSteps) {
 
-      console.log('⚠️ Estado del wizard inválido, reiniciando...');
+      console.log('  Estado del wizard inválido, reiniciando...');
       this.wizardStateService.resetWizard();
     }
   }
@@ -102,7 +102,7 @@ export class WizardLayout implements OnInit, OnDestroy {
   private forceInitialUpdate(): void {
     // Obtener estado actual y actualizar UI inmediatamente
     const currentState = this.wizardStateService.getCurrentState();
-    console.log('🔍 Estado inicial del wizard:', currentState);
+    console.log('  Estado inicial del wizard:', currentState);
 
     if (currentState) {
       this.wizardState = currentState;
@@ -116,7 +116,7 @@ export class WizardLayout implements OnInit, OnDestroy {
   private detectCurrentRoute(): void {
     const urlSegments = this.router.url.split('/');
     this.currentRoute = urlSegments[urlSegments.length - 1] || 'inicio';
-    console.log('🔍 Ruta detectada:', this.currentRoute);
+    console.log('  Ruta detectada:', this.currentRoute);
 
     this.updateStepsFromRoute();
   }
@@ -181,7 +181,7 @@ export class WizardLayout implements OnInit, OnDestroy {
       const activeStep = this.steps.find(step => step.route === this.currentRoute);
       if (activeStep) {
         activeStep.isActive = true;
-        console.log(`✅ Paso activo: ${activeStep.title}`);
+        console.log(`  Paso activo: ${activeStep.title}`);
       }
     }
 
@@ -194,7 +194,7 @@ export class WizardLayout implements OnInit, OnDestroy {
 
   private updateStepsUI(state: WizardState): void {
     if (!state) {
-      console.log('⚠️ Estado del wizard vacío, reseteando pasos...');
+      console.log('  Estado del wizard vacío, reseteando pasos...');
       this.steps.forEach(step => {
         step.isActive = false;
         step.isCompleted = false;
@@ -207,15 +207,15 @@ export class WizardLayout implements OnInit, OnDestroy {
     console.log('🎯 Paso actual:', state.currentStep);
 
     this.steps.forEach((step, index) => {
-      // ✅ VERIFICACIÓN ESTRICTA: Solo completado si está en la lista
+      //   VERIFICACIÓN ESTRICTA: Solo completado si está en la lista
       step.isCompleted = state.completedSteps &&
                         state.completedSteps.length > 0 &&
                         state.completedSteps.includes(step.stepEnum);
 
-      // ✅ VERIFICACIÓN ESTRICTA: Solo activo si coincide exactamente
+      //   VERIFICACIÓN ESTRICTA: Solo activo si coincide exactamente
       step.isActive = state.currentStep === step.stepEnum;
 
-      console.log(`🔍 Paso ${index + 1} (${step.route}):`, {
+      console.log(`  Paso ${index + 1} (${step.route}):`, {
         active: step.isActive,
         completed: step.isCompleted,
         stepEnum: step.stepEnum,
@@ -372,7 +372,7 @@ export class WizardLayout implements OnInit, OnDestroy {
   // ==========================================
 
   debugWizardState(): void {
-    console.log('🔍 DEBUG - Estado actual del wizard:', {
+    console.log('  DEBUG - Estado actual del wizard:', {
       currentRoute: this.currentRoute,
       wizardState: this.wizardState,
       steps: this.steps.map(s => ({

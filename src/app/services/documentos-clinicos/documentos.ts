@@ -647,7 +647,7 @@ getDocumentosByPacienteId(idPaciente: number): Observable<ApiResponse<DocumentoC
   return this.http.get<ApiResponse<DocumentoClinico[]>>(`${this.API_URL}/paciente/${idPaciente}`).pipe(
     // Si falla, hacer fallback a filtros
     catchError(error => {
-      console.warn('⚠️ Endpoint específico no disponible, usando filtros como fallback');
+      console.warn('  Endpoint específico no disponible, usando filtros como fallback');
 
       // Usar el método existente con filtros como fallback
       const filters: DocumentoClinicoFilters = {
@@ -698,7 +698,7 @@ getDocumentosByPacienteId(idPaciente: number): Observable<ApiResponse<DocumentoC
       limit: 100 // Obtener más documentos para el perfil
     };
 
-    // ✅ CORREGIDO: Mapear la respuesta paginada a array simple
+    //   CORREGIDO: Mapear la respuesta paginada a array simple
     return this.getDocumentosClinicos(filters).pipe(
       map(response => ({ // ← CORREGIDO: response con minúscula
         success: response.success,

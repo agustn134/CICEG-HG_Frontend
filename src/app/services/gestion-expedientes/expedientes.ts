@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { firstValueFrom } from 'rxjs'; // ✅ AGREGAR ESTE IMPORT
+import { firstValueFrom } from 'rxjs'; //   AGREGAR ESTE IMPORT
 import { BaseService } from '../base.service';
 import {
   Expediente,
@@ -62,7 +62,7 @@ export interface ExpedientesPorPaciente {
   expedientes: {
     id_expediente: number;
     numero_expediente: string;
-    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+    numero_expediente_administrativo?: string | null;
     fecha_apertura: string;
     estado: string;
     notas_administrativas?: string;
@@ -87,7 +87,7 @@ export interface DashboardExpedientes {
   expedientes_con_internamiento_activo: {
     id_expediente: number;
     numero_expediente: string;
-    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+    numero_expediente_administrativo?: string | null;
     nombre_paciente: string;
     fecha_ingreso: string;
     servicio?: string;
@@ -98,7 +98,7 @@ export interface DashboardExpedientes {
   expedientes_mas_activos: {
     id_expediente: number;
     numero_expediente: string;
-    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+    numero_expediente_administrativo?: string | null;
     nombre_paciente: string;
     total_documentos: number;
     documentos_semana: number;
@@ -109,7 +109,7 @@ export interface DashboardExpedientes {
     mensaje: string;
     fecha_alerta: string;
     numero_expediente?: string;
-    numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+    numero_expediente_administrativo?: string | null;
     nombre_paciente?: string;
   }[];
 }
@@ -299,7 +299,7 @@ getExpedientesAgrupadosPorEstado(): Observable<{ [estado: string]: number }> {
   return this.getExpedientes().pipe(
     map(response => {
       const agrupados: { [estado: string]: number } = {};
-      // ✅ CORREGIR: Verificar que response.data existe
+      //   CORREGIR: Verificar que response.data existe
       const expedientes = response.data || [];
       expedientes.forEach(exp => {
         agrupados[exp.estado] = (agrupados[exp.estado] || 0) + 1;
@@ -323,7 +323,7 @@ actualizarNumerosAdministrativosEnLote(actualizaciones: {
 
   const promesas = actualizaciones.map(async (actualizacion) => {
     try {
-      // ✅ CORREGIR: Usar firstValueFrom en lugar de toPromise()
+      //   CORREGIR: Usar firstValueFrom en lugar de toPromise()
       await firstValueFrom(this.updateNumeroAdministrativo(
         actualizacion.id_expediente,
         actualizacion.numero_expediente_administrativo,
@@ -354,7 +354,7 @@ actualizarNumerosAdministrativosEnLote(actualizaciones: {
 exportarExpedientes(filters?: ExpedienteFilters, formato: 'csv' | 'excel' = 'csv'): Observable<Blob> {
   return this.getExpedientes(filters).pipe(
     map(response => {
-      // ✅ CORREGIR: Verificar que response.data existe
+      //   CORREGIR: Verificar que response.data existe
       const data = response.data || [];
 
       if (formato === 'csv') {
@@ -382,7 +382,7 @@ private convertirACSV(expedientes: Expediente[]): Blob {
     'Internamientos Activos'
   ];
 
-  // ✅ CORREGIR: Verificar que expedientes existe y no es undefined
+  //   CORREGIR: Verificar que expedientes existe y no es undefined
   const expedientesSeguros = expedientes || [];
   const filas = expedientesSeguros.map(exp => [
     exp.id_expediente,
@@ -415,7 +415,7 @@ getEstadisticasNumerosAdministrativos(): Observable<{
 }> {
   return this.getExpedientes().pipe(
     map(response => {
-      // ✅ CORREGIR: Verificar que response.data existe
+      //   CORREGIR: Verificar que response.data existe
       const expedientes = response.data || [];
       const total = expedientes.length;
       const conNumero = expedientes.filter(exp => exp.numero_expediente_administrativo).length;
@@ -690,7 +690,7 @@ buscarPorCualquierNumeroSoloData(numero: string): Observable<ExpedienteBusqueda[
   // }> {
   //   return this.getExpedientes().pipe(
   //     map(response => {
-  //       const expedientes = response.data || []; // ✅ CORREGIDO
+  //       const expedientes = response.data || []; //   CORREGIDO
   //       const total = expedientes.length;
   //       const conNumero = expedientes.filter(exp => exp.numero_expediente_administrativo).length;
   //       const sinNumero = total - conNumero;

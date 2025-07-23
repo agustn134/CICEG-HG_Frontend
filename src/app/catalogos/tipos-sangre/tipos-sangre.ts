@@ -149,7 +149,7 @@ export class TiposSangre implements OnInit, OnDestroy {
           if (response.success && response.data) {
             this.tiposSangre.unshift(response.data);
             this.cerrarModal();
-            console.log('✅ Tipo de sangre creado exitosamente');
+            console.log('  Tipo de sangre creado exitosamente');
           } else {
             this.error = response.message || 'Error al crear tipo de sangre';
           }
@@ -190,7 +190,7 @@ export class TiposSangre implements OnInit, OnDestroy {
               this.tiposSangre[index] = response.data;
             }
             this.cerrarModal();
-            console.log('✅ Tipo de sangre actualizado exitosamente');
+            console.log('  Tipo de sangre actualizado exitosamente');
           } else {
             this.error = response.message || 'Error al actualizar tipo de sangre';
           }
@@ -220,7 +220,7 @@ export class TiposSangre implements OnInit, OnDestroy {
           if (response.success) {
             this.tiposSangre = this.tiposSangre.filter(t => t.id_tipo_sangre !== this.tipoSeleccionado!.id_tipo_sangre);
             this.cerrarConfirmacion();
-            console.log('✅ Tipo de sangre eliminado exitosamente');
+            console.log('  Tipo de sangre eliminado exitosamente');
           } else {
             this.error = response.message || 'Error al eliminar tipo de sangre';
           }

@@ -18,8 +18,16 @@ export class ConsentimientosInformados {
   // }
 
   createConsentimiento(data: any): Observable<ApiResponse<any>> {
-  return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, data);
-}
+    console.log('🔄 ConsentimientosService.createConsentimiento()');
+    console.log('🚀 URL:', `${this.apiUrl}`);
+    console.log('🚀 Datos enviados:', data);
+    console.log('🔍 Campos requeridos verificados:');
+    console.log('  - id_expediente:', data.id_expediente ? '✅' : '❌');
+    console.log('  - id_paciente:', data.id_paciente ? '✅' : '❌');
+    console.log('  - id_personal_medico:', data.id_personal_medico ? '✅' : '❌');
+    
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, data);
+  }
 
   getConsentimientos(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(this.apiUrl);

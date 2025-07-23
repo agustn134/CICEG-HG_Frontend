@@ -71,7 +71,7 @@ export class PersonasService {
             );
             this.personasSubject.next(personasFrontend);
 
-            console.log('✅ Personas cargadas exitosamente:', personasFrontend.length);
+            console.log('  Personas cargadas exitosamente:', personasFrontend.length);
 
             // Devolver respuesta convertida
             return {

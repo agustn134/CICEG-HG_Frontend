@@ -73,24 +73,24 @@
 //    * GET /api/catalogos/tipos-documento
 //    */
 //   getTiposDocumento(): Observable<TipoDocumentoBackend[]> {
-//     console.log('🔍 Cargando tipos de documento desde:', `${this.baseUrl}/tipos-documento`);
+//     console.log('  Cargando tipos de documento desde:', `${this.baseUrl}/tipos-documento`);
 
 //     return this.http.get<any>(`${this.baseUrl}/tipos-documento`)
 //       .pipe(
 //         map(response => {
 //           // Si el response tiene structure de ApiResponse
 //           if (response.success && response.data) {
-//             console.log('✅ Respuesta del backend (tipos documento):', response.data);
+//             console.log('  Respuesta del backend (tipos documento):', response.data);
 //             return response.data;
 //           }
 //           // Si el response es directo array
 //           else if (Array.isArray(response)) {
-//             console.log('✅ Respuesta directa del backend (tipos documento):', response);
+//             console.log('  Respuesta directa del backend (tipos documento):', response);
 //             return response;
 //           }
 //           // Si no hay datos
 //           else {
-//             console.warn('⚠️ Respuesta inesperada del backend:', response);
+//             console.warn('  Respuesta inesperada del backend:', response);
 //             return [];
 //           }
 //         }),
@@ -272,7 +272,7 @@
 // //     try {
 // //       const response = await this.http.get(`${this.baseUrl}/${endpoint}`).toPromise();
 // //       results[endpoint] = true;
-// //       console.log(`✅ Endpoint disponible: /api/catalogos/${endpoint}`);
+// //       console.log(`  Endpoint disponible: /api/catalogos/${endpoint}`);
 // //     } catch (error) {
 // //       results[endpoint] = false;
 // //       console.log(`❌ Endpoint NO disponible: /api/catalogos/${endpoint}`);
@@ -434,35 +434,35 @@
 
 // // private fetchCatalogo(tipo: TipoCatalogo): Observable<CatalogoItem[]> {
 // //   const endpointMap: { [key in TipoCatalogo]: string } = {
-// //     'tipos_sangre': 'tipos-sangre',           // ✅ Corregido
-// //     'estados_civiles': 'estados-civiles',     // ✅ Nuevo endpoint necesario
-// //     'religiones': 'religiones',               // ✅ Nuevo endpoint necesario
-// //     'servicios': 'servicios',                 // ✅ Ya existe
-// //     'especialidades_medicas': 'especialidades-medicas', // ✅ Nuevo endpoint necesario
-// //     'tipos_documentos_clinicos': 'tipos-documento', // ✅ Ya existe
-// //     'areas_interconsulta': 'areas-interconsulta', // ✅ Ya existe
-// //     'parentescos': 'parentescos',             // ✅ Nuevo endpoint necesario
-// //     'niveles_escolaridad': 'niveles-escolaridad', // ✅ Nuevo endpoint necesario
-// //     'estados_republica': 'estados-republica', // ✅ Nuevo endpoint necesario
-// //     'tipos_egreso': 'tipos-egreso',           // ✅ Nuevo endpoint necesario
-// //     'estados_documento': 'estados-documento'  // ✅ Nuevo endpoint necesario
+// //     'tipos_sangre': 'tipos-sangre',           //   Corregido
+// //     'estados_civiles': 'estados-civiles',     //   Nuevo endpoint necesario
+// //     'religiones': 'religiones',               //   Nuevo endpoint necesario
+// //     'servicios': 'servicios',                 //   Ya existe
+// //     'especialidades_medicas': 'especialidades-medicas', //   Nuevo endpoint necesario
+// //     'tipos_documentos_clinicos': 'tipos-documento', //   Ya existe
+// //     'areas_interconsulta': 'areas-interconsulta', //   Ya existe
+// //     'parentescos': 'parentescos',             //   Nuevo endpoint necesario
+// //     'niveles_escolaridad': 'niveles-escolaridad', //   Nuevo endpoint necesario
+// //     'estados_republica': 'estados-republica', //   Nuevo endpoint necesario
+// //     'tipos_egreso': 'tipos-egreso',           //   Nuevo endpoint necesario
+// //     'estados_documento': 'estados-documento'  //   Nuevo endpoint necesario
 // //   };
 
 // //   const endpoint = endpointMap[tipo];
 // //   const url = `${this.baseUrl}/${endpoint}`;
 
-// //   console.log(`🔍 Solicitando catálogo: ${tipo} -> ${url}`);
+// //   console.log(`  Solicitando catálogo: ${tipo} -> ${url}`);
 
 // //   return this.http.get<CatalogoResponse>(url).pipe(
 // //     map(response => {
 // //       if (response.success && response.data) {
-// //         console.log(`✅ Catálogo ${tipo} cargado desde backend:`, response.data.length, 'items');
+// //         console.log(`  Catálogo ${tipo} cargado desde backend:`, response.data.length, 'items');
 // //         return response.data;
 // //       }
 // //       throw new Error(response.mensaje || 'Error al cargar catálogo');
 // //     }),
 // //     catchError(error => {
-// //       console.warn(`⚠️ Error al cargar catálogo ${tipo}, usando datos estáticos:`, error);
+// //       console.warn(`  Error al cargar catálogo ${tipo}, usando datos estáticos:`, error);
 
 // //       // Fallback a datos estáticos
 // //       const staticData = this.getStaticCatalogo(tipo);
@@ -504,13 +504,13 @@
 //   const endpoint = endpointMap[tipo];
 //   const url = `${this.baseUrl}/${endpoint}`;
 
-//   // 🔍 LOGGING SIMPLE (siempre activo en desarrollo)
-//   console.log(`🔍 Solicitando catálogo: ${tipo} -> ${url}`);
+//   //   LOGGING SIMPLE (siempre activo en desarrollo)
+//   console.log(`  Solicitando catálogo: ${tipo} -> ${url}`);
 
 //   return this.http.get<CatalogoResponse>(url).pipe(
 //     map(response => {
 //       if (response.success && response.data) {
-//         console.log(`✅ Catálogo ${tipo} cargado desde backend:`, response.data.length, 'items');
+//         console.log(`  Catálogo ${tipo} cargado desde backend:`, response.data.length, 'items');
 //         return response.data;
 //       }
 //       throw new Error(response.mensaje || 'Error al cargar catálogo');
@@ -524,7 +524,7 @@
 //         console.info(`📋 Usando datos estáticos para ${tipo}`);
 //       } else {
 //         // Warning para errores inesperados
-//         console.warn(`⚠️ Error al cargar catálogo ${tipo}:`, error.status, error.statusText);
+//         console.warn(`  Error al cargar catálogo ${tipo}:`, error.status, error.statusText);
 //       }
 
 //       const staticData = this.getStaticCatalogo(tipo);
@@ -564,7 +564,7 @@
 //         headers: { 'X-Silent-Check': 'true' }
 //       }).toPromise();
 //       results[endpoint] = true;
-//       console.log(`✅ Endpoint disponible: /api/catalogos/${endpoint}`);
+//       console.log(`  Endpoint disponible: /api/catalogos/${endpoint}`);
 //     } catch {
 //       results[endpoint] = false;
 //       console.log(`❌ Endpoint NO disponible: /api/catalogos/${endpoint}`);
@@ -777,24 +777,24 @@ export class CatalogoService {
    * GET /api/catalogos/tipos-documento
    */
   getTiposDocumento(): Observable<TipoDocumentoBackend[]> {
-    console.log('🔍 Cargando tipos de documento desde:', `${this.baseUrl}/tipos-documento`);
+    console.log('  Cargando tipos de documento desde:', `${this.baseUrl}/tipos-documento`);
 
     return this.http.get<any>(`${this.baseUrl}/tipos-documento`)
       .pipe(
         map(response => {
           // Si el response tiene structure de ApiResponse
           if (response.success && response.data) {
-            console.log('✅ Respuesta del backend (tipos documento):', response.data);
+            console.log('  Respuesta del backend (tipos documento):', response.data);
             return response.data;
           }
           // Si el response es directo array
           else if (Array.isArray(response)) {
-            console.log('✅ Respuesta directa del backend (tipos documento):', response);
+            console.log('  Respuesta directa del backend (tipos documento):', response);
             return response;
           }
           // Si no hay datos
           else {
-            console.warn('⚠️ Respuesta inesperada del backend:', response);
+            console.warn('  Respuesta inesperada del backend:', response);
             return [];
           }
         }),
@@ -907,8 +907,8 @@ export class CatalogoService {
 preloadEssentialCatalogos(): Observable<boolean> {
   // 🎯 SOLO CATÁLOGOS QUE EXISTEN EN TU BACKEND
   const essentialTypes: TipoCatalogo[] = [
-    'tipos_sangre',     // ✅ Existe como tipos-sangre
-    'servicios'         // ✅ Existe como servicios
+    'tipos_sangre',     //   Existe como tipos-sangre
+    'servicios'         //   Existe como servicios
     // ❌ NO incluir: 'tipos_documentos_clinicos' porque da problemas
   ];
 
@@ -916,21 +916,21 @@ preloadEssentialCatalogos(): Observable<boolean> {
 
   // Si no hay catálogos que cargar, retornar éxito inmediatamente
   if (essentialTypes.length === 0) {
-    console.log('✅ No hay catálogos esenciales que cargar');
+    console.log('  No hay catálogos esenciales que cargar');
     return of(true);
   }
 
   return this.getCatalogos(essentialTypes).pipe(
     map(() => {
-      console.log('✅ Catálogos esenciales cargados correctamente');
+      console.log('  Catálogos esenciales cargados correctamente');
       return true;
     }),
     catchError((error) => {
-      console.warn('⚠️ Error al cargar algunos catálogos esenciales:', error);
-      // ✅ RETORNAR TRUE PARA CONTINUAR AUNQUE HAYA ERRORES
+      console.warn('  Error al cargar algunos catálogos esenciales:', error);
+      //   RETORNAR TRUE PARA CONTINUAR AUNQUE HAYA ERRORES
       return of(true);
     }),
-    // ✅ TIMEOUT DE SEGURIDAD: Si no responde en 2 segundos, continuar
+    //   TIMEOUT DE SEGURIDAD: Si no responde en 2 segundos, continuar
     timeout(2000),
     catchError(() => {
       console.warn('⏰ Timeout en carga de catálogos - continuando');
@@ -1129,7 +1129,7 @@ preloadEssentialCatalogos(): Observable<boolean> {
     const endpoint = endpointMap[tipo];
     const url = `${this.baseUrl}/${endpoint}`;
 
-    console.log(`🔍 Solicitando catálogo: ${tipo} -> ${url}`);
+    console.log(`  Solicitando catálogo: ${tipo} -> ${url}`);
 
     return this.http.get<CatalogoResponse>(url).pipe(
       map(response => {

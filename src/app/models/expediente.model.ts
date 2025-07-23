@@ -1,5 +1,5 @@
 // src/app/models/expediente.model.ts
-import { BaseEntity, AuditInfo, BaseFilters, Genero, EstadoDocumento, TipoEgreso, PaginationInfo } from './base.models';
+import { BaseEntity, AuditInfo, BaseFilters, Genero, EstadoDocumento, TipoEgreso } from './base.models';
 
 // ==========================================
 // INTERFACE PRINCIPAL EXPEDIENTE
@@ -9,7 +9,7 @@ export interface Expediente extends BaseEntity, AuditInfo {
   id_paciente: number;
   numero_expediente: string;
   // 🆕 Número asignado manualmente por expedientes clínicos
-  numero_expediente_administrativo?: string;
+  numero_expediente_administrativo?: string | null;  //   Ahora permite null
   fecha_apertura: string;
   estado: string; // 'Activo', 'Cerrado', 'Archivado', 'Suspendido', 'Eliminado'
   notas_administrativas?: string;
@@ -123,7 +123,7 @@ export interface SignosVitalesResumen {
 export interface ExpedienteBusqueda {
   id_expediente: number;
   numero_expediente: string;
-  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+  numero_expediente_administrativo?: string;  //   AGREGAR ESTE CAMPO
   fecha_apertura: string;
   estado: string;
   nombre_paciente: string;
@@ -145,7 +145,7 @@ export interface ExpedientesPorPaciente {
 export interface ExpedienteResumen {
   id_expediente: number;
   numero_expediente: string;
-  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+  numero_expediente_administrativo?: string;  //   AGREGAR ESTE CAMPO
   fecha_apertura: string;
   estado: string;
   notas_administrativas?: string;
@@ -195,9 +195,15 @@ export interface CreateExpedienteDto {
   crear_historia_clinica?: boolean;
   id_medico_creador?: number;
 }
+// export interface UpdateExpedienteDto {
+//   estado?: string;
+//   numero_expediente_administrativo?: string;  //   AGREGAR ESTE CAMPO
+//   notas_administrativas?: string;
+//   id_medico_modificador?: number;
+// }
 export interface UpdateExpedienteDto {
   estado?: string;
-  numero_expediente_administrativo?: string;  // ✅ AGREGAR ESTE CAMPO
+  numero_expediente_administrativo?: string | null;  //   CAMBIAR AQUÍ
   notas_administrativas?: string;
   id_medico_modificador?: number;
 }

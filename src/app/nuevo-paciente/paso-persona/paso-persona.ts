@@ -35,6 +35,9 @@ export class PasoPersona implements OnInit, OnDestroy {
   edadCalculada = signal(0);
   autoGuardadoStatus = signal('');
 
+  mostrarModalEditarExpediente = false;
+numeroAdministrativoTemporal = '';
+
   // Configuración
   fechaMaxima = '';
   totalCamposObligatorios = 5; // nombre, apellido_paterno, fecha_nacimiento, genero, curp
@@ -69,6 +72,10 @@ export class PasoPersona implements OnInit, OnDestroy {
     return completados;
   });
 
+
+
+
+
   constructor(
     private fb: FormBuilder,
     private wizardStateService: WizardStateService,
@@ -90,6 +97,10 @@ export class PasoPersona implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+
+
+
 
   // ==========================================
   // INICIALIZACIÓN
@@ -350,7 +361,7 @@ private saveAndContinue(): void {
     // Llamada real al backend a través del PersonasService
     this.personasService.createPersona(personaFrontendDto).subscribe({
       next: (response) => {
-        console.log('✅ Respuesta del backend:', response);
+        console.log('  Respuesta del backend:', response);
 
         if (response.success && response.data) {
           // Actualizar estado del wizard con datos guardados
@@ -366,10 +377,10 @@ private saveAndContinue(): void {
 
           // Actualizar UI
           this.isLoading.set(false);
-          this.autoGuardadoStatus.set('✅ Persona registrada exitosamente');
+          this.autoGuardadoStatus.set('Persona registrada exitosamente');
 
-          console.log('✅ Persona creada con ID:', response.data.id_persona);
-          console.log('➡️ Navegando al siguiente paso...');
+          console.log('Persona creada con ID:', response.data.id_persona);
+          console.log('Navegando al siguiente paso...');
 
           // Navegar al siguiente paso después de una breve pausa
           setTimeout(() => {
@@ -469,7 +480,7 @@ private saveAndContinueAlternative(): void {
 
           // UI updates
           this.isLoading.set(false);
-          this.autoGuardadoStatus.set('✅ Persona registrada exitosamente');
+          this.autoGuardadoStatus.set('  Persona registrada exitosamente');
 
           // Navigate to next step
           setTimeout(() => {
