@@ -85,6 +85,15 @@ import { AltaVoluntaria } from '../../models/alta-voluntaria.model';
 import { SolicitudCultivo } from '../../models/solicitud-cultivo.model';
 import { SolicitudGasometria } from '../../models/solicitud-gasometria.model';
 
+// ... otras importaciones ...
+import { AntecedentesHeredoFamiliaresService } from '../../services/documentos-clinicos/antecedentes-heredo-familiares';
+import { AntecedentesPerinatalesService } from '../../services/documentos-clinicos/antecedentes-perinatales';
+import { DesarrolloPsicomotrizService } from '../../services/documentos-clinicos/desarrollo-psicomotriz';
+import { EstadoNutricionalPediatricoService } from '../../services/documentos-clinicos/estado-nutricional-pediatrico';
+import { InmunizacionesService } from '../../services/documentos-clinicos/inmunizaciones';
+import { VacunasAdicionalesService } from '../../services/documentos-clinicos/vacunas-adicionales';
+// ... otras importaciones ...
+
 
 interface TipoDocumentoConfig {
   id: string;
@@ -168,6 +177,14 @@ interface FormularioEstado {
   prescripcionMedicamento: boolean;
   registroTransfusion: boolean;
   notaEgreso: boolean;
+  desarrolloPsicomotriz: boolean;
+  alimentacionPediatrica: boolean;
+  tamizajeNeonatal: boolean;
+  antecedentesHeredoFamiliares: boolean;
+  antecedentesPerinatales: boolean;
+  estadoNutricionalPediatrico: boolean;
+  inmunizaciones: boolean;
+  vacunasAdicionales: boolean;
 }
 
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
@@ -189,6 +206,11 @@ type FormularioActivo =
   | 'desarrolloPsicomotriz'
   | 'alimentacionPediatrica'
   | 'tamizajeNeonatal'
+  | 'antecedentesHeredoFamiliares'
+  | 'antecedentesPerinatales'
+  | 'estadoNutricionalPediatrico'
+  | 'inmunizaciones'
+  | 'vacunasAdicionales'
   | 'solicitudEstudio'
   | 'referenciaTraslado'
   | 'prescripcionMedicamento'
@@ -242,6 +264,11 @@ historiaClinicaPediatricaForm!: FormGroup;
 desarrolloPsicomotrizForm!: FormGroup;
 alimentacionPediatricaForm!: FormGroup;
 tamizajeNeonatalForm!: FormGroup;
+  antecedentesHeredoFamiliaresForm!: FormGroup;
+  antecedentesPerinatalesForm!: FormGroup;
+  estadoNutricionalPediatricoForm!: FormGroup;
+  inmunizacionesForm!: FormGroup;
+  vacunasAdicionalesForm!: FormGroup;
 
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
@@ -263,12 +290,15 @@ tamizajeNeonatalForm!: FormGroup;
     prescripcionMedicamento: false,
     registroTransfusion: false,
     notaEgreso: false,
-  historiaClinicaPediatrica: false,
-  desarrolloPsicomotriz: false,
-  alimentacionPediatrica: false,
-  tamizajeNeonatal: false,
-
-
+    historiaClinicaPediatrica: false,
+    desarrolloPsicomotriz: false,
+    alimentacionPediatrica: false,
+    tamizajeNeonatal: false,
+    antecedentesHeredoFamiliares: false,
+    antecedentesPerinatales: false,
+    estadoNutricionalPediatrico: false,
+    inmunizaciones: false,
+    vacunasAdicionales: false,
   };
 
 
@@ -313,7 +343,13 @@ numeroAdministrativoTemporal = '';
     private hojaFrontalService: HojaFrontalService,
     private altaVoluntariaService: AltaVoluntariaService,
     private cultivosService: CultivosService,
-    private gasometriaService: GasometriaService
+    private gasometriaService: GasometriaService,
+    private antecedentesHeredoFamiliaresService: AntecedentesHeredoFamiliaresService,
+    private antecedentesPerinatalesService: AntecedentesPerinatalesService,
+    private desarrolloPsicomotrizService: DesarrolloPsicomotrizService,
+    private estadoNutricionalPediatricoService: EstadoNutricionalPediatricoService,
+    private inmunizacionesService: InmunizacionesService,
+    private vacunasAdicionalesService: VacunasAdicionalesService
   ) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
@@ -670,7 +706,7 @@ numeroAdministrativoTemporal = '';
   {
     id: 'desarrolloPsicomotriz',
     nombre: 'Desarrollo Psicomotriz',
-    descripción: 'Evaluación del desarrollo psicomotor',
+    descripcion: 'Evaluación del desarrollo psicomotor',
     icono: 'fas fa-child',
     color: 'indigo',
     requiereInternamiento: false,
@@ -682,7 +718,7 @@ numeroAdministrativoTemporal = '';
   {
     id: 'alimentacionPediatrica',
     nombre: 'Alimentación Pediátrica',
-    descripción: 'Evaluación nutricional pediátrica',
+    descripcion: 'Evaluación nutricional pediátrica',
     icono: 'fas fa-utensils',
     color: 'green',
     requiereInternamiento: false,
@@ -694,7 +730,7 @@ numeroAdministrativoTemporal = '';
   {
     id: 'tamizajeNeonatal',
     nombre: 'Tamizaje Neonatal',
-    descripción: 'Pruebas de detección neonatal',
+    descripcion: 'Pruebas de detección neonatal',
     icono: 'fas fa-microscope',
     color: 'yellow',
     requiereInternamiento: false,
@@ -1170,7 +1206,12 @@ private obtenerIdMedicoActual(): number | undefined {
   this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
   this.alimentacionPediatricaForm = this.initializeAlimentacionPediatricaForm();
   this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
-
+// Dentro de inicializarFormularios() o una función similar
+this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
+this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
+this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
+this.inmunizacionesForm = this.initializeInmunizacionesForm();
+this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
     console.log(
       '- Todos los formularios han sido inicializados correctamente.'
     );
@@ -1883,6 +1924,18 @@ this.error = `Error al procesar ${nombreFormulario}`;
     });
   }
 
+  private marcarCamposInvalidos(form: FormGroup): void {
+    Object.keys(form.controls).forEach(field => {
+      const control = form.get(field);
+      if (control) {
+        control.markAsTouched();
+        if (control instanceof FormGroup) {
+          this.marcarCamposInvalidos(control);
+        }
+      }
+    });
+  }
+
   getClasesTarjetaDocumento(documento: TipoDocumentoConfig): string {
     const estado = this.getEstadoDocumento(documento.id);
     const baseClasses =
@@ -2348,6 +2401,68 @@ this.error = `Error al procesar ${nombreFormulario}`;
     });
   }
 
+
+  // Dentro de tu clase PerfilPaciente
+private prepararDatosAntecedentesHeredoFamiliares(): any {
+    return {
+        ...this.antecedentesHeredoFamiliaresForm.value,
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_personal_registro: this.medicoActual,
+        id_paciente: this.pacienteId,
+    };
+}
+
+private prepararDatosAntecedentesPerinatales(): any {
+    return {
+        ...this.antecedentesPerinatalesForm.value,
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_personal_registro: this.medicoActual,
+        id_paciente: this.pacienteId,
+    };
+}
+
+private prepararDatosDesarrolloPsicomotriz(): any {
+    return {
+        ...this.desarrolloPsicomotrizForm.value,
+        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+        id_personal_registro: this.medicoActual,
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_paciente: this.pacienteId,
+    };
+}
+
+private prepararDatosEstadoNutricionalPediatrico(): any {
+    return {
+        ...this.estadoNutricionalPediatricoForm.value,
+        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+        id_personal_registro: this.medicoActual,
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_paciente: this.pacienteId,
+        fecha_evaluacion: new Date().toISOString().split('T')[0], // Fecha actual
+    };
+}
+
+private prepararDatosInmunizaciones(): any {
+    return {
+        ...this.inmunizacionesForm.value,
+        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+        id_personal_registro: this.medicoActual,
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_paciente: this.pacienteId,
+    };
+}
+
+private prepararDatosVacunasAdicionales(): any {
+    return {
+        ...this.vacunasAdicionalesForm.value,
+        id_inmunizacion: 1, // Esto podría necesitar ser obtenido dinámicamente
+        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+        id_paciente: this.pacienteId,
+        id_personal_registro: this.medicoActual,
+    };
+}
+
+
   private initializeControlCrecimientoForm(): FormGroup {
     return this.fb.group({
       peso: [
@@ -2450,44 +2565,6 @@ private initializeHistoriaClinicaPediatricaForm(): FormGroup {
   });
 }
 
-// Nuevo: Desarrollo Psicomotriz
-private initializeDesarrolloPsicomotrizForm(): FormGroup {
-  return this.fb.group({
-    // Hitos motores gruesos
-    sostuvo_cabeza_meses: ['', [Validators.min(0), Validators.max(12)]],
-    se_sento_sin_apoyo_meses: ['', [Validators.min(0), Validators.max(18)]],
-    gateo_meses: ['', [Validators.min(0), Validators.max(18)]],
-    camino_solo_meses: ['', [Validators.min(0), Validators.max(24)]],
-    corrio_meses: ['', [Validators.min(0), Validators.max(36)]],
-    
-    // Hitos motores finos
-    pinza_fina_meses: ['', [Validators.min(0), Validators.max(18)]],
-    dibujo_circulo_meses: ['', [Validators.min(0), Validators.max(48)]],
-    uso_cuchara_meses: ['', [Validators.min(0), Validators.max(36)]],
-    
-    // Desarrollo del lenguaje
-    primera_palabra_meses: ['', [Validators.min(0), Validators.max(24)]],
-    frases_dos_palabras_meses: ['', [Validators.min(0), Validators.max(36)]],
-    oraciones_completas_meses: ['', [Validators.min(0), Validators.max(48)]],
-    
-    // Desarrollo social
-    sonrisa_social_meses: ['', [Validators.min(0), Validators.max(6)]],
-    juego_simbolico_meses: ['', [Validators.min(0), Validators.max(36)]],
-    control_esfinteres_meses: ['', [Validators.min(0), Validators.max(48)]],
-    
-    // Evaluación actual
-    edad_meses_evaluacion: [this.calcularEdadEnMeses()],
-    desarrollo_acorde_edad: [true],
-    areas_retraso: [''],
-    recomendaciones_estimulacion: [''],
-    referencia_especialista: [false],
-    tipo_especialista: [''],
-    
-    // Observaciones
-    observaciones_generales: [''],
-    alertas_desarrollo: ['']
-  });
-}
 
 // Nuevo: Alimentación Pediátrica
 private initializeAlimentacionPediatricaForm(): FormGroup {
@@ -2579,8 +2656,220 @@ private initializeTamizajeNeonatalForm(): FormGroup {
 
 
 
+private initializeAntecedentesHeredoFamiliaresForm(): FormGroup {
+    return this.fb.group({
+        // Inicializa con valores por defecto o vacíos
+        // Basado en CreateAntecedentesHeredoFamiliaresDto
+        antecedentes_paternos: this.fb.group({
+            diabetes: [false],
+            hipertension: [false],
+            cardiopatias: [false],
+            cancer: [false],
+            enfermedades_mentales: [false],
+            malformaciones_congenitas: [false],
+            otros: ['']
+        }),
+        antecedentes_maternos: this.fb.group({
+            diabetes: [false],
+            hipertension: [false],
+            cardiopatias: [false],
+            cancer: [false],
+            enfermedades_mentales: [false],
+            malformaciones_congenitas: [false],
+            otros: ['']
+        }),
+        numero_hermanos: [null, [Validators.min(0)]],
+        antecedentes_hermanos: [''],
+        otros_antecedentes_familiares: [''],
+        observaciones: ['']
+        // id_personal_registro se asignará al guardar
+    });
+}
+
+private initializeAntecedentesPerinatalesForm(): FormGroup {
+    return this.fb.group({
+         // Basado en CreateAntecedentesPerinatalesDto
+        embarazo_planeado: [false],
+        numero_embarazo: [null, [Validators.min(1)]],
+        control_prenatal: [false],
+        numero_consultas_prenatales: [null, [Validators.min(0)]],
+        complicaciones_embarazo: [''],
+        tipo_parto: ['', Validators.required], // 'Vaginal' | 'Cesarea'
+        semanas_gestacion: [null, [Validators.min(0)]],
+        peso_nacimiento: [null, [Validators.min(0)]], // DECIMAL
+        talla_nacimiento: [null, [Validators.min(0)]], // DECIMAL
+        apgar_1_min: [null, [Validators.min(0), Validators.max(10)]],
+        apgar_5_min: [null, [Validators.min(0), Validators.max(10)]],
+        llanto_inmediato: [false],
+        hospitalizacion_neonatal: [false],
+        dias_hospitalizacion_neonatal: [null, [Validators.min(0)]],
+        problemas_neonatales: [''],
+        alimentacion_neonatal: [''], // 'Seno materno' | 'Fórmula' | 'Mixta'
+        peso_2_meses: [null], // DECIMAL
+        peso_4_meses: [null], // DECIMAL
+        peso_6_meses: [null], // DECIMAL
+        observaciones: ['']
+        // id_personal_registro se asignará al guardar
+    });
+}
 
 
+
+// Dentro de tu clase PerfilPaciente
+// Asumiendo que tienes acceso a `this.fb: FormBuilder` desde el constructor
+
+// ... (initializeAntecedentesHeredoFamiliaresForm e initializeAntecedentesPerinatalesForm como antes) ...
+
+private initializeDesarrolloPsicomotrizForm(): FormGroup {
+    return this.fb.group({
+        // Desarrollo motor grueso
+        sostuvo_cabeza_meses: [null, [Validators.min(0)]],
+        se_sento_meses: [null, [Validators.min(0)]],
+        gateo_meses: [null, [Validators.min(0)]],
+        camino_meses: [null, [Validators.min(0)]],
+        // Puedes añadir más hitos de motor grueso según tu modelo/BD
+
+        // Desarrollo del lenguaje
+        primera_palabra_meses: [null, [Validators.min(0)]],
+        primeras_frases_meses: [null, [Validators.min(0)]],
+
+        // Desarrollo social y otros
+        sonrisa_social_meses: [null, [Validators.min(0)]],
+        reconocimiento_padres_meses: [null, [Validators.min(0)]],
+        control_diurno_meses: [null, [Validators.min(0)]],
+        control_nocturno_meses: [null, [Validators.min(0)]],
+        juego_simbolico_meses: [null, [Validators.min(0)]],
+        seguimiento_instrucciones_meses: [null, [Validators.min(0)]],
+
+        // Evaluación actual
+        desarrollo_normal: [true],
+        observaciones_desarrollo: [''],
+        necesita_estimulacion: [false],
+        tipo_estimulacion: [''],
+        areas_retraso: [''],
+        recomendaciones: ['']
+        // id_personal_registro se asignará al guardar
+    });
+}
+
+private initializeEstadoNutricionalPediatricoForm(): FormGroup {
+    return this.fb.group({
+        // Datos antropométricos
+        peso_kg: [null, [Validators.required, Validators.min(0.1)]],
+        talla_cm: [null, [Validators.required, Validators.min(20)]],
+        perimetro_cefalico_cm: [null, [Validators.min(0)]],
+        perimetro_brazo_cm: [null, [Validators.min(0)]],
+
+        // Índices nutricionales (pueden ser calculados o ingresados)
+        percentil_peso: [null, [Validators.min(0), Validators.max(100)]],
+        percentil_talla: [null, [Validators.min(0), Validators.max(100)]],
+        percentil_perimetro_cefalico: [null, [Validators.min(0), Validators.max(100)]],
+        peso_para_edad: [''],
+        talla_para_edad: [''],
+        peso_para_talla: [''],
+        imc: [null, [Validators.min(0)]],
+        // imc_percentil podría calcularse
+
+        // Evaluación clínica
+        aspecto_general: [''],
+        estado_hidratacion: [''],
+        palidez_mucosas: [false],
+        edemas: [false],
+        masa_muscular: [''],
+        tejido_adiposo: [''],
+
+        // Clasificación nutricional
+        diagnostico_nutricional: [''], // Este podría ser un select basado en cálculos
+        riesgo_nutricional: [false],
+
+        // Alimentación
+        tipo_alimentacion: [''], // Considera usar un select con las opciones del enum
+        numero_comidas_dia: [null, [Validators.min(1)]],
+        apetito: [''], // Considera usar un select: 'BUENO', 'REGULAR', 'MALO'
+
+        // Síntomas relacionados
+        nauseas: [false],
+        vomitos: [false],
+        diarrea: [false],
+        estrenimiento: [false],
+
+        // Plan nutricional
+        recomendaciones_nutricionales: [''],
+        suplementos_vitaminicos: [''],
+        observaciones: [''],
+
+        // Fecha de evaluación (se puede manejar automáticamente o permitir selección)
+        fecha_evaluacion: [new Date().toISOString().split('T')[0]]
+        // id_personal_registro se asignará al guardar
+    });
+}
+
+// Para Inmunizaciones, dado que maneja múltiples vacunas y dosis,
+// es más complejo. Una opción es manejar las vacunas como un FormArray
+// o tener campos específicos. Aquí un ejemplo básico con campos principales.
+private initializeInmunizacionesForm(): FormGroup {
+    return this.fb.group({
+        // Campos generales del esquema
+        esquema_completo_edad: [false],
+        esquema_incompleto_razon: [''],
+        porcentaje_completado: [null, [Validators.min(0), Validators.max(100)]],
+        reacciones_adversas: [''],
+        observaciones: [''],
+        
+        // Campos para vacunas individuales (esto es simplificado)
+        // En la práctica, podrías necesitar un FormArray para manejar múltiples dosis
+        // o estructuras anidadas. Esto es un ejemplo básico.
+        bcg_fecha: [''],
+        bcg_observaciones: [''],
+        // ... otros campos de vacunas según tu estructura de BD ...
+        
+        // id_personal_registro se asignará al guardar
+    });
+}
+
+// VacunasAdicionales está más relacionado con registros individuales de vacunas aplicadas
+// que con un esquema general. Es posible que no necesites un formulario grande aquí,
+// sino una forma de agregar/eliminar vacunas adicionales una por una.
+// Si necesitas un formulario para esto, podría ser algo como:
+private initializeVacunasAdicionalesForm(): FormGroup {
+    // Este formulario podría representar una *única* vacuna adicional a agregar
+    return this.fb.group({
+        // id_inmunizacion: [null, Validators.required], // Se necesitaría el ID del esquema
+        nombre_vacuna: ['', Validators.required],
+        laboratorio: [''],
+        lote: [''],
+        fecha_aplicacion: [new Date().toISOString().split('T')[0], Validators.required],
+        dosis: [1, [Validators.required, Validators.min(1)]],
+        via_aplicacion: [''],
+        sitio_aplicacion: [''],
+        reacciones_adversas: [''],
+        observaciones: ['']
+        // id_personal_registro se asignará al guardar
+    });
+}
+
+// O si necesitas manejar varias vacunas adicionales en un solo formulario:
+private initializeVacunasAdicionalesListForm(): FormGroup {
+    return this.fb.group({
+        vacunas: this.fb.array([]) // Un FormArray para manejar múltiples VacunaAdicional
+    });
+}
+
+// Helper para crear un FormGroup para una vacuna adicional individual (para usar con FormArray)
+createVacunaAdicionalGroup(): FormGroup {
+    return this.fb.group({
+        // id_vacuna_adicional: [null], // Para ediciones
+        nombre_vacuna: ['', Validators.required],
+        laboratorio: [''],
+        lote: [''],
+        fecha_aplicacion: [new Date().toISOString().split('T')[0], Validators.required],
+        dosis: [1, [Validators.required, Validators.min(1)]],
+        via_aplicacion: [''],
+        sitio_aplicacion: [''],
+        reacciones_adversas: [''],
+        observaciones: ['']
+    });
+}
 
 
 
@@ -2748,18 +3037,6 @@ private initializeTamizajeNeonatalForm(): FormGroup {
           this.formularioEstado['esquemaVacunacion'] = true;
           break;
 
-           case 'controlCrecimiento':
-        await this.guardarControlCrecimiento();
-        this.formularioEstado['controlCrecimiento'] = true;
-        this.success = 'Control de Crecimiento guardado correctamente';
-        break;
-
-      case 'esquemaVacunacion':
-        await this.guardarEsquemaVacunacion();
-        this.formularioEstado['esquemaVacunacion'] = true;
-        this.success = 'Registro de vacunación guardado correctamente';
-        break;
-
       case 'historiaClinicaPediatrica':
         await this.guardarHistoriaClinicaPediatrica();
         this.formularioEstado['historiaClinicaPediatrica'] = true;
@@ -2837,7 +3114,7 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
     fecha_elaboracion: new Date().toISOString(),
   };
   
-  await firstValueFrom(this.historiasClinicasService.create(datosHistoria));
+  await firstValueFrom(this.historiasClinicasService.createHistoriaClinica(datosHistoria));
 }
 
   private async guardarConsentimiento(): Promise<void> {
@@ -3073,6 +3350,15 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
         prescripcionMedicamento: false,
         registroTransfusion: false,
         notaEgreso: false,
+        historiaClinicaPediatrica: false,
+        desarrolloPsicomotriz: false,
+        alimentacionPediatrica: false,
+        tamizajeNeonatal: false,
+        antecedentesHeredoFamiliares: false,
+        antecedentesPerinatales: false,
+        estadoNutricionalPediatrico: false,
+        inmunizaciones: false,
+        vacunasAdicionales: false,
       };
 
       setTimeout(() => {
