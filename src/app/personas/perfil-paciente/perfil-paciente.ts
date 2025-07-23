@@ -185,11 +185,15 @@ interface FormularioEstado {
   estadoNutricionalPediatrico: boolean;
   inmunizaciones: boolean;
   vacunasAdicionales: boolean;
+  solicitudCultivo: boolean;
+  solicitudGasometria: boolean;
+  hojaFrontal: boolean;
+  altaVoluntaria: boolean;
 }
 
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
 
-type FormularioActivo = 
+type FormularioActivo =
   | 'signosVitales'
   | 'historiaClinica'
   | 'notaUrgencias'
@@ -216,6 +220,10 @@ type FormularioActivo =
   | 'prescripcionMedicamento'
   | 'registroTransfusion'
   | 'notaEgreso'
+  | 'hojaFrontal'
+  | 'solicitudCultivo'
+  | 'solicitudGasometria'
+  | 'altaVoluntaria'
   | null;
 
 @Component({
@@ -299,6 +307,10 @@ tamizajeNeonatalForm!: FormGroup;
     estadoNutricionalPediatrico: false,
     inmunizaciones: false,
     vacunasAdicionales: false,
+    solicitudCultivo: false,
+  solicitudGasometria: false,
+  hojaFrontal: false,
+  altaVoluntaria: false,
   };
 
 
@@ -2513,38 +2525,38 @@ private initializeHistoriaClinicaPediatricaForm(): FormGroup {
     apgar_5min: ['', [Validators.min(0), Validators.max(10)]],
     tipo_parto: ['', Validators.required],
     complicaciones_parto: [''],
-    
+
     // Antecedentes familiares pediátricos
     diabetes_familiar: [false],
     hipertension_familiar: [false],
     cardiopatias_familiar: [false],
     malformaciones_familiar: [false],
     otros_antecedentes_familiar: [''],
-    
+
     // Desarrollo actual
     desarrollo_motor: [''],
     desarrollo_lenguaje: [''],
     desarrollo_social: [''],
     hitos_desarrollo: [''],
-    
+
     // Alimentación
     lactancia_materna: [false],
     lactancia_duracion_meses: [''],
     edad_ablactacion_meses: [''],
     alimentacion_actual: [''],
-    
+
     // Padecimiento actual pediátrico
     motivo_consulta: ['', Validators.required],
     tiempo_evolucion: [''],
     sintomas_asociados: [''],
-    
+
     // Exploración física pediátrica
     estado_general: [''],
     estado_hidratacion: [''],
     palidez_tegumentos: [false],
     ictericia: [false],
     cianosis: [false],
-    
+
     // Sistemas
     respiratorio: [''],
     cardiovascular: [''],
@@ -2552,11 +2564,11 @@ private initializeHistoriaClinicaPediatricaForm(): FormGroup {
     genitourinario: [''],
     neurologico: [''],
     musculoesqueletico: [''],
-    
+
     // Diagnósticos
     diagnostico_principal: ['', Validators.required],
     diagnosticos_secundarios: [''],
-    
+
     // Plan
     plan_manejo: ['', Validators.required],
     medicamentos: [''],
@@ -2574,37 +2586,37 @@ private initializeAlimentacionPediatricaForm(): FormGroup {
     edad_inicio_lactancia: [''],
     duracion_lactancia_meses: [''],
     dificultades_lactancia: [''],
-    
+
     // Fórmula
     uso_formula: [false],
     tipo_formula: [''],
     cantidad_formula_ml: [''],
     frecuencia_formula: [''],
-    
+
     // Ablactación
     edad_inicio_ablactacion_meses: ['', [Validators.min(3), Validators.max(12)]],
     primeros_alimentos: [''],
     alergias_alimentarias: [''],
     intolerancias: [''],
-    
+
     // Alimentación actual
     tipo_alimentacion_actual: ['', Validators.required],
     numero_comidas_dia: ['', [Validators.min(1), Validators.max(8)]],
     apetito: [''],
     preferencias_alimentarias: [''],
     rechazos_alimentarios: [''],
-    
+
     // Suplementos
     vitaminas: [false],
     tipo_vitaminas: [''],
     hierro: [false],
     otros_suplementos: [''],
-    
+
     // Evaluación nutricional
     estado_nutricional: [''],
     signos_desnutricion: [false],
     signos_sobrepeso: [false],
-    
+
     // Recomendaciones
     plan_alimentario: [''],
     recomendaciones_padres: [''],
@@ -2619,7 +2631,7 @@ private initializeTamizajeNeonatalForm(): FormGroup {
     fecha_toma_muestra: ['', Validators.required],
     edad_horas_toma: ['', [Validators.required, Validators.min(24), Validators.max(168)]],
     lugar_toma: [''],
-    
+
     // Tamizaje metabólico
     hipotiroidismo_congenito: [''],
     fenilcetonuria: [''],
@@ -2627,27 +2639,27 @@ private initializeTamizajeNeonatalForm(): FormGroup {
     hiperplasia_suprarrenal: [''],
     fibrosis_quistica: [''],
     deficiencia_biotinidasa: [''],
-    
+
     // Resultados
     resultados_normales: [true],
     alteraciones_encontradas: [''],
     requiere_confirmacion: [false],
-    
+
     // Tamizaje auditivo
     tamizaje_auditivo_realizado: [false],
     resultado_auditivo: [''],
     fecha_tamizaje_auditivo: [''],
-    
+
     // Tamizaje visual
     reflejo_rojo_presente: [true],
     cataratas_congenitas: [false],
     otras_alteraciones_visuales: [''],
-    
+
     // Seguimiento
     requiere_seguimiento: [false],
     tipo_seguimiento: [''],
     fecha_proxima_cita: [''],
-    
+
     // Observaciones
     observaciones: [''],
     medico_responsable: ['']
@@ -2815,14 +2827,14 @@ private initializeInmunizacionesForm(): FormGroup {
         porcentaje_completado: [null, [Validators.min(0), Validators.max(100)]],
         reacciones_adversas: [''],
         observaciones: [''],
-        
+
         // Campos para vacunas individuales (esto es simplificado)
         // En la práctica, podrías necesitar un FormArray para manejar múltiples dosis
         // o estructuras anidadas. Esto es un ejemplo básico.
         bcg_fecha: [''],
         bcg_observaciones: [''],
         // ... otros campos de vacunas según tu estructura de BD ...
-        
+
         // id_personal_registro se asignará al guardar
     });
 }
@@ -3113,13 +3125,13 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
     id_personal_medico: this.medicoActual,
     fecha_elaboracion: new Date().toISOString(),
   };
-  
+
   await firstValueFrom(this.historiasClinicasService.createHistoriaClinica(datosHistoria));
 }
 
   private async guardarConsentimiento(): Promise<void> {
     console.log('🔄 Guardando consentimiento informado...');
-    
+
     if (!this.consentimientoForm.valid) {
       console.error('❌ Formulario de consentimiento informado inválido');
       console.log('🔍 Errores del formulario:', this.consentimientoForm.errors);
@@ -3128,11 +3140,11 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
 
     // ✅ PASO 1: Buscar el tipo de documento de consentimiento informado
     const tipoConsentimiento = this.tiposDocumentosDisponibles.find(
-      (t) => t.nombre === 'Consentimiento Informado' || 
+      (t) => t.nombre === 'Consentimiento Informado' ||
              t.nombre === 'Consentimientos Informados' ||
              t.nombre.toLowerCase().includes('consentimiento')
     );
-    
+
     if (!tipoConsentimiento) {
       console.error('❌ Tipo de documento de consentimiento no encontrado');
       console.log('🔍 Tipos disponibles:', this.tiposDocumentosDisponibles.map(t => t.nombre));
@@ -3359,6 +3371,10 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
         estadoNutricionalPediatrico: false,
         inmunizaciones: false,
         vacunasAdicionales: false,
+        solicitudCultivo: false,
+  solicitudGasometria: false,
+  hojaFrontal: false,
+  altaVoluntaria: false,
       };
 
       setTimeout(() => {

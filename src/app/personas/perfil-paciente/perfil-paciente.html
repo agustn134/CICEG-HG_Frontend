@@ -293,11 +293,10 @@
     <!-- ==========================================
            NAVEGACIÓN DE FORMULARIOS (SOLO EN TAB CREAR)
            ========================================== -->
-    <div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
+    <!-- <div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
       <div class="border-b border-gray-200">
         <nav class="flex overflow-x-auto space-x-2 px-6 scrollbar-hide" aria-label="Formularios">
 
-          <!-- Signos Vitales -->
           <button (click)="cambiarFormulario('signosVitales')"
             [class]="formularioActivo === 'signosVitales' ? 'border-rose-500 text-rose-600 bg-rose-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -305,7 +304,6 @@
             Signos Vitales
           </button>
 
-          <!-- Historia Clínica -->
           <button (click)="cambiarFormulario('historiaClinica')"
             [class]="formularioActivo === 'historiaClinica' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -313,7 +311,6 @@
             {{ esPacientePediatrico ? 'Historia Pediátrica' : 'Historia Clínica' }}
           </button>
 
-          <!-- Nota de Urgencias -->
           <button (click)="cambiarFormulario('notaUrgencias')"
             [class]="formularioActivo === 'notaUrgencias' ? 'border-red-500 text-red-600 bg-red-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -321,7 +318,6 @@
             Urgencias
           </button>
 
-          <!-- Nota de Evolución -->
           <button (click)="cambiarFormulario('notaEvolucion')"
             [class]="formularioActivo === 'notaEvolucion' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -329,7 +325,6 @@
             Evolución (SOAP)
           </button>
 
-          <!-- Consentimiento Informado -->
           <button (click)="cambiarFormulario('consentimiento')"
             [class]="formularioActivo === 'consentimiento' ? 'border-slate-500 text-slate-600 bg-slate-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -337,7 +332,6 @@
             Consentimiento
           </button>
 
-          <!-- Nota de Interconsulta -->
           <button (click)="cambiarFormulario('notaInterconsulta')"
             [class]="formularioActivo === 'notaInterconsulta' ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
             class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -372,52 +366,37 @@
               <i class="fas fa-heartbeat mr-2"></i>
               Postanestésica
             </button>
-          <!-- </ng-container> -->
-
-          <!-- Documentos pediátricos (solo si es pediátrico) -->
-          <!-- Documentos pediátricos (solo si es pediátrico) -->
             <ng-container *ngIf="esPacientePediatrico">
-              <!-- Control de Crecimiento -->
               <button (click)="cambiarFormulario('controlCrecimiento')"
                 [class]="formularioActivo === 'controlCrecimiento' ? 'border-cyan-500 text-cyan-600 bg-cyan-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
                 <i class="fas fa-chart-area mr-2"></i>
                 Control Crecimiento
               </button>
-
-              <!-- Esquema de Vacunación -->
-              <button (click)="cambiarFormulario('esquemaVacunacion')"
+             <button (click)="cambiarFormulario('esquemaVacunacion')"
                 [class]="formularioActivo === 'esquemaVacunacion' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
                 <i class="fas fa-shield-alt mr-2"></i>
                 Vacunación
               </button>
-
-              <!-- Historia Clínica Pediátrica -->
               <button (click)="cambiarFormulario('historiaClinicaPediatrica')"
                 [class]="formularioActivo === 'historiaClinicaPediatrica' ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
                 <i class="fas fa-baby mr-2"></i>
                 Historia Pediátrica
               </button>
-
-              <!-- Desarrollo Psicomotriz -->
               <button (click)="cambiarFormulario('desarrolloPsicomotriz')"
                 [class]="formularioActivo === 'desarrolloPsicomotriz' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
                 <i class="fas fa-child mr-2"></i>
                 Desarrollo
               </button>
-
-              <!-- Alimentación Pediátrica -->
-              <button (click)="cambiarFormulario('alimentacionPediatrica')"
+ <button (click)="cambiarFormulario('alimentacionPediatrica')"
                 [class]="formularioActivo === 'alimentacionPediatrica' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
                 <i class="fas fa-utensils mr-2"></i>
                 Alimentación
               </button>
-
-              <!-- Tamizaje Neonatal -->
               <button (click)="cambiarFormulario('tamizajeNeonatal')"
                 [class]="formularioActivo === 'tamizajeNeonatal' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
                 class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
@@ -428,11 +407,267 @@
 
         </nav>
       </div>
-    </div>
+    </div> -->
 
-    <!-- ==========================================
-         CONTENIDO DE TABS
-         ========================================== -->
+
+
+
+<!-- NAVEGACIÓN DE FORMULARIOS (SOLO EN TAB CREAR) -->
+<div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
+  <div class="border-b border-gray-200">
+    <nav class="flex overflow-x-auto space-x-2 px-6 scrollbar-hide" aria-label="Formularios">
+
+      <!-- ==========================================
+           FORMULARIOS BÁSICOS OBLIGATORIOS NOM-004
+           ========================================== -->
+
+      <!-- Signos Vitales -->
+      <button (click)="cambiarFormulario('signosVitales')"
+        [class]="formularioActivo === 'signosVitales' ? 'border-rose-500 text-rose-600 bg-rose-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-heartbeat mr-2"></i>
+        Signos Vitales
+      </button>
+
+      <!-- Historia Clínica -->
+      <button (click)="cambiarFormulario('historiaClinica')"
+        [class]="formularioActivo === 'historiaClinica' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i [class]="esPacientePediatrico ? 'fas fa-baby mr-2' : 'fas fa-file-medical-alt mr-2'"></i>
+        {{ esPacientePediatrico ? 'Historia Pediátrica' : 'Historia Clínica' }}
+      </button>
+
+      <!-- Nota de Urgencias -->
+      <button (click)="cambiarFormulario('notaUrgencias')"
+        [class]="formularioActivo === 'notaUrgencias' ? 'border-red-500 text-red-600 bg-red-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-ambulance mr-2"></i>
+        Urgencias
+      </button>
+
+      <!-- Nota de Evolución -->
+      <button (click)="cambiarFormulario('notaEvolucion')"
+        [class]="formularioActivo === 'notaEvolucion' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-chart-line mr-2"></i>
+        Evolución (SOAP)
+      </button>
+
+      <!-- Nota de Interconsulta -->
+      <button (click)="cambiarFormulario('notaInterconsulta')"
+        [class]="formularioActivo === 'notaInterconsulta' ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-user-md mr-2"></i>
+        Interconsulta
+      </button>
+
+      <!-- Referencia y Traslado -->
+      <button (click)="cambiarFormulario('referenciaTraslado')"
+        [class]="formularioActivo === 'referenciaTraslado' ? 'border-amber-500 text-amber-600 bg-amber-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-exchange-alt mr-2"></i>
+        Referencia/Traslado
+      </button>
+
+      <!-- ==========================================
+           CONSENTIMIENTOS INFORMADOS (NOM-004)
+           ========================================== -->
+
+      <!-- Consentimiento Informado -->
+      <button (click)="cambiarFormulario('consentimiento')"
+        [class]="formularioActivo === 'consentimiento' ? 'border-slate-500 text-slate-600 bg-slate-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-file-signature mr-2"></i>
+        Consentimiento
+      </button>
+
+      <!-- ==========================================
+           NOTAS QUIRÚRGICAS Y ANESTÉSICAS
+           ========================================== -->
+
+      <!-- Nota Preoperatoria -->
+      <button (click)="cambiarFormulario('notaPreoperatoria')"
+        [class]="formularioActivo === 'notaPreoperatoria' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-clipboard-check mr-2"></i>
+        Preoperatoria
+      </button>
+
+      <!-- Nota Preanestésica -->
+      <button (click)="cambiarFormulario('notaPreanestesica')"
+        [class]="formularioActivo === 'notaPreanestesica' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-syringe mr-2"></i>
+        Preanestésica
+      </button>
+
+      <!-- Nota Postoperatoria -->
+      <button (click)="cambiarFormulario('notaPostoperatoria')"
+        [class]="formularioActivo === 'notaPostoperatoria' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-band-aid mr-2"></i>
+        Postoperatoria
+      </button>
+
+      <!-- Nota Postanestésica -->
+      <button (click)="cambiarFormulario('notaPostanestesica')"
+        [class]="formularioActivo === 'notaPostanestesica' ? 'border-teal-500 text-teal-600 bg-teal-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-heartbeat mr-2"></i>
+        Postanestésica
+      </button>
+
+      <!-- ==========================================
+           SOLICITUDES DE ESTUDIOS
+           ========================================== -->
+
+      <!-- Solicitud de Estudios -->
+      <button (click)="cambiarFormulario('solicitudEstudio')"
+        [class]="formularioActivo === 'solicitudEstudio' ? 'border-gray-500 text-gray-600 bg-gray-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-vial mr-2"></i>
+        Solicitud Estudios
+      </button>
+
+      <!-- Solicitud Cultivo -->
+      <button (click)="cambiarFormulario('solicitudCultivo')"
+        [class]="formularioActivo === 'solicitudCultivo' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-bacteria mr-2"></i>
+        Cultivo
+      </button>
+
+      <!-- Solicitud Gasometría -->
+      <button (click)="cambiarFormulario('solicitudGasometria')"
+        [class]="formularioActivo === 'solicitudGasometria' ? 'border-teal-500 text-teal-600 bg-teal-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-lungs mr-2"></i>
+        Gasometría
+      </button>
+
+      <!-- ==========================================
+           PRESCRIPCIONES Y TRATAMIENTOS
+           ========================================== -->
+
+      <!-- Prescripción Medicamentos -->
+      <button (click)="cambiarFormulario('prescripcionMedicamento')"
+        [class]="formularioActivo === 'prescripcionMedicamento' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-pills mr-2"></i>
+        Prescripción
+      </button>
+
+      <!-- Registro Transfusión -->
+      <button (click)="cambiarFormulario('registroTransfusion')"
+        [class]="formularioActivo === 'registroTransfusion' ? 'border-red-500 text-red-600 bg-red-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-tint mr-2"></i>
+        Transfusión
+      </button>
+
+      <!-- ==========================================
+           DOCUMENTOS ESPECIALES
+           ========================================== -->
+
+      <!-- Hoja Frontal -->
+      <button (click)="cambiarFormulario('hojaFrontal')"
+        [class]="formularioActivo === 'hojaFrontal' ? 'border-gray-500 text-gray-600 bg-gray-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-folder mr-2"></i>
+        Hoja Frontal
+      </button>
+
+      <!-- Alta Voluntaria -->
+      <button (click)="cambiarFormulario('altaVoluntaria')"
+        [class]="formularioActivo === 'altaVoluntaria' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+        class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        Alta Voluntaria
+      </button>
+
+      <!-- ==========================================
+           DOCUMENTOS PEDIÁTRICOS (Solo si es pediátrico)
+           ========================================== -->
+      <ng-container *ngIf="esPacientePediatrico">
+
+        <!-- Control de Crecimiento -->
+        <button (click)="cambiarFormulario('controlCrecimiento')"
+          [class]="formularioActivo === 'controlCrecimiento' ? 'border-cyan-500 text-cyan-600 bg-cyan-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-chart-area mr-2"></i>
+          Control Crecimiento
+        </button>
+
+        <!-- Esquema de Vacunación -->
+        <button (click)="cambiarFormulario('esquemaVacunacion')"
+          [class]="formularioActivo === 'esquemaVacunacion' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-shield-alt mr-2"></i>
+          Vacunación
+        </button>
+
+        <!-- Antecedentes Heredo-Familiares -->
+        <button (click)="cambiarFormulario('antecedentesHeredoFamiliares')"
+          [class]="formularioActivo === 'antecedentesHeredoFamiliares' ? 'border-pink-500 text-pink-600 bg-pink-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-users mr-2"></i>
+          Ant. Heredo-Fam.
+        </button>
+
+        <!-- Antecedentes Perinatales -->
+        <button (click)="cambiarFormulario('antecedentesPerinatales')"
+          [class]="formularioActivo === 'antecedentesPerinatales' ? 'border-rose-500 text-rose-600 bg-rose-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-baby-carriage mr-2"></i>
+          Ant. Perinatales
+        </button>
+
+        <!-- Desarrollo Psicomotriz -->
+        <button (click)="cambiarFormulario('desarrolloPsicomotriz')"
+          [class]="formularioActivo === 'desarrolloPsicomotriz' ? 'border-indigo-500 text-indigo-600 bg-indigo-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-child mr-2"></i>
+          Desarrollo
+        </button>
+
+        <!-- Estado Nutricional Pediátrico -->
+        <button (click)="cambiarFormulario('estadoNutricionalPediatrico')"
+          [class]="formularioActivo === 'estadoNutricionalPediatrico' ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-apple-alt mr-2"></i>
+          Estado Nutricional
+        </button>
+
+        <!-- Inmunizaciones -->
+        <button (click)="cambiarFormulario('inmunizaciones')"
+          [class]="formularioActivo === 'inmunizaciones' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-syringe mr-2"></i>
+          Inmunizaciones
+        </button>
+
+        <!-- Vacunas Adicionales -->
+        <button (click)="cambiarFormulario('vacunasAdicionales')"
+          [class]="formularioActivo === 'vacunasAdicionales' ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'"
+          class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm transition-all duration-200 rounded-t-md">
+          <i class="fas fa-plus-circle mr-2"></i>
+          Vacunas Extra
+        </button>
+
+      </ng-container>
+
+    </nav>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 
     <!-- ==========================================
          TAB: VISTA GENERAL
