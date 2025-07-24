@@ -5,7 +5,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // 🏥 Colores específicos para sistema hospitalario
+      //    Colores específicos para sistema hospitalario
       colors: {
         hospital: {
           // Azules principales (confianza, profesionalismo)
@@ -182,7 +182,7 @@ module.exports = {
     // Plugin personalizado mejorado para clases de utilidad hospitalarias
     function({ addUtilities, addComponents, theme }) {
       const newUtilities = {
-        // 🏥 Clases para tarjetas de hospital
+        //    Clases para tarjetas de hospital
         '.card-hospital': {
           backgroundColor: theme('colors.white'),
           borderRadius: theme('borderRadius.card'),

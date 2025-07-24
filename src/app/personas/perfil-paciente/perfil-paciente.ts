@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -93,7 +93,6 @@ import { EstadoNutricionalPediatricoService } from '../../services/documentos-cl
 import { InmunizacionesService } from '../../services/documentos-clinicos/inmunizaciones';
 import { VacunasAdicionalesService } from '../../services/documentos-clinicos/vacunas-adicionales';
 // ... otras importaciones ...
-
 
 interface TipoDocumentoConfig {
   id: string;
@@ -226,6 +225,10 @@ type FormularioActivo =
   | 'altaVoluntaria'
   | null;
 
+
+
+  
+
 @Component({
   selector: 'app-perfil-paciente',
   standalone: true,
@@ -236,14 +239,20 @@ type FormularioActivo =
 
 
 export class PerfilPaciente implements OnInit, OnDestroy {
+
+    // ViewChild para el contenedor de navegación
+  @ViewChild('formNav') formNav!: ElementRef;
+
   private destroy$ = new Subject<void>();
   private autoguardadoInterval: any;
   private ultimoGuardadoLocal = Date.now();
   pacienteCompleto: PacienteCompleto | null = null;
   pacienteId: number | null = null;
   medicoActual: number | null = null;
+  medicoCompleto: any | null = null;
   isLoading = true;
   isCreatingDocument = false;
+  guardandoFormulario = false;
   error: string | null = null;
   mostrarError = false;
   hayProblemasConexion = false;
@@ -321,8 +330,6 @@ tamizajeNeonatalForm!: FormGroup;
 
   mostrarModalEditarExpediente = false;
 numeroAdministrativoTemporal = '';
-
-
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
@@ -375,6 +382,8 @@ numeroAdministrativoTemporal = '';
     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
     this.inicializarFormularios();
   }
+
+  
 
   private documentosDisponibles: TipoDocumentoConfig[] = [
     {
@@ -2190,12 +2199,18 @@ this.error = `Error al procesar ${nombreFormulario}`;
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => {
+        next: async (data) => {
           this.construirPacienteCompleto(data.paciente);
           this.procesarCatalogos(data.catalogos);
+          // Cargar datos completos del médico
+          try {
+            this.medicoCompleto = await this.obtenerDatosMedicoCompleto();
+          } catch (error) {
+            console.warn('No se pudieron cargar datos del médico:', error);
+          }
           this.isLoading = false;
           console.log('- Componente inicializado correctamente');
-          console.log('🏥 Datos del paciente:', this.pacienteCompleto);
+          console.log('   Datos del paciente:', this.pacienteCompleto);
           console.log('📋 Catálogos cargados:', data.catalogos);
         },
         error: (error) => {
@@ -2365,9 +2380,21 @@ this.error = `Error al procesar ${nombreFormulario}`;
 
   private initializeNotaInterconsultaForm(): FormGroup {
     return this.fb.group({
-      servicio_solicitado: ['', Validators.required],
+      area_interconsulta: ['', Validators.required],
       motivo_interconsulta: ['', Validators.required],
-      resumen_clinico: ['', Validators.required],
+      diagnostico_presuntivo: [''],
+      examenes_laboratorio: [false],
+      examenes_gabinete: [false],
+      hallazgos: [''],
+      impresion_diagnostica: [''],
+      recomendaciones: [''],
+      seguimiento_requerido: [''],
+      tiempo_seguimiento: [''],
+      prioridad: ['media'],
+      medico_solicitante: [''],
+      cedula_solicitante: [''],
+      id_medico_interconsulta: [''],
+      especialidad_interconsulta: [''],
     });
   }
 
@@ -3264,18 +3291,40 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
     );
   }
 
-  private async guardarNotaInterconsulta(): Promise<void> {
+  async guardarNotaInterconsulta(): Promise<void> {
     if (!this.notaInterconsultaForm.valid) {
-      throw new Error('Formulario de nota de interconsulta inválido');
+      this.error = 'Por favor complete todos los campos requeridos';
+      return;
     }
-    const payload = {
-      ...this.notaInterconsultaForm.value,
-      id_paciente: this.pacienteId,
-      id_personal_medico: this.medicoActual,
-    };
-    await firstValueFrom(
-      this.notasInterconsultaService.createNotaInterconsulta(payload)
-    );
+    
+    try {
+      this.guardandoFormulario = true;
+      this.error = null;
+      
+      const payload = {
+        ...this.notaInterconsultaForm.value,
+        id_paciente: this.pacienteId,
+        id_personal_medico: this.medicoActual,
+      };
+      
+      const response = await firstValueFrom(
+        this.notasInterconsultaService.createNotaInterconsulta(payload)
+      );
+      
+      this.formularioEstado.notaInterconsulta = true;
+      this.success = 'Nota de interconsulta guardada correctamente';
+      
+      // Limpiar el mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        this.success = '';
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Error al guardar nota de interconsulta:', error);
+      this.error = 'Error al guardar la nota de interconsulta';
+    } finally {
+      this.guardandoFormulario = false;
+    }
   }
 
   private avanzarAlSiguientePaso(): void {
@@ -4031,6 +4080,35 @@ resetearFormularioActual(): void {
     return this.notaEvolucionService.validarDatosNOM004(datos);
   }
 
+  async generarPDFInterconsulta(): Promise<void> {
+    try {
+      if (!this.formularioEstado.notaInterconsulta) {
+        this.error = 'Debe guardar la nota de interconsulta antes de generar el PDF';
+        return;
+      }
+      await this.generarPDF('Nota de Interconsulta');
+    } catch (error) {
+      console.error('Error al generar PDF de interconsulta:', error);
+      this.error = 'Error al generar PDF de interconsulta';
+    }
+  }
+
+  limpiarFormulario(tipoFormulario: string): void {
+    switch (tipoFormulario) {
+      case 'notaInterconsulta':
+        this.notaInterconsultaForm.reset();
+        this.notaInterconsultaForm.patchValue({
+          prioridad: 'media',
+          examenes_laboratorio: false,
+          examenes_gabinete: false
+        });
+        this.formularioEstado.notaInterconsulta = false;
+        break;
+      default:
+        console.warn('Tipo de formulario no reconocido para limpiar:', tipoFormulario);
+    }
+  }
+
   async generarPDF(tipoDocumento: string): Promise<void> {
     try {
       console.log(`- Generando PDF para: ${tipoDocumento}`);
@@ -4119,16 +4197,16 @@ resetearFormularioActual(): void {
           });
           break;
 
-        case 'Nota de Interconsulta':
-          await this.pdfGeneratorService.generarNotaInterconsulta({
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            notaInterconsulta: this.notaInterconsultaForm?.value || {},
-            signosVitales: this.signosVitalesForm.value,
-            guiaClinica: this.guiaClinicaSeleccionada,
-          });
-          break;
+        // case 'Nota de Interconsulta':
+        //   await this.pdfGeneratorService.generarNotaInterconsulta({
+        //     paciente: datosPacienteEstructurados,
+        //     medico: medicoCompleto,
+        //     expediente: this.pacienteCompleto?.expediente,
+        //     notaInterconsulta: this.notaInterconsultaForm?.value || {},
+        //     signosVitales: this.signosVitalesForm.value,
+        //     guiaClinica: this.guiaClinicaSeleccionada,
+        //   });
+        //   break;
 
         case 'Nota Preoperatoria':
           await this.pdfGeneratorService.generarNotaPreoperatoria({
@@ -4323,6 +4401,17 @@ resetearFormularioActual(): void {
             medico: medicoCompleto,
             expediente: this.pacienteCompleto?.expediente,
             consentimientoTratamiento: this.consentimientoForm?.value || {},
+          });
+          break;
+
+        // Nota de Interconsulta (NOM-004)
+        case 'Nota de Interconsulta':
+          await this.pdfGeneratorService.generarDocumentoPDF('Nota Interconsulta', {
+            paciente: datosPacienteEstructurados,
+            medico: medicoCompleto,
+            expediente: this.pacienteCompleto?.expediente,
+            interconsulta: this.notaInterconsultaForm?.value || {},
+            signosVitales: this.signosVitalesForm.value,
           });
           break;
 
@@ -5010,7 +5099,7 @@ get puedeAvanzar(): boolean {
         this.formularioActivo = datos.formularioActivo;
       }
 
-      this.success = 'Datos recuperados desde tu última sesión 📁';
+      this.success = 'Datos recuperados desde tu última sesión';
 
       setTimeout(() => {
         this.success = null;
@@ -5116,4 +5205,8 @@ get puedeAvanzar(): boolean {
     if (error?.message) return error.message;
     return 'Datos inválidos';
   }
+
+
+
+
 }

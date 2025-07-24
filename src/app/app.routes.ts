@@ -117,7 +117,7 @@ export const routes: Routes = [
             },
           },
 
-          // 🏥 Paso 1: Datos de la persona
+          //    Paso 1: Datos de la persona
           {
             path: 'persona',
             component: PasoPersona,
@@ -148,7 +148,7 @@ export const routes: Routes = [
             },
           },
 
-          // 📁 Paso 3: Creación automática del expediente
+          // Paso 3: Creación automática del expediente
           {
             path: 'expediente',
             component: PasoExpediente,

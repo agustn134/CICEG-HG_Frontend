@@ -25,6 +25,8 @@ import {
   UpdatePersonalMedicoDto,
 } from '../../models';
 import { PersonalMedicoService } from '../../services/personas/personal-medico';
+import { FormularioService } from '../../services/documentos-clinicos/formulario';
+import { TiposDocumentoService } from '../../services/catalogos/tipos-documento';
 
 @Component({
   selector: 'app-personal-medico',
@@ -34,9 +36,7 @@ import { PersonalMedicoService } from '../../services/personas/personal-medico';
   styleUrl: './personal-medico.css',
 })
 export class PersonalMedicoComponent implements OnInit, OnDestroy {
-  // ==========================================
-  // INYECCIÓN DE DEPENDENCIAS
-  // ==========================================
+
   private personalMedicoService = inject(PersonalMedicoService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -61,21 +61,16 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   mostrarModalPerfil = false;
   mostrarModalCredenciales = false;
   vistaActual: 'tabla' | 'tarjetas' = 'tarjetas';
-
-  // Formularios - INICIALIZADOS CORRECTAMENTE
   textoBusqueda = '';
   filtrosForm!: FormGroup;
   personalForm!: FormGroup;
   credencialesForm!: FormGroup;
   filtrosAplicados: PersonalMedicoFilters = {};
-  // En personal-medico.ts, agregar esta propiedad:
   mostrarPassword = false;
   usuarioYaExiste = false;
   correoYaExiste = false;
   curpYaExiste = false;
   cedulaYaExiste = false;
-
-  // Estados del formulario
   isEditMode = false;
   personalEnEdicion: PersonalMedico | null = null;
   procesandoFormulario = false;
@@ -107,6 +102,7 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.initializeForms();
+    
   }
 
   ngOnInit(): void {
@@ -452,46 +448,108 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
       });
   }
 
-  private actualizarPersonal(formData: any): void {
-    if (!this.personalEnEdicion) return;
+  // private actualizarPersonal(formData: any): void {
+  //   if (!this.personalEnEdicion) return;
 
-    const personalData: UpdatePersonalMedicoDto = {
-      numero_cedula: formData.numero_cedula,
-      especialidad: formData.especialidad,
-      cargo: formData.cargo || undefined,
-      departamento: formData.departamento || undefined,
-      activo: formData.activo,
-    };
+  //   const personalData: UpdatePersonalMedicoDto = {
+  //     numero_cedula: formData.numero_cedula,
+  //     especialidad: formData.especialidad,
+  //     cargo: formData.cargo || undefined,
+  //     departamento: formData.departamento || undefined,
+  //     activo: formData.activo,
+  //   };
 
-    this.personalMedicoService
-      .updatePersonalMedico(
-        this.personalEnEdicion.id_personal_medico,
-        personalData
-      )
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.mostrarExito('Personal médico actualizado exitosamente');
-            this.cargarPersonalMedico();
-            this.cargarEstadisticas();
-            this.cerrarModal();
-          } else {
-            this.mostrarError(
-              'Error al actualizar personal médico: ' + response.message
-            );
-          }
-          this.procesandoFormulario = false;
-        },
-        error: (error) => {
+  //   this.personalMedicoService
+  //     .updatePersonalMedico(
+  //       this.personalEnEdicion.id_personal_medico,
+  //       personalData
+  //     )
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe({
+  //       next: (response) => {
+  //         if (response.success) {
+  //           this.mostrarExito('Personal médico actualizado exitosamente');
+  //           this.cargarPersonalMedico();
+  //           this.cargarEstadisticas();
+  //           this.cerrarModal();
+  //         } else {
+  //           this.mostrarError(
+  //             'Error al actualizar personal médico: ' + response.message
+  //           );
+  //         }
+  //         this.procesandoFormulario = false;
+  //       },
+  //       error: (error) => {
+  //         this.mostrarError(
+  //           'Error al actualizar personal médico: ' +
+  //             (error.error?.message || error.message || 'Error desconocido')
+  //         );
+  //         this.procesandoFormulario = false;
+  //       },
+  //     });
+  // }
+
+  // Reemplaza el método actualizarPersonal existente con este:
+private actualizarPersonal(formData: any): void {
+  if (!this.personalEnEdicion) return;
+
+  // Estructura completa para actualización
+  const requestData = {
+    // Datos de personal médico
+    numero_cedula: formData.numero_cedula,
+    especialidad: formData.especialidad,
+    cargo: formData.cargo || null,
+    departamento: formData.departamento || null,
+    activo: formData.activo,
+
+    // Datos de persona para actualizar también
+    persona: {
+      nombre: formData.nombre,
+      apellido_paterno: formData.apellido_paterno,
+      apellido_materno: formData.apellido_materno || null,
+      fecha_nacimiento: formData.fecha_nacimiento,
+      sexo: formData.sexo,
+      telefono: formData.telefono || null,
+      correo_electronico: formData.correo_electronico || null,
+      curp: formData.curp || null,
+      tipo_sangre: formData.tipo_sangre || null,
+    }
+  };
+
+  console.log('📤 Enviando datos para actualizar personal médico:', {
+    id: this.personalEnEdicion.id_personal_medico,
+    nombre: requestData.persona.nombre,
+  });
+
+  this.personalMedicoService
+    .updatePersonalMedico(
+      this.personalEnEdicion.id_personal_medico,
+      requestData as any
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.mostrarExito('Personal médico actualizado exitosamente');
+          this.cargarPersonalMedico();
+          this.cargarEstadisticas();
+          this.cerrarModal();
+        } else {
           this.mostrarError(
-            'Error al actualizar personal médico: ' +
-              (error.error?.message || error.message || 'Error desconocido')
+            'Error al actualizar personal médico: ' + response.message
           );
-          this.procesandoFormulario = false;
-        },
-      });
-  }
+        }
+        this.procesandoFormulario = false;
+      },
+      error: (error) => {
+        this.mostrarError(
+          'Error al actualizar personal médico: ' +
+            (error.error?.message || error.message || 'Error desconocido')
+        );
+        this.procesandoFormulario = false;
+      },
+    });
+}
 
   private marcarCamposComoTocados(): void {
     Object.keys(this.personalForm.controls).forEach((key) => {

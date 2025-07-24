@@ -283,9 +283,9 @@ export class App {
 
   private initializeHospitalSystem(): void {
     // Log de inicialización del sistema
-    console.log('🏥 CICEG-HG - Sistema de Expedientes Clínicos');
-    console.log('🏥 Hospital General San Luis de la Paz, Guanajuato');
-    console.log('🏥 Iniciando aplicación...');
+    console.log('   CICEG-HG - Sistema de Expedientes Clínicos');
+    console.log('   Hospital General San Luis de la Paz, Guanajuato');
+    console.log('   Iniciando aplicación...');
 
     // Configurar título de la página
     document.title = 'CICEG-HG - Sistema de Expedientes Clínicos';
@@ -326,13 +326,13 @@ export class App {
   private setupGlobalErrorHandlers(): void {
     // Manejador global de errores de JavaScript
     window.addEventListener('error', (event) => {
-      console.error('🏥 Error del sistema hospitalario:', event.error);
+      console.error('   Error del sistema hospitalario:', event.error);
       // TODO: Enviar errores a servicio de logging
     });
 
     // Manejador de promesas rechazadas
     window.addEventListener('unhandledrejection', (event) => {
-      console.error('🏥 Promesa rechazada en sistema hospitalario:', event.reason);
+      console.error('   Promesa rechazada en sistema hospitalario:', event.reason);
       // TODO: Enviar errores a servicio de logging
     });
   }

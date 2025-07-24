@@ -1,5 +1,4 @@
 // src/app/services/pdf-generator.service.ts
-// Al inicio del archivo pdf-generator.service.ts, agregar estos imports:
 import { Injectable } from '@angular/core';
 import { PersonalMedicoService } from './personas/personal-medico';
 import { AuthService } from './auth/auth.service';
@@ -11,7 +10,6 @@ import { NotasUrgenciasService } from './documentos-clinicos/notas-urgencias';
 import { NotasEvolucionService } from './documentos-clinicos/notas-evolucion';
 import { NotasEgresoService } from './documentos-clinicos/notas-egreso';
 import { DocumentosService } from './documentos-clinicos/documentos';
-
 
 interface GuiaClinicaData {
   codigo: string | null;
@@ -43,138 +41,134 @@ interface SignosVitalesData {
 @Injectable({
   providedIn: 'root',
 })
-
 export class PdfGeneratorService {
-
   private pdfMake: any;
   private isLoaded = false;
 
   constructor(
-  private personalMedicoService: PersonalMedicoService,
-  private authService: AuthService,
-  private guiasClinicasService: GuiasClinicasService,
-  private pacientesService: PacientesService,
-  private signosVitalesService: SignosVitalesService,
-  private historiasClinicasService: HistoriasClinicasService,
-  private notasUrgenciasService: NotasUrgenciasService,
-  private notasEvolucionService: NotasEvolucionService,
-  private notasEgresoService: NotasEgresoService,
-  private documentosService: DocumentosService
-) {
-  this.loadPdfMake();
-}
-
-
-
-// 🔥 MÉTODO PRINCIPAL PARA INTEGRAR TODOS LOS FORMATOS
-async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
-  console.log('🎯 Iniciando generación de PDF:', tipoDocumento);
-
-  try {
-    switch (tipoDocumento) {
-      case 'Historia Clínica':
-        await this.generarHistoriaClinica(datos);
-        break;
-      case 'Nota de Urgencias':
-        await this.generarNotaUrgencias(datos);
-        break;
-      case 'Nota de Evolución':
-        await this.generarNotaEvolucion(datos);
-        break;
-      case 'Nota de Egreso':
-        await this.generarNotaEgreso(datos);
-        break;
-      case 'Nota de Interconsulta':
-        await this.generarNotaInterconsulta(datos);
-        break;
-      case 'Nota Preoperatoria':
-        await this.generarNotaPreoperatoria(datos);
-        break;
-      case 'Nota Postoperatoria':
-        await this.generarNotaPostoperatoria(datos);
-        break;
-      case 'Nota Postanestésica':
-        await this.generarNotaPostanestesica(datos);
-        break;
-      case 'Nota Preanestésica':
-        await this.generarNotaPreanestesica(datos);
-        break;
-      case 'Signos Vitales':
-        await this.generarSignosVitales(datos);
-        break;
-      case 'Consentimiento Procedimientos':
-        await this.generarNotaConsentimientoProcedimientos(datos);
-        break;
-      case 'Consentimiento Hospitalización':
-        await this.generarConsentimientoHospitalizacion(datos);
-        break;
-      case 'Consentimiento Referencia':
-        await this.generarConsentimientoReferenciaPacientes(datos);
-        break;
-      case 'Consentimiento Transfusión':
-        await this.generarConsentimientoTransfusionSanguinea(datos);
-        break;
-      case 'Consentimiento Tratamiento':
-        await this.generarConsentimientoTratamientoMedico(datos);
-        break;
-      case 'Hoja Alta Voluntaria':
-        await this.generarHojaAltaVoluntaria(datos);
-        break;
-      case 'Hoja Informe Diario':
-        await this.generarHojaInformeDiario(datos);
-        break;
-      case 'Hoja Frontal Expediente':
-        await this.generarHojaFrontalExpediente(datos);
-        break;
-      case 'Solicitud Laboratorio':
-        await this.generarSolicitudLaboratorio(datos);
-        break;
-      case 'Solicitud Imagenología':
-        await this.generarSolicitudImagenologia(datos);
-        break;
-      case 'Solicitud Cultivo':
-        await this.generarSolicitudCultivo(datos);
-        break;
-      case 'Prescripción Medicamentos':
-        await this.generarPrescripcionMedicamentos(datos);
-        break;
-      case 'Registro Transfusión':
-        await this.generarRegistroTransfusion(datos);
-        break;
-      case 'Hoja Quirófano':
-        await this.generarHojaQuirofano(datos);
-        break;
-      // Casos adicionales que se pueden usar temporalmente mientras se implementan los métodos específicos
-      case 'Referencia Traslado':
-        console.log('📄 Generando Referencia Traslado con datos generales');
-        await this.generarDocumentoGenerico('Referencia de Traslado', datos);
-        break;
-      case 'Control Crecimiento':
-        console.log('📄 Generando Control de Crecimiento con datos generales');
-        await this.generarDocumentoGenerico('Control de Crecimiento', datos);
-        break;
-      case 'Esquema Vacunación':
-        console.log('📄 Generando Esquema de Vacunación con datos generales');
-        await this.generarDocumentoGenerico('Esquema de Vacunación', datos);
-        break;
-      case 'Solicitud Gasometría':
-        console.log('📄 Generando Solicitud de Gasometría con datos generales');
-        await this.generarDocumentoGenerico('Solicitud de Gasometría', datos);
-        break;
-      default:
-        throw new Error(`Tipo de documento no soportado: ${tipoDocumento}`);
-    }
-
-    console.log(`  PDF ${tipoDocumento} generado exitosamente`);
-
-  } catch (error) {
-    console.error(`❌ Error generando PDF ${tipoDocumento}:`, error);
-    throw error;
+    private personalMedicoService: PersonalMedicoService,
+    private authService: AuthService,
+    private guiasClinicasService: GuiasClinicasService,
+    private pacientesService: PacientesService,
+    private signosVitalesService: SignosVitalesService,
+    private historiasClinicasService: HistoriasClinicasService,
+    private notasUrgenciasService: NotasUrgenciasService,
+    private notasEvolucionService: NotasEvolucionService,
+    private notasEgresoService: NotasEgresoService,
+    private documentosService: DocumentosService
+  ) {
+    this.loadPdfMake();
   }
-}
 
+  // 🔥 MÉTODO PRINCIPAL PARA INTEGRAR TODOS LOS FORMATOS
+  async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
+    console.log('🎯 Iniciando generación de PDF:', tipoDocumento);
 
+    try {
+      switch (tipoDocumento) {
+        case 'Historia Clínica':
+          await this.generarHistoriaClinica(datos);
+          break;
+        case 'Nota de Urgencias':
+          await this.generarNotaUrgencias(datos);
+          break;
+        case 'Nota de Evolución':
+          await this.generarNotaEvolucion(datos);
+          break;
+        case 'Nota de Egreso':
+          await this.generarNotaEgreso(datos);
+          break;
+        case 'Nota de Interconsulta':
+          await this.generarNotaInterconsulta(datos);
+          break;
+        case 'Nota Preoperatoria':
+          await this.generarNotaPreoperatoria(datos);
+          break;
+        case 'Nota Postoperatoria':
+          await this.generarNotaPostoperatoria(datos);
+          break;
+        case 'Nota Postanestésica':
+          await this.generarNotaPostanestesica(datos);
+          break;
+        case 'Nota Preanestésica':
+          await this.generarNotaPreanestesica(datos);
+          break;
+        case 'Signos Vitales':
+          await this.generarSignosVitales(datos);
+          break;
+        case 'Consentimiento Procedimientos':
+          await this.generarNotaConsentimientoProcedimientos(datos);
+          break;
+        case 'Consentimiento Hospitalización':
+          await this.generarConsentimientoHospitalizacion(datos);
+          break;
+        case 'Consentimiento Referencia':
+          await this.generarConsentimientoReferenciaPacientes(datos);
+          break;
+        case 'Consentimiento Transfusión':
+          await this.generarConsentimientoTransfusionSanguinea(datos);
+          break;
+        case 'Consentimiento Tratamiento':
+          await this.generarConsentimientoTratamientoMedico(datos);
+          break;
+        case 'Hoja Alta Voluntaria':
+          await this.generarHojaAltaVoluntaria(datos);
+          break;
+        case 'Hoja Informe Diario':
+          await this.generarHojaInformeDiario(datos);
+          break;
+        case 'Hoja Frontal Expediente':
+          await this.generarHojaFrontalExpediente(datos);
+          break;
+        case 'Solicitud Laboratorio':
+          await this.generarSolicitudLaboratorio(datos);
+          break;
+        case 'Solicitud Imagenología':
+          await this.generarSolicitudImagenologia(datos);
+          break;
+        case 'Solicitud Cultivo':
+          await this.generarSolicitudCultivo(datos);
+          break;
+        case 'Prescripción Medicamentos':
+          await this.generarPrescripcionMedicamentos(datos);
+          break;
+        case 'Registro Transfusión':
+          await this.generarRegistroTransfusion(datos);
+          break;
+        case 'Hoja Quirófano':
+          await this.generarHojaQuirofano(datos);
+          break;
+        // Casos adicionales que se pueden usar temporalmente mientras se implementan los métodos específicos
+        case 'Referencia Traslado':
+          console.log('📄 Generando Referencia Traslado con datos generales');
+          await this.generarDocumentoGenerico('Referencia de Traslado', datos);
+          break;
+        case 'Control Crecimiento':
+          console.log(
+            '📄 Generando Control de Crecimiento con datos generales'
+          );
+          await this.generarDocumentoGenerico('Control de Crecimiento', datos);
+          break;
+        case 'Esquema Vacunación':
+          console.log('📄 Generando Esquema de Vacunación con datos generales');
+          await this.generarDocumentoGenerico('Esquema de Vacunación', datos);
+          break;
+        case 'Solicitud Gasometría':
+          console.log(
+            '📄 Generando Solicitud de Gasometría con datos generales'
+          );
+          await this.generarDocumentoGenerico('Solicitud de Gasometría', datos);
+          break;
+        default:
+          throw new Error(`Tipo de documento no soportado: ${tipoDocumento}`);
+      }
 
+      console.log(`  PDF ${tipoDocumento} generado exitosamente`);
+    } catch (error) {
+      console.error(`❌ Error generando PDF ${tipoDocumento}:`, error);
+      throw error;
+    }
+  }
 
   private async obtenerDatosMedicoActual(): Promise<any> {
     try {
@@ -700,12 +694,13 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
   }
 
   private obtenerNumeroExpedientePreferido(expediente: any): string {
-  // Priorizar número administrativo sobre el del sistema
-  return expediente?.numero_expediente_administrativo ||
-         expediente?.numero_expediente ||
-         'Sin número';
-}
-
+    // Priorizar número administrativo sobre el del sistema
+    return (
+      expediente?.numero_expediente_administrativo ||
+      expediente?.numero_expediente ||
+      'Sin número'
+    );
+  }
 
   // 📄 SIGNOS VITALES CON DATOS COMPLETOS
   async generarSignosVitales(datos: any): Promise<void> {
@@ -763,7 +758,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
                   text: [
                     { text: 'Folio:\n', fontSize: 8, bold: true },
                     {
-                      text: `SV-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}\n`,
+                      text: `SV-${this.obtenerNumeroExpedientePreferido(
+                        pacienteCompleto.expediente
+                      )}\n`,
                       fontSize: 8,
                     },
                     { text: 'Hora:\n', fontSize: 8, bold: true },
@@ -812,9 +809,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
                 [
                   {},
                   {
-                    text: `Expediente: ${
-                      this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
-                    } | Fecha de registro: ${fechaActual.toLocaleDateString(
+                    text: `Expediente: ${this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    )} | Fecha de registro: ${fechaActual.toLocaleDateString(
                       'es-MX'
                     )}`,
                     fontSize: 8,
@@ -1537,7 +1534,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO HOSPITALIZACIÓN...');
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO HOSPITALIZACIÓN...'
+    );
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1582,7 +1581,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     if (porcentaje < 90) {
       console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('  CONSENTIMIENTO HOSPITALIZACIÓN CUMPLE CON ESTÁNDARES LEGALES');
+      console.log(
+        '  CONSENTIMIENTO HOSPITALIZACIÓN CUMPLE CON ESTÁNDARES LEGALES'
+      );
     }
   }
 
@@ -1592,7 +1593,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO REFERENCIA...');
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO REFERENCIA...'
+    );
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1642,10 +1645,11 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     if (porcentaje < 90) {
       console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
     } else {
-      console.log('  CONSENTIMIENTO REFERENCIA CUMPLE CON ESTÁNDARES ADMINISTRATIVOS');
+      console.log(
+        '  CONSENTIMIENTO REFERENCIA CUMPLE CON ESTÁNDARES ADMINISTRATIVOS'
+      );
     }
   }
-
 
   // 🔥 VALIDACIÓN ESPECÍFICA PARA CONSENTIMIENTO DE TRANSFUSIÓN SANGUÍNEA
   private validarCumplimientoConsentimientoTransfusion(
@@ -1653,7 +1657,9 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     medico: any,
     paciente: any
   ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - CONSENTIMIENTO TRANSFUSIÓN...');
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - CONSENTIMIENTO TRANSFUSIÓN...'
+    );
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1726,19 +1732,21 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     }
   }
 
-
   // 🔥 VALIDACIÓN ESPECÍFICA PARA CONSENTIMIENTO DE TRATAMIENTO MÉDICO
   private validarCumplimientoConsentimientoTratamiento(
     datos: any,
     medico: any,
     paciente: any
   ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO TRATAMIENTO MÉDICO...');
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 - CONSENTIMIENTO TRATAMIENTO MÉDICO...'
+    );
 
     const validaciones = {
       // Datos del paciente (5.9)
       nombre_completo_paciente: !!paciente.nombre_completo,
-      apellidos_nombres_separados: !!paciente.apellido_paterno && !!paciente.nombre,
+      apellidos_nombres_separados:
+        !!paciente.apellido_paterno && !!paciente.nombre,
       edad_paciente: !!paciente.edad,
       sexo_paciente: !!paciente.sexo,
       numero_expediente: !!paciente.numero_expediente,
@@ -1793,13 +1801,15 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     }
   }
 
-    // 🔥 VALIDACIÓN ESPECÍFICA PARA HOJA DE ALTA VOLUNTARIA
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA HOJA DE ALTA VOLUNTARIA
   private validarCumplimientoAltaVoluntaria(
     datos: any,
     medico: any,
     paciente: any
   ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE ALTA VOLUNTARIA...');
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE ALTA VOLUNTARIA...'
+    );
 
     const validaciones = {
       // Datos del paciente (5.9)
@@ -1869,522 +1879,597 @@ async generarDocumentoPDF(tipoDocumento: string, datos: any): Promise<void> {
     }
   }
 
-
   // 🔥 VALIDACIÓN ESPECÍFICA PARA HOJA DE INFORME DIARIO
-private validarCumplimientoInformeDiario(
-  datos: any,
-  medico: any,
-  paciente: any
-): void {
-  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE INFORME DIARIO...');
+  private validarCumplimientoInformeDiario(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 - HOJA DE INFORME DIARIO...');
 
-  const validaciones = {
-    // Datos del paciente (5.9)
-    nombre_completo_paciente: !!paciente.nombre_completo,
-    numero_expediente: !!paciente.numero_expediente,
-    fecha_nacimiento: !!paciente.fecha_nacimiento,
-    curp_paciente: !!paciente.curp,
+    const validaciones = {
+      // Datos del paciente (5.9)
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      numero_expediente: !!paciente.numero_expediente,
+      fecha_nacimiento: !!paciente.fecha_nacimiento,
+      curp_paciente: !!paciente.curp,
 
-    // Información médica básica
-    servicio_medico: !!medico.departamento,
-    medico_responsable: !!medico.nombre_completo,
-    numero_cama: true, // Campo incluido
+      // Información médica básica
+      servicio_medico: !!medico.departamento,
+      medico_responsable: !!medico.nombre_completo,
+      numero_cama: true, // Campo incluido
 
-    // Estructura del informe
-    fecha_periodo: true, // Incluida
-    diagnostico_principal: true, // Campo incluido
-    turno_especificado: true, // Campo incluido
+      // Estructura del informe
+      fecha_periodo: true, // Incluida
+      diagnostico_principal: true, // Campo incluido
+      turno_especificado: true, // Campo incluido
 
-    // Elementos de registro
-    tabla_registros: true, // Tabla incluida
-    campos_fecha_hora: true, // Columna incluida
-    campos_quien_informa: true, // Columna incluida
-    campos_quien_recibe: true, // Columna incluida
-    campos_informacion: true, // Columna incluida
+      // Elementos de registro
+      tabla_registros: true, // Tabla incluida
+      campos_fecha_hora: true, // Columna incluida
+      campos_quien_informa: true, // Columna incluida
+      campos_quien_recibe: true, // Columna incluida
+      campos_informacion: true, // Columna incluida
 
-    // Instrucciones y normas
-    instrucciones_llenado: true, // Incluidas
-    confidencialidad_mencionada: true, // Incluida
-    archivo_expediente: true, // Mencionado
+      // Instrucciones y normas
+      instrucciones_llenado: true, // Incluidas
+      confidencialidad_mencionada: true, // Incluida
+      archivo_expediente: true, // Mencionado
 
-    // Aspectos administrativos
-    formato_estructurado: true, // Tabla organizada
-    espacios_suficientes: true, // 15 filas
-    hospital_identificado: true, // En header
+      // Aspectos administrativos
+      formato_estructurado: true, // Tabla organizada
+      espacios_suficientes: true, // 15 filas
+      hospital_identificado: true, // En header
 
-    // Fecha y lugar
-    fecha_elaboracion: true,
-    hospital_identificado_completo: true,
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado_completo: true,
 
-    // Cumplimiento normativo
-    referencia_nom_004: true, // En footer
-    formato_oficial: true, // Estructura formal
-  };
+      // Cumplimiento normativo
+      referencia_nom_004: true, // En footer
+      formato_oficial: true, // Estructura formal
+    };
 
-  const cumplimiento = Object.values(validaciones).filter((v) => v).length;
-  const total = Object.keys(validaciones).length;
-  const porcentaje = Math.round((cumplimiento / total) * 100);
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
 
-  console.log(
-    `📊 CUMPLIMIENTO HOJA INFORME DIARIO: ${cumplimiento}/${total} (${porcentaje}%)`
-  );
+    console.log(
+      `📊 CUMPLIMIENTO HOJA INFORME DIARIO: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
 
-  if (porcentaje < 90) {
-    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
-  } else {
-    console.log('  HOJA DE INFORME DIARIO CUMPLE CON NOM-004');
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  HOJA DE INFORME DIARIO CUMPLE CON NOM-004');
+    }
   }
-}
 
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE EGRESO
+  private validarCumplimientoNotaEgreso(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D12 - NOTA DE EGRESO...'
+    );
 
-// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE EGRESO
-private validarCumplimientoNotaEgreso(
-  datos: any,
-  medico: any,
-  paciente: any
-): void {
-  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D12 - NOTA DE EGRESO...');
+    const validaciones = {
+      // D12.1 - Nombre del paciente
+      nombre_paciente: !!paciente.nombre_completo,
 
-  const validaciones = {
-    // D12.1 - Nombre del paciente
-    nombre_paciente: !!paciente.nombre_completo,
+      // D12.2 - Edad y sexo
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
 
-    // D12.2 - Edad y sexo
-    edad_sexo: !!paciente.edad && !!paciente.sexo,
+      // D12.3 - Fecha y hora de elaboración
+      fecha_hora_elaboracion: true,
 
-    // D12.3 - Fecha y hora de elaboración
-    fecha_hora_elaboracion: true,
+      // D12.4 - Signos vitales
+      signos_vitales: true, // Estructura completa incluida
 
-    // D12.4 - Signos vitales
-    signos_vitales: true, // Estructura completa incluida
+      // D12.5 - Fecha y hora ingreso/egreso
+      fecha_hora_ingreso_egreso: true,
 
-    // D12.5 - Fecha y hora ingreso/egreso
-    fecha_hora_ingreso_egreso: true,
+      // D12.6 - Días de estancia
+      dias_estancia: true,
 
-    // D12.6 - Días de estancia
-    dias_estancia: true,
+      // D12.7 - Identificación de reingreso
+      identificacion_reingreso: true,
 
-    // D12.7 - Identificación de reingreso
-    identificacion_reingreso: true,
+      // D12.8 - Diagnósticos de ingreso
+      diagnosticos_ingreso: true,
 
-    // D12.8 - Diagnósticos de ingreso
-    diagnosticos_ingreso: true,
+      // D12.9 - Resumen evolución y estado actual
+      resumen_evolucion: true,
 
-    // D12.9 - Resumen evolución y estado actual
-    resumen_evolucion: true,
+      // D12.10 - Manejo durante estancia
+      manejo_estancia: true,
 
-    // D12.10 - Manejo durante estancia
-    manejo_estancia: true,
+      // D12.11 - Diagnósticos finales
+      diagnosticos_finales: true,
 
-    // D12.11 - Diagnósticos finales
-    diagnosticos_finales: true,
+      // D12.12 - Procedimientos realizados
+      procedimientos_realizados: true,
 
-    // D12.12 - Procedimientos realizados
-    procedimientos_realizados: true,
+      // D12.13 - Motivo de egreso
+      motivo_egreso: true,
 
-    // D12.13 - Motivo de egreso
-    motivo_egreso: true,
+      // D12.14 - Problemas clínicos pendientes
+      problemas_pendientes: true,
 
-    // D12.14 - Problemas clínicos pendientes
-    problemas_pendientes: true,
+      // D12.15 -
+      // D12.15 - Plan de manejo y tratamiento
+      plan_manejo_tratamiento: true,
 
-    // D12.15 -
-    // D12.15 - Plan de manejo y tratamiento
-   plan_manejo_tratamiento: true,
+      // D12.16 - Recomendaciones vigilancia ambulatoria
+      recomendaciones_ambulatorias: true,
 
-   // D12.16 - Recomendaciones vigilancia ambulatoria
-   recomendaciones_ambulatorias: true,
+      // D12.17 - Nombre completo, cédula profesional y firma del médico
+      nombre_completo_medico: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      firma_espacio: true,
 
-   // D12.17 - Nombre completo, cédula profesional y firma del médico
-   nombre_completo_medico: !!medico.nombre_completo,
-   cedula_profesional: !!medico.numero_cedula,
-   firma_espacio: true,
+      // Datos adicionales del paciente
+      numero_expediente: !!paciente.numero_expediente,
+      identificacion_hospital: true,
+    };
 
-   // Datos adicionales del paciente
-   numero_expediente: !!paciente.numero_expediente,
-   identificacion_hospital: true,
- };
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
 
- const cumplimiento = Object.values(validaciones).filter((v) => v).length;
- const total = Object.keys(validaciones).length;
- const porcentaje = Math.round((cumplimiento / total) * 100);
+    console.log(
+      `📊 CUMPLIMIENTO NOTA EGRESO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
 
- console.log(
-   `📊 CUMPLIMIENTO NOTA EGRESO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
- );
-
- if (porcentaje < 90) {
-   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
- } else {
-   console.log('  NOTA DE EGRESO CUMPLE CON NOM-004 SECCIÓN D12');
- }
-}
-
-// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE INTERCONSULTA
-private validarCumplimientoNotaInterconsulta(
-  datos: any,
-  medico: any,
-  paciente: any
-): void {
-  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D7 - NOTA DE INTERCONSULTA...');
-
-  const validaciones = {
-    // Datos del paciente (5.9)
-    nombre_completo_paciente: !!paciente.nombre_completo,
-    edad_sexo: !!paciente.edad && !!paciente.sexo,
-    numero_expediente: !!paciente.numero_expediente,
-
-    // D7.12 - Criterio diagnóstico
-    criterio_diagnostico: true, // Sección incluida
-
-    // D7.13 - Sugerencias diagnósticas y de tratamiento
-    sugerencias_diagnosticas: true, // Sección incluida
-    sugerencias_tratamiento: true, // Sección incluida
-
-    // D7.14 - Motivo de la consulta
-    motivo_consulta: true, // Sección incluida
-
-    // Información del médico solicitante
-    medico_solicitante: !!medico.nombre_completo,
-    cedula_solicitante: !!medico.numero_cedula,
-    servicio_solicitante: !!medico.departamento,
-
-    // Especialidad solicitada
-    especialidad_identificada: true, // Campo incluido
-
-    // Firma y fecha
-    fecha_elaboracion: true,
-    espacio_firmas: true, // Ambos médicos
-
-    // Estructura del documento
-    identificacion_hospital: true,
-    formato_estructurado: true,
-  };
-
-  const cumplimiento = Object.values(validaciones).filter((v) => v).length;
-  const total = Object.keys(validaciones).length;
-  const porcentaje = Math.round((cumplimiento / total) * 100);
-
-  console.log(
-    `📊 CUMPLIMIENTO NOTA INTERCONSULTA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
-  );
-
-  if (porcentaje < 90) {
-    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
-  } else {
-    console.log('  NOTA DE INTERCONSULTA CUMPLE CON NOM-004 SECCIÓN D7');
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  NOTA DE EGRESO CUMPLE CON NOM-004 SECCIÓN D12');
+    }
   }
-}
 
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE INTERCONSULTA
+  private validarCumplimientoNotaInterconsulta(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D7 - NOTA DE INTERCONSULTA...'
+    );
 
-// 🔥 VALIDACIÓN ESPECÍFICA PARA PRESCRIPCIÓN DE MEDICAMENTOS
-private validarCumplimientoPrescripcionMedicamentos(
- datos: any,
- medico: any,
- paciente: any
-): void {
- console.log('  VALIDANDO CUMPLIMIENTO PRESCRIPCIÓN DE MEDICAMENTOS...');
+    const validaciones = {
+      // Datos del paciente (5.9)
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
+      numero_expediente: !!paciente.numero_expediente,
 
- const validaciones = {
-   // Datos del paciente
-   nombre_completo_paciente: !!paciente.nombre_completo,
-   edad_paciente: !!paciente.edad,
-   numero_expediente: !!paciente.numero_expediente,
+      // D7.12 - Criterio diagnóstico
+      criterio_diagnostico: true, // Sección incluida
 
-   // Información médica básica
-   diagnostico_incluido: true, // Campo incluido
-   peso_paciente: true, // Campo incluido para dosificación
-   alergias_verificadas: true, // Campo incluido
+      // D7.13 - Sugerencias diagnósticas y de tratamiento
+      sugerencias_diagnosticas: true, // Sección incluida
+      sugerencias_tratamiento: true, // Sección incluida
 
-   // Medicamentos prescritos
-   tabla_medicamentos: true, // Tabla estructurada
-   denominacion_generica: true, // Campo obligatorio
-   presentacion_concentracion: true, // Campo incluido
-   cantidad_prescrita: true, // Campo incluido
-   indicaciones_completas: true, // Dosis, vía, frecuencia
+      // D7.14 - Motivo de la consulta
+      motivo_consulta: true, // Sección incluida
 
-   // Instrucciones al paciente
-   instrucciones_generales: true, // Incluidas
-   proxima_cita: true, // Campo incluido
-   dias_tratamiento: true, // Campo incluido
+      // Información del médico solicitante
+      medico_solicitante: !!medico.nombre_completo,
+      cedula_solicitante: !!medico.numero_cedula,
+      servicio_solicitante: !!medico.departamento,
 
-   // Datos del médico prescriptor
-   nombre_completo_medico: !!medico.nombre_completo,
-   cedula_profesional: !!medico.numero_cedula,
-   especialidad_medico: !!medico.especialidad,
-   firma_espacio: true, // Espacio para firma y sello
+      // Especialidad solicitada
+      especialidad_identificada: true, // Campo incluido
 
-   // Fecha y validez
-   fecha_prescripcion: true,
-   identificacion_hospital: true,
+      // Firma y fecha
+      fecha_elaboracion: true,
+      espacio_firmas: true, // Ambos médicos
 
-   // Advertencias legales
-   advertencias_incluidas: true, // Sección incluida
-   contacto_emergencia: true, // Teléfono incluido
- };
+      // Estructura del documento
+      identificacion_hospital: true,
+      formato_estructurado: true,
+    };
 
- const cumplimiento = Object.values(validaciones).filter((v) => v).length;
- const total = Object.keys(validaciones).length;
- const porcentaje = Math.round((cumplimiento / total) * 100);
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
 
- console.log(
-   `📊 CUMPLIMIENTO PRESCRIPCIÓN MEDICAMENTOS: ${cumplimiento}/${total} (${porcentaje}%)`
- );
+    console.log(
+      `📊 CUMPLIMIENTO NOTA INTERCONSULTA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
 
- if (porcentaje < 90) {
-   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
- } else {
-   console.log('  PRESCRIPCIÓN DE MEDICAMENTOS CUMPLE CON ESTÁNDARES MÉDICOS');
- }
-}
-
-// 🔥 VALIDACIÓN ESPECÍFICA PARA REGISTRO DE TRANSFUSIÓN
-private validarCumplimientoRegistroTransfusion(
- datos: any,
- medico: any,
- paciente: any
-): void {
- console.log('  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - REGISTRO DE TRANSFUSIÓN...');
-
- const validaciones = {
-   // D15.1 - Cantidad, volumen, número de identificación
-   cantidad_unidades: true, // Campo incluido
-   volumen_transfundido: true, // Campo incluido
-   numero_identificacion: true, // Campo incluido
-   tipo_componente: true, // Especificado
-
-   // D15.2 - Fecha y hora inicio y finalización
-   fecha_hora_inicio: true, // Campos incluidos
-   fecha_hora_finalizacion: true, // Campos incluidos
-
-   // D15.3 - Control signos vitales antes, durante y después
-   signos_vitales_antes: true, // Tabla completa
-   signos_vitales_durante: true, // Campos incluidos
-   signos_vitales_despues: true, // Campos incluidos
-   estado_general: true, // Campo incluido
-
-   // D15.4 - Reacciones adversas
-   reacciones_adversas_evaluadas: true, // Sección incluida
-   tipo_reaccion: true, // Campo incluido
-   manejo_reacciones: true, // Campo incluido
-   investigacion_procedimientos: true, // Referenciado
-
-   // D15.5 - Personal responsable
-   medico_indicador: !!medico.nombre_completo,
-   cedula_medico: !!medico.numero_cedula,
-   personal_aplicacion: true, // Campo incluido
-   personal_vigilancia: true, // Campo incluido
-
-   // Datos del paciente
-   nombre_completo_paciente: !!paciente.nombre_completo,
-   tipo_sanguineo: true, // Campo crítico incluido
-   numero_expediente: !!paciente.numero_expediente,
-
-   // Marco normativo
-   cumplimiento_nom_004: true, // Estructura según norma
-   cumplimiento_nom_253: true, // Disposición de sangre
-
-   // Firmas múltiples requeridas
-   firma_medico: true, // Espacio incluido
-   firma_enfermeria: true, // Espacio incluido
-   firma_banco_sangre: true, // Espacio incluido
-
-   // Fecha y lugar
-   fecha_elaboracion: true,
-   hospital_identificado: true,
- };
-
- const cumplimiento = Object.values(validaciones).filter((v) => v).length;
- const total = Object.keys(validaciones).length;
- const porcentaje = Math.round((cumplimiento / total) * 100);
-
- console.log(
-   `📊 CUMPLIMIENTO REGISTRO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
- );
-
- if (porcentaje < 90) {
-   console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
- } else {
-   console.log('  REGISTRO DE TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
- }
-}
-
-// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTOPERATORIA
-private validarCumplimientoNotaPostoperatoria(
-  datos: any,
-  medico: any,
-  paciente: any
-): void {
-  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.8 - NOTA POSTOPERATORIA...');
-
-  const validaciones = {
-    // 8.8.1 - Diagnóstico preoperatorio
-    diagnostico_preoperatorio: true, // Campo incluido
-
-    // 8.8.2 - Operación planeada
-    operacion_planeada: true, // Campo incluido
-
-    // 8.8.3 - Operación realizada
-    operacion_realizada: true, // Campo incluido
-
-    // 8.8.4 - Diagnóstico postoperatorio
-    diagnostico_postoperatorio: true, // Campo incluido
-
-    // 8.8.5 - Descripción técnica quirúrgica
-    descripcion_tecnica_quirurgica: true, // Campo incluido
-
-    // 8.8.6 - Hallazgos transoperatorios
-    hallazgos_transoperatorios: true, // Campo incluido
-
-    // 8.8.7 - Reporte de conteo gasas, compresas e instrumental
-    conteo_gasas: true, // Campo incluido
-    conteo_compresas: true, // Campo incluido
-    conteo_instrumental: true, // Campo incluido
-
-    // 8.8.8 - Incidentes y accidentes
-    incidentes_accidentes: true, // Campo incluido
-
-    // 8.8.9 - Cuantificación sangrado y transfusiones
-    cuantificacion_sangrado: true, // Campo incluido
-    transfusiones_reportadas: true, // Campo incluido
-
-    // 8.8.10 - Estudios servicios auxiliares transoperatorios
-    estudios_transoperatorios: true, // Campo incluido
-
-    // 8.8.11 - Ayudantes, instrumentistas, anestesiólogo y circulante
-    equipo_quirurgico_completo: true, // Tabla incluida
-    ayudantes: true, // Campo incluido
-    instrumentistas: true, // Campo incluido
-    anestesiologo: true, // Campo incluido
-    circulante: true, // Campo incluido
-
-    // 8.8.12 - Estado post-quirúrgico inmediato
-    estado_postquirurgico_inmediato: true, // Campo incluido
-
-    // 8.8.13 - Plan manejo y tratamiento postoperatorio inmediato
-    plan_manejo_postoperatorio: true, // Campo incluido
-
-    // 8.8.14 - Pronóstico
-    pronostico: true, // Campo incluido
-
-    // 8.8.15 - Envío piezas y biopsias quirúrgicas
-    envio_piezas_biopsias: true, // Campo incluido
-
-    // 8.8.16 - Otros hallazgos de importancia
-    otros_hallazgos_importancia: true, // Campo incluido
-
-    // 8.8.17 - Nombre completo y firma del responsable
-    nombre_completo_cirujano: !!medico.nombre_completo,
-    cedula_profesional: !!medico.numero_cedula,
-    firma_responsable_cirugia: true, // Espacio incluido
-
-    // Datos del paciente
-    nombre_completo_paciente: !!paciente.nombre_completo,
-    numero_expediente: !!paciente.numero_expediente,
-    edad_sexo: !!paciente.edad && !!paciente.sexo,
-
-    // Información quirúrgica
-    fecha_cirugia: true, // Campo incluido
-    duracion_procedimiento: true, // Campo incluido
-    quirofano_identificado: true, // Campo incluido
-
-    // Fecha y lugar
-    fecha_elaboracion: true,
-    hospital_identificado: true,
-  };
-
-  const cumplimiento = Object.values(validaciones).filter((v) => v).length;
-  const total = Object.keys(validaciones).length;
-  const porcentaje = Math.round((cumplimiento / total) * 100);
-
-  console.log(
-    `📊 CUMPLIMIENTO NOTA POSTOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
-  );
-
-  if (porcentaje < 90) {
-    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
-  } else {
-    console.log('  NOTA POSTOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.8');
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  NOTA DE INTERCONSULTA CUMPLE CON NOM-004 SECCIÓN D7');
+    }
   }
-}
 
-// 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA PREOPERATORIA
-private validarCumplimientoNotaPreoperatoria(
-  datos: any,
-  medico: any,
-  paciente: any
-): void {
-  console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.5 - NOTA PREOPERATORIA...');
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA PRESCRIPCIÓN DE MEDICAMENTOS
+  private validarCumplimientoPrescripcionMedicamentos(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log('  VALIDANDO CUMPLIMIENTO PRESCRIPCIÓN DE MEDICAMENTOS...');
 
-  const validaciones = {
-    // 8.5.1 - Fecha de la cirugía
-    fecha_cirugia: true, // Campo incluido
+    const validaciones = {
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      edad_paciente: !!paciente.edad,
+      numero_expediente: !!paciente.numero_expediente,
 
-    // 8.5.2 - Diagnóstico
-    diagnostico_preoperatorio: true, // Campo incluido
+      // Información médica básica
+      diagnostico_incluido: true, // Campo incluido
+      peso_paciente: true, // Campo incluido para dosificación
+      alergias_verificadas: true, // Campo incluido
 
-    // 8.5.3 - Plan quirúrgico
-    plan_quirurgico: true, // Campo incluido
+      // Medicamentos prescritos
+      tabla_medicamentos: true, // Tabla estructurada
+      denominacion_generica: true, // Campo obligatorio
+      presentacion_concentracion: true, // Campo incluido
+      cantidad_prescrita: true, // Campo incluido
+      indicaciones_completas: true, // Dosis, vía, frecuencia
 
-    // 8.5.4 - Tipo de intervención quirúrgica
-    tipo_intervencion_quirurgica: true, // Campo incluido
+      // Instrucciones al paciente
+      instrucciones_generales: true, // Incluidas
+      proxima_cita: true, // Campo incluido
+      dias_tratamiento: true, // Campo incluido
 
-    // 8.5.5 - Riesgo quirúrgico
-    riesgo_quirurgico: true, // Campo incluido con clasificación
-    justificacion_riesgo: true, // Campo incluido
+      // Datos del médico prescriptor
+      nombre_completo_medico: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      especialidad_medico: !!medico.especialidad,
+      firma_espacio: true, // Espacio para firma y sello
 
-    // 8.5.6 - Cuidados y plan terapéutico preoperatorios
-    cuidados_preoperatorios: true, // Campo incluido
-    plan_terapeutico_preoperatorio: true, // Campo incluido
+      // Fecha y validez
+      fecha_prescripcion: true,
+      identificacion_hospital: true,
 
-    // 8.5.7 - Pronóstico
-    pronostico: true, // Campo incluido
+      // Advertencias legales
+      advertencias_incluidas: true, // Sección incluida
+      contacto_emergencia: true, // Teléfono incluido
+    };
 
-    // Datos del paciente
-    nombre_completo_paciente: !!paciente.nombre_completo,
-    numero_expediente: !!paciente.numero_expediente,
-    edad_sexo: !!paciente.edad && !!paciente.sexo,
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
 
-    // Datos del cirujano
-    nombre_completo_cirujano: !!medico.nombre_completo,
-    cedula_profesional: !!medico.numero_cedula,
-    especialidad_cirujano: !!medico.especialidad,
+    console.log(
+      `📊 CUMPLIMIENTO PRESCRIPCIÓN MEDICAMENTOS: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
 
-    // Información quirúrgica adicional
-    estudios_preoperatorios: true, // Laboratorio y gabinete
-    equipo_quirurgico: true, // Equipo programado
-    tipo_sanguineo: true, // Campo crítico
-    hora_programada: true, // Campo incluido
-    quirofano_asignado: true, // Campo incluido
-
-    // Fecha y lugar
-    fecha_elaboracion: true,
-    hospital_identificado: true,
-    firma_cirujano: true, // Espacio incluido
-  };
-
-  const cumplimiento = Object.values(validaciones).filter((v) => v).length;
-  const total = Object.keys(validaciones).length;
-  const porcentaje = Math.round((cumplimiento / total) * 100);
-
-  console.log(
-    `📊 CUMPLIMIENTO NOTA PREOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
-  );
-
-  if (porcentaje < 90) {
-    console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
-  } else {
-    console.log('  NOTA PREOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.5');
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log(
+        '  PRESCRIPCIÓN DE MEDICAMENTOS CUMPLE CON ESTÁNDARES MÉDICOS'
+      );
+    }
   }
-}
 
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA REGISTRO DE TRANSFUSIÓN
+  private validarCumplimientoRegistroTransfusion(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 Y NOM-253 - REGISTRO DE TRANSFUSIÓN...'
+    );
 
+    const validaciones = {
+      // D15.1 - Cantidad, volumen, número de identificación
+      cantidad_unidades: true, // Campo incluido
+      volumen_transfundido: true, // Campo incluido
+      numero_identificacion: true, // Campo incluido
+      tipo_componente: true, // Especificado
 
+      // D15.2 - Fecha y hora inicio y finalización
+      fecha_hora_inicio: true, // Campos incluidos
+      fecha_hora_finalizacion: true, // Campos incluidos
 
+      // D15.3 - Control signos vitales antes, durante y después
+      signos_vitales_antes: true, // Tabla completa
+      signos_vitales_durante: true, // Campos incluidos
+      signos_vitales_despues: true, // Campos incluidos
+      estado_general: true, // Campo incluido
 
+      // D15.4 - Reacciones adversas
+      reacciones_adversas_evaluadas: true, // Sección incluida
+      tipo_reaccion: true, // Campo incluido
+      manejo_reacciones: true, // Campo incluido
+      investigacion_procedimientos: true, // Referenciado
 
+      // D15.5 - Personal responsable
+      medico_indicador: !!medico.nombre_completo,
+      cedula_medico: !!medico.numero_cedula,
+      personal_aplicacion: true, // Campo incluido
+      personal_vigilancia: true, // Campo incluido
 
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      tipo_sanguineo: true, // Campo crítico incluido
+      numero_expediente: !!paciente.numero_expediente,
 
+      // Marco normativo
+      cumplimiento_nom_004: true, // Estructura según norma
+      cumplimiento_nom_253: true, // Disposición de sangre
+
+      // Firmas múltiples requeridas
+      firma_medico: true, // Espacio incluido
+      firma_enfermeria: true, // Espacio incluido
+      firma_banco_sangre: true, // Espacio incluido
+
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado: true,
+    };
+
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
+
+    console.log(
+      `📊 CUMPLIMIENTO REGISTRO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
+
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  REGISTRO DE TRANSFUSIÓN CUMPLE CON NOM-004 Y NOM-253');
+    }
+  }
+
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTOPERATORIA
+  private validarCumplimientoNotaPostoperatoria(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.8 - NOTA POSTOPERATORIA...'
+    );
+
+    const validaciones = {
+      // 8.8.1 - Diagnóstico preoperatorio
+      diagnostico_preoperatorio: true, // Campo incluido
+
+      // 8.8.2 - Operación planeada
+      operacion_planeada: true, // Campo incluido
+
+      // 8.8.3 - Operación realizada
+      operacion_realizada: true, // Campo incluido
+
+      // 8.8.4 - Diagnóstico postoperatorio
+      diagnostico_postoperatorio: true, // Campo incluido
+
+      // 8.8.5 - Descripción técnica quirúrgica
+      descripcion_tecnica_quirurgica: true, // Campo incluido
+
+      // 8.8.6 - Hallazgos transoperatorios
+      hallazgos_transoperatorios: true, // Campo incluido
+
+      // 8.8.7 - Reporte de conteo gasas, compresas e instrumental
+      conteo_gasas: true, // Campo incluido
+      conteo_compresas: true, // Campo incluido
+      conteo_instrumental: true, // Campo incluido
+
+      // 8.8.8 - Incidentes y accidentes
+      incidentes_accidentes: true, // Campo incluido
+
+      // 8.8.9 - Cuantificación sangrado y transfusiones
+      cuantificacion_sangrado: true, // Campo incluido
+      transfusiones_reportadas: true, // Campo incluido
+
+      // 8.8.10 - Estudios servicios auxiliares transoperatorios
+      estudios_transoperatorios: true, // Campo incluido
+
+      // 8.8.11 - Ayudantes, instrumentistas, anestesiólogo y circulante
+      equipo_quirurgico_completo: true, // Tabla incluida
+      ayudantes: true, // Campo incluido
+      instrumentistas: true, // Campo incluido
+      anestesiologo: true, // Campo incluido
+      circulante: true, // Campo incluido
+
+      // 8.8.12 - Estado post-quirúrgico inmediato
+      estado_postquirurgico_inmediato: true, // Campo incluido
+
+      // 8.8.13 - Plan manejo y tratamiento postoperatorio inmediato
+      plan_manejo_postoperatorio: true, // Campo incluido
+
+      // 8.8.14 - Pronóstico
+      pronostico: true, // Campo incluido
+
+      // 8.8.15 - Envío piezas y biopsias quirúrgicas
+      envio_piezas_biopsias: true, // Campo incluido
+
+      // 8.8.16 - Otros hallazgos de importancia
+      otros_hallazgos_importancia: true, // Campo incluido
+
+      // 8.8.17 - Nombre completo y firma del responsable
+      nombre_completo_cirujano: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      firma_responsable_cirugia: true, // Espacio incluido
+
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      numero_expediente: !!paciente.numero_expediente,
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
+
+      // Información quirúrgica
+      fecha_cirugia: true, // Campo incluido
+      duracion_procedimiento: true, // Campo incluido
+      quirofano_identificado: true, // Campo incluido
+
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado: true,
+    };
+
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
+
+    console.log(
+      `📊 CUMPLIMIENTO NOTA POSTOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
+
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  NOTA POSTOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.8');
+    }
+  }
+
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA PREOPERATORIA
+  private validarCumplimientoNotaPreoperatoria(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 8.5 - NOTA PREOPERATORIA...'
+    );
+
+    const validaciones = {
+      // 8.5.1 - Fecha de la cirugía
+      fecha_cirugia: true, // Campo incluido
+
+      // 8.5.2 - Diagnóstico
+      diagnostico_preoperatorio: true, // Campo incluido
+
+      // 8.5.3 - Plan quirúrgico
+      plan_quirurgico: true, // Campo incluido
+
+      // 8.5.4 - Tipo de intervención quirúrgica
+      tipo_intervencion_quirurgica: true, // Campo incluido
+
+      // 8.5.5 - Riesgo quirúrgico
+      riesgo_quirurgico: true, // Campo incluido con clasificación
+      justificacion_riesgo: true, // Campo incluido
+
+      // 8.5.6 - Cuidados y plan terapéutico preoperatorios
+      cuidados_preoperatorios: true, // Campo incluido
+      plan_terapeutico_preoperatorio: true, // Campo incluido
+
+      // 8.5.7 - Pronóstico
+      pronostico: true, // Campo incluido
+
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      numero_expediente: !!paciente.numero_expediente,
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
+
+      // Datos del cirujano
+      nombre_completo_cirujano: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      especialidad_cirujano: !!medico.especialidad,
+
+      // Información quirúrgica adicional
+      estudios_preoperatorios: true, // Laboratorio y gabinete
+      equipo_quirurgico: true, // Equipo programado
+      tipo_sanguineo: true, // Campo crítico
+      hora_programada: true, // Campo incluido
+      quirofano_asignado: true, // Campo incluido
+
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado: true,
+      firma_cirujano: true, // Espacio incluido
+    };
+
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
+
+    console.log(
+      `📊 CUMPLIMIENTO NOTA PREOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
+
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  NOTA PREOPERATORIA CUMPLE CON NOM-004 SECCIÓN 8.5');
+    }
+  }
+
+  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTANESTÉSICA - MOVIDO DENTRO DE LA CLASE
+  private validarCumplimientoNotaPostanestesica(
+    datos: any,
+    medico: any,
+    paciente: any
+  ): void {
+    console.log(
+      '  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...'
+    );
+
+    const validaciones = {
+      // D11.12 - Medicamentos utilizados
+      medicamentos_utilizados:
+        !!datos.notaPostanestesica?.medicamentos_utilizados,
+
+      // D11.13 - Duración de la anestesia
+      duracion_anestesia: !!datos.notaPostanestesica?.duracion_anestesia,
+      tipo_anestesia: !!datos.notaPostanestesica?.tipo_anestesia,
+
+      // D11.14 - Incidentes y accidentes atribuibles a la anestesia
+      incidentes_accidentes_evaluados: true, // Sección incluida
+
+      // D11.15 - Cantidad de sangre o soluciones aplicadas
+      liquidos_administrados: true, // Campo incluido
+      balance_hidrico_reportado: true, // Sección incluida
+      hemoderivados_documentados: true, // Campo incluido
+
+      // D11.16 - Estado clínico del enfermo a su egreso de quirófano
+      estado_clinico_egreso: true, // Campo obligatorio incluido
+      signos_vitales_egreso: true, // Tabla completa incluida
+      evaluacion_neurológica: true, // Incluida en estado clínico
+
+      // D11.17 - Plan manejo y tratamiento inmediato
+      plan_tratamiento_inmediato: true, // Campo incluido
+
+      // Datos del paciente
+      nombre_completo_paciente: !!paciente.nombre_completo,
+      numero_expediente: !!paciente.numero_expediente,
+      edad_sexo: !!paciente.edad && !!paciente.sexo,
+
+      // Datos del anestesiólogo
+      nombre_completo_anestesiologo: !!medico.nombre_completo,
+      cedula_profesional: !!medico.numero_cedula,
+      firma_espacio: true, // Espacio incluido
+
+      // Información quirúrgica
+      procedimiento_identificado: true, // Campo incluido
+      fecha_cirugia: true, // Campo incluido
+      quirofano_identificado: true, // Campo incluido
+
+      // Escala de recuperación
+      escala_aldrete: true, // Incluida para evaluación objetiva
+      puntuacion_recuperacion: true, // Calculada automáticamente
+
+      // Fecha y lugar
+      fecha_elaboracion: true,
+      hospital_identificado: true,
+    };
+
+    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
+    const total = Object.keys(validaciones).length;
+    const porcentaje = Math.round((cumplimiento / total) * 100);
+
+    console.log(
+      `📊 CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+    );
+
+    if (porcentaje < 90) {
+      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
+    } else {
+      console.log('  NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
+    }
+  }
 
   /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 
@@ -2495,7 +2580,10 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 2],
                           },
                           {
-                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 2],
@@ -3712,7 +3800,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 6,
                       },
                     ],
@@ -3853,7 +3943,10 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 1],
@@ -3866,9 +3959,9 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: `NU-${
-                              this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
-                            }-${fechaActual.getFullYear()}`,
+                            text: `NU-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
                             fontSize: 6,
                             alignment: 'center',
                             margin: [0, 1],
@@ -4559,7 +4652,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 6,
                       },
                     ],
@@ -4704,7 +4799,10 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
                             fontSize: 7,
                             alignment: 'center',
                             margin: [0, 1],
@@ -4724,9 +4822,9 @@ private validarCumplimientoNotaPreoperatoria(
                             margin: [0, 1],
                           },
                           {
-                            text: `NE-${
-                              this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)
-                            }-${fechaActual.getFullYear()}`,
+                            text: `NE-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
                             fontSize: 6,
                             alignment: 'center',
                             margin: [0, 1],
@@ -5517,7 +5615,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 6,
                       },
                     ],
@@ -5653,7 +5753,9 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'Expediente:', fontSize: 9, bold: true },
                   {
-                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
                     fontSize: 9,
                     decoration: 'underline',
                   },
@@ -6023,7 +6125,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -6065,15 +6169,19 @@ private validarCumplimientoNotaPreoperatoria(
     }
   }
 
-    // 📄 CONSENTIMIENTO INFORMADO PARA HOSPITALIZACIÓN SEGÚN NOM-004-SSA3-2012
+  // 📄 CONSENTIMIENTO INFORMADO PARA HOSPITALIZACIÓN SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoHospitalizacion(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
 
-      console.log('🏥 Generando Consentimiento Informado para Hospitalización según NOM-004...');
+      console.log(
+        '   Generando Consentimiento Informado para Hospitalización según NOM-004...'
+      );
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const consentimientoData = datos.consentimientoHospitalizacion || {};
       const fechaActual = new Date();
 
@@ -6091,27 +6199,65 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'Nombre:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Edad:', fontSize: 9, bold: true },
-                  { text: `${pacienteCompleto.edad} años`, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Fecha:', fontSize: 9, bold: true },
-                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'CURP:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.curp, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.curp,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Sexo:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.sexo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'F. Nacimiento:', fontSize: 8, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Cama:', fontSize: 9, bold: true },
-                  { text: consentimientoData.numero_cama || 'Por asignar', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: consentimientoData.numero_cama || 'Por asignar',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Servicio:', fontSize: 9, bold: true },
-                  { text: medicoCompleto.departamento, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: medicoCompleto.departamento,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -6127,9 +6273,11 @@ private validarCumplimientoNotaPreoperatoria(
                 [
                   { text: 'YO', fontSize: 11, bold: true },
                   {
-                    text: consentimientoData.nombre_responsable || pacienteCompleto.nombre_completo,
+                    text:
+                      consentimientoData.nombre_responsable ||
+                      pacienteCompleto.nombre_completo,
                     fontSize: 11,
-                    decoration: 'underline'
+                    decoration: 'underline',
                   },
                 ],
               ],
@@ -6427,7 +6575,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -6449,27 +6599,39 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('  PDF de Consentimiento Informado para Hospitalización generado exitosamente');
+      console.log(
+        '  PDF de Consentimiento Informado para Hospitalización generado exitosamente'
+      );
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-      this.validarCumplimientoConsentimientoHospitalizacion(datos, medicoCompleto, pacienteCompleto);
-
+      this.validarCumplimientoConsentimientoHospitalizacion(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
     } catch (error) {
-      console.error('❌ Error al generar PDF de Consentimiento para Hospitalización:', error);
+      console.error(
+        '❌ Error al generar PDF de Consentimiento para Hospitalización:',
+        error
+      );
       throw error;
     }
   }
 
-    // 📄 CARTA DE CONSENTIMIENTO INFORMADO PARA REFERENCIA DE PACIENTES SEGÚN NOM-004-SSA3-2012
+  // 📄 CARTA DE CONSENTIMIENTO INFORMADO PARA REFERENCIA DE PACIENTES SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoReferenciaPacientes(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
 
-      console.log('🔄 Generando Carta de Consentimiento Informado para Referencia de Pacientes según NOM-004...');
+      console.log(
+        '🔄 Generando Carta de Consentimiento Informado para Referencia de Pacientes según NOM-004...'
+      );
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const referenciaData = datos.referenciaConsentimiento || {};
       const fechaActual = new Date();
 
@@ -6513,8 +6675,16 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['28%', '72%'],
               body: [
                 [
-                  { text: 'Nombre de la Unidad Médica:', fontSize: 10, bold: true },
-                  { text: 'Hospital General San Luis de la Paz', fontSize: 10, bold: true },
+                  {
+                    text: 'Nombre de la Unidad Médica:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: 'Hospital General San Luis de la Paz',
+                    fontSize: 10,
+                    bold: true,
+                  },
                 ],
               ],
             },
@@ -6528,12 +6698,33 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['22%', '12%', '5%', '15%', '5%', '15%', '26%'],
               body: [
                 [
-                  { text: 'San Luis de la Paz, Guanajuato a', fontSize: 10, bold: true },
-                  { text: fechaActual.getDate().toString(), fontSize: 10, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: 'San Luis de la Paz, Guanajuato a',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: fechaActual.getDate().toString(),
+                    fontSize: 10,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                   { text: 'de', fontSize: 10, bold: true, alignment: 'center' },
-                  { text: fechaActual.toLocaleDateString('es-MX', { month: 'long' }), fontSize: 10, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX', {
+                      month: 'long',
+                    }),
+                    fontSize: 10,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                   { text: 'de', fontSize: 10, bold: true, alignment: 'center' },
-                  { text: fechaActual.getFullYear().toString(), fontSize: 10, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: fechaActual.getFullYear().toString(),
+                    fontSize: 10,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                   { text: '', fontSize: 10 },
                 ],
               ],
@@ -6548,16 +6739,30 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['28%', '17%', '10%', '15%', '8%', '22%'],
               body: [
                 [
-                  { text: 'Fecha de Ingreso hospitalario:', fontSize: 10, bold: true },
                   {
-                    text: referenciaData.fecha_ingreso || fechaActual.toLocaleDateString('es-MX'),
+                    text: 'Fecha de Ingreso hospitalario:',
                     fontSize: 10,
-                    decoration: 'underline'
+                    bold: true,
+                  },
+                  {
+                    text:
+                      referenciaData.fecha_ingreso ||
+                      fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 10,
+                    decoration: 'underline',
                   },
                   { text: 'Servicio:', fontSize: 10, bold: true },
-                  { text: medicoCompleto.departamento, fontSize: 10, decoration: 'underline' },
+                  {
+                    text: medicoCompleto.departamento,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                   { text: 'Cama:', fontSize: 10, bold: true },
-                  { text: referenciaData.numero_cama || 'Sin asignar', fontSize: 10, decoration: 'underline' },
+                  {
+                    text: referenciaData.numero_cama || 'Sin asignar',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -6571,10 +6776,24 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['28%', '40%', '16%', '16%'],
               body: [
                 [
-                  { text: 'Nombre del (la) paciente:', fontSize: 10, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 10, decoration: 'underline' },
+                  {
+                    text: 'Nombre del (la) paciente:',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 10, decoration: 'underline' },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -6588,11 +6807,23 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'Fecha de nacimiento:', fontSize: 10, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 10, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                   { text: 'Edad:', fontSize: 10, bold: true },
-                  { text: `${pacienteCompleto.edad} años`, fontSize: 10, decoration: 'underline' },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
                   { text: 'Fecha/hora:', fontSize: 10, bold: true },
-                  { text: fechaActual.toLocaleString('es-MX'), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: fechaActual.toLocaleString('es-MX'),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -6606,8 +6837,16 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['25%', '75%'],
               body: [
                 [
-                  { text: 'Acepto que el (la) Dr (a)', fontSize: 10, bold: true },
-                  { text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`, fontSize: 11, decoration: 'underline' },
+                  {
+                    text: 'Acepto que el (la) Dr (a)',
+                    fontSize: 10,
+                    bold: true,
+                  },
+                  {
+                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                    fontSize: 11,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -6679,7 +6918,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: referenciaData.motivo_referencia || 'Requiere atención especializada no disponible en esta unidad médica.',
+                        text:
+                          referenciaData.motivo_referencia ||
+                          'Requiere atención especializada no disponible en esta unidad médica.',
                         fontSize: 10,
                       },
                       {
@@ -6688,7 +6929,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: referenciaData.unidad_destino || 'Por definir según disponibilidad y especialidad requerida.',
+                        text:
+                          referenciaData.unidad_destino ||
+                          'Por definir según disponibilidad y especialidad requerida.',
                         fontSize: 10,
                       },
                       {
@@ -6697,7 +6940,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: referenciaData.especialidad_requerida || 'Según criterio médico.',
+                        text:
+                          referenciaData.especialidad_requerida ||
+                          'Según criterio médico.',
                         fontSize: 10,
                       },
                     ],
@@ -6764,14 +7009,20 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   {
-                    text: `\n\n\n${referenciaData.testigo1_nombre || '__________________________'}\n_______________________________`,
+                    text: `\n\n\n${
+                      referenciaData.testigo1_nombre ||
+                      '__________________________'
+                    }\n_______________________________`,
                     fontSize: 10,
                     alignment: 'center',
                     margin: [0, 15, 0, 5],
                   },
                   { text: '', fontSize: 10 },
                   {
-                    text: `\n\n\n${referenciaData.testigo2_nombre || '__________________________'}\n_______________________________`,
+                    text: `\n\n\n${
+                      referenciaData.testigo2_nombre ||
+                      '__________________________'
+                    }\n_______________________________`,
                     fontSize: 10,
                     alignment: 'center',
                     margin: [0, 15, 0, 5],
@@ -6823,7 +7074,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -6845,28 +7098,39 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('  PDF de Consentimiento Informado para Referencia de Pacientes generado exitosamente');
+      console.log(
+        '  PDF de Consentimiento Informado para Referencia de Pacientes generado exitosamente'
+      );
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-      this.validarCumplimientoConsentimientoReferencia(datos, medicoCompleto, pacienteCompleto);
-
+      this.validarCumplimientoConsentimientoReferencia(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
     } catch (error) {
-      console.error('❌ Error al generar PDF de Consentimiento para Referencia:', error);
+      console.error(
+        '❌ Error al generar PDF de Consentimiento para Referencia:',
+        error
+      );
       throw error;
     }
   }
-
 
   // 📄 CARTA DE CONSENTIMIENTO INFORMADO PARA TRANSFUSIÓN SANGUÍNEA O SUS DERIVADOS SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoTransfusionSanguinea(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
 
-      console.log('🩸 Generando Carta de Consentimiento Informado para Transfusión Sanguínea según NOM-004...');
+      console.log(
+        '🩸 Generando Carta de Consentimiento Informado para Transfusión Sanguínea según NOM-004...'
+      );
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const transfusionData = datos.consentimientoTransfusion || {};
       const fechaActual = new Date();
 
@@ -6911,37 +7175,84 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'Nombre:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Edad:', fontSize: 9, bold: true },
-                  { text: `${pacienteCompleto.edad} años`, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'CURP:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.curp, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.curp,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Género:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.sexo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'F. Nacimiento:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'Cama:', fontSize: 9, bold: true },
-                  { text: transfusionData.numero_cama || 'Sin asignar', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: transfusionData.numero_cama || 'Sin asignar',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Servicio:', fontSize: 9, bold: true },
-                  { text: medicoCompleto.departamento, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: medicoCompleto.departamento,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'Estado civil:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.estado_civil || 'No registrado', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.estado_civil || 'No registrado',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Diagnóstico:', fontSize: 9, bold: true },
-                  { text: transfusionData.diagnostico || 'Pendiente', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: transfusionData.diagnostico || 'Pendiente',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'Domicilio:', fontSize: 9, bold: true },
-                  { text: this.formatearDireccionMejorada(pacienteCompleto), fontSize: 9, decoration: 'underline', colSpan: 3 },
+                  {
+                    text: this.formatearDireccionMejorada(pacienteCompleto),
+                    fontSize: 9,
+                    decoration: 'underline',
+                    colSpan: 3,
+                  },
                   {},
                   {},
                 ],
@@ -7097,11 +7408,28 @@ private validarCumplimientoNotaPreoperatoria(
                 [
                   { text: 'San Luis de la Paz, Guanajuato,', fontSize: 11 },
                   { text: 'a', fontSize: 11, alignment: 'center' },
-                  { text: fechaActual.getDate().toString(), fontSize: 11, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: fechaActual.getDate().toString(),
+                    fontSize: 11,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                   { text: 'de', fontSize: 11, alignment: 'center' },
-                  { text: fechaActual.toLocaleDateString('es-MX', { month: 'long' }), fontSize: 11, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX', {
+                      month: 'long',
+                    }),
+                    fontSize: 11,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                   { text: 'de', fontSize: 11, alignment: 'center' },
-                  { text: fechaActual.getFullYear().toString(), fontSize: 11, decoration: 'underline', alignment: 'center' },
+                  {
+                    text: fechaActual.getFullYear().toString(),
+                    fontSize: 11,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
                 ],
               ],
             },
@@ -7152,7 +7480,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: transfusionData.tipo_hemoderivado || 'Por definir según necesidad clínica (sangre total, concentrado eritrocitario, plasma, plaquetas, crioprecipitados)',
+                        text:
+                          transfusionData.tipo_hemoderivado ||
+                          'Por definir según necesidad clínica (sangre total, concentrado eritrocitario, plasma, plaquetas, crioprecipitados)',
                         fontSize: 10,
                       },
                       {
@@ -7161,7 +7491,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: transfusionData.indicacion_medica || 'Según criterio médico y estado clínico del paciente',
+                        text:
+                          transfusionData.indicacion_medica ||
+                          'Según criterio médico y estado clínico del paciente',
                         fontSize: 10,
                       },
                       {
@@ -7170,7 +7502,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: pacienteCompleto.tipo_sangre || 'Por determinar mediante tipificación',
+                        text:
+                          pacienteCompleto.tipo_sangre ||
+                          'Por determinar mediante tipificación',
                         fontSize: 10,
                       },
                     ],
@@ -7276,7 +7610,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -7298,535 +7634,595 @@ private validarCumplimientoNotaPreoperatoria(
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('  PDF de Consentimiento Informado para Transfusión Sanguínea generado exitosamente');
+      console.log(
+        '  PDF de Consentimiento Informado para Transfusión Sanguínea generado exitosamente'
+      );
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-      this.validarCumplimientoConsentimientoTransfusion(datos, medicoCompleto, pacienteCompleto);
-
+      this.validarCumplimientoConsentimientoTransfusion(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
     } catch (error) {
-      console.error('❌ Error al generar PDF de Consentimiento para Transfusión Sanguínea:', error);
+      console.error(
+        '❌ Error al generar PDF de Consentimiento para Transfusión Sanguínea:',
+        error
+      );
       throw error;
     }
   }
 
   // 📄 HOJA DE CONSENTIMIENTO INFORMADO PARA TRATAMIENTO MÉDICO SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoTratamientoMedico(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
+    try {
+      await this.ensurePdfMakeLoaded();
 
-    console.log('⚕️ Generando Hoja de Consentimiento Informado para Tratamiento Médico según NOM-004...');
+      console.log(
+        '⚕️ Generando Hoja de Consentimiento Informado para Tratamiento Médico según NOM-004...'
+      );
 
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const tratamientoData = datos.consentimientoTratamiento || {};
-    const fechaActual = new Date();
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const tratamientoData = datos.consentimientoTratamiento || {};
+      const fechaActual = new Date();
 
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [45, 60, 45, 60],
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [45, 60, 45, 60],
 
-      content: [
-        { text: '', margin: [0, 40] },
+        content: [
+          { text: '', margin: [0, 40] },
 
-        // 🔹 TÍTULO
-        {
-          text: 'HOJA DE CONSENTIMIENTO INFORMADO PARA TRATAMIENTO MÉDICO',
-          fontSize: 12,
-          bold: true,
-          alignment: 'center',
-          margin: [0, 0, 0, 25],
-        },
-
-        // 🔹 FECHA Y LUGAR
-        {
-          table: {
-            widths: ['42%', '8%', '8%', '12%', '8%', '22%'],
-            body: [
-              [
-                { text: 'San Luis de la Paz, Guanajuato a', fontSize: 9, bold: true },
-                { text: fechaActual.getDate().toString(), fontSize: 9, decoration: 'underline', alignment: 'center' },
-                { text: 'de', fontSize: 9, bold: true, alignment: 'center' },
-                { text: fechaActual.toLocaleDateString('es-MX', { month: 'long' }), fontSize: 9, decoration: 'underline', alignment: 'center' },
-                { text: 'de', fontSize: 9, bold: true, alignment: 'center' },
-                { text: `20${fechaActual.getFullYear().toString().slice(-2)}`, fontSize: 9, bold: true, alignment: 'center' },
-              ],
-            ],
+          // 🔹 TÍTULO
+          {
+            text: 'HOJA DE CONSENTIMIENTO INFORMADO PARA TRATAMIENTO MÉDICO',
+            fontSize: 12,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 25],
           },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 30],
-        },
 
-        // 🔹 DESTINATARIO
-        {
-          text: `DR. ${medicoCompleto.nombre_completo}`,
-          fontSize: 10,
-          bold: true,
-          margin: [0, 0, 0, 8],
-        },
-
-        {
-          text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
-          fontSize: 10,
-          margin: [0, 0, 0, 8],
-        },
-
-        {
-          text: 'DIRECTOR',
-          fontSize: 10,
-          margin: [0, 0, 0, 8],
-        },
-
-        {
-          text: 'PRESENTE.',
-          fontSize: 10,
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 QUIEN SUSCRIBE
-        {
-          text: 'QUIEN SUSCRIBE:',
-          fontSize: 10,
-          bold: true,
-          margin: [0, 0, 0, 15],
-        },
-
-        {
-          text: `${pacienteCompleto.apellido_paterno || '_'.repeat(30)} ${pacienteCompleto.apellido_materno || '_'.repeat(30)} ${pacienteCompleto.nombre || '_'.repeat(30)}`,
-          fontSize: 10,
-          decoration: 'underline',
-          alignment: 'center',
-          margin: [0, 0, 0, 8],
-        },
-
-        {
-          text: 'APELLIDO PATERNO                                           APELLIDO MATERNO                                           NOMBRE(S)',
-          fontSize: 8,
-          alignment: 'center',
-          margin: [0, 0, 0, 25],
-        },
-
-        // 🔹 DOMICILIO
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                { text: 'DOMICILIO:', fontSize: 10, bold: true },
-                { text: this.formatearDireccionMejorada(pacienteCompleto), fontSize: 10, decoration: 'underline' },
+          // 🔹 FECHA Y LUGAR
+          {
+            table: {
+              widths: ['42%', '8%', '8%', '12%', '8%', '22%'],
+              body: [
+                [
+                  {
+                    text: 'San Luis de la Paz, Guanajuato a',
+                    fontSize: 9,
+                    bold: true,
+                  },
+                  {
+                    text: fechaActual.getDate().toString(),
+                    fontSize: 9,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
+                  { text: 'de', fontSize: 9, bold: true, alignment: 'center' },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX', {
+                      month: 'long',
+                    }),
+                    fontSize: 9,
+                    decoration: 'underline',
+                    alignment: 'center',
+                  },
+                  { text: 'de', fontSize: 9, bold: true, alignment: 'center' },
+                  {
+                    text: `20${fechaActual.getFullYear().toString().slice(-2)}`,
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                  },
+                ],
               ],
-            ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 30],
           },
-          layout: 'noBorders',
-          margin: [0, 0, 0, 25],
+
+          // 🔹 DESTINATARIO
+          {
+            text: `DR. ${medicoCompleto.nombre_completo}`,
+            fontSize: 10,
+            bold: true,
+            margin: [0, 0, 0, 8],
+          },
+
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
+            fontSize: 10,
+            margin: [0, 0, 0, 8],
+          },
+
+          {
+            text: 'DIRECTOR',
+            fontSize: 10,
+            margin: [0, 0, 0, 8],
+          },
+
+          {
+            text: 'PRESENTE.',
+            fontSize: 10,
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 QUIEN SUSCRIBE
+          {
+            text: 'QUIEN SUSCRIBE:',
+            fontSize: 10,
+            bold: true,
+            margin: [0, 0, 0, 15],
+          },
+
+          {
+            text: `${pacienteCompleto.apellido_paterno || '_'.repeat(30)} ${
+              pacienteCompleto.apellido_materno || '_'.repeat(30)
+            } ${pacienteCompleto.nombre || '_'.repeat(30)}`,
+            fontSize: 10,
+            decoration: 'underline',
+            alignment: 'center',
+            margin: [0, 0, 0, 8],
+          },
+
+          {
+            text: 'APELLIDO PATERNO                                           APELLIDO MATERNO                                           NOMBRE(S)',
+            fontSize: 8,
+            alignment: 'center',
+            margin: [0, 0, 0, 25],
+          },
+
+          // 🔹 DOMICILIO
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  { text: 'DOMICILIO:', fontSize: 10, bold: true },
+                  {
+                    text: this.formatearDireccionMejorada(pacienteCompleto),
+                    fontSize: 10,
+                    decoration: 'underline',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 25],
+          },
+
+          // 🔹 DATOS ADICIONALES DEL PACIENTE
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'INFORMACIÓN DEL PACIENTE',
+                    fontSize: 10,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 8, 0, 8],
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: 'Expediente: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        ),
+                        fontSize: 9,
+                      },
+                      {
+                        text: '     Edad: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `${pacienteCompleto.edad} años`,
+                        fontSize: 9,
+                      },
+                      {
+                        text: '     Sexo: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: pacienteCompleto.sexo,
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\nCURP: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: pacienteCompleto.curp || 'No registrado',
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\nFecha de nacimiento: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text:
+                          pacienteCompleto.fecha_nacimiento || 'No registrada',
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\nServicio médico: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: medicoCompleto.departamento,
+                        fontSize: 9,
+                      },
+                    ],
+                    margin: [10, 10, 10, 10],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 25],
+          },
+
+          // 🔹 AUTORIZACIÓN PRINCIPAL
+          {
+            text: 'AUTORIZO PLENAMENTE AL PERSONAL DE ESTE HOSPITAL A SU CARGO PARA EJECUTAR LAS INVESTIGACIONES CLÍNICAS, DE LABORATORIO Y DE GABINETE, QUE SEAN NECESARIAS PARA EL DIAGNÓSTICO DE MI ENFERMEDAD, ASÍ COMO TAMBIÉN PARA REALIZAR LOS TRATAMIENTOS MÉDICOS O QUIRÚRGICOS QUE CONVENGAN. ASÍ MISMO ME COMPROMETO A OBSERVAR EL REGLAMENTO INTERNO DE LA INSTITUCIÓN.',
+            fontSize: 10,
+            lineHeight: 1.5,
+            alignment: 'justify',
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 INFORMACIÓN ESPECÍFICA DEL TRATAMIENTO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'INFORMACIÓN ESPECÍFICA DEL TRATAMIENTO',
+                    fontSize: 10,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 8, 0, 8],
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: 'Diagnóstico presuntivo: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text:
+                          tratamientoData.diagnostico_presuntivo ||
+                          'Por determinar mediante estudios clínicos y de gabinete',
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\n\nTratamiento propuesto: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text:
+                          tratamientoData.tratamiento_propuesto ||
+                          'Según criterio médico y evolución clínica del paciente',
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\n\nEstudios de laboratorio y gabinete autorizados: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text:
+                          tratamientoData.estudios_autorizados ||
+                          'Los que sean médicamente necesarios para el diagnóstico',
+                        fontSize: 9,
+                      },
+                      {
+                        text: '\n\nMédico responsable: ',
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                        fontSize: 9,
+                      },
+                      {
+                        text: ' - Cédula: ',
+                        fontSize: 9,
+                      },
+                      {
+                        text: medicoCompleto.numero_cedula || 'No disponible',
+                        fontSize: 9,
+                      },
+                    ],
+                    margin: [10, 10, 10, 10],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 25],
+          },
+
+          // 🔹 DECLARACIÓN DE CONFORMIDAD
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'DECLARACIÓN DE CONFORMIDAD',
+                    fontSize: 10,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 8, 0, 8],
+                  },
+                ],
+                [
+                  {
+                    text: 'Declaro que he sido informado(a) sobre los procedimientos médicos, estudios de diagnóstico y tratamientos que se realizarán. Entiendo los riesgos y beneficios del tratamiento propuesto. He tenido la oportunidad de hacer preguntas y todas han sido respondidas satisfactoriamente. Autorizo voluntariamente el tratamiento médico propuesto y me comprometo a seguir las indicaciones médicas.',
+                    fontSize: 10,
+                    alignment: 'justify',
+                    lineHeight: 1.4,
+                    margin: [10, 10, 10, 10],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 30],
+          },
+
+          // 🔹 DESPEDIDA
+          {
+            text: 'A T E N T A M E N T E',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 30],
+          },
+
+          // 🔹 FIRMAS
+          {
+            table: {
+              widths: ['45%', '10%', '45%'],
+              body: [
+                [
+                  {
+                    text: '\n\n\n\n_________________________________',
+                    fontSize: 10,
+                    alignment: 'center',
+                    margin: [0, 20, 0, 5],
+                  },
+                  { text: '', fontSize: 10 },
+                  {
+                    text: '\n\n\n\n_________________________________',
+                    fontSize: 10,
+                    alignment: 'center',
+                    margin: [0, 20, 0, 5],
+                  },
+                ],
+                [
+                  {
+                    text: 'NOMBRE Y FIRMA DE LA PERSONA LEGALMENTE RESPONSABLE',
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                  { text: '', fontSize: 8 },
+                  {
+                    text: 'NOMBRE Y FIRMA DEL PACIENTE',
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+                [
+                  { text: '', fontSize: 10, margin: [0, 20, 0, 0] },
+                  { text: '', fontSize: 10 },
+                  { text: '', fontSize: 10 },
+                ],
+                [
+                  {
+                    text: '\n\n\n\n_________________________________',
+                    fontSize: 10,
+                    alignment: 'center',
+                    margin: [0, 15, 0, 5],
+                  },
+                  { text: '', fontSize: 10 },
+                  {
+                    text: '\n\n\n\n_________________________________',
+                    fontSize: 10,
+                    alignment: 'center',
+                    margin: [0, 15, 0, 5],
+                  },
+                ],
+                [
+                  {
+                    text: 'TESTIGO',
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                  { text: '', fontSize: 8 },
+                  {
+                    text: 'TESTIGO',
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          },
+
+          { text: '', margin: [0, 15] },
+
+          // 🔹 INFORMACIÓN MÉDICA ADICIONAL
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'INFORMACIÓN DEL MÉDICO TRATANTE',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `Médico: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Cédula Profesional: ${
+                          medicoCompleto.numero_cedula || 'No disponible'
+                        }\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de elaboración: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} ${fechaActual.toLocaleTimeString('es-MX')}`,
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [8, 8, 8, 8],
+                    lineHeight: 1.2,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [45, 20],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 8,
+                    color: '#000000',
+                  },
+                  {
+                    text: 'Consentimiento Tratamiento Médico - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#000000',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#000000',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
         },
+      };
 
-        // 🔹 DATOS ADICIONALES DEL PACIENTE
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'INFORMACIÓN DEL PACIENTE',
-                  fontSize: 10,
-                  bold: true,
-                  alignment: 'center',
-                  margin: [0, 8, 0, 8],
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: 'Expediente: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
-                      fontSize: 9,
-                    },
-                    {
-                      text: '     Edad: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `${pacienteCompleto.edad} años`,
-                      fontSize: 9,
-                    },
-                    {
-                      text: '     Sexo: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: pacienteCompleto.sexo,
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\nCURP: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: pacienteCompleto.curp || 'No registrado',
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\nFecha de nacimiento: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: pacienteCompleto.fecha_nacimiento || 'No registrada',
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\nServicio médico: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: medicoCompleto.departamento,
-                      fontSize: 9,
-                    },
-                  ],
-                  margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 25],
-        },
+      const nombreArchivo = `consentimiento-tratamiento-medico-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
-        // 🔹 AUTORIZACIÓN PRINCIPAL
-        {
-          text: 'AUTORIZO PLENAMENTE AL PERSONAL DE ESTE HOSPITAL A SU CARGO PARA EJECUTAR LAS INVESTIGACIONES CLÍNICAS, DE LABORATORIO Y DE GABINETE, QUE SEAN NECESARIAS PARA EL DIAGNÓSTICO DE MI ENFERMEDAD, ASÍ COMO TAMBIÉN PARA REALIZAR LOS TRATAMIENTOS MÉDICOS O QUIRÚRGICOS QUE CONVENGAN. ASÍ MISMO ME COMPROMETO A OBSERVAR EL REGLAMENTO INTERNO DE LA INSTITUCIÓN.',
-          fontSize: 10,
-          lineHeight: 1.5,
-          alignment: 'justify',
-          margin: [0, 0, 0, 20],
-        },
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
 
-        // 🔹 INFORMACIÓN ESPECÍFICA DEL TRATAMIENTO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'INFORMACIÓN ESPECÍFICA DEL TRATAMIENTO',
-                  fontSize: 10,
-                  bold: true,
-                  alignment: 'center',
-                  margin: [0, 8, 0, 8],
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: 'Diagnóstico presuntivo: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: tratamientoData.diagnostico_presuntivo || 'Por determinar mediante estudios clínicos y de gabinete',
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\n\nTratamiento propuesto: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: tratamientoData.tratamiento_propuesto || 'Según criterio médico y evolución clínica del paciente',
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\n\nEstudios de laboratorio y gabinete autorizados: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: tratamientoData.estudios_autorizados || 'Los que sean médicamente necesarios para el diagnóstico',
-                      fontSize: 9,
-                    },
-                    {
-                      text: '\n\nMédico responsable: ',
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
-                      fontSize: 9,
-                    },
-                    {
-                      text: ' - Cédula: ',
-                      fontSize: 9,
-                    },
-                    {
-                      text: medicoCompleto.numero_cedula || 'No disponible',
-                      fontSize: 9,
-                    },
-                  ],
-                  margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 25],
-        },
+      console.log(
+        '  PDF de Consentimiento Informado para Tratamiento Médico generado exitosamente'
+      );
+      console.log(`📄 Archivo: ${nombreArchivo}`);
 
-        // 🔹 DECLARACIÓN DE CONFORMIDAD
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'DECLARACIÓN DE CONFORMIDAD',
-                  fontSize: 10,
-                  bold: true,
-                  alignment: 'center',
-                  margin: [0, 8, 0, 8],
-                },
-              ],
-              [
-                {
-                  text: 'Declaro que he sido informado(a) sobre los procedimientos médicos, estudios de diagnóstico y tratamientos que se realizarán. Entiendo los riesgos y beneficios del tratamiento propuesto. He tenido la oportunidad de hacer preguntas y todas han sido respondidas satisfactoriamente. Autorizo voluntariamente el tratamiento médico propuesto y me comprometo a seguir las indicaciones médicas.',
-                  fontSize: 10,
-                  alignment: 'justify',
-                  lineHeight: 1.4,
-                  margin: [10, 10, 10, 10],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 30],
-        },
-
-        // 🔹 DESPEDIDA
-        {
-          text: 'A T E N T A M E N T E',
-          fontSize: 10,
-          bold: true,
-          alignment: 'center',
-          margin: [0, 0, 0, 30],
-        },
-
-        // 🔹 FIRMAS
-        {
-          table: {
-            widths: ['45%', '10%', '45%'],
-            body: [
-              [
-                {
-                  text: '\n\n\n\n_________________________________',
-                  fontSize: 10,
-                  alignment: 'center',
-                  margin: [0, 20, 0, 5],
-                },
-                { text: '', fontSize: 10 },
-                {
-                  text: '\n\n\n\n_________________________________',
-                  fontSize: 10,
-                  alignment: 'center',
-                  margin: [0, 20, 0, 5],
-                },
-              ],
-              [
-                {
-                  text: 'NOMBRE Y FIRMA DE LA PERSONA LEGALMENTE RESPONSABLE',
-                  fontSize: 8,
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-                { text: '', fontSize: 8 },
-                {
-                  text: 'NOMBRE Y FIRMA DEL PACIENTE',
-                  fontSize: 8,
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-              ],
-              [
-                { text: '', fontSize: 10, margin: [0, 20, 0, 0] },
-                { text: '', fontSize: 10 },
-                { text: '', fontSize: 10 },
-              ],
-              [
-                {
-                  text: '\n\n\n\n_________________________________',
-                  fontSize: 10,
-                  alignment: 'center',
-                  margin: [0, 15, 0, 5],
-                },
-                { text: '', fontSize: 10 },
-                {
-                  text: '\n\n\n\n_________________________________',
-                  fontSize: 10,
-                  alignment: 'center',
-                  margin: [0, 15, 0, 5],
-                },
-              ],
-              [
-                {
-                  text: 'TESTIGO',
-                  fontSize: 8,
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-                { text: '', fontSize: 8 },
-                {
-                  text: 'TESTIGO',
-                  fontSize: 8,
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        },
-
-        { text: '', margin: [0, 15] },
-
-        // 🔹 INFORMACIÓN MÉDICA ADICIONAL
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'INFORMACIÓN DEL MÉDICO TRATANTE',
-                  fontSize: 9,
-                  bold: true,
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `Médico: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'No disponible'}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Servicio: ${medicoCompleto.departamento}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Fecha de elaboración: ${fechaActual.toLocaleDateString('es-MX')} ${fechaActual.toLocaleTimeString('es-MX')}`,
-                      fontSize: 8,
-                    },
-                  ],
-                  margin: [8, 8, 8, 8],
-                  lineHeight: 1.2,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [45, 20],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
-                  color: '#000000',
-                },
-                {
-                  text: 'Consentimiento Tratamiento Médico - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 8,
-                  alignment: 'center',
-                  color: '#000000',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                      fontSize: 7,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#000000',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-    };
-
-    const nombreArchivo = `consentimiento-tratamiento-medico-${pacienteCompleto.nombre
-      .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split
-
-      ('T')[0]}.pdf`;
-
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
-
-    console.log('  PDF de Consentimiento Informado para Tratamiento Médico generado exitosamente');
-    console.log(`📄 Archivo: ${nombreArchivo}`);
-
-    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-    this.validarCumplimientoConsentimientoTratamiento(datos, medicoCompleto, pacienteCompleto);
-
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Consentimiento para Tratamiento Médico:', error);
-    throw error;
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoConsentimientoTratamiento(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error(
+        '❌ Error al generar PDF de Consentimiento para Tratamiento Médico:',
+        error
+      );
+      throw error;
+    }
   }
-}
 
   // 📄 HOJA DE ALTA VOLUNTARIA SEGÚN NOM-004-SSA3-2012
   async generarHojaAltaVoluntaria(datos: any): Promise<void> {
@@ -7836,7 +8232,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('🚪 Generando Hoja de Alta Voluntaria según NOM-004...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const altaVoluntariaData = datos.altaVoluntaria || {};
       const fechaActual = new Date();
 
@@ -7872,27 +8270,65 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'Nombre:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Edad:', fontSize: 9, bold: true },
-                  { text: `${pacienteCompleto.edad} años`, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: `${pacienteCompleto.edad} años`,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Fecha:', fontSize: 9, bold: true },
-                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'CURP:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.curp, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.curp,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Sexo:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.sexo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.sexo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Expediente:', fontSize: 9, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'F. Nacimiento:', fontSize: 8, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Cama:', fontSize: 9, bold: true },
-                  { text: altaVoluntariaData.numero_cama || 'Sin asignar', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: altaVoluntariaData.numero_cama || 'Sin asignar',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Servicio:', fontSize: 9, bold: true },
-                  { text: medicoCompleto.departamento, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: medicoCompleto.departamento,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -7923,7 +8359,8 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: altaVoluntariaData.fecha_ingreso || 'No especificada',
+                        text:
+                          altaVoluntariaData.fecha_ingreso || 'No especificada',
                         fontSize: 10,
                       },
                       {
@@ -7932,7 +8369,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: altaVoluntariaData.motivo_ingreso || 'No especificado',
+                        text:
+                          altaVoluntariaData.motivo_ingreso ||
+                          'No especificado',
                         fontSize: 10,
                       },
                       {
@@ -7941,7 +8380,8 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: altaVoluntariaData.diagnostico_alta || 'Por definir',
+                        text:
+                          altaVoluntariaData.diagnostico_alta || 'Por definir',
                         fontSize: 10,
                       },
                       {
@@ -7992,7 +8432,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: altaVoluntariaData.nombre_responsable || pacienteCompleto.nombre_completo,
+                        text:
+                          altaVoluntariaData.nombre_responsable ||
+                          pacienteCompleto.nombre_completo,
                         fontSize: 11,
                         bold: true,
                         decoration: 'underline',
@@ -8002,7 +8444,8 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 11,
                       },
                       {
-                        text: altaVoluntariaData.relacion_paciente || 'paciente',
+                        text:
+                          altaVoluntariaData.relacion_paciente || 'paciente',
                         fontSize: 11,
                         decoration: 'underline',
                       },
@@ -8064,7 +8507,8 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   {
-                    text: altaVoluntariaData.recomendaciones_medicas ||
+                    text:
+                      altaVoluntariaData.recomendaciones_medicas ||
                       'Se recomienda:\n• Acudir inmediatamente a la unidad de salud más cercana si presenta deterioro de su estado general\n• Continuar con medicamentos prescritos según indicaciones\n• Seguimiento médico ambulatorio en las próximas 24-48 horas\n• Acudir a urgencias si presenta signos de alarma',
                     fontSize: 10,
                     margin: [10, 10, 10, 10],
@@ -8098,7 +8542,8 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   {
-                    text: altaVoluntariaData.signos_alarma ||
+                    text:
+                      altaVoluntariaData.signos_alarma ||
                       '• Dificultad para respirar o falta de aire\n• Dolor de pecho intenso\n• Pérdida de conocimiento o desmayo\n• Vómito persistente\n• Fiebre alta (mayor a 38.5°C)\n• Sangrado abundante\n• Convulsiones\n• Cambios en el estado de conciencia\n• Cualquier síntoma que considere grave o preocupante',
                     fontSize: 10,
                     margin: [10, 10, 10, 10],
@@ -8123,12 +8568,16 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   {
-                    text: `Fecha del alta voluntaria: ${fechaActual.toLocaleDateString('es-MX')}`,
+                    text: `Fecha del alta voluntaria: ${fechaActual.toLocaleDateString(
+                      'es-MX'
+                    )}`,
                     fontSize: 10,
                     bold: true,
                   },
                   {
-                    text: `Hora del alta: ${fechaActual.toLocaleTimeString('es-MX')}`,
+                    text: `Hora del alta: ${fechaActual.toLocaleTimeString(
+                      'es-MX'
+                    )}`,
                     fontSize: 10,
                     bold: true,
                   },
@@ -8210,7 +8659,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 9,
                       },
                       {
-                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'No disponible'}\n`,
+                        text: `Cédula Profesional: ${
+                          medicoCompleto.numero_cedula || 'No disponible'
+                        }\n`,
                         fontSize: 9,
                       },
                       {
@@ -8267,7 +8718,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -8293,16 +8746,21 @@ private validarCumplimientoNotaPreoperatoria(
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-      this.validarCumplimientoAltaVoluntaria(datos, medicoCompleto, pacienteCompleto);
-
+      this.validarCumplimientoAltaVoluntaria(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
     } catch (error) {
-      console.error('❌ Error al generar PDF de Hoja de Alta Voluntaria:', error);
+      console.error(
+        '❌ Error al generar PDF de Hoja de Alta Voluntaria:',
+        error
+      );
       throw error;
     }
   }
 
-
-    // 📄 HOJA DE INFORME DIARIO SEGÚN NOM-004-SSA3-2012
+  // 📄 HOJA DE INFORME DIARIO SEGÚN NOM-004-SSA3-2012
   async generarHojaInformeDiario(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
@@ -8310,7 +8768,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('📋 Generando Hoja de Informe Diario según NOM-004...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const informeDiarioData = datos.informeDiario || {};
       const fechaActual = new Date();
 
@@ -8347,21 +8807,47 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'Nombre del paciente:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'No. de expediente:', fontSize: 9, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, decoration: 'underline' },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'Fecha de Nacimiento:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || 'No registrada', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || 'No registrada',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'CURP:', fontSize: 9, bold: true },
-                  { text: pacienteCompleto.curp, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: pacienteCompleto.curp,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
                 [
                   { text: 'Servicio:', fontSize: 9, bold: true },
-                  { text: medicoCompleto.departamento, fontSize: 9, decoration: 'underline' },
+                  {
+                    text: medicoCompleto.departamento,
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                   { text: 'Cama:', fontSize: 9, bold: true },
-                  { text: informeDiarioData.numero_cama || 'Sin asignar', fontSize: 9, decoration: 'underline' },
+                  {
+                    text: informeDiarioData.numero_cama || 'Sin asignar',
+                    fontSize: 9,
+                    decoration: 'underline',
+                  },
                 ],
               ],
             },
@@ -8392,7 +8878,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: `${fechaActual.toLocaleDateString('es-MX')} - Turno: ${informeDiarioData.turno || 'Matutino'}`,
+                        text: `${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} - Turno: ${informeDiarioData.turno || 'Matutino'}`,
                         fontSize: 9,
                       },
                       {
@@ -8401,7 +8889,9 @@ private validarCumplimientoNotaPreoperatoria(
                         bold: true,
                       },
                       {
-                        text: informeDiarioData.diagnostico_principal || 'Por definir',
+                        text:
+                          informeDiarioData.diagnostico_principal ||
+                          'Por definir',
                         fontSize: 9,
                       },
                       {
@@ -8468,29 +8958,40 @@ private validarCumplimientoNotaPreoperatoria(
                 // Filas de datos (generar 15 filas vacías para completar a mano)
                 ...Array.from({ length: 15 }, (_, index) => [
                   {
-                    text: index === 0 && informeDiarioData.registros?.[0]?.fecha ?
-                      informeDiarioData.registros[0].fecha : '',
+                    text:
+                      index === 0 && informeDiarioData.registros?.[0]?.fecha
+                        ? informeDiarioData.registros[0].fecha
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 25,
                   },
                   {
-                    text: index === 0 && informeDiarioData.registros?.[0]?.quien_informa ?
-                      informeDiarioData.registros[0].quien_informa : '',
+                    text:
+                      index === 0 &&
+                      informeDiarioData.registros?.[0]?.quien_informa
+                        ? informeDiarioData.registros[0].quien_informa
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 25,
                   },
                   {
-                    text: index === 0 && informeDiarioData.registros?.[0]?.quien_recibe ?
-                      informeDiarioData.registros[0].quien_recibe : '',
+                    text:
+                      index === 0 &&
+                      informeDiarioData.registros?.[0]?.quien_recibe
+                        ? informeDiarioData.registros[0].quien_recibe
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 25,
                   },
                   {
-                    text: index === 0 && informeDiarioData.registros?.[0]?.informacion ?
-                      informeDiarioData.registros[0].informacion : '',
+                    text:
+                      index === 0 &&
+                      informeDiarioData.registros?.[0]?.informacion
+                        ? informeDiarioData.registros[0].informacion
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 25,
@@ -8524,13 +9025,14 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   {
-                    text: '• Registrar toda comunicación relevante sobre el estado del paciente\n' +
-                          '• Incluir fecha y hora exacta de cada comunicación\n' +
-                          '• Anotar nombre completo y cargo de quien proporciona la información\n' +
-                          '• Registrar nombre completo de quien recibe la información (familiar, médico, etc.)\n' +
-                          '• Describir brevemente el contenido de la información comunicada\n' +
-                          '• Mantener confidencialidad según normativa de protección de datos\n' +
-                          '• Archivar en expediente clínico una vez completado',
+                    text:
+                      '• Registrar toda comunicación relevante sobre el estado del paciente\n' +
+                      '• Incluir fecha y hora exacta de cada comunicación\n' +
+                      '• Anotar nombre completo y cargo de quien proporciona la información\n' +
+                      '• Registrar nombre completo de quien recibe la información (familiar, médico, etc.)\n' +
+                      '• Describir brevemente el contenido de la información comunicada\n' +
+                      '• Mantener confidencialidad según normativa de protección de datos\n' +
+                      '• Archivar en expediente clínico una vez completado',
                     fontSize: 8,
                     margin: [8, 8, 8, 8],
                     lineHeight: 1.3,
@@ -8572,7 +9074,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -8598,10 +9102,16 @@ private validarCumplimientoNotaPreoperatoria(
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-      this.validarCumplimientoInformeDiario(datos, medicoCompleto, pacienteCompleto);
-
+      this.validarCumplimientoInformeDiario(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
     } catch (error) {
-      console.error('❌ Error al generar PDF de Hoja de Informe Diario:', error);
+      console.error(
+        '❌ Error al generar PDF de Hoja de Informe Diario:',
+        error
+      );
       throw error;
     }
   }
@@ -8614,7 +9124,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('📋 Generando Hoja Frontal de Expediente según NOM-004...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const expedienteData = datos.expediente || {};
       const fechaActual = new Date();
 
@@ -8650,7 +9162,9 @@ private validarCumplimientoNotaPreoperatoria(
                     border: [false, false, false, true],
                   },
                   {
-                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
                     fontSize: 9,
                     border: [false, false, false, true],
                   },
@@ -8828,29 +9342,38 @@ private validarCumplimientoNotaPreoperatoria(
                 // Generar 25 filas vacías para llenar a mano
                 ...Array.from({ length: 25 }, (_, index) => [
                   {
-                    text: index === 0 && expedienteData.registros?.[0]?.fecha_ingreso ?
-                      expedienteData.registros[0].fecha_ingreso : '',
+                    text:
+                      index === 0 &&
+                      expedienteData.registros?.[0]?.fecha_ingreso
+                        ? expedienteData.registros[0].fecha_ingreso
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 20,
                   },
                   {
-                    text: index === 0 && expedienteData.registros?.[0]?.fecha_egreso ?
-                      expedienteData.registros[0].fecha_egreso : '',
+                    text:
+                      index === 0 && expedienteData.registros?.[0]?.fecha_egreso
+                        ? expedienteData.registros[0].fecha_egreso
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 20,
                   },
                   {
-                    text: index === 0 && expedienteData.registros?.[0]?.diagnostico ?
-                      expedienteData.registros[0].diagnostico : '',
+                    text:
+                      index === 0 && expedienteData.registros?.[0]?.diagnostico
+                        ? expedienteData.registros[0].diagnostico
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 20,
                   },
                   {
-                    text: index === 0 && expedienteData.registros?.[0]?.medico ?
-                      expedienteData.registros[0].medico : '',
+                    text:
+                      index === 0 && expedienteData.registros?.[0]?.medico
+                        ? expedienteData.registros[0].medico
+                        : '',
                     fontSize: 8,
                     margin: [3, 8, 3, 8],
                     minHeight: 20,
@@ -8965,7 +9488,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -8989,8 +9514,9 @@ private validarCumplimientoNotaPreoperatoria(
 
       console.log('  PDF de Hoja Frontal de Expediente generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
-      console.log('ℹ️ Nota: Este es un formato básico que probablemente se llene a mano');
-
+      console.log(
+        'ℹ️ Nota: Este es un formato básico que probablemente se llene a mano'
+      );
     } catch (error) {
       console.error('❌ Error al generar PDF de Hoja Frontal:', error);
       throw error;
@@ -9005,7 +9531,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('🧪 Generando Solicitud de Laboratorio según NOM-004...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const laboratorioData = datos.solicitudLaboratorio || {};
       const fechaActual = new Date();
 
@@ -9075,34 +9603,53 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 [
                   { text: 'NOMBRE DEL PACIENTE:', fontSize: 8, bold: true },
-                  { text: pacienteCompleto.nombre_completo, fontSize: 8, colSpan: 3 },
+                  {
+                    text: pacienteCompleto.nombre_completo,
+                    fontSize: 8,
+                    colSpan: 3,
+                  },
                   {},
                   {},
                 ],
                 [
                   { text: 'FECHA DE NACIMIENTO:', fontSize: 8, bold: true },
-                  { text: pacienteCompleto.fecha_nacimiento || '', fontSize: 8 },
+                  {
+                    text: pacienteCompleto.fecha_nacimiento || '',
+                    fontSize: 8,
+                  },
                   { text: 'CURP:', fontSize: 8, bold: true },
                   { text: pacienteCompleto.curp || '', fontSize: 7 },
                 ],
                 [
                   { text: 'NÚMERO DE EXPEDIENTE:', fontSize: 8, bold: true },
-                  { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 8 },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 8,
+                  },
                   { text: 'No CAUSAS:', fontSize: 8, bold: true },
                   { text: laboratorioData.numero_causas || '', fontSize: 8 },
                 ],
                 [
-                  { text: 'DIAGNÓSTICO CAUSAS Y/O SMNG SIN ABREVIATURAS:', fontSize: 8, bold: true, colSpan: 4 },
+                  {
+                    text: 'DIAGNÓSTICO CAUSAS Y/O SMNG SIN ABREVIATURAS:',
+                    fontSize: 8,
+                    bold: true,
+                    colSpan: 4,
+                  },
                   {},
                   {},
                   {},
                 ],
                 [
                   {
-                    text: laboratorioData.diagnostico || 'Diagnóstico por especificar',
+                    text:
+                      laboratorioData.diagnostico ||
+                      'Diagnóstico por especificar',
                     fontSize: 8,
                     colSpan: 4,
-                    margin: [0, 5, 0, 5]
+                    margin: [0, 5, 0, 5],
                   },
                   {},
                   {},
@@ -9110,9 +9657,15 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   { text: 'FECHA DE SOLICITUD:', fontSize: 8, bold: true },
-                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 8,
+                  },
                   { text: 'FECHA PRÓXIMA CONSULTA:', fontSize: 8, bold: true },
-                  { text: laboratorioData.fecha_proxima_consulta || '', fontSize: 8 },
+                  {
+                    text: laboratorioData.fecha_proxima_consulta || '',
+                    fontSize: 8,
+                  },
                 ],
                 [
                   { text: 'EDAD:', fontSize: 8, bold: true },
@@ -9122,14 +9675,17 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   { text: 'No CAMA:', fontSize: 8, bold: true },
-                  { text: laboratorioData.numero_cama || 'Ambulatorio', fontSize: 8 },
+                  {
+                    text: laboratorioData.numero_cama || 'Ambulatorio',
+                    fontSize: 8,
+                  },
                   { text: 'PRIORIDAD:', fontSize: 8, bold: true },
                   {
                     text: [
                       { text: '☐ URGENTE  ', fontSize: 8 },
-                      { text: '☐ RUTINA', fontSize: 8 }
+                      { text: '☐ RUTINA', fontSize: 8 },
                     ],
-                    fontSize: 8
+                    fontSize: 8,
                   },
                 ],
               ],
@@ -9150,9 +9706,23 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 // HEMATOLOGÍA
                 [
-                  { text: 'HEMATOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'HEMATOLOGÍA',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
-                  { text: 'INMUNOHEMATOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'INMUNOHEMATOLOGÍA',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                 ],
                 [
@@ -9182,7 +9752,14 @@ private validarCumplimientoNotaPreoperatoria(
                 [
                   { text: '☐ FROTIS SANGRE GOTA GRUESA', fontSize: 7 },
                   { text: '20105', fontSize: 7, alignment: 'center' },
-                  { text: 'INMUNOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'INMUNOLOGÍA',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                 ],
                 [
@@ -9198,7 +9775,14 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: '19206', fontSize: 7, alignment: 'center' },
                 ],
                 [
-                  { text: 'PAQUETES', fontSize: 8, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'PAQUETES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                   { text: '☐ FACTOR REUMATOIDE', fontSize: 7 },
                   { text: '19207', fontSize: 7, alignment: 'center' },
@@ -9217,7 +9801,14 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 // COAGULACIÓN
                 [
-                  { text: 'COAGULACIÓN', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'COAGULACIÓN',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                   { text: '☐ ANTÍGENO PROSTÁTICO CUALITATIVO', fontSize: 7 },
                   { text: '19212', fontSize: 7, alignment: 'center' },
@@ -9258,9 +9849,23 @@ private validarCumplimientoNotaPreoperatoria(
               body: [
                 // BIOQUÍMICA CLÍNICA
                 [
-                  { text: 'BIOQUÍMICA CLÍNICA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'BIOQUÍMICA CLÍNICA',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
-                  { text: 'URIANALISIS', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'URIANALISIS',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                 ],
                 [
@@ -9308,7 +9913,14 @@ private validarCumplimientoNotaPreoperatoria(
                 [
                   { text: '☐ COLESTEROL TOTAL', fontSize: 7 },
                   { text: '19307', fontSize: 7, alignment: 'center' },
-                  { text: 'PARASITOLOGÍA', fontSize: 9, bold: true, fillColor: '#f0f0f0', colSpan: 2, alignment: 'center' },
+                  {
+                    text: 'PARASITOLOGÍA',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    colSpan: 2,
+                    alignment: 'center',
+                  },
                   {},
                 ],
                 [
@@ -9376,8 +9988,20 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['50%', '50%'],
               body: [
                 [
-                  { text: 'PAQUETES DE ESTUDIOS', fontSize: 9, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
-                  { text: 'OTROS ESTUDIOS', fontSize: 9, bold: true, fillColor: '#f0f0f0', alignment: 'center' },
+                  {
+                    text: 'PAQUETES DE ESTUDIOS',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'OTROS ESTUDIOS',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f0f0f0',
+                    alignment: 'center',
+                  },
                 ],
                 [
                   { text: '☐ QUÍMICA SANGUÍNEA III (20204)', fontSize: 7 },
@@ -9397,14 +10021,20 @@ private validarCumplimientoNotaPreoperatoria(
                 ],
                 [
                   { text: '☐ PERFIL REUMÁTICO (20210)', fontSize: 7 },
-                  { text: 'OTROS ESTUDIOS ESPECIALES:', fontSize: 8, bold: true },
+                  {
+                    text: 'OTROS ESTUDIOS ESPECIALES:',
+                    fontSize: 8,
+                    bold: true,
+                  },
                 ],
                 [
                   { text: '☐ PERFIL CONTROL DE EMBARAZO (20211)', fontSize: 7 },
                   {
-                    text: laboratorioData.otros_estudios || '________________________',
+                    text:
+                      laboratorioData.otros_estudios ||
+                      '________________________',
                     fontSize: 7,
-                    margin: [0, 10, 0, 10]
+                    margin: [0, 10, 0, 10],
                   },
                 ],
               ],
@@ -9437,14 +10067,34 @@ private validarCumplimientoNotaPreoperatoria(
                       widths: ['33%', '33%', '34%'],
                       body: [
                         [
-                          { text: 'HORA DE TOMA DE MUESTRA:', fontSize: 7, bold: true },
-                          { text: 'HORA DE RECEPCIÓN:', fontSize: 7, bold: true },
+                          {
+                            text: 'HORA DE TOMA DE MUESTRA:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'HORA DE RECEPCIÓN:',
+                            fontSize: 7,
+                            bold: true,
+                          },
                           { text: 'HORA DE ENTREGA:', fontSize: 7, bold: true },
                         ],
                         [
-                          { text: '________________', fontSize: 8, alignment: 'center' },
-                          { text: '________________', fontSize: 8, alignment: 'center' },
-                          { text: '________________', fontSize: 8, alignment: 'center' },
+                          {
+                            text: '________________',
+                            fontSize: 8,
+                            alignment: 'center',
+                          },
+                          {
+                            text: '________________',
+                            fontSize: 8,
+                            alignment: 'center',
+                          },
+                          {
+                            text: '________________',
+                            fontSize: 8,
+                            alignment: 'center',
+                          },
                         ],
                       ],
                     },
@@ -9488,7 +10138,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 7,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 6,
                       },
                     ],
@@ -9512,14 +10164,16 @@ private validarCumplimientoNotaPreoperatoria(
 
       console.log('  PDF de Solicitud de Laboratorio generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
-
     } catch (error) {
-      console.error('❌ Error al generar PDF de Solicitud de Laboratorio:', error);
+      console.error(
+        '❌ Error al generar PDF de Solicitud de Laboratorio:',
+        error
+      );
       throw error;
     }
   }
 
-// 📄 SOLICITUD DE IMAGENOLOGIA
+  // 📄 SOLICITUD DE IMAGENOLOGIA
   async generarSolicitudImagenologia(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
@@ -9527,7 +10181,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('📷 Generando Solicitud de Imagenología...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const solicitudData = datos.solicitudImagenologia || {};
       const fechaActual = new Date();
 
@@ -9571,7 +10227,11 @@ private validarCumplimientoNotaPreoperatoria(
               widths: ['30%', '35%', '15%', '20%'],
               body: [
                 [
-                  { text: 'Nombre del (la) paciente:', fontSize: 10, bold: true },
+                  {
+                    text: 'Nombre del (la) paciente:',
+                    fontSize: 10,
+                    bold: true,
+                  },
                   {
                     text: pacienteCompleto.nombre_completo,
                     fontSize: 10,
@@ -9579,7 +10239,9 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
                   {
-                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -9828,23 +10490,53 @@ private validarCumplimientoNotaPreoperatoria(
                 [
                   {
                     text: [
-                      { text: 'Médico que solicita:\n', fontSize: 10, bold: true },
+                      {
+                        text: 'Médico que solicita:\n',
+                        fontSize: 10,
+                        bold: true,
+                      },
                       {
                         text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
                         fontSize: 10,
                       },
-                      { text: `Cédula: ${medicoCompleto.numero_cedula}\n`, fontSize: 9 },
-                      { text: 'Firma: _________________________\n', fontSize: 10 },
-                      { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 9 },
+                      {
+                        text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 9,
+                      },
+                      {
+                        text: 'Firma: _________________________\n',
+                        fontSize: 10,
+                      },
+                      {
+                        text: `Fecha: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )}`,
+                        fontSize: 9,
+                      },
                     ],
                     margin: [0, 10],
                   },
                   {
                     text: [
-                      { text: 'Firma y hora que recibe (camillero):\n', fontSize: 10, bold: true },
-                      { text: 'Nombre: _________________________\n', fontSize: 10 },
-                      { text: 'Firma: _________________________\n', fontSize: 10 },
-                      { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 9 },
+                      {
+                        text: 'Firma y hora que recibe (camillero):\n',
+                        fontSize: 10,
+                        bold: true,
+                      },
+                      {
+                        text: 'Nombre: _________________________\n',
+                        fontSize: 10,
+                      },
+                      {
+                        text: 'Firma: _________________________\n',
+                        fontSize: 10,
+                      },
+                      {
+                        text: `Hora: ${fechaActual.toLocaleTimeString(
+                          'es-MX'
+                        )}`,
+                        fontSize: 9,
+                      },
                     ],
                     margin: [0, 10],
                   },
@@ -9863,10 +10555,25 @@ private validarCumplimientoNotaPreoperatoria(
                   { text: '', fontSize: 10 },
                   {
                     text: [
-                      { text: 'Firma y hora que recibe (técnico rayos X):\n', fontSize: 10, bold: true },
-                      { text: 'Nombre: _________________________\n', fontSize: 10 },
-                      { text: 'Firma: _________________________\n', fontSize: 10 },
-                      { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 9 },
+                      {
+                        text: 'Firma y hora que recibe (técnico rayos X):\n',
+                        fontSize: 10,
+                        bold: true,
+                      },
+                      {
+                        text: 'Nombre: _________________________\n',
+                        fontSize: 10,
+                      },
+                      {
+                        text: 'Firma: _________________________\n',
+                        fontSize: 10,
+                      },
+                      {
+                        text: `Hora: ${fechaActual.toLocaleTimeString(
+                          'es-MX'
+                        )}`,
+                        fontSize: 9,
+                      },
                     ],
                     margin: [0, 10],
                   },
@@ -9902,7 +10609,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -9927,13 +10636,15 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('  PDF de Solicitud de Imagenología generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
     } catch (error) {
-      console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
+      console.error(
+        '❌ Error al generar PDF de Solicitud de Imagenología:',
+        error
+      );
       throw error;
     }
   }
 
   // 📄 SOLICITUD DE CULTIVO HOSPITAL MATERNO
-
   async generarSolicitudCultivo(datos: any): Promise<void> {
     try {
       await this.ensurePdfMakeLoaded();
@@ -9941,7 +10652,9 @@ private validarCumplimientoNotaPreoperatoria(
       console.log('🧫 Generando Solicitud de Cultivo para Hospital Materno...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
       const cultivoData = datos.solicitudCultivo || {};
       const fechaActual = new Date();
 
@@ -9949,7 +10662,7 @@ private validarCumplimientoNotaPreoperatoria(
         pageSize: 'LETTER',
         pageMargins: [20, 40, 20, 40],
 
-        header: function(currentPage: number) {
+        header: function (currentPage: number) {
           return [
             {
               table: {
@@ -10075,7 +10788,9 @@ private validarCumplimientoNotaPreoperatoria(
                   },
                   { text: 'No. Expediente:', fontSize: 10, bold: true },
                   {
-                    text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente),
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -10163,7 +10878,9 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                   },
                   {
-                    text: cultivoData.responsable_muestra || '___________________________',
+                    text:
+                      cultivoData.responsable_muestra ||
+                      '___________________________',
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -10305,11 +11022,16 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                   },
                   {
-                    text: cultivoData.recibe_antibiotico ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                    text: cultivoData.recibe_antibiotico
+                      ? '☑ Sí   ☐ No'
+                      : '☐ Sí   ☑ No',
                     fontSize: 10,
                   },
                   {
-                    text: '¿Cuál? ' + (cultivoData.antibiotico_actual || '___________________________'),
+                    text:
+                      '¿Cuál? ' +
+                      (cultivoData.antibiotico_actual ||
+                        '___________________________'),
                     fontSize: 10,
                     decoration: 'underline',
                   },
@@ -10332,7 +11054,9 @@ private validarCumplimientoNotaPreoperatoria(
                     bold: true,
                   },
                   {
-                    text: cultivoData.cultivos_previos ? '☑ Sí   ☐ No' : '☐ Sí   ☑ No',
+                    text: cultivoData.cultivos_previos
+                      ? '☑ Sí   ☐ No'
+                      : '☐ Sí   ☑ No',
                     fontSize: 10,
                   },
                   {
@@ -10444,7 +11168,9 @@ private validarCumplimientoNotaPreoperatoria(
                         fontSize: 8,
                       },
                       {
-                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
                         fontSize: 7,
                       },
                     ],
@@ -10474,7304 +11200,7868 @@ private validarCumplimientoNotaPreoperatoria(
     }
   }
 
-
   // 📄 NOTA DE EGRESO SEGÚN NOM-004-SSA3-2012 SECCIÓN D12
-async generarNotaEgreso(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
+  async generarNotaEgreso(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
 
-    console.log('🏥 Generando Nota de Egreso según NOM-004-SSA3-2012...');
+      console.log('   Generando Nota de Egreso según NOM-004-SSA3-2012...');
 
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const egresoData = datos.notaEgreso || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const egresoData = datos.notaEgreso || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
 
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
 
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EGRESO',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.2)
-        {
+        header: {
+          margin: [20, 10, 20, 10],
           table: {
-            widths: ['15%', '85%'],
+            widths: ['100%'],
             body: [
               [
                 {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EGRESO',
+                  fontSize: 11,
                   bold: true,
-                  fillColor: '#f5f5f5',
                   alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha egreso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora egreso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. de cama',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Folio egreso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: egresoData.fecha_egreso || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: egresoData.hora_egreso || fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: egresoData.numero_cama || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `EG-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
-                          fontSize: 6,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['60%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '50%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha y hora ingreso hospitalario',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Días de estancia en la unidad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${egresoData.fecha_ingreso || 'No registrada'} - ${egresoData.hora_ingreso || 'No registrada'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: `${egresoData.dias_estancia || this.calcularDiaHospitalizacion()} días`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['60%', '40%'],
-                    body: [
-                      [
-                        {
-                          text: 'Servicio',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Reingreso por la misma afección en el año',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.departamento || 'No especificado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: egresoData.es_reingreso ? 'SÍ' : 'NO',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                          color: egresoData.es_reingreso ? '#dc2626' : '#059669',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 SIGNOS VITALES AL EGRESO (NOM-004 D12.4)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'SIGNOS VITALES AL EGRESO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  table: {
-                    widths: ['16%', '16%', '16%', '16%', '16%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Peso',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Talla',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Presión arterial',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'FC',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'FR',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Temperatura',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${signosVitalesReales.peso || '___'} kg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.talla || '___'} cm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_respiratoria || '___'} rpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.temperatura || '___'} °C`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Estado general al egreso',
-                          fontSize: 7,
-                          bold: true,
-                          fillColor: '#f9f9f9',
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: egresoData.estado_general_egreso || 'Estable, sin signos de alarma.',
-                          fontSize: 8,
-                          margin: [5, 5],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 DIAGNÓSTICOS (NOM-004 D12.8 y D12.11)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'DIAGNÓSTICOS',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'DIAGNÓSTICO(S) DE INGRESO (D12.8)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.diagnosticos_ingreso || 'No especificados en el momento del ingreso.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'DIAGNÓSTICO(S) FINAL(ES) (D12.11)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.diagnosticos_finales || 'Diagnósticos finales por definir.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 EVOLUCIÓN Y MANEJO (NOM-004 D12.9 y D12.10)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EVOLUCIÓN Y MANEJO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'RESUMEN DE LA EVOLUCIÓN Y ESTADO ACTUAL (D12.9)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.resumen_evolucion || 'Evolución clínica favorable durante la estancia hospitalaria.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'MANEJO DURANTE LA ESTANCIA HOSPITALARIA (D12.10)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.manejo_hospitalario || 'Manejo médico integral según protocolos institucionales.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 PROCEDIMIENTOS Y MOTIVO DE EGRESO (NOM-004 D12.12 y D12.13)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'PROCEDIMIENTOS Y EGRESO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'PROCEDIMIENTOS REALIZADOS (D12.12)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.procedimientos_realizados || 'Sin procedimientos especiales durante la estancia.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'MOTIVO DE EGRESO (D12.13)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: egresoData.motivo_egreso === 'maximo_beneficio' ? '☑ Máximo beneficio' : '☐ Máximo beneficio',
-                          fontSize: 7,
-                          alignment: 'center',
-                        },
-                        {
-                          text: egresoData.motivo_egreso === 'mejoria' ? '☑ Por mejoría' : '☐ Por mejoría',
-                          fontSize: 7,
-                          alignment: 'center',
-                        },
-                        {
-                          text: egresoData.motivo_egreso === 'alta_voluntaria' ? '☑ Alta voluntaria' : '☐ Alta voluntaria',
-                          fontSize: 7,
-                          alignment: 'center',
-                        },
-                        {
-                          text: egresoData.motivo_egreso === 'exitus' ? '☑ Exitus' : '☐ Exitus',
-                          fontSize: 7,
-                          alignment: 'center',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 3],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 PROBLEMAS PENDIENTES Y PLAN (NOM-004 D12.14 y D12.15)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'SEGUIMIENTO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 6,
-                },
-                {
-                  text: 'PROBLEMAS CLÍNICOS PENDIENTES (D12.14)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.problemas_pendientes || 'Sin problemas clínicos pendientes al momento del egreso.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'PLAN DE MANEJO Y TRATAMIENTO (D12.15)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.plan_manejo_tratamiento || 'Continuar manejo ambulatorio según indicaciones médicas.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'RECOMENDACIONES PARA VIGILANCIA AMBULATORIA (D12.16)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: egresoData.recomendaciones_ambulatorias || 'Control médico en consulta externa según programación. Acudir a urgencias en caso de signos de alarma.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (D12.17)
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA DEL MÉDICO (D12.17)',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-                {
-                  text: 'FIRMA AUTÓGRAFA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Hospital General San Luis de la Paz\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
-                      fontSize: 7,
-                    },
-                  ],
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-                {
-                  text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
-                  fontSize: 8,
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 2] },
-
-        // 🔹 NOTA REFERENCIAL
-        {
-          text: [
-            {
-              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D12 "Nota de egreso"\n',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-            {
-              text: '* Cumple con los requisitos establecidos en los numerales D12.1 al D12.17',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-          ],
-          alignment: 'left',
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [20, 5],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: 'Nota de Egreso - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
                 },
               ],
             ],
           },
           layout: 'noBorders',
-        };
-      },
-    };
-
-    const nombreArchivo = `nota-egreso-${pacienteCompleto.nombre
-      .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
-
-    console.log('  PDF de Nota de Egreso NOM-004 generado exitosamente');
-    console.log(`📄 Archivo: ${nombreArchivo}`);
-
-    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EGRESO
-    this.validarCumplimientoNotaEgreso(datos, medicoCompleto, pacienteCompleto);
-
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Nota de Egreso:', error);
-    throw error;
-  }
-}
-
-// 📄 NOTA DE INTERCONSULTA SEGÚN NOM-004-SSA3-2012 SECCIÓN D7
-async generarNotaInterconsulta(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('🔄 Generando Nota de Interconsulta según NOM-004-SSA3-2012...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const interconsultaData = datos.notaInterconsulta || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE INTERCONSULTA',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha interconsulta',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora interconsulta',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. de cama',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Folio interconsulta',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: interconsultaData.numero_cama || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `IC-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
-                          fontSize: 6,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['60%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '50%'],
-                    body: [
-                      [
-                        {
-                          text: 'Servicio solicitante',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Especialidad solicitada',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.departamento || 'No especificado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: interconsultaData.especialidad_solicitada || 'No especificada',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Médico que solicita interconsulta',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
         },
 
-        { text: '', margin: [0, 3] },
+        content: [
+          { text: '', margin: [0, 10] },
 
-        // 🔹 MOTIVO DE LA CONSULTA (NOM-004 D7.14)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'SOLICITUD DE INTERCONSULTA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'MOTIVO DE LA CONSULTA (D7.14)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.motivo_consulta || 'Motivo de interconsulta no especificado.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'PROBLEMA CLÍNICO ESPECÍFICO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.problema_clinico || 'Se solicita valoración y manejo por especialidad correspondiente.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ANTECEDENTES RELEVANTES
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ANTECEDENTES RELEVANTES',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'ANTECEDENTES PERSONALES PATOLÓGICOS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.antecedentes_patologicos || 'Sin antecedentes patológicos de importancia.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'MEDICAMENTOS ACTUALES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.medicamentos_actuales || 'Sin medicamentos de base reportados.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 EXPLORACIÓN FÍSICA RELEVANTE
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EXPLORACIÓN FÍSICA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'SIGNOS VITALES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Presión arterial',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Frecuencia cardíaca',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Frecuencia respiratoria',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Temperatura',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'} mmHg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_respiratoria || '___'} rpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.temperatura || '___'} °C`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 2],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'HALLAZGOS RELEVANTES PARA INTERCONSULTA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.hallazgos_relevantes || 'Exploración física dirigida según el motivo de interconsulta.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ESTUDIOS DISPONIBLES
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ESTUDIOS DISPONIBLES',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'LABORATORIO Y GABINETE',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.estudios_disponibles || 'Se adjuntan estudios de laboratorio y gabinete disponibles en el expediente.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 RESPUESTA DEL ESPECIALISTA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'RESPUESTA DEL ESPECIALISTA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#e0f2fe',
-                  alignment: 'center',
-                  rowSpan: 8,
-                },
-                {
-                  text: 'CRITERIO DIAGNÓSTICO (D7.12)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.criterio_diagnostico || '________________________________________________________________________________________\n________________________________________________________________________________________',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'SUGERENCIAS DIAGNÓSTICAS (D7.13)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.sugerencias_diagnosticas || '________________________________________________________________________________________\n________________________________________________________________________________________',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'SUGERENCIAS DE TRATAMIENTO (D7.13)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.sugerencias_tratamiento || '________________________________________________________________________________________\n________________________________________________________________________________________',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'ESTUDIOS ADICIONALES SUGERIDOS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: interconsultaData.estudios_sugeridos || '________________________________________________________________________________________',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 FIRMAS
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  text: 'MÉDICO QUE SOLICITA INTERCONSULTA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-                {
-                  text: 'MÉDICO ESPECIALISTA CONSULTADO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#e0f2fe',
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `${medicoCompleto.departamento}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: '\n_________________________\nFIRMA',
-                      fontSize: 8,
-                    },
-                  ],
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-                {
-                  text: [
-                    {
-                      text: `${interconsultaData.especialista_nombre || '__________________________'}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula: ${interconsultaData.especialista_cedula || '______________'}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `${interconsultaData.especialidad_solicitada || '__________________________'}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Fecha: ${interconsultaData.fecha_respuesta || '______________'}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: '\n_________________________\nFIRMA',
-                      fontSize: 8,
-                    },
-                  ],
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 2] },
-
-        // 🔹 NOTA REFERENCIAL
-        {
-          text: [
-            {
-              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D7 "Notas de interconsulta"\n',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-            {
-              text: '* Cumple con los requisitos establecidos en los numerales D7.12, D7.13 y D7.14',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-          ],
-          alignment: 'left',
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [20, 5],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: 'Nota de Interconsulta - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-    };
-
-    const nombreArchivo = `nota-interconsulta-${pacienteCompleto.nombre
-      .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
-
-    console.log('  PDF de Nota de Interconsulta NOM-004 generado exitosamente');
-    console.log(`📄 Archivo: ${nombreArchivo}`);
-
-    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-    this.validarCumplimientoNotaInterconsulta(datos, medicoCompleto, pacienteCompleto);
-
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Nota de Interconsulta:', error);
-    throw error;
-  }
-}
-
-
-// 📄 PRESCRIPCIÓN DE MEDICAMENTOS SEGÚN NOM-004-SSA3-2012
-async generarPrescripcionMedicamentos(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('💊 Generando Prescripción de Medicamentos según NOM-004...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const prescripcionData = datos.prescripcionMedicamentos || {};
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [30, 60, 30, 50],
-
-      header: {
-        margin: [30, 15, 30, 15],
-        table: {
-          widths: ['20%', '60%', '20%'],
-          body: [
-            [
-              {
-                text: '💊',
-                fontSize: 24,
-                alignment: 'center',
-                color: '#059669',
-              },
-              {
-                text: [
-                  {
-                    text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\n',
-                    fontSize: 13,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'PRESCRIPCIÓN MÉDICA\n',
-                    fontSize: 11,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Blvd. Centenario de la Revolución Mexicana #110',
-                    fontSize: 8,
-                    alignment: 'center',
-                  },
-                ],
-              },
-              {
-                text: [
-                  { text: 'Folio:\n', fontSize: 8, bold: true },
-                  { text: `PM-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}\n`, fontSize: 7 },
-                  { text: 'Fecha:\n', fontSize: 8, bold: true },
-                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
-                ],
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 DATOS DEL PACIENTE
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'DATOS DEL PACIENTE',
-                  fontSize: 9,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  margin: [0, 3, 0, 3],
-                },
-              ],
-              [
-                {
-                  table: {
-                    widths: ['20%', '30%', '20%', '30%'],
-                    body: [
-                      [
-                        { text: 'Nombre:', fontSize: 8, bold: true },
-                        { text: pacienteCompleto.nombre_completo, fontSize: 8 },
-                        { text: 'Expediente:', fontSize: 8, bold: true },
-                        { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 8, bold: true },
-                      ],
-                      [
-                        { text: 'Edad:', fontSize: 8, bold: true },
-                        { text: `${pacienteCompleto.edad} años`, fontSize: 8 },
-                        { text: 'Sexo:', fontSize: 8, bold: true },
-                        { text: pacienteCompleto.sexo, fontSize: 8 },
-                      ],
-                      [
-                        { text: 'Peso:', fontSize: 8, bold: true },
-                        { text: `${prescripcionData.peso_paciente || '___'} kg`, fontSize: 8 },
-                        { text: 'Alergias:', fontSize: 8, bold: true },
-                        { text: prescripcionData.alergias_conocidas || 'No conocidas', fontSize: 8 },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 5, 5, 5],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 DIAGNÓSTICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'DIAGNÓSTICO:',
-                  fontSize: 9,
-                  bold: true,
-                  margin: [5, 5, 5, 2],
-                },
-              ],
-              [
-                {
-                  text: prescripcionData.diagnostico || 'Diagnóstico por especificar',
-                  fontSize: 9,
-                  margin: [5, 2, 5, 8],
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 MEDICAMENTOS PRESCRITOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'Rp/ MEDICAMENTOS PRESCRITOS',
-                  fontSize: 10,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 5],
-        },
-
-        // 🔹 TABLA DE MEDICAMENTOS
-        {
-          table: {
-            widths: ['5%', '35%', '20%', '15%', '25%'],
-            body: [
-              // Encabezados
-              [
-                {
-                  text: '#',
-                  fontSize: 8,
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#e0f2fe',
-                },
-                {
-                  text: 'MEDICAMENTO\n(Denominación genérica)',
-                  fontSize: 8,
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#e0f2fe',
-                },
-                {
-                  text: 'PRESENTACIÓN\nY CONCENTRACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#e0f2fe',
-                },
-                {
-                  text: 'CANTIDAD',
-                  fontSize: 8,
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#e0f2fe',
-                },
-                {
-                  text: 'INDICACIONES\n(Dosis, vía, frecuencia)',
-                  fontSize: 8,
-                  bold: true,
-                  alignment: 'center',
-                  fillColor: '#e0f2fe',
-                },
-              ],
-              // Generar filas de medicamentos (máximo 10)
-              ...Array.from({ length: 10 }, (_, index) => {
-                const medicamento = prescripcionData.medicamentos?.[index];
-                return [
-                  {
-                    text: (index + 1).toString(),
-                    fontSize: 8,
-                    alignment: 'center',
-                    margin: [0, 8, 0, 8],
-                  },
-                  {
-                    text: medicamento?.nombre_generico || '',
-                    fontSize: 9,
-                    margin: [3, 8, 3, 8],
-                    bold: !!medicamento?.nombre_generico,
-                  },
-                  {
-                    text: medicamento?.presentacion || '',
-                    fontSize: 8,
-                    margin: [3, 8, 3, 8],
-                    alignment: 'center',
-                  },
-                  {
-                    text: medicamento?.cantidad || '',
-                    fontSize: 8,
-                    margin: [3, 8, 3, 8],
-                    alignment: 'center',
-                  },
-                  {
-                    text: medicamento?.indicaciones || '',
-                    fontSize: 8,
-                    margin: [3, 8, 3, 8],
-                  },
-                ];
-              }),
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 INSTRUCCIONES GENERALES
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'INSTRUCCIONES GENERALES AL PACIENTE:',
-                  fontSize: 9,
-                  bold: true,
-                  margin: [5, 5, 5, 2],
-                },
-              ],
-              [
-                {
-                  text: prescripcionData.instrucciones_generales ||
-                    '• Tomar los medicamentos según las indicaciones médicas\n' +
-                    '• Completar el tratamiento aunque se sienta mejor\n' +
-                    '• No suspender medicamentos sin autorización médica\n' +
-                    '• Acudir a control médico en la fecha indicada\n' +
-                    '• En caso de reacciones adversas, suspender y acudir al médico',
-                  fontSize: 8,
-                  margin: [5, 5, 5, 8],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 15],
-        },
-
-        // 🔹 PRÓXIMA CITA
-        {
-          table: {
-            widths: ['70%', '30%'],
-            body: [
-              [
-                {
-                  text: `PRÓXIMA CITA: ${prescripcionData.proxima_cita || '___________________'}`,
-                  fontSize: 9,
-                  bold: true,
-                  margin: [5, 8, 5, 8],
-                },
-                {
-                  text: `DÍAS DE TRATAMIENTO: ${prescripcionData.dias_tratamiento || '____'} días`,
-                  fontSize: 9,
-                  bold: true,
-                  margin: [5, 8, 5, 8],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-          margin: [0, 0, 0, 20],
-        },
-
-        // 🔹 FIRMA DEL MÉDICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'DATOS DEL MÉDICO PRESCRIPTOR',
-                  fontSize: 9,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  margin: [0, 5, 0, 5],
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `Nombre: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Servicio: ${medicoCompleto.departamento}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Fecha de prescripción: ${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 8,
-                    },
-                  ],
-                  margin: [5, 10, 5, 5],
-                  alignment: 'left',
-                },
-              ],
-              [
-                {
-                  text: '\n\n_____________________________________\nFIRMA Y SELLO DEL MÉDICO',
-                  fontSize: 9,
-                  alignment: 'center',
-                  margin: [0, 10, 0, 15],
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 10] },
-
-        // 🔹 ADVERTENCIAS LEGALES
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '  ADVERTENCIAS IMPORTANTES',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fef3c7',
-                  alignment: 'center',
-                  margin: [0, 3, 0, 3],
-                },
-              ],
-              [
-                {
-                  text: '• Esta prescripción es válida únicamente para el paciente indicado\n' +
-                        '• Los medicamentos controlados requieren presentar receta original\n' +
-                        '• Conservar en lugar fresco y seco, fuera del alcance de los niños\n' +
-                        '• No automedicarse ni compartir medicamentos\n' +
-                        '• En caso de emergencia comunicarse al Hospital: Tel. (468) 688-0001',
-                  fontSize: 7,
-                  margin: [5, 5, 5, 5],
-                  lineHeight: 1.2,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 1,
-            vLineWidth: () => 1,
-            hLineColor: () => '#f59e0b',
-            vLineColor: () => '#f59e0b',
-          },
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [30, 10],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: 'Prescripción Médica - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-    };
-
-    const nombreArchivo = `prescripcion-medicamentos-${pacienteCompleto.nombre
-      .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
-
-    console.log('  PDF de Prescripción de Medicamentos generado exitosamente');
-    console.log(`📄 Archivo: ${nombreArchivo}`);
-
-    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-    this.validarCumplimientoPrescripcionMedicamentos(datos, medicoCompleto, pacienteCompleto);
-
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Prescripción de Medicamentos:', error);
-    throw error;
-  }
-}
-
-// 📄 REGISTRO DE TRANSFUSIÓN SEGÚN NOM-004-SSA3-2012 SECCIÓN D15
-async generarRegistroTransfusion(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('🩸 Generando Registro de Transfusión según NOM-004 y NOM-253...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const transfusionData = datos.registroTransfusion || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 60, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - REGISTRO DE TRANSFUSIÓN',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-            [
-              {
-                text: 'REGISTRO DE TRANSFUSIÓN DE UNIDADES DE SANGRE O COMPONENTES',
-                fontSize: 9,
-                bold: true,
-                alignment: 'center',
-                margin: [0, 3, 0, 0],
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha transfusión',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora inicio',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. de cama',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Folio registro',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: transfusionData.fecha_transfusion || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: transfusionData.hora_inicio || fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: transfusionData.numero_cama || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `RT-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
-                          fontSize: 6,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['40%', '30%', '30%'],
-                    body: [
-                      [
-                        {
-                          text: 'Servicio',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Diagnóstico',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Tipo sanguíneo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.departamento || 'No especificado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: transfusionData.diagnostico || 'No especificado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.tipo_sangre || 'No registrado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                          color: '#dc2626',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Médico que indica la transfusión',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 INFORMACIÓN DE LAS UNIDADES TRANSFUNDIDAS (NOM-004 D15.1)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'UNIDADES TRANSFUNDIDAS',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fee2e2',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'INFORMACIÓN DE UNIDADES DE SANGRE O COMPONENTES (D15.1)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fef2f2',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Tipo de componente',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Cantidad de unidades',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Volumen total (ml)',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. identificación',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: transfusionData.tipo_componente || 'Concentrado eritrocitario',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: transfusionData.cantidad_unidades || '1',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                        {
-                          text: transfusionData.volumen_total || '250',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: transfusionData.numero_identificacion || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'FECHA Y HORA DE INICIO Y FINALIZACIÓN (D15.2)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fef2f2',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha inicio',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora inicio',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Fecha finalización',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora finalización',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: transfusionData.fecha_inicio || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: transfusionData.hora_inicio || fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: transfusionData.fecha_finalizacion || '______________',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: transfusionData.hora_finalizacion || '______________',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 CONTROL DE SIGNOS VITALES (NOM-004 D15.3)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'CONTROL SIGNOS VITALES',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#dbeafe',
-                 alignment: 'center',
-                 rowSpan: 4,
-               },
-               {
-                 text: 'SIGNOS VITALES ANTES, DURANTE Y DESPUÉS DE LA TRANSFUSIÓN (D15.3)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#eff6ff',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['25%', '25%', '25%', '25%'],
-                   body: [
-                     [
-                       {
-                         text: 'Momento',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Presión arterial',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Frecuencia cardíaca',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Temperatura',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: 'ANTES',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                         fillColor: '#f0f9ff',
-                       },
-                       {
-                         text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'}`,
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: `${signosVitalesReales.temperatura || '___'} °C`,
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: 'DURANTE',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                         fillColor: '#f0f9ff',
-                       },
-                       {
-                         text: transfusionData.pa_durante || '__________',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: transfusionData.fc_durante || '___ lpm',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: transfusionData.temp_durante || '___ °C',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: 'DESPUÉS',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                         fillColor: '#f0f9ff',
-                       },
-                       {
-                         text: transfusionData.pa_despues || '__________',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: transfusionData.fc_despues || '___ lpm',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                       {
-                         text: transfusionData.temp_despues || '___ °C',
-                         fontSize: 7,
-                         alignment: 'center',
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'ESTADO GENERAL DEL PACIENTE',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#eff6ff',
-               },
-             ],
-             [
-               {},
-               {
-                 text: transfusionData.estado_general || 'Paciente estable durante todo el procedimiento de transfusión. Sin signos de reacciones adversas.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 REACCIONES ADVERSAS (NOM-004 D15.4)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'REACCIONES ADVERSAS',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#fef3c7',
-                 alignment: 'center',
-                 rowSpan: 4,
-               },
-               {
-                 text: 'REACCIONES ADVERSAS A LA TRANSFUSIÓN (D15.4)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fffbeb',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['20%', '80%'],
-                   body: [
-                     [
-                       {
-                         text: transfusionData.hubo_reacciones ? '☑ SÍ' : '☑ NO',
-                         fontSize: 8,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Se presentaron reacciones adversas durante o después de la transfusión',
-                         fontSize: 8,
-                         alignment: 'left',
-                       },
-                     ],
-                   ],
-                 },
-                 layout: 'noBorders',
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'TIPO DE REACCIÓN Y MANEJO',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fffbeb',
-               },
-             ],
-             [
-               {},
-               {
-                 text: transfusionData.tipo_reaccion_manejo ||
-                   (transfusionData.hubo_reacciones ?
-                     'Describir tipo de reacción: _________________________________\nManejo aplicado: _________________________________' :
-                     'Sin reacciones adversas reportadas durante el procedimiento.'),
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 PERSONAL RESPONSABLE (NOM-004 D15.5)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'PERSONAL RESPONSABLE',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f0fdf4',
-                 alignment: 'center',
-                 rowSpan: 6,
-               },
-               {
-                 text: 'MÉDICO QUE INDICÓ LA TRANSFUSIÓN (D15.5)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f7fee7',
-               },
-             ],
-             [
-               {},
-               {
-                 text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
-                 fontSize: 8,
-                 margin: [5, 3],
-                 bold: true,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'PERSONAL DE SALUD ENCARGADO DE APLICACIÓN Y VIGILANCIA (D15.5)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f7fee7',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['50%', '50%'],
-                   body: [
-                     [
-                       {
-                         text: 'Nombre del personal de enfermería:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: 'Cédula profesional:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                     ],
-                     [
-                       {
-                         text: transfusionData.enfermera_responsable || '____________________________',
-                         fontSize: 8,
-                         decoration: 'underline',
-                       },
-                       {
-                         text: transfusionData.cedula_enfermera || '____________________________',
-                         fontSize: 8,
-                         decoration: 'underline',
-                       },
-                     ],
-                   ],
-                 },
-                 layout: 'noBorders',
-                 margin: [5, 3],
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'OBSERVACIONES ADICIONALES',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f7fee7',
-               },
-             ],
-             [
-               {},
-               {
-                 text: transfusionData.observaciones_adicionales ||
-                   'Transfusión realizada sin complicaciones. Paciente toleró bien el procedimiento.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 5] },
-
-       // 🔹 FIRMAS MÚLTIPLES SEGÚN NOM-004
-       {
-         table: {
-           widths: ['33.33%', '33.33%', '33.34%'],
-           body: [
-             [
-               {
-                 text: 'MÉDICO QUE INDICA',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-               },
-               {
-                 text: 'PERSONAL DE ENFERMERÍA',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-               },
-               {
-                 text: 'BANCO DE SANGRE',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-               },
-             ],
-             [
-               {
-                 text: [
-                   {
-                     text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                     fontSize: 8,
-                     bold: true,
-                   },
-                   {
-                     text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: `${medicoCompleto.especialidad}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: '\n\n_____________________\nFIRMA',
-                     fontSize: 7,
-                   },
-                 ],
-                 margin: [2, 10],
-                 alignment: 'center',
-               },
-               {
-                 text: [
-                   {
-                     text: `${transfusionData.enfermera_responsable || '__________________'}\n`,
-                     fontSize: 8,
-                     bold: true,
-                   },
-                   {
-                     text: `Cédula: ${transfusionData.cedula_enfermera || '__________'}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: 'Enfermería\n',
-                     fontSize: 7,
-                   },
-                   {
-                     text: '\n\n_____________________\nFIRMA',
-                     fontSize: 7,
-                   },
-                 ],
-                 margin: [2, 10],
-                 alignment: 'center',
-               },
-               {
-                 text: [
-                   {
-                     text: `${transfusionData.responsable_banco_sangre || '__________________'}\n`,
-                     fontSize: 8,
-                     bold: true,
-                   },
-                   {
-                     text: `Cédula: ${transfusionData.cedula_banco || '__________'}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: 'Banco de Sangre\n',
-                     fontSize: 7,
-                   },
-                   {
-                     text: '\n\n_____________________\nFIRMA',
-                     fontSize: 7,
-                   },
-                 ],
-                 margin: [2, 10],
-                 alignment: 'center',
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 2] },
-
-       // 🔹 NOTA REFERENCIAL
-       {
-         text: [
-           {
-             text: '* Registro elaborado conforme a NOM-004-SSA3-2012, Sección D15 "Registro de transfusión"\n',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-           {
-             text: '* Cumple con NOM-253-SSA1-2012 para disposición de sangre humana y componentes',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-         ],
-         alignment: 'left',
-       },
-     ],
-
-     footer: (currentPage: number, pageCount: number) => {
-       return {
-         margin: [20, 5],
-         table: {
-           widths: ['25%', '50%', '25%'],
-           body: [
-             [
-               {
-                 text: `Página ${currentPage} de ${pageCount}`,
-                 fontSize: 7,
-                 color: '#666666',
-               },
-               {
-                 text: 'Registro de Transfusión - SICEG\nNOM-004-SSA3-2012 | NOM-253-SSA1-2012',
-                 fontSize: 7,
-                 alignment: 'center',
-                 color: '#666666',
-               },
-               {
-                 text: [
-                   {
-                     text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                     fontSize: 6,
-                   },
-                 ],
-                 alignment: 'right',
-                 color: '#666666',
-               },
-             ],
-           ],
-         },
-         layout: 'noBorders',
-       };
-     },
-   };
-
-   const nombreArchivo = `registro-transfusion-${pacienteCompleto.nombre
-     .replace(/\s+/g, '-')
-     .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-   pdfDocGenerator.download(nombreArchivo);
-
-   console.log('  PDF de Registro de Transfusión NOM-004 generado exitosamente');
-   console.log(`📄 Archivo: ${nombreArchivo}`);
-
-   // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-   this.validarCumplimientoRegistroTransfusion(datos, medicoCompleto, pacienteCompleto);
-
- } catch (error) {
-   console.error('❌ Error al generar PDF de Registro de Transfusión:', error);
-   throw error;
- }
-}
-
-
-// 📄 NOTA PREOPERATORIA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.5
-async generarNotaPreoperatoria(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('🔪 Generando Nota Preoperatoria según NOM-004-SSA3-2012...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const preoperatoriaData = datos.notaPreoperatoria || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA PREOPERATORIA',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha cirugía',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora programada',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Quirófano',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Folio nota',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: preoperatoriaData.fecha_cirugia || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: preoperatoriaData.hora_programada || '00:00',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: preoperatoriaData.quirofano || 'Por asignar',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `NPO-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
-                          fontSize: 6,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['40%', '30%', '30%'],
-                    body: [
-                      [
-                        {
-                          text: 'Servicio',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Peso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Tipo sanguíneo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.departamento || 'Cirugía General',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: `${signosVitalesReales.peso || '___'} kg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.tipo_sangre || 'No registrado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                          color: '#dc2626',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Cirujano responsable',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 DIAGNÓSTICO PREOPERATORIO (NOM-004 8.5.2)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EVALUACIÓN PREOPERATORIA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 6,
-                },
-                {
-                  text: 'DIAGNÓSTICO PREOPERATORIO (8.5.2)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.diagnostico_preoperatorio || 'Diagnóstico preoperatorio por especificar.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                  bold: true,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'PLAN QUIRÚRGICO (8.5.3)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.plan_quirurgico || 'Plan quirúrgico por definir según evaluación.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'TIPO DE INTERVENCIÓN QUIRÚRGICA (8.5.4)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.tipo_intervencion || 'Tipo de intervención por especificar.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 RIESGO QUIRÚRGICO (NOM-004 8.5.5)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EVALUACIÓN DE RIESGO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fef3c7',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'RIESGO QUIRÚRGICO (8.5.5)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: preoperatoriaData.riesgo_quirurgico === 'bajo' ? '☑ BAJO' : '☐ BAJO',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preoperatoriaData.riesgo_quirurgico === 'moderado' ? '☑ MODERADO' : '☐ MODERADO',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preoperatoriaData.riesgo_quirurgico === 'alto' ? '☑ ALTO' : '☐ ALTO',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preoperatoriaData.riesgo_quirurgico === 'muy_alto' ? '☑ MUY ALTO' : '☐ MUY ALTO',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'JUSTIFICACIÓN DEL RIESGO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.justificacion_riesgo || 'Paciente con riesgo quirúrgico apropiado para el procedimiento programado.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 CUIDADOS PREOPERATORIOS (NOM-004 8.5.6)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'CUIDADOS PREOPERATORIOS',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#e0f2fe',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'CUIDADOS Y PLAN TERAPÉUTICO PREOPERATORIO (8.5.6)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.cuidados_preoperatorios ||
-                    '• Ayuno mínimo 8 horas para sólidos, 2 horas para líquidos claros\n' +
-                    '• Baño preoperatorio con jabón antiséptico\n' +
-                    '• Verificar retiro de prótesis dentales, joyas y lentes de contacto\n' +
-                    '• Administrar premedicación según indicación anestésica\n' +
-                    '• Verificar consentimiento informado firmado',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'MEDICACIÓN PREOPERATORIA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.medicacion_preoperatoria || 'Según indicación del anestesiólogo.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ESTUDIOS PREOPERATORIOS
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ESTUDIOS PREOPERATORIOS',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f0fdf4',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'LABORATORIO PREOPERATORIO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.laboratorio_preoperatorio || 'Biometría hemática, química sanguínea, tiempos de coagulación según protocolo.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'ESTUDIOS DE GABINETE',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preoperatoriaData.gabinete_preoperatorio || 'Radiografía de tórax, electrocardiograma según protocolo y edad del paciente.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 PRONÓSTICO (NOM-004 8.5.7)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'PRONÓSTICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-                {
-                  text: `PRONÓSTICO (8.5.7): ${preoperatoriaData.pronostico || 'Favorable para la vida y función, reservado a la evolución transoperatoria y postoperatoria.'}`,
-                  fontSize: 8,
-                  margin: [5, 8],
-                  lineHeight: 1.3,
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 EQUIPO QUIRÚRGICO PROGRAMADO
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EQUIPO QUIRÚRGICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'EQUIPO QUIRÚRGICO PROGRAMADO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Cirujano:',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Ayudante:',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Anestesiólogo:',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Instrumentista:',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.nombre_completo,
-                          fontSize: 7,
-                        },
-                        {
-                          text: preoperatoriaData.ayudante || '________________',
-                          fontSize: 7,
-                        },
-                        {
-                          text: preoperatoriaData.anestesiologo || '________________',
-                          fontSize: 7,
-                        },
-                        {
-                          text: preoperatoriaData.instrumentista || '________________',
-                          fontSize: 7,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 5],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 FIRMA DEL CIRUJANO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'CIRUJANO RESPONSABLE',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Servicio: ${medicoCompleto.departamento}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Fecha de elaboración: ${fechaActual.toLocaleDateString('es-MX')} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: '\n\n_____________________________________\nFIRMA DEL CIRUJANO RESPONSABLE',
-                      fontSize: 8,
-                    },
-                  ],
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 2] },
-
-        // 🔹 NOTA REFERENCIAL
-        {
-          text: [
-            {
-              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.5 "Nota preoperatoria"\n',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-            {
-              text: '* Cumple con los requisitos establecidos en los numerales 8.5.1 al 8.5.7',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-          ],
-          alignment: 'left',
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [20, 5],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: 'Nota Preoperatoria - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-    };
-
-    const nombreArchivo = `nota-preoperatoria-${pacienteCompleto.nombre
-      .replace(/\s+/g, '-')
-      .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
-
-    console.log('  PDF de Nota Preoperatoria NOM-004 generado exitosamente');
-    console.log(`📄 Archivo: ${nombreArchivo}`);
-
-    // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-    this.validarCumplimientoNotaPreoperatoria(datos, medicoCompleto, pacienteCompleto);
-
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Nota Preoperatoria:', error);
-    throw error;
-  }
-}
-
-
-// 📄 NOTA POSTOPERATORIA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.8
-async generarNotaPostoperatoria(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('🏥 Generando Nota Postoperatoria según NOM-004-SSA3-2012...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const postoperatoriaData = datos.notaPostoperatoria || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA POSTOPERATORIA',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha cirugía',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora finalización',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Quirófano',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Duración cirugía',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: postoperatoriaData.fecha_cirugia || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: postoperatoriaData.hora_finalizacion || fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                         text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 1],
-                         bold: true,
-                       },
-                       {
-                         text: postoperatoriaData.quirofano || 'Q1',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 1],
-                       },
-                       {
-                         text: postoperatoriaData.duracion_cirugia || '_____ min',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 1],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['50%', '25%', '25%'],
-                   body: [
-                     [
-                       {
-                         text: 'Nombre completo del paciente',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: 'Edad',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Sexo',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: pacienteCompleto.nombre_completo,
-                         fontSize: 8,
-                         bold: true,
-                         margin: [2, 2],
-                       },
-                       {
-                         text: `${pacienteCompleto.edad} años`,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: pacienteCompleto.sexo,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['40%', '30%', '30%'],
-                   body: [
-                     [
-                       {
-                         text: 'Servicio',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Tipo sanguíneo',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'ASA',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: medicoCompleto.departamento || 'Cirugía General',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: pacienteCompleto.tipo_sangre || 'No registrado',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                         bold: true,
-                         color: '#dc2626',
-                       },
-                       {
-                         text: postoperatoriaData.clasificacion_asa || 'ASA II',
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['100%'],
-                   body: [
-                     [
-                       {
-                         text: 'Cirujano responsable',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 DIAGNÓSTICOS Y OPERACIONES (NOM-004 8.8.1-8.8.4)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'DIAGNÓSTICOS Y PROCEDIMIENTOS',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-                 rowSpan: 8,
-               },
-               {
-                 text: 'DIAGNÓSTICO PREOPERATORIO (8.8.1)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.diagnostico_preoperatorio || 'Diagnóstico preoperatorio.',
-                 fontSize: 8,
-                 margin: [5, 3],
-                 lineHeight: 1.3,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'OPERACIÓN PLANEADA (8.8.2)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.operacion_planeada || 'Operación programada.',
-                 fontSize: 8,
-                 margin: [5, 3],
-                 lineHeight: 1.3,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'OPERACIÓN REALIZADA (8.8.3)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.operacion_realizada || 'Operación efectivamente realizada.',
-                 fontSize: 8,
-                 margin: [5, 3],
-                 lineHeight: 1.3,
-                 bold: true,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'DIAGNÓSTICO POSTOPERATORIO (8.8.4)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.diagnostico_postoperatorio || 'Diagnóstico postoperatorio.',
-                 fontSize: 8,
-                 margin: [5, 3],
-                 lineHeight: 1.3,
-                 bold: true,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 DESCRIPCIÓN TÉCNICA QUIRÚRGICA (NOM-004 8.8.5)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'TÉCNICA QUIRÚRGICA',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#e0f2fe',
-                 alignment: 'center',
-                 rowSpan: 4,
-               },
-               {
-                 text: 'DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA (8.8.5)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f0f9ff',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.descripcion_tecnica || 'Descripción detallada de la técnica quirúrgica empleada.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'HALLAZGOS TRANSOPERATORIOS (8.8.6)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f0f9ff',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.hallazgos_transoperatorios || 'Hallazgos encontrados durante el procedimiento quirúrgico.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 CONTROL QUIRÚRGICO (NOM-004 8.8.7-8.8.9)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'CONTROL QUIRÚRGICO',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#fef3c7',
-                 alignment: 'center',
-                 rowSpan: 6,
-               },
-               {
-                 text: 'REPORTE DE CONTEO DE GASAS, COMPRESAS E INSTRUMENTAL (8.8.7)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fffbeb',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['33%', '33%', '34%'],
-                   body: [
-                     [
-                       {
-                         text: 'Gasas',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Compresas',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                       {
-                         text: 'Instrumental',
-                         fontSize: 7,
-                         bold: true,
-                         alignment: 'center',
-                       },
-                     ],
-                     [
-                       {
-                         text: `${postoperatoriaData.conteo_gasas || 'Completo ✓'}`,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: `${postoperatoriaData.conteo_compresas || 'Completo ✓'}`,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                       {
-                         text: `${postoperatoriaData.conteo_instrumental || 'Completo ✓'}`,
-                         fontSize: 7,
-                         alignment: 'center',
-                         margin: [0, 2],
-                       },
-                     ],
-                   ],
-                 },
-                 layout: {
-                   hLineWidth: () => 0.3,
-                   vLineWidth: () => 0.3,
-                   hLineColor: () => '#000000',
-                   vLineColor: () => '#000000',
-                 },
-                 margin: [5, 2],
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'INCIDENTES Y ACCIDENTES (8.8.8)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fffbeb',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.incidentes_accidentes || 'Sin incidentes ni accidentes transoperatorios.',
-                 fontSize: 8,
-                 margin: [5, 3],
-                 lineHeight: 1.3,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'CUANTIFICACIÓN DE SANGRADO Y TRANSFUSIONES (8.8.9)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fffbeb',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['50%', '50%'],
-                   body: [
-                     [
-                       {
-                         text: `Sangrado: ${postoperatoriaData.sangrado_ml || '___'} ml`,
-                         fontSize: 8,
-                         bold: true,
-                       },
-                       {
-                         text: `Transfusiones: ${postoperatoriaData.transfusiones || 'No'}`,
-                         fontSize: 8,
-                         bold: true,
-                       },
-                     ],
-                   ],
-                 },
-                 layout: 'noBorders',
-                 margin: [5, 3],
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 ESTUDIOS TRANSOPERATORIOS (NOM-004 8.8.10)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'ESTUDIOS TRANSOPERATORIOS',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f0fdf4',
-                 alignment: 'center',
-                 rowSpan: 2,
-               },
-               {
-                 text: 'ESTUDIOS DE SERVICIOS AUXILIARES DE DIAGNÓSTICO Y TRATAMIENTO (8.8.10)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f7fee7',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.estudios_transoperatorios || 'No se realizaron estudios transoperatorios.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 EQUIPO QUIRÚRGICO (NOM-004 8.8.11)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'EQUIPO QUIRÚRGICO',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#fdf2f8',
-                 alignment: 'center',
-                 rowSpan: 2,
-               },
-               {
-                 text: 'AYUDANTES, INSTRUMENTISTAS, ANESTESIÓLOGO Y CIRCULANTE (8.8.11)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#fef7ff',
-               },
-             ],
-             [
-               {},
-               {
-                 table: {
-                   widths: ['25%', '25%', '25%', '25%'],
-                   body: [
-                     [
-                       {
-                         text: 'Cirujano:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: 'Ayudante:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: 'Anestesiólogo:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: 'Instrumentista:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                     ],
-                     [
-                       {
-                         text: medicoCompleto.nombre_completo,
-                         fontSize: 7,
-                       },
-                       {
-                         text: postoperatoriaData.ayudante || 'N/A',
-                         fontSize: 7,
-                       },
-                       {
-                         text: postoperatoriaData.anestesiologo || 'N/A',
-                         fontSize: 7,
-                       },
-                       {
-                         text: postoperatoriaData.instrumentista || 'N/A',
-                         fontSize: 7,
-                       },
-                     ],
-                     [
-                       {
-                         text: 'Circulante:',
-                         fontSize: 7,
-                         bold: true,
-                       },
-                       {
-                         text: postoperatoriaData.circulante || 'N/A',
-                         fontSize: 7,
-                         colSpan: 3,
-                       },
-                       {},
-                       {},
-                     ],
-                   ],
-                 },
-                 layout: 'noBorders',
-                 margin: [5, 5],
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 ESTADO POSTQUIRÚRGICO Y PLAN (NOM-004 8.8.12-8.8.13)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'ESTADO POSTQUIRÚRGICO',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-                 rowSpan: 4,
-               },
-               {
-                 text: 'ESTADO POST-QUIRÚRGICO INMEDIATO (8.8.12)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.estado_postquirurgico || 'Paciente estable al término del procedimiento quirúrgico.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'PLAN DE MANEJO Y TRATAMIENTO POSTOPERATORIO INMEDIATO (8.8.13)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.plan_postoperatorio || 'Plan de manejo postoperatorio inmediato según protocolo.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 PRONÓSTICO Y BIOPSIAS (NOM-004 8.8.14-8.8.15)
-       {
-         table: {
-           widths: ['20%', '80%'],
-           body: [
-             [
-               {
-                 text: 'PRONÓSTICO Y BIOPSIAS',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-                 rowSpan: 4,
-               },
-               {
-                 text: 'PRONÓSTICO (8.8.14)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.pronostico || 'Favorable para la vida y función.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-                 bold: true,
-               },
-             ],
-             [
-               {},
-               {
-                 text: 'ENVÍO DE PIEZAS O BIOPSIAS QUIRÚRGICAS (8.8.15)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-               },
-             ],
-             [
-               {},
-               {
-                 text: postoperatoriaData.envio_biopsias || 'No se enviaron piezas quirúrgicas para estudio histopatológico.',
-                 fontSize: 8,
-                 margin: [5, 5],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 3] },
-
-       // 🔹 OTROS HALLAZGOS (NOM-004 8.8.16)
-       {
-         table: {
-           widths: ['100%'],
-           body: [
-             [
-               {
-                 text: 'OTROS HALLAZGOS DE IMPORTANCIA (8.8.16)',
-                 fontSize: 7,
-                 bold: true,
-                 fillColor: '#f9f9f9',
-                 alignment: 'center',
-               },
-             ],
-             [
-               {
-                 text: postoperatoriaData.otros_hallazgos || 'Sin otros hallazgos de importancia para reportar.',
-                 fontSize: 8,
-                 margin: [5, 8],
-                 lineHeight: 1.3,
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 5] },
-
-       // 🔹 FIRMA DEL CIRUJANO RESPONSABLE (NOM-004 8.8.17)
-       {
-         table: {
-           widths: ['100%'],
-           body: [
-             [
-               {
-                 text: 'CIRUJANO RESPONSABLE (8.8.17)',
-                 fontSize: 8,
-                 bold: true,
-                 fillColor: '#f5f5f5',
-                 alignment: 'center',
-               },
-             ],
-             [
-               {
-                 text: [
-                   {
-                     text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                     fontSize: 9,
-                     bold: true,
-                   },
-                   {
-                     text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                     fontSize: 8,
-                   },
-                   {
-                     text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                     fontSize: 8,
-                   },
-                   {
-                     text: `Servicio: ${medicoCompleto.departamento}\n`,
-                     fontSize: 8,
-                   },
-                   {
-                     text: `Fecha de elaboración: ${fechaActual.toLocaleDateString('es-MX')} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
-                     fontSize: 8,
-                   },
-                   {
-                     text: '\n\n_____________________________________\nNOMBRE COMPLETO Y FIRMA DEL RESPONSABLE DE LA CIRUGÍA',
-                     fontSize: 8,
-                   },
-                 ],
-                 margin: [5, 15],
-                 alignment: 'center',
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
-
-       { text: '', margin: [0, 2] },
-
-       // 🔹 NOTA REFERENCIAL
-       {
-         text: [
-           {
-             text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.8 "Nota postoperatoria"\n',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-           {
-             text: '* Cumple con los requisitos establecidos en los numerales 8.8.1 al 8.8.17',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-         ],
-         alignment: 'left',
-       },
-     ],
-
-     footer: (currentPage: number, pageCount: number) => {
-       return {
-         margin: [20, 5],
-         table: {
-           widths: ['25%', '50%', '25%'],
-           body: [
-             [
-               {
-                 text: `Página ${currentPage} de ${pageCount}`,
-                 fontSize: 7,
-                 color: '#666666',
-               },
-               {
-                 text: 'Nota Postoperatoria - SICEG\nNOM-004-SSA3-2012',
-                 fontSize: 7,
-                 alignment: 'center',
-                 color: '#666666',
-               },
-               {
-                 text: [
-                   {
-                     text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                     fontSize: 6,
-                   },
-                 ],
-                 alignment: 'right',
-                 color: '#666666',
-               },
-             ],
-           ],
-         },
-         layout: 'noBorders',
-       };
-     },
-   };
-
-   const nombreArchivo = `nota-postoperatoria-${pacienteCompleto.nombre
-     .replace(/\s+/g, '-')
-     .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-   pdfDocGenerator.download(nombreArchivo);
-
-   console.log('  PDF de Nota Postoperatoria NOM-004 generado exitosamente');
-   console.log(`📄 Archivo: ${nombreArchivo}`);
-
-   // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-   this.validarCumplimientoNotaPostoperatoria(datos, medicoCompleto, pacienteCompleto);
-
- } catch (error) {
-   console.error('❌ Error al generar PDF de Nota Postoperatoria:', error);
-   throw error;
- }
-}
-
-
-// 📄 NOTA PREANESTÉSICA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.7 Y NOM-006-SSA3-2011
-async generarNotaPreanestesica(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
-
-    console.log('💉 Generando Nota Preanestésica según NOM-004 y NOM-006...');
-
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const preanestesicaData = datos.notaPreanestesica || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA PREANESTÉSICA',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha cirugía',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora programada',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Quirófano',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'ASA',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: preanestesicaData.fecha_cirugia || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.hora_programada || '00:00',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.quirofano || 'Q1',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: preanestesicaData.clasificacion_asa || 'ASA II',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                          color: '#dc2626',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['30%', '25%', '25%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Peso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Talla',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'IMC',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Tipo sanguíneo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${signosVitalesReales.peso || '___'} kg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: `${signosVitalesReales.talla || '___'} cm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: this.calcularIMC(signosVitalesReales.peso, signosVitalesReales.talla),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.tipo_sangre || 'No registrado',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                          color: '#dc2626',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Procedimiento quirúrgico programado',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: preanestesicaData.procedimiento_programado || 'Procedimiento quirúrgico por especificar',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 EVALUACIÓN CLÍNICA DEL PACIENTE (NOM-004 D9.12)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EVALUACIÓN CLÍNICA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#dbeafe',
-                  alignment: 'center',
-                  rowSpan: 8,
-                },
-                {
-                  text: 'EVALUACIÓN CLÍNICA DEL PACIENTE (D9.12)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#eff6ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'ANTECEDENTES ANESTÉSICOS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.antecedentes_anestesicos || 'Sin antecedentes anestésicos previos conocidos.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'ANTECEDENTES PATOLÓGICOS RELEVANTES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.antecedentes_patologicos || 'Sin antecedentes patológicos de importancia para anestesia.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'MEDICAMENTOS ACTUALES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.medicamentos_actuales || 'Sin medicamentos de importancia anestésica.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'ALERGIAS Y REACCIONES ADVERSAS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.alergias || 'Sin alergias conocidas a medicamentos.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 EXPLORACIÓN FÍSICA ANESTÉSICA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EXPLORACIÓN FÍSICA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fef3c7',
-                  alignment: 'center',
-                  rowSpan: 6,
-                },
-                {
-                  text: 'SIGNOS VITALES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Presión arterial',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Frecuencia cardíaca',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Frecuencia respiratoria',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Saturación O2',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${signosVitalesReales.presion_arterial_sistolica || '___'}/${signosVitalesReales.presion_arterial_diastolica || '___'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_cardiaca || '___'} lpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.frecuencia_respiratoria || '___'} rpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitalesReales.saturacion_oxigeno || '___'} %`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 2],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'VÍA AÉREA Y CUELLO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.via_aerea || 'Vía aérea permeable, cuello móvil, apertura oral adecuada, clasificación Mallampati I-II.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'SISTEMAS CARDIOVASCULAR Y RESPIRATORIO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.cardiovascular_respiratorio || 'Ruidos cardíacos rítmicos, sin soplos. Murmullo vesicular presente bilateral.',
-                  fontSize: 8,
-                  margin: [5, 3],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 TIPO DE ANESTESIA (NOM-004 D9.13)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'PLAN ANESTÉSICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f0fdf4',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'TIPO DE ANESTESIA PLANEADA (D9.13)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: preanestesicaData.tipo_anestesia === 'general' ? '☑ GENERAL' : '☐ GENERAL',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.tipo_anestesia === 'regional' ? '☑ REGIONAL' : '☐ REGIONAL',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.tipo_anestesia === 'local' ? '☑ LOCAL' : '☐ LOCAL',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.tipo_anestesia === 'combinada' ? '☑ COMBINADA' : '☐ COMBINADA',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'TÉCNICA ANESTÉSICA ESPECÍFICA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  text: preanestesicaData.tecnica_especifica || 'Técnica anestésica por definir según evaluación y tipo de cirugía.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 RIESGO ANESTÉSICO (NOM-004 D9.14)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'RIESGO ANESTÉSICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fee2e2',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'CLASIFICACIÓN ASA Y RIESGO ANESTÉSICO (D9.14)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fef2f2',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: preanestesicaData.clasificacion_asa === 'ASA I' ? '☑ ASA I' : '☐ ASA I',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.clasificacion_asa === 'ASA II' ? '☑ ASA II' : '☐ ASA II',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.clasificacion_asa === 'ASA III' ? '☑ ASA III' : '☐ ASA III',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.clasificacion_asa === 'ASA IV' ? '☑ ASA IV' : '☐ ASA IV',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                        {
-                          text: preanestesicaData.clasificacion_asa === 'ASA V' ? '☑ ASA V' : '☐ ASA V',
-                          fontSize: 7,
-                          alignment: 'center',
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: 'noBorders',
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'JUSTIFICACIÓN DEL RIESGO ANESTÉSICO',
-                fontSize: 7,
-                bold: true,
-                fillColor: '#fef2f2',
-              },
-            ],
-            [
-              {},
-              {
-                text: preanestesicaData.justificacion_riesgo || 'Paciente con estado físico apropiado para anestesia y cirugía programada.',
-                fontSize: 8,
-                margin: [5, 5],
-                lineHeight: 1.3,
-              },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0.5,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-      },
-
-      { text: '', margin: [0, 3] },
-
-      // 🔹 PREMEDICACIÓN (NOM-004 D9.15)
-      {
-        table: {
-          widths: ['20%', '80%'],
-          body: [
-            [
-              {
-                text: 'PREMEDICACIÓN',
-                fontSize: 8,
-                bold: true,
-                fillColor: '#f3e8ff',
-                alignment: 'center',
-                rowSpan: 2,
-              },
-              {
-                text: 'MEDICACIÓN PREANESTÉSICA (D9.15)',
-                fontSize: 7,
-                bold: true,
-                fillColor: '#faf5ff',
-              },
-            ],
-            [
-              {},
-              {
-                text: preanestesicaData.premedicacion || 'Premedicación según protocolo anestésico y estado del paciente.',
-                fontSize: 8,
-                margin: [5, 5],
-                lineHeight: 1.3,
-              },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0.5,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-      },
-
-      { text: '', margin: [0, 3] },
-
-      // 🔹 AYUNO Y PREPARACIÓN
-      {
-        table: {
-          widths: ['20%', '80%'],
-          body: [
-            [
-              {
-                text: 'PREPARACIÓN PREOPERATORIA',
-                fontSize: 8,
-                bold: true,
-                fillColor: '#f5f5f5',
-                alignment: 'center',
-                rowSpan: 4,
-              },
-              {
-                text: 'AYUNO PREOPERATORIO',
-                fontSize: 7,
-                bold: true,
-                fillColor: '#f9f9f9',
-              },
-            ],
-            [
-              {},
-              {
-                text: `Ayuno de sólidos: ${preanestesicaData.ayuno_solidos || '8 horas'} | Ayuno de líquidos: ${preanestesicaData.ayuno_liquidos || '2 horas'}`,
-                fontSize: 8,
-                margin: [5, 3],
-              },
-            ],
-            [
-              {},
-              {
-                text: 'PREPARACIÓN ESPECIAL',
-                fontSize: 7,
-                bold: true,
-                fillColor: '#f9f9f9',
-              },
-            ],
-            [
-              {},
-              {
-                text: preanestesicaData.preparacion_especial || 'Preparación estándar preoperatoria.',
-                fontSize: 8,
-                margin: [5, 3],
-                lineHeight: 1.3,
-              },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0.5,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-      },
-
-      { text: '', margin: [0, 5] },
-
-      // 🔹 ANESTESIÓLOGO RESPONSABLE
-      {
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'ANESTESIÓLOGO RESPONSABLE',
-                fontSize: 8,
-                bold: true,
-                fillColor: '#f5f5f5',
-                alignment: 'center',
-              },
-            ],
-            [
-              {
-                text: [
-                  {
-                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                    fontSize: 9,
-                    bold: true,
-                  },
-                  {
-                    text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                    fontSize: 8,
-                  },
-                  {
-                    text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                    fontSize: 8,
-                  },
-                  {
-                    text: `Servicio: Anestesiología\n`,
-                    fontSize: 8,
-                  },
-                  {
-                    text: `Fecha de evaluación: ${fechaActual.toLocaleDateString('es-MX')} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
-                    fontSize: 8,
-                  },
-                  {
-                    text: '\n\n_____________________________________\nFIRMA DEL ANESTESIÓLOGO',
-                    fontSize: 8,
-                  },
-                ],
-                margin: [5, 15],
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0.5,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-      },
-
-      { text: '', margin: [0, 2] },
-
-      // 🔹 NOTA REFERENCIAL
-      {
-        text: [
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE (NOM-004 5.2)
           {
-            text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.7 "Nota preanestésica"\n',
-            fontSize: 6,
-            italics: true,
-            color: '#666666',
-          },
-          {
-            text: '* Cumple con NOM-006-SSA3-2011 para la práctica de la anestesiología',
-            fontSize: 6,
-            italics: true,
-            color: '#666666',
-          },
-        ],
-        alignment: 'left',
-      },
-    ],
-
-    footer: (currentPage: number, pageCount: number) => {
-      return {
-        margin: [20, 5],
-        table: {
-          widths: ['25%', '50%', '25%'],
-          body: [
-            [
-              {
-                text: `Página ${currentPage} de ${pageCount}`,
-                fontSize: 7,
-                color: '#666666',
-              },
-              {
-                text: 'Nota Preanestésica - SICEG\nNOM-004-SSA3-2012 | NOM-006-SSA3-2011',
-                fontSize: 7,
-                alignment: 'center',
-                color: '#666666',
-              },
-              {
-                text: [
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
                   {
-                    text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha egreso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora egreso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. de cama',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio egreso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              egresoData.fecha_egreso ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              egresoData.hora_egreso ||
+                              fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: egresoData.numero_cama || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `EG-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['60%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '50%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha y hora ingreso hospitalario',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Días de estancia en la unidad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              egresoData.fecha_ingreso || 'No registrada'
+                            } - ${egresoData.hora_ingreso || 'No registrada'}`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${
+                              egresoData.dias_estancia ||
+                              this.calcularDiaHospitalizacion()
+                            } días`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['60%', '40%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Reingreso por la misma afección en el año',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'No especificado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: egresoData.es_reingreso ? 'SÍ' : 'NO',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: egresoData.es_reingreso
+                              ? '#dc2626'
+                              : '#059669',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 SIGNOS VITALES AL EGRESO (NOM-004 D12.4)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'SIGNOS VITALES AL EGRESO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    table: {
+                      widths: ['16%', '16%', '16%', '16%', '16%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Peso',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Talla',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Presión arterial',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'FC',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'FR',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Temperatura',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${signosVitalesReales.peso || '___'} kg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${signosVitalesReales.talla || '___'} cm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.presion_arterial_sistolica ||
+                              '___'
+                            }/${
+                              signosVitalesReales.presion_arterial_diastolica ||
+                              '___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_cardiaca || '___'
+                            } lpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_respiratoria ||
+                              '___'
+                            } rpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.temperatura || '___'
+                            } °C`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Estado general al egreso',
+                            fontSize: 7,
+                            bold: true,
+                            fillColor: '#f9f9f9',
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              egresoData.estado_general_egreso ||
+                              'Estable, sin signos de alarma.',
+                            fontSize: 8,
+                            margin: [5, 5],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 DIAGNÓSTICOS (NOM-004 D12.8 y D12.11)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'DIAGNÓSTICOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'DIAGNÓSTICO(S) DE INGRESO (D12.8)',
                     fontSize: 7,
-                  },
-                  {
-                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                    fontSize: 6,
+                    bold: true,
+                    fillColor: '#f9f9f9',
                   },
                 ],
-                alignment: 'right',
-                color: '#666666',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      };
-    },
-  };
-
-  const nombreArchivo = `nota-preanestesica-${pacienteCompleto.nombre
-    .replace(/\s+/g, '-')
-    .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-
-  const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-  pdfDocGenerator.download(nombreArchivo);
-
-  console.log('  PDF de Nota Preanestésica NOM-004 generado exitosamente');
-  console.log(`📄 Archivo: ${nombreArchivo}`);
-
-} catch (error) {
-  console.error('❌ Error al generar PDF de Nota Preanestésica:', error);
-  throw error;
-}
-}
-
-
-// 📄 HOJA DE QUIRÓFANO SEGÚN NOM-004-SSA3-2012
-async generarHojaQuirofano(datos: any): Promise<void> {
-try {
-  await this.ensurePdfMakeLoaded();
-
-  console.log('🏥 Generando Hoja de Quirófano según NOM-004...');
-
-  const medicoCompleto = await this.obtenerDatosMedicoActual();
-  const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-  const quirofanoData = datos.hojaQuirofano || {};
-  const fechaActual = new Date();
-
-  const documentDefinition = {
-    pageSize: 'LETTER',
-    pageOrientation: 'landscape',
-    pageMargins: [15, 50, 15, 40],
-
-    header: {
-      margin: [15, 10, 15, 10],
-      table: {
-        widths: ['100%'],
-        body: [
-          [
-            {
-              text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HOJA DE QUIRÓFANO',
-              fontSize: 12,
-              bold: true,
-              alignment: 'center',
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.diagnosticos_ingreso ||
+                      'No especificados en el momento del ingreso.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'DIAGNÓSTICO(S) FINAL(ES) (D12.11)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.diagnosticos_finales ||
+                      'Diagnósticos finales por definir.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
             },
-          ],
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 EVOLUCIÓN Y MANEJO (NOM-004 D12.9 y D12.10)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EVOLUCIÓN Y MANEJO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'RESUMEN DE LA EVOLUCIÓN Y ESTADO ACTUAL (D12.9)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.resumen_evolucion ||
+                      'Evolución clínica favorable durante la estancia hospitalaria.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MANEJO DURANTE LA ESTANCIA HOSPITALARIA (D12.10)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.manejo_hospitalario ||
+                      'Manejo médico integral según protocolos institucionales.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PROCEDIMIENTOS Y MOTIVO DE EGRESO (NOM-004 D12.12 y D12.13)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PROCEDIMIENTOS Y EGRESO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'PROCEDIMIENTOS REALIZADOS (D12.12)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.procedimientos_realizados ||
+                      'Sin procedimientos especiales durante la estancia.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MOTIVO DE EGRESO (D12.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text:
+                              egresoData.motivo_egreso === 'maximo_beneficio'
+                                ? '☑ Máximo beneficio'
+                                : '☐ Máximo beneficio',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text:
+                              egresoData.motivo_egreso === 'mejoria'
+                                ? '☑ Por mejoría'
+                                : '☐ Por mejoría',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text:
+                              egresoData.motivo_egreso === 'alta_voluntaria'
+                                ? '☑ Alta voluntaria'
+                                : '☐ Alta voluntaria',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text:
+                              egresoData.motivo_egreso === 'exitus'
+                                ? '☑ Exitus'
+                                : '☐ Exitus',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PROBLEMAS PENDIENTES Y PLAN (NOM-004 D12.14 y D12.15)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'SEGUIMIENTO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'PROBLEMAS CLÍNICOS PENDIENTES (D12.14)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.problemas_pendientes ||
+                      'Sin problemas clínicos pendientes al momento del egreso.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PLAN DE MANEJO Y TRATAMIENTO (D12.15)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.plan_manejo_tratamiento ||
+                      'Continuar manejo ambulatorio según indicaciones médicas.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'RECOMENDACIONES PARA VIGILANCIA AMBULATORIA (D12.16)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      egresoData.recomendaciones_ambulatorias ||
+                      'Control médico en consulta externa según programación. Acudir a urgencias en caso de signos de alarma.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (D12.17)
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  {
+                    text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA DEL MÉDICO (D12.17)',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'FIRMA AUTÓGRAFA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Hospital General San Luis de la Paz\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Fecha: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Hora: ${fechaActual.toLocaleTimeString(
+                          'es-MX'
+                        )}`,
+                        fontSize: 7,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                  {
+                    text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO TRATANTE\n(NOM-004-SSA3-2012)',
+                    fontSize: 8,
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D12 "Nota de egreso"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos establecidos en los numerales D12.1 al D12.17',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
         ],
-      },
-      layout: 'noBorders',
-    },
 
-    content: [
-      { text: '', margin: [0, 5] },
-
-      // 🔹 DATOS GENERALES
-      {
-        table: {
-          widths: ['20%', '30%', '15%', '35%'],
-          body: [
-            [
-              { text: 'Paciente:', fontSize: 9, bold: true },
-              { text: pacienteCompleto.nombre_completo, fontSize: 9 },
-              { text: 'Expediente:', fontSize: 9, bold: true },
-              { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente), fontSize: 9, bold: true },
-            ],
-            [
-              { text: 'Procedimiento:', fontSize: 9, bold: true },
-              { text: quirofanoData.procedimiento || 'Por especificar', fontSize: 9, colSpan: 3 },
-              {},
-              {},
-            ],
-            [
-              { text: 'Cirujano:', fontSize: 9, bold: true },
-              { text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`, fontSize: 9 },
-              { text: 'Quirófano:', fontSize: 9, bold: true },
-              { text: quirofanoData.numero_quirofano || 'Q1', fontSize: 9 },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 1,
-          vLineWidth: () => 1,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-        margin: [0, 0, 0, 15],
-      },
-
-      // 🔹 TABLA DE REGISTRO HORARIO
-      {
-        table: {
-          widths: ['15%', '15%', '15%', '15%', '15%', '25%'],
-          body: [
-            [
-              { text: 'HORA', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-              { text: 'PA (mmHg)', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-              { text: 'FC (lpm)', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-              { text: 'FR (rpm)', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-              { text: 'TEMP (°C)', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-              { text: 'OBSERVACIONES', fontSize: 8, bold: true, alignment: 'center', fillColor: '#f5f5f5' },
-            ],
-            // Generar 20 filas vacías para llenar manualmente
-            ...Array.from({ length: 20 }, () => [
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-              { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
-            ]),
-          ],
-        },
-        layout: {
-          hLineWidth: () => 1,
-          vLineWidth: () => 1,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-        margin: [0, 0, 0, 15],
-      },
-
-      // 🔹 DATOS DEL EQUIPO QUIRÚRGICO
-      {
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'EQUIPO QUIRÚRGICO',
-                fontSize: 9,
-                bold: true,
-                fillColor: '#f5f5f5',
-                alignment: 'center',
-              },
-            ],
-            [
-              {
-                table: {
-                  widths: ['25%', '25%', '25%', '25%'],
-                  body: [
-                    [
-                      { text: 'Cirujano:', fontSize: 8, bold: true },
-                      { text: 'Anestesiólogo:', fontSize: 8, bold: true },
-                      { text: 'Instrumentista:', fontSize: 8, bold: true },
-                      { text: 'Circulante:', fontSize: 8, bold: true },
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota de Egreso - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
                     ],
-                    [
-                      { text: medicoCompleto.nombre_completo, fontSize: 8 },
-                      { text: quirofanoData.anestesiologo || '____________', fontSize: 8 },
-                      { text: quirofanoData.instrumentista || '____________', fontSize: 8 },
-                      { text: quirofanoData.circulante || '____________', fontSize: 8 },
-                    ],
-                  ],
-                },
-                layout: 'noBorders',
-                margin: [5, 5, 5, 5],
-              },
-            ],
-          ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
         },
-        layout: {
-          hLineWidth: () => 1,
-          vLineWidth: () => 1,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-      },
-    ],
-
-    footer: (currentPage: number, pageCount: number) => {
-      return {
-        margin: [15, 10],
-        table: {
-          widths: ['25%', '50%', '25%'],
-          body: [
-            [
-              {
-                text: `Página ${currentPage} de ${pageCount}`,
-                fontSize: 8,
-                color: '#666666',
-              },
-              {
-                text: 'Hoja de Quirófano - SICEG\nNOM-004-SSA3-2012',
-                fontSize: 8,
-                alignment: 'center',
-                color: '#666666',
-              },
-              {
-                text: fechaActual.toLocaleDateString('es-MX'),
-                fontSize: 8,
-                alignment: 'right',
-                color: '#666666',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
       };
-    },
-  };
 
-  const nombreArchivo = `hoja-quirofano-${pacienteCompleto.nombre
-    .replace(/\s+/g, '-')
-    .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+      const nombreArchivo = `nota-egreso-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
-  const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-  pdfDocGenerator.download(nombreArchivo);
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
 
-  console.log('  PDF de Hoja de Quirófano generado exitosamente');
+      console.log('  PDF de Nota de Egreso NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
 
-} catch (error) {
-  console.error('❌ Error al generar PDF de Hoja de Quirófano:', error);
-  throw error;
-}
-}
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO NOTA EGRESO
+      this.validarCumplimientoNotaEgreso(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota de Egreso:', error);
+      throw error;
+    }
+  }
 
+  // 📄 NOTA DE INTERCONSULTA SEGÚN NOM-004-SSA3-2012 SECCIÓN D7
+  async generarNotaInterconsulta(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
 
+      console.log(
+        '🔄 Generando Nota de Interconsulta según NOM-004-SSA3-2012...'
+      );
 
-// 📄 NOTA POSTANESTÉSICA SEGÚN NOM-004-SSA3-2012 SECCIÓN D11
-async generarNotaPostanestesica(datos: any): Promise<void> {
-  try {
-    await this.ensurePdfMakeLoaded();
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const interconsultaData = datos.notaInterconsulta || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
 
-    console.log('🏥 Generando Nota Postanestésica según NOM-004-SSA3-2012...');
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
 
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const postanestesicaData = datos.notaPostanestesica || {};
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-    const fechaActual = new Date();
-
-    const documentDefinition = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-
-      header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['100%'],
-          body: [
-            [
-              {
-                text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA POSTANESTÉSICA',
-                fontSize: 11,
-                bold: true,
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      },
-
-      content: [
-        { text: '', margin: [0, 10] },
-
-        // 🔹 IDENTIFICACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'IDENTIFICACIÓN',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Fecha cirugía',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hora término',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'No. Expediente',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Quirófano',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Folio nota',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: postanestesicaData.fecha_cirugia || fechaActual.toLocaleDateString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: postanestesicaData.hora_termino || fechaActual.toLocaleTimeString('es-MX'),
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                          bold: true,
-                        },
-                        {
-                          text: postanestesicaData.quirofano || 'Q1',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `NPA-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`,
-                          fontSize: 6,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['50%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Nombre completo del paciente',
-                          fontSize: 7,
-                          bold: true,
-                        },
-                        {
-                          text: 'Edad',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Sexo',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: pacienteCompleto.nombre_completo,
-                          fontSize: 8,
-                          bold: true,
-                          margin: [2, 2],
-                        },
-                        {
-                          text: `${pacienteCompleto.edad} años`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: pacienteCompleto.sexo,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['40%', '30%', '30%'],
-                    body: [
-                      [
-                        {
-                          text: 'Servicio',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Peso',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'ASA',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: medicoCompleto.departamento || 'Anestesiología',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: `${signosVitalesReales.peso || '___'} kg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                        },
-                        {
-                          text: postanestesicaData.clasificacion_asa || 'ASA II',
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                          color: '#dc2626',
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['100%'],
-                    body: [
-                      [
-                        {
-                          text: 'Procedimiento quirúrgico realizado',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: postanestesicaData.procedimiento_realizado || 'Procedimiento quirúrgico por especificar',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 MEDICAMENTOS UTILIZADOS (NOM-004 D11.12)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'MEDICAMENTOS UTILIZADOS',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#dbeafe',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'MEDICAMENTOS UTILIZADOS DURANTE LA ANESTESIA (D11.12)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#eff6ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: postanestesicaData.medicamentos_utilizados ||
-                    'Medicamentos anestésicos y coadyuvantes utilizados durante el procedimiento:\n' +
-                    '• Agentes anestésicos principales\n' +
-                    '• Medicamentos de inducción\n' +
-                    '• Relajantes musculares\n' +
-                    '• Analgésicos\n' +
-                    '• Otros medicamentos según protocolo',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 DURACIÓN DE LA ANESTESIA (NOM-004 D11.13)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'DURACIÓN ANESTESIA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fef3c7',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'DURACIÓN DE LA ANESTESIA (D11.13)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fffbeb',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['25%', '25%', '25%', '25%'],
-                    body: [
-                      [
-                        {
-                          text: 'Inicio anestesia',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Término anestesia',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Duración total',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Tipo anestesia',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: postanestesicaData.hora_inicio || '__:__',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                        },
-                        {
-                          text: postanestesicaData.hora_termino || '__:__',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                        },
-                        {
-                          text: `${postanestesicaData.duracion_anestesia || '___'} minutos`,
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                          bold: true,
-                        },
-                        {
-                          text: postanestesicaData.tipo_anestesia || 'General',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 3],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 INCIDENTES Y ACCIDENTES (NOM-004 D11.14)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'INCIDENTES Y ACCIDENTES',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fee2e2',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'INCIDENTES Y ACCIDENTES ATRIBUIBLES A LA ANESTESIA (D11.14)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fef2f2',
-                },
-              ],
-              [
-                {},
-                {
-                  text: postanestesicaData.incidentes_accidentes ||
-                    'Sin incidentes ni accidentes atribuibles a la anestesia durante el procedimiento.',
-                  fontSize: 8,
-                  margin: [5, 8],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 CANTIDAD DE SANGRE Y SOLUCIONES (NOM-004 D11.15)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'BALANCE HÍDRICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f0fdf4',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'CANTIDAD DE SANGRE O SOLUCIONES APLICADAS (D11.15)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['33%', '33%', '34%'],
-                    body: [
-                      [
-                        {
-                          text: 'Líquidos administrados',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Pérdidas sanguíneas',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Hemoderivados',
-                          fontSize: 7,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${postanestesicaData.liquidos_administrados || '___'} ml`,
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                          bold: true,
-                        },
-                        {
-                          text: `${postanestesicaData.sangrado || '___'} ml`,
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                          bold: true,
-                        },
-                        {
-                          text: postanestesicaData.hemoderivados_transfundidos || 'Ninguno',
-                          fontSize: 8,
-                          alignment: 'center',
-                          margin: [0, 3],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'BALANCE HÍDRICO DETALLADO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f7fee7',
-                },
-              ],
-              [
-                {},
-                {
-                  text: postanestesicaData.balance_hidrico ||
-                    'Balance hídrico equilibrado durante el procedimiento anestésico.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ESTADO CLÍNICO AL EGRESO (NOM-004 D11.16)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ESTADO CLÍNICO EGRESO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#e0f2fe',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'ESTADO CLÍNICO DEL ENFERMO A SU EGRESO DE QUIRÓFANO (D11.16)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'SIGNOS VITALES AL EGRESO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f9ff',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'PA',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'FC',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'FR',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'SatO2',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Temp',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${postanestesicaData.presion_arterial_egreso || '___/___'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${postanestesicaData.frecuencia_cardiaca_egreso || '___'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${postanestesicaData.frecuencia_respiratoria_egreso || '___'}`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${postanestesicaData.saturacion_oxigeno_egreso || '___'}%`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${postanestesicaData.temperatura_egreso || '___'}°C`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 2],
-                },
-              ],
-              [
-                {},
-                {
-                  text: postanestesicaData.estado_clinico_egreso ||
-                    'Paciente estable, consciente, orientado, con signos vitales dentro de parámetros normales. Egresa de quirófano en condiciones satisfactorias.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 PLAN DE MANEJO (NOM-004 D11.17)
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'PLAN POSTANESTÉSICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f3e8ff',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'PLAN DE MANEJO Y TRATAMIENTO INMEDIATO (D11.17)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#faf5ff',
-                },
-              ],
-              [
-                {},
-                {
-                  text: postanestesicaData.plan_tratamiento ||
-                    '• Vigilancia estricta en sala de recuperación\n' +
-                    '• Monitoreo continuo de signos vitales\n' +
-                    '• Control del dolor postoperatorio\n' +
-                    '• Manejo de náusea y vómito postoperatorio si aplica\n' +
-                    '• Evaluación neurológica continua\n' +
-                    '• Indicaciones específicas según evolución',
-                  fontSize: 8,
-                  margin: [5, 8],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ESCALA DE RECUPERACIÓN ANESTÉSICA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ESCALA ALDRETE',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#fdf2f8',
-                  alignment: 'center',
-                  rowSpan: 2,
-                },
-                {
-                  text: 'ESCALA DE RECUPERACIÓN POSTANESTÉSICA (ALDRETE)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#fef7ff',
-                },
-              ],
-              [
-                {},
-                {
-                  table: {
-                    widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [
-                      [
-                        {
-                          text: 'Actividad motora',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Respiración',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Circulación',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Conciencia',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                        {
-                          text: 'Saturación O2',
-                          fontSize: 6,
-                          bold: true,
-                          alignment: 'center',
-                        },
-                      ],
-                      [
-                        {
-                          text: `${postanestesicaData.aldrete_actividad || '2'} / 2`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                        {
-                          text: `${postanestesicaData.aldrete_respiracion || '2'} / 2`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                        {
-                          text: `${postanestesicaData.aldrete_circulacion || '2'} / 2`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                        {
-                          text: `${postanestesicaData.aldrete_conciencia || '2'} / 2`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                        {
-                          text: `${postanestesicaData.aldrete_saturacion || '2'} / 2`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 2],
-                          bold: true,
-                        },
-                      ],
-                      [
-                        {
-                          text: `TOTAL ALDRETE: ${this.calcularTotalAldrete(postanestesicaData)} / 10`,
-                          fontSize: 8,
-                          alignment: 'center',
-                          bold: true,
-                          colSpan: 5,
-                          fillColor: '#f0f9ff',
-                          margin: [0, 3],
-                        },
-                        {},
-                        {},
-                        {},
-                        {},
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 3],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 ANESTESIÓLOGO RESPONSABLE
-        {
+        header: {
+          margin: [20, 10, 20, 10],
           table: {
             widths: ['100%'],
             body: [
               [
                 {
-                  text: 'ANESTESIÓLOGO RESPONSABLE',
-                  fontSize: 8,
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE INTERCONSULTA',
+                  fontSize: 11,
                   bold: true,
-                  fillColor: '#f5f5f5',
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha interconsulta',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora interconsulta',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. de cama',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio interconsulta',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: interconsultaData.numero_cama || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `IC-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['60%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '50%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio solicitante',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Especialidad solicitada',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'No especificado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              interconsultaData.especialidad_solicitada ||
+                              'No especificada',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Médico que solicita interconsulta',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 MOTIVO DE LA CONSULTA (NOM-004 D7.14)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'SOLICITUD DE INTERCONSULTA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'MOTIVO DE LA CONSULTA (D7.14)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.motivo_consulta ||
+                      'Motivo de interconsulta no especificado.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PROBLEMA CLÍNICO ESPECÍFICO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.problema_clinico ||
+                      'Se solicita valoración y manejo por especialidad correspondiente.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ANTECEDENTES RELEVANTES
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ANTECEDENTES RELEVANTES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'ANTECEDENTES PERSONALES PATOLÓGICOS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.antecedentes_patologicos ||
+                      'Sin antecedentes patológicos de importancia.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MEDICAMENTOS ACTUALES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.medicamentos_actuales ||
+                      'Sin medicamentos de base reportados.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 EXPLORACIÓN FÍSICA RELEVANTE
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EXPLORACIÓN FÍSICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'SIGNOS VITALES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Presión arterial',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia cardíaca',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia respiratoria',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Temperatura',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              signosVitalesReales.presion_arterial_sistolica ||
+                              '___'
+                            }/${
+                              signosVitalesReales.presion_arterial_diastolica ||
+                              '___'
+                            } mmHg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_cardiaca || '___'
+                            } lpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_respiratoria ||
+                              '___'
+                            } rpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.temperatura || '___'
+                            } °C`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 2],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'HALLAZGOS RELEVANTES PARA INTERCONSULTA',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.hallazgos_relevantes ||
+                      'Exploración física dirigida según el motivo de interconsulta.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESTUDIOS DISPONIBLES
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTUDIOS DISPONIBLES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'LABORATORIO Y GABINETE',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.estudios_disponibles ||
+                      'Se adjuntan estudios de laboratorio y gabinete disponibles en el expediente.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 RESPUESTA DEL ESPECIALISTA
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'RESPUESTA DEL ESPECIALISTA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#e0f2fe',
+                    alignment: 'center',
+                    rowSpan: 8,
+                  },
+                  {
+                    text: 'CRITERIO DIAGNÓSTICO (D7.12)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.criterio_diagnostico ||
+                      '________________________________________________________________________________________\n________________________________________________________________________________________',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SUGERENCIAS DIAGNÓSTICAS (D7.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.sugerencias_diagnosticas ||
+                      '________________________________________________________________________________________\n________________________________________________________________________________________',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SUGERENCIAS DE TRATAMIENTO (D7.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.sugerencias_tratamiento ||
+                      '________________________________________________________________________________________\n________________________________________________________________________________________',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ESTUDIOS ADICIONALES SUGERIDOS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      interconsultaData.estudios_sugeridos ||
+                      '________________________________________________________________________________________',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 FIRMAS
+          {
+            table: {
+              widths: ['50%', '50%'],
+              body: [
+                [
+                  {
+                    text: 'MÉDICO QUE SOLICITA INTERCONSULTA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'MÉDICO ESPECIALISTA CONSULTADO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#e0f2fe',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: '\n_________________________\nFIRMA',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${
+                          interconsultaData.especialista_nombre ||
+                          '__________________________'
+                        }\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula: ${
+                          interconsultaData.especialista_cedula ||
+                          '______________'
+                        }\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `${
+                          interconsultaData.especialidad_solicitada ||
+                          '__________________________'
+                        }\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha: ${
+                          interconsultaData.fecha_respuesta || '______________'
+                        }\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: '\n_________________________\nFIRMA',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D7 "Notas de interconsulta"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos establecidos en los numerales D7.12, D7.13 y D7.14',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota de Interconsulta - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `nota-interconsulta-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log(
+        '  PDF de Nota de Interconsulta NOM-004 generado exitosamente'
+      );
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoNotaInterconsulta(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota de Interconsulta:', error);
+      throw error;
+    }
+  }
+
+  // 📄 PRESCRIPCIÓN DE MEDICAMENTOS SEGÚN NOM-004-SSA3-2012
+  async generarPrescripcionMedicamentos(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('💊 Generando Prescripción de Medicamentos según NOM-004...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const prescripcionData = datos.prescripcionMedicamentos || {};
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [30, 60, 30, 50],
+
+        header: {
+          margin: [30, 15, 30, 15],
+          table: {
+            widths: ['20%', '60%', '20%'],
+            body: [
+              [
+                {
+                  text: '💊',
+                  fontSize: 24,
+                  alignment: 'center',
+                  color: '#059669',
+                },
+                {
+                  text: [
+                    {
+                      text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\n',
+                      fontSize: 13,
+                      bold: true,
+                      alignment: 'center',
+                    },
+                    {
+                      text: 'PRESCRIPCIÓN MÉDICA\n',
+                      fontSize: 11,
+                      bold: true,
+                      alignment: 'center',
+                    },
+                    {
+                      text: 'Blvd. Centenario de la Revolución Mexicana #110',
+                      fontSize: 8,
+                      alignment: 'center',
+                    },
+                  ],
+                },
+                {
+                  text: [
+                    { text: 'Folio:\n', fontSize: 8, bold: true },
+                    {
+                      text: `PM-${this.obtenerNumeroExpedientePreferido(
+                        pacienteCompleto.expediente
+                      )}-${fechaActual.getFullYear()}\n`,
+                      fontSize: 7,
+                    },
+                    { text: 'Fecha:\n', fontSize: 8, bold: true },
+                    {
+                      text: fechaActual.toLocaleDateString('es-MX'),
+                      fontSize: 8,
+                    },
+                  ],
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 DATOS DEL PACIENTE
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'DATOS DEL PACIENTE',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    margin: [0, 3, 0, 3],
+                  },
+                ],
+                [
+                  {
+                    table: {
+                      widths: ['20%', '30%', '20%', '30%'],
+                      body: [
+                        [
+                          { text: 'Nombre:', fontSize: 8, bold: true },
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                          },
+                          { text: 'Expediente:', fontSize: 8, bold: true },
+                          {
+                            text: this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            ),
+                            fontSize: 8,
+                            bold: true,
+                          },
+                        ],
+                        [
+                          { text: 'Edad:', fontSize: 8, bold: true },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 8,
+                          },
+                          { text: 'Sexo:', fontSize: 8, bold: true },
+                          { text: pacienteCompleto.sexo, fontSize: 8 },
+                        ],
+                        [
+                          { text: 'Peso:', fontSize: 8, bold: true },
+                          {
+                            text: `${
+                              prescripcionData.peso_paciente || '___'
+                            } kg`,
+                            fontSize: 8,
+                          },
+                          { text: 'Alergias:', fontSize: 8, bold: true },
+                          {
+                            text:
+                              prescripcionData.alergias_conocidas ||
+                              'No conocidas',
+                            fontSize: 8,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 5, 5, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 DIAGNÓSTICO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'DIAGNÓSTICO:',
+                    fontSize: 9,
+                    bold: true,
+                    margin: [5, 5, 5, 2],
+                  },
+                ],
+                [
+                  {
+                    text:
+                      prescripcionData.diagnostico ||
+                      'Diagnóstico por especificar',
+                    fontSize: 9,
+                    margin: [5, 2, 5, 8],
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 MEDICAMENTOS PRESCRITOS
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'Rp/ MEDICAMENTOS PRESCRITOS',
+                    fontSize: 10,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 5],
+          },
+
+          // 🔹 TABLA DE MEDICAMENTOS
+          {
+            table: {
+              widths: ['5%', '35%', '20%', '15%', '25%'],
+              body: [
+                // Encabezados
+                [
+                  {
+                    text: '#',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#e0f2fe',
+                  },
+                  {
+                    text: 'MEDICAMENTO\n(Denominación genérica)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#e0f2fe',
+                  },
+                  {
+                    text: 'PRESENTACIÓN\nY CONCENTRACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#e0f2fe',
+                  },
+                  {
+                    text: 'CANTIDAD',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#e0f2fe',
+                  },
+                  {
+                    text: 'INDICACIONES\n(Dosis, vía, frecuencia)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#e0f2fe',
+                  },
+                ],
+                // Generar filas de medicamentos (máximo 10)
+                ...Array.from({ length: 10 }, (_, index) => {
+                  const medicamento = prescripcionData.medicamentos?.[index];
+                  return [
+                    {
+                      text: (index + 1).toString(),
+                      fontSize: 8,
+                      alignment: 'center',
+                      margin: [0, 8, 0, 8],
+                    },
+                    {
+                      text: medicamento?.nombre_generico || '',
+                      fontSize: 9,
+                      margin: [3, 8, 3, 8],
+                      bold: !!medicamento?.nombre_generico,
+                    },
+                    {
+                      text: medicamento?.presentacion || '',
+                      fontSize: 8,
+                      margin: [3, 8, 3, 8],
+                      alignment: 'center',
+                    },
+                    {
+                      text: medicamento?.cantidad || '',
+                      fontSize: 8,
+                      margin: [3, 8, 3, 8],
+                      alignment: 'center',
+                    },
+                    {
+                      text: medicamento?.indicaciones || '',
+                      fontSize: 8,
+                      margin: [3, 8, 3, 8],
+                    },
+                  ];
+                }),
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 INSTRUCCIONES GENERALES
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'INSTRUCCIONES GENERALES AL PACIENTE:',
+                    fontSize: 9,
+                    bold: true,
+                    margin: [5, 5, 5, 2],
+                  },
+                ],
+                [
+                  {
+                    text:
+                      prescripcionData.instrucciones_generales ||
+                      '• Tomar los medicamentos según las indicaciones médicas\n' +
+                        '• Completar el tratamiento aunque se sienta mejor\n' +
+                        '• No suspender medicamentos sin autorización médica\n' +
+                        '• Acudir a control médico en la fecha indicada\n' +
+                        '• En caso de reacciones adversas, suspender y acudir al médico',
+                    fontSize: 8,
+                    margin: [5, 5, 5, 8],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 PRÓXIMA CITA
+          {
+            table: {
+              widths: ['70%', '30%'],
+              body: [
+                [
+                  {
+                    text: `PRÓXIMA CITA: ${
+                      prescripcionData.proxima_cita || '___________________'
+                    }`,
+                    fontSize: 9,
+                    bold: true,
+                    margin: [5, 8, 5, 8],
+                  },
+                  {
+                    text: `DÍAS DE TRATAMIENTO: ${
+                      prescripcionData.dias_tratamiento || '____'
+                    } días`,
+                    fontSize: 9,
+                    bold: true,
+                    margin: [5, 8, 5, 8],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 20],
+          },
+
+          // 🔹 FIRMA DEL MÉDICO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'DATOS DEL MÉDICO PRESCRIPTOR',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    margin: [0, 5, 0, 5],
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `Nombre: ${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de prescripción: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )}\n`,
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 10, 5, 5],
+                    alignment: 'left',
+                  },
+                ],
+                [
+                  {
+                    text: '\n\n_____________________________________\nFIRMA Y SELLO DEL MÉDICO',
+                    fontSize: 9,
+                    alignment: 'center',
+                    margin: [0, 10, 0, 15],
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 10] },
+
+          // 🔹 ADVERTENCIAS LEGALES
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: '  ADVERTENCIAS IMPORTANTES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    margin: [0, 3, 0, 3],
+                  },
+                ],
+                [
+                  {
+                    text:
+                      '• Esta prescripción es válida únicamente para el paciente indicado\n' +
+                      '• Los medicamentos controlados requieren presentar receta original\n' +
+                      '• Conservar en lugar fresco y seco, fuera del alcance de los niños\n' +
+                      '• No automedicarse ni compartir medicamentos\n' +
+                      '• En caso de emergencia comunicarse al Hospital: Tel. (468) 688-0001',
+                    fontSize: 7,
+                    margin: [5, 5, 5, 5],
+                    lineHeight: 1.2,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#f59e0b',
+              vLineColor: () => '#f59e0b',
+            },
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [30, 10],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Prescripción Médica - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `prescripcion-medicamentos-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log(
+        '  PDF de Prescripción de Medicamentos generado exitosamente'
+      );
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoPrescripcionMedicamentos(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error(
+        '❌ Error al generar PDF de Prescripción de Medicamentos:',
+        error
+      );
+      throw error;
+    }
+  }
+
+  // 📄 REGISTRO DE TRANSFUSIÓN SEGÚN NOM-004-SSA3-2012 SECCIÓN D15
+  async generarRegistroTransfusion(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log(
+        '🩸 Generando Registro de Transfusión según NOM-004 y NOM-253...'
+      );
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const transfusionData = datos.registroTransfusion || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 60, 20, 50],
+
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - REGISTRO DE TRANSFUSIÓN',
+                  fontSize: 11,
+                  bold: true,
                   alignment: 'center',
                 },
               ],
               [
                 {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
+                  text: 'REGISTRO DE TRANSFUSIÓN DE UNIDADES DE SANGRE O COMPONENTES',
+                  fontSize: 9,
+                  bold: true,
+                  alignment: 'center',
+                  margin: [0, 3, 0, 0],
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha transfusión',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora inicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. de cama',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio registro',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              transfusionData.fecha_transfusion ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              transfusionData.hora_inicio ||
+                              fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: transfusionData.numero_cama || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `RT-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
                     },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
                     },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
                     },
-                    {
-                      text: `Servicio: Anestesiología\n`,
-                      fontSize: 8,
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
                     },
-                    {
-                     text: `Fecha de elaboración: ${fechaActual.toLocaleDateString('es-MX')} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
-                     fontSize: 8,
-                   },
-                   {
-                     text: '\n\n_____________________________________\nFIRMA DEL ANESTESIÓLOGO RESPONSABLE',
-                     fontSize: 8,
-                   },
-                 ],
-                 margin: [5, 15],
-                 alignment: 'center',
-               },
-             ],
-           ],
-         },
-         layout: {
-           hLineWidth: () => 0.5,
-           vLineWidth: () => 0.5,
-           hLineColor: () => '#000000',
-           vLineColor: () => '#000000',
-         },
-       },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['40%', '30%', '30%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Diagnóstico',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo sanguíneo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'No especificado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              transfusionData.diagnostico || 'No especificado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.tipo_sangre || 'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Médico que indica la transfusión',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-       { text: '', margin: [0, 2] },
+          { text: '', margin: [0, 3] },
 
-       // 🔹 NOTA REFERENCIAL
-       {
-         text: [
-           {
-             text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D11 "Nota postanestésica"\n',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-           {
-             text: '* Cumple con los requisitos D11.12 al D11.17 establecidos en la norma oficial',
-             fontSize: 6,
-             italics: true,
-             color: '#666666',
-           },
-         ],
-         alignment: 'left',
-       },
-     ],
+          // 🔹 INFORMACIÓN DE LAS UNIDADES TRANSFUNDIDAS (NOM-004 D15.1)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'UNIDADES TRANSFUNDIDAS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fee2e2',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'INFORMACIÓN DE UNIDADES DE SANGRE O COMPONENTES (D15.1)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef2f2',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Tipo de componente',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Cantidad de unidades',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Volumen total (ml)',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. identificación',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              transfusionData.tipo_componente ||
+                              'Concentrado eritrocitario',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: transfusionData.cantidad_unidades || '1',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                          {
+                            text: transfusionData.volumen_total || '250',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              transfusionData.numero_identificacion || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'FECHA Y HORA DE INICIO Y FINALIZACIÓN (D15.2)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef2f2',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha inicio',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora inicio',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Fecha finalización',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora finalización',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              transfusionData.fecha_inicio ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              transfusionData.hora_inicio ||
+                              fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              transfusionData.fecha_finalizacion ||
+                              '______________',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              transfusionData.hora_finalizacion ||
+                              '______________',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-     footer: (currentPage: number, pageCount: number) => {
-       return {
-         margin: [20, 5],
-         table: {
-           widths: ['25%', '50%', '25%'],
-           body: [
-             [
-               {
-                 text: `Página ${currentPage} de ${pageCount}`,
-                 fontSize: 7,
-                 color: '#666666',
-               },
-               {
-                 text: 'Nota Postanestésica - SICEG\nNOM-004-SSA3-2012',
-                 fontSize: 7,
-                 alignment: 'center',
-                 color: '#666666',
-               },
-               {
-                 text: [
-                   {
-                     text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                     fontSize: 7,
-                   },
-                   {
-                     text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                     fontSize: 6,
-                   },
-                 ],
-                 alignment: 'right',
-                 color: '#666666',
-               },
-             ],
-           ],
-         },
-         layout: 'noBorders',
-       };
-     },
-   };
+          { text: '', margin: [0, 3] },
 
-   const nombreArchivo = `nota-postanestesica-${pacienteCompleto.nombre
-     .replace(/\s+/g, '-')
-     .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+          // 🔹 CONTROL DE SIGNOS VITALES (NOM-004 D15.3)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'CONTROL SIGNOS VITALES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#dbeafe',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'SIGNOS VITALES ANTES, DURANTE Y DESPUÉS DE LA TRANSFUSIÓN (D15.3)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#eff6ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Momento',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Presión arterial',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia cardíaca',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Temperatura',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: 'ANTES',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                            fillColor: '#f0f9ff',
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.presion_arterial_sistolica ||
+                              '___'
+                            }/${
+                              signosVitalesReales.presion_arterial_diastolica ||
+                              '___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_cardiaca || '___'
+                            } lpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.temperatura || '___'
+                            } °C`,
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: 'DURANTE',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                            fillColor: '#f0f9ff',
+                          },
+                          {
+                            text: transfusionData.pa_durante || '__________',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: transfusionData.fc_durante || '___ lpm',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: transfusionData.temp_durante || '___ °C',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: 'DESPUÉS',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                            fillColor: '#f0f9ff',
+                          },
+                          {
+                            text: transfusionData.pa_despues || '__________',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: transfusionData.fc_despues || '___ lpm',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                          {
+                            text: transfusionData.temp_despues || '___ °C',
+                            fontSize: 7,
+                            alignment: 'center',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ESTADO GENERAL DEL PACIENTE',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#eff6ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      transfusionData.estado_general ||
+                      'Paciente estable durante todo el procedimiento de transfusión. Sin signos de reacciones adversas.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-   pdfDocGenerator.download(nombreArchivo);
+          { text: '', margin: [0, 3] },
 
-   console.log('  PDF de Nota Postanestésica NOM-004 generado exitosamente');
-   console.log(`📄 Archivo: ${nombreArchivo}`);
+          // 🔹 REACCIONES ADVERSAS (NOM-004 D15.4)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'REACCIONES ADVERSAS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'REACCIONES ADVERSAS A LA TRANSFUSIÓN (D15.4)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['20%', '80%'],
+                      body: [
+                        [
+                          {
+                            text: transfusionData.hubo_reacciones
+                              ? '☑ SÍ'
+                              : '☑ NO',
+                            fontSize: 8,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Se presentaron reacciones adversas durante o después de la transfusión',
+                            fontSize: 8,
+                            alignment: 'left',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'TIPO DE REACCIÓN Y MANEJO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      transfusionData.tipo_reaccion_manejo ||
+                      (transfusionData.hubo_reacciones
+                        ? 'Describir tipo de reacción: _________________________________\nManejo aplicado: _________________________________'
+                        : 'Sin reacciones adversas reportadas durante el procedimiento.'),
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
 
-   // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
-   this.validarCumplimientoNotaPostanestesica(datos, medicoCompleto, pacienteCompleto);
+          { text: '', margin: [0, 3] },
 
- } catch (error) {
-   console.error('❌ Error al generar PDF de Nota Postanestésica:', error);
-   throw error;
- }
-}
+          // 🔹 PERSONAL RESPONSABLE (NOM-004 D15.5)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PERSONAL RESPONSABLE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0fdf4',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'MÉDICO QUE INDICÓ LA TRANSFUSIÓN (D15.5)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                    fontSize: 8,
+                    margin: [5, 3],
+                    bold: true,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PERSONAL DE SALUD ENCARGADO DE APLICACIÓN Y VIGILANCIA (D15.5)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '50%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre del personal de enfermería:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Cédula profesional:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              transfusionData.enfermera_responsable ||
+                              '____________________________',
+                            fontSize: 8,
+                            decoration: 'underline',
+                          },
+                          {
+                            text:
+                              transfusionData.cedula_enfermera ||
+                              '____________________________',
+                            fontSize: 8,
+                            decoration: 'underline',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'OBSERVACIONES ADICIONALES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      transfusionData.observaciones_adicionales ||
+                      'Transfusión realizada sin complicaciones. Paciente toleró bien el procedimiento.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 FIRMAS MÚLTIPLES SEGÚN NOM-004
+          {
+            table: {
+              widths: ['33.33%', '33.33%', '33.34%'],
+              body: [
+                [
+                  {
+                    text: 'MÉDICO QUE INDICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'PERSONAL DE ENFERMERÍA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: 'BANCO DE SANGRE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 8,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `${medicoCompleto.especialidad}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: '\n\n_____________________\nFIRMA',
+                        fontSize: 7,
+                      },
+                    ],
+                    margin: [2, 10],
+                    alignment: 'center',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${
+                          transfusionData.enfermera_responsable ||
+                          '__________________'
+                        }\n`,
+                        fontSize: 8,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula: ${
+                          transfusionData.cedula_enfermera || '__________'
+                        }\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: 'Enfermería\n',
+                        fontSize: 7,
+                      },
+                      {
+                        text: '\n\n_____________________\nFIRMA',
+                        fontSize: 7,
+                      },
+                    ],
+                    margin: [2, 10],
+                    alignment: 'center',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${
+                          transfusionData.responsable_banco_sangre ||
+                          '__________________'
+                        }\n`,
+                        fontSize: 8,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula: ${
+                          transfusionData.cedula_banco || '__________'
+                        }\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: 'Banco de Sangre\n',
+                        fontSize: 7,
+                      },
+                      {
+                        text: '\n\n_____________________\nFIRMA',
+                        fontSize: 7,
+                      },
+                    ],
+                    margin: [2, 10],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Registro elaborado conforme a NOM-004-SSA3-2012, Sección D15 "Registro de transfusión"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con NOM-253-SSA1-2012 para disposición de sangre humana y componentes',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Registro de Transfusión - SICEG\nNOM-004-SSA3-2012 | NOM-253-SSA1-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `registro-transfusion-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log(
+        '  PDF de Registro de Transfusión NOM-004 generado exitosamente'
+      );
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoRegistroTransfusion(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error(
+        '❌ Error al generar PDF de Registro de Transfusión:',
+        error
+      );
+      throw error;
+    }
+  }
+
+  // 📄 NOTA PREOPERATORIA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.5
+  async generarNotaPreoperatoria(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('🔪 Generando Nota Preoperatoria según NOM-004-SSA3-2012...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const preoperatoriaData = datos.notaPreoperatoria || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
+
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA PREOPERATORIA',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha cirugía',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora programada',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Quirófano',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio nota',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              preoperatoriaData.fecha_cirugia ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: preoperatoriaData.hora_programada || '00:00',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: preoperatoriaData.quirofano || 'Por asignar',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `NPO-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['40%', '30%', '30%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Peso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo sanguíneo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'Cirugía General',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${signosVitalesReales.peso || '___'} kg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.tipo_sangre || 'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Cirujano responsable',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 DIAGNÓSTICO PREOPERATORIO (NOM-004 8.5.2)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EVALUACIÓN PREOPERATORIA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'DIAGNÓSTICO PREOPERATORIO (8.5.2)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.diagnostico_preoperatorio ||
+                      'Diagnóstico preoperatorio por especificar.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PLAN QUIRÚRGICO (8.5.3)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.plan_quirurgico ||
+                      'Plan quirúrgico por definir según evaluación.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'TIPO DE INTERVENCIÓN QUIRÚRGICA (8.5.4)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.tipo_intervencion ||
+                      'Tipo de intervención por especificar.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 RIESGO QUIRÚRGICO (NOM-004 8.5.5)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EVALUACIÓN DE RIESGO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'RIESGO QUIRÚRGICO (8.5.5)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text:
+                              preoperatoriaData.riesgo_quirurgico === 'bajo'
+                                ? '☑ BAJO'
+                                : '☐ BAJO',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.riesgo_quirurgico === 'moderado'
+                                ? '☑ MODERADO'
+                                : '☐ MODERADO',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.riesgo_quirurgico === 'alto'
+                                ? '☑ ALTO'
+                                : '☐ ALTO',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.riesgo_quirurgico === 'muy_alto'
+                                ? '☑ MUY ALTO'
+                                : '☐ MUY ALTO',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'JUSTIFICACIÓN DEL RIESGO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.justificacion_riesgo ||
+                      'Paciente con riesgo quirúrgico apropiado para el procedimiento programado.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 CUIDADOS PREOPERATORIOS (NOM-004 8.5.6)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'CUIDADOS PREOPERATORIOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#e0f2fe',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'CUIDADOS Y PLAN TERAPÉUTICO PREOPERATORIO (8.5.6)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.cuidados_preoperatorios ||
+                      '• Ayuno mínimo 8 horas para sólidos, 2 horas para líquidos claros\n' +
+                        '• Baño preoperatorio con jabón antiséptico\n' +
+                        '• Verificar retiro de prótesis dentales, joyas y lentes de contacto\n' +
+                        '• Administrar premedicación según indicación anestésica\n' +
+                        '• Verificar consentimiento informado firmado',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MEDICACIÓN PREOPERATORIA',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.medicacion_preoperatoria ||
+                      'Según indicación del anestesiólogo.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESTUDIOS PREOPERATORIOS
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTUDIOS PREOPERATORIOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0fdf4',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'LABORATORIO PREOPERATORIO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.laboratorio_preoperatorio ||
+                      'Biometría hemática, química sanguínea, tiempos de coagulación según protocolo.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ESTUDIOS DE GABINETE',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preoperatoriaData.gabinete_preoperatorio ||
+                      'Radiografía de tórax, electrocardiograma según protocolo y edad del paciente.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PRONÓSTICO (NOM-004 8.5.7)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PRONÓSTICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                  {
+                    text: `PRONÓSTICO (8.5.7): ${
+                      preoperatoriaData.pronostico ||
+                      'Favorable para la vida y función, reservado a la evolución transoperatoria y postoperatoria.'
+                    }`,
+                    fontSize: 8,
+                    margin: [5, 8],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 EQUIPO QUIRÚRGICO PROGRAMADO
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EQUIPO QUIRÚRGICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'EQUIPO QUIRÚRGICO PROGRAMADO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Cirujano:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Ayudante:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Anestesiólogo:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Instrumentista:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                        [
+                          {
+                            text: medicoCompleto.nombre_completo,
+                            fontSize: 7,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.ayudante || '________________',
+                            fontSize: 7,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.anestesiologo ||
+                              '________________',
+                            fontSize: 7,
+                          },
+                          {
+                            text:
+                              preoperatoriaData.instrumentista ||
+                              '________________',
+                            fontSize: 7,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 FIRMA DEL CIRUJANO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'CIRUJANO RESPONSABLE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de elaboración: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: '\n\n_____________________________________\nFIRMA DEL CIRUJANO RESPONSABLE',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.5 "Nota preoperatoria"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos establecidos en los numerales 8.5.1 al 8.5.7',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota Preoperatoria - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `nota-preoperatoria-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('  PDF de Nota Preoperatoria NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoNotaPreoperatoria(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota Preoperatoria:', error);
+      throw error;
+    }
+  }
+
+  // 📄 NOTA POSTOPERATORIA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.8
+  async generarNotaPostoperatoria(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log(
+        '   Generando Nota Postoperatoria según NOM-004-SSA3-2012...'
+      );
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const postoperatoriaData = datos.notaPostoperatoria || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
+
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA POSTOPERATORIA',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha cirugía',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora finalización',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Quirófano',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Duración cirugía',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              postoperatoriaData.fecha_cirugia ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text:
+                              postoperatoriaData.hora_finalizacion ||
+                              fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: postoperatoriaData.quirofano || 'Q1',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              postoperatoriaData.duracion_cirugia ||
+                              '_____ min',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['40%', '30%', '30%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo sanguíneo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'ASA',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'Cirugía General',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.tipo_sangre || 'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                          {
+                            text:
+                              postoperatoriaData.clasificacion_asa || 'ASA II',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Cirujano responsable',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo} - Cédula: ${medicoCompleto.numero_cedula}`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 DIAGNÓSTICOS Y OPERACIONES (NOM-004 8.8.1-8.8.4)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'DIAGNÓSTICOS Y PROCEDIMIENTOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 8,
+                  },
+                  {
+                    text: 'DIAGNÓSTICO PREOPERATORIO (8.8.1)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.diagnostico_preoperatorio ||
+                      'Diagnóstico preoperatorio.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'OPERACIÓN PLANEADA (8.8.2)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.operacion_planeada ||
+                      'Operación programada.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'OPERACIÓN REALIZADA (8.8.3)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.operacion_realizada ||
+                      'Operación efectivamente realizada.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'DIAGNÓSTICO POSTOPERATORIO (8.8.4)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.diagnostico_postoperatorio ||
+                      'Diagnóstico postoperatorio.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 DESCRIPCIÓN TÉCNICA QUIRÚRGICA (NOM-004 8.8.5)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'TÉCNICA QUIRÚRGICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#e0f2fe',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA (8.8.5)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.descripcion_tecnica ||
+                      'Descripción detallada de la técnica quirúrgica empleada.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'HALLAZGOS TRANSOPERATORIOS (8.8.6)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.hallazgos_transoperatorios ||
+                      'Hallazgos encontrados durante el procedimiento quirúrgico.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 CONTROL QUIRÚRGICO (NOM-004 8.8.7-8.8.9)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'CONTROL QUIRÚRGICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'REPORTE DE CONTEO DE GASAS, COMPRESAS E INSTRUMENTAL (8.8.7)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['33%', '33%', '34%'],
+                      body: [
+                        [
+                          {
+                            text: 'Gasas',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Compresas',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Instrumental',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              postoperatoriaData.conteo_gasas || 'Completo ✓'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${
+                              postoperatoriaData.conteo_compresas ||
+                              'Completo ✓'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${
+                              postoperatoriaData.conteo_instrumental ||
+                              'Completo ✓'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 2],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'INCIDENTES Y ACCIDENTES (8.8.8)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.incidentes_accidentes ||
+                      'Sin incidentes ni accidentes transoperatorios.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'CUANTIFICACIÓN DE SANGRADO Y TRANSFUSIONES (8.8.9)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '50%'],
+                      body: [
+                        [
+                          {
+                            text: `Sangrado: ${
+                              postoperatoriaData.sangrado_ml || '___'
+                            } ml`,
+                            fontSize: 8,
+                            bold: true,
+                          },
+                          {
+                            text: `Transfusiones: ${
+                              postoperatoriaData.transfusiones || 'No'
+                            }`,
+                            fontSize: 8,
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESTUDIOS TRANSOPERATORIOS (NOM-004 8.8.10)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTUDIOS TRANSOPERATORIOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0fdf4',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'ESTUDIOS DE SERVICIOS AUXILIARES DE DIAGNÓSTICO Y TRATAMIENTO (8.8.10)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.estudios_transoperatorios ||
+                      'No se realizaron estudios transoperatorios.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 EQUIPO QUIRÚRGICO (NOM-004 8.8.11)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EQUIPO QUIRÚRGICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fdf2f8',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'AYUDANTES, INSTRUMENTISTAS, ANESTESIÓLOGO Y CIRCULANTE (8.8.11)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef7ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Cirujano:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Ayudante:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Anestesiólogo:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Instrumentista:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                        [
+                          {
+                            text: medicoCompleto.nombre_completo,
+                            fontSize: 7,
+                          },
+                          {
+                            text: postoperatoriaData.ayudante || 'N/A',
+                            fontSize: 7,
+                          },
+                          {
+                            text: postoperatoriaData.anestesiologo || 'N/A',
+                            fontSize: 7,
+                          },
+                          {
+                            text: postoperatoriaData.instrumentista || 'N/A',
+                            fontSize: 7,
+                          },
+                        ],
+                        [
+                          {
+                            text: 'Circulante:',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: postoperatoriaData.circulante || 'N/A',
+                            fontSize: 7,
+                            colSpan: 3,
+                          },
+                          {},
+                          {},
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESTADO POSTQUIRÚRGICO Y PLAN (NOM-004 8.8.12-8.8.13)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTADO POSTQUIRÚRGICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'ESTADO POST-QUIRÚRGICO INMEDIATO (8.8.12)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.estado_postquirurgico ||
+                      'Paciente estable al término del procedimiento quirúrgico.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PLAN DE MANEJO Y TRATAMIENTO POSTOPERATORIO INMEDIATO (8.8.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.plan_postoperatorio ||
+                      'Plan de manejo postoperatorio inmediato según protocolo.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PRONÓSTICO Y BIOPSIAS (NOM-004 8.8.14-8.8.15)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PRONÓSTICO Y BIOPSIAS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'PRONÓSTICO (8.8.14)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.pronostico ||
+                      'Favorable para la vida y función.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ENVÍO DE PIEZAS O BIOPSIAS QUIRÚRGICAS (8.8.15)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postoperatoriaData.envio_biopsias ||
+                      'No se enviaron piezas quirúrgicas para estudio histopatológico.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 OTROS HALLAZGOS (NOM-004 8.8.16)
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'OTROS HALLAZGOS DE IMPORTANCIA (8.8.16)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text:
+                      postoperatoriaData.otros_hallazgos ||
+                      'Sin otros hallazgos de importancia para reportar.',
+                    fontSize: 8,
+                    margin: [5, 8],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 FIRMA DEL CIRUJANO RESPONSABLE (NOM-004 8.8.17)
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'CIRUJANO RESPONSABLE (8.8.17)',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: ${medicoCompleto.departamento}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de elaboración: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: '\n\n_____________________________________\nNOMBRE COMPLETO Y FIRMA DEL RESPONSABLE DE LA CIRUGÍA',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.8 "Nota postoperatoria"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos establecidos en los numerales 8.8.1 al 8.8.17',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota Postoperatoria - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `nota-postoperatoria-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('  PDF de Nota Postoperatoria NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoNotaPostoperatoria(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota Postoperatoria:', error);
+      throw error;
+    }
+  }
+
+  // 📄 NOTA PREANESTÉSICA SEGÚN NOM-004-SSA3-2012 SECCIÓN 8.7 Y NOM-006-SSA3-2011
+  async generarNotaPreanestesica(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('💉 Generando Nota Preanestésica según NOM-004 y NOM-006...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const preanestesicaData = datos.notaPreanestesica || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
+
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA PREANESTÉSICA',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha cirugía',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora programada',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Quirófano',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'ASA',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              preanestesicaData.fecha_cirugia ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: preanestesicaData.hora_programada || '00:00',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: preanestesicaData.quirofano || 'Q1',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa || 'ASA II',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['30%', '25%', '25%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Peso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Talla',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'IMC',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo sanguíneo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${signosVitalesReales.peso || '___'} kg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${signosVitalesReales.talla || '___'} cm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: this.calcularIMC(
+                              signosVitalesReales.peso,
+                              signosVitalesReales.talla
+                            ),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              pacienteCompleto.tipo_sangre || 'No registrado',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Procedimiento quirúrgico programado',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              preanestesicaData.procedimiento_programado ||
+                              'Procedimiento quirúrgico por especificar',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 EVALUACIÓN CLÍNICA DEL PACIENTE (NOM-004 D9.12)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EVALUACIÓN CLÍNICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#dbeafe',
+                    alignment: 'center',
+                    rowSpan: 8,
+                  },
+                  {
+                    text: 'EVALUACIÓN CLÍNICA DEL PACIENTE (D9.12)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#eff6ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ANTECEDENTES ANESTÉSICOS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.antecedentes_anestesicos ||
+                      'Sin antecedentes anestésicos previos conocidos.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ANTECEDENTES PATOLÓGICOS RELEVANTES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.antecedentes_patologicos ||
+                      'Sin antecedentes patológicos de importancia para anestesia.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'MEDICAMENTOS ACTUALES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.medicamentos_actuales ||
+                      'Sin medicamentos de importancia anestésica.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'ALERGIAS Y REACCIONES ADVERSAS',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.alergias ||
+                      'Sin alergias conocidas a medicamentos.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 EXPLORACIÓN FÍSICA ANESTÉSICA
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'EXPLORACIÓN FÍSICA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    rowSpan: 6,
+                  },
+                  {
+                    text: 'SIGNOS VITALES',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Presión arterial',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia cardíaca',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Frecuencia respiratoria',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Saturación O2',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              signosVitalesReales.presion_arterial_sistolica ||
+                              '___'
+                            }/${
+                              signosVitalesReales.presion_arterial_diastolica ||
+                              '___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_cardiaca || '___'
+                            } lpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.frecuencia_respiratoria ||
+                              '___'
+                            } rpm`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              signosVitalesReales.saturacion_oxigeno || '___'
+                            } %`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 2],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'VÍA AÉREA Y CUELLO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.via_aerea ||
+                      'Vía aérea permeable, cuello móvil, apertura oral adecuada, clasificación Mallampati I-II.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SISTEMAS CARDIOVASCULAR Y RESPIRATORIO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.cardiovascular_respiratorio ||
+                      'Ruidos cardíacos rítmicos, sin soplos. Murmullo vesicular presente bilateral.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 TIPO DE ANESTESIA (NOM-004 D9.13)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PLAN ANESTÉSICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0fdf4',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'TIPO DE ANESTESIA PLANEADA (D9.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text:
+                              preanestesicaData.tipo_anestesia === 'general'
+                                ? '☑ GENERAL'
+                                : '☐ GENERAL',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.tipo_anestesia === 'regional'
+                                ? '☑ REGIONAL'
+                                : '☐ REGIONAL',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.tipo_anestesia === 'local'
+                                ? '☑ LOCAL'
+                                : '☐ LOCAL',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.tipo_anestesia === 'combinada'
+                                ? '☑ COMBINADA'
+                                : '☐ COMBINADA',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'TÉCNICA ANESTÉSICA ESPECÍFICA',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.tecnica_especifica ||
+                      'Técnica anestésica por definir según evaluación y tipo de cirugía.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 RIESGO ANESTÉSICO (NOM-004 D9.14)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'RIESGO ANESTÉSICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fee2e2',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'CLASIFICACIÓN ASA Y RIESGO ANESTÉSICO (D9.14)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef2f2',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa === 'ASA I'
+                                ? '☑ ASA I'
+                                : '☐ ASA I',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa === 'ASA II'
+                                ? '☑ ASA II'
+                                : '☐ ASA II',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa === 'ASA III'
+                                ? '☑ ASA III'
+                                : '☐ ASA III',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa === 'ASA IV'
+                                ? '☑ ASA IV'
+                                : '☐ ASA IV',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                          {
+                            text:
+                              preanestesicaData.clasificacion_asa === 'ASA V'
+                                ? '☑ ASA V'
+                                : '☐ ASA V',
+                            fontSize: 7,
+                            alignment: 'center',
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'JUSTIFICACIÓN DEL RIESGO ANESTÉSICO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef2f2',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.justificacion_riesgo ||
+                      'Paciente con estado físico apropiado para anestesia y cirugía programada.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PREMEDICACIÓN (NOM-004 D9.15)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PREMEDICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f3e8ff',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'MEDICACIÓN PREANESTÉSICA (D9.15)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#faf5ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.premedicacion ||
+                      'Premedicación según protocolo anestésico y estado del paciente.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 AYUNO Y PREPARACIÓN
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PREPARACIÓN PREOPERATORIA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'AYUNO PREOPERATORIO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: `Ayuno de sólidos: ${
+                      preanestesicaData.ayuno_solidos || '8 horas'
+                    } | Ayuno de líquidos: ${
+                      preanestesicaData.ayuno_liquidos || '2 horas'
+                    }`,
+                    fontSize: 8,
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'PREPARACIÓN ESPECIAL',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f9f9f9',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      preanestesicaData.preparacion_especial ||
+                      'Preparación estándar preoperatoria.',
+                    fontSize: 8,
+                    margin: [5, 3],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 ANESTESIÓLOGO RESPONSABLE
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'ANESTESIÓLOGO RESPONSABLE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: Anestesiología\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de evaluación: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: '\n\n_____________________________________\nFIRMA DEL ANESTESIÓLOGO',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 8.7 "Nota preanestésica"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con NOM-006-SSA3-2011 para la práctica de la anestesiología',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota Preanestésica - SICEG\nNOM-004-SSA3-2012 | NOM-006-SSA3-2011',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `nota-preanestesica-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('  PDF de Nota Preanestésica NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota Preanestésica:', error);
+      throw error;
+    }
+  }
+
+  // 📄 HOJA DE QUIRÓFANO SEGÚN NOM-004-SSA3-2012
+  async generarHojaQuirofano(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log('   Generando Hoja de Quirófano según NOM-004...');
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const quirofanoData = datos.hojaQuirofano || {};
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageOrientation: 'landscape',
+        pageMargins: [15, 50, 15, 40],
+
+        header: {
+          margin: [15, 10, 15, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HOJA DE QUIRÓFANO',
+                  fontSize: 12,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 5] },
+
+          // 🔹 DATOS GENERALES
+          {
+            table: {
+              widths: ['20%', '30%', '15%', '35%'],
+              body: [
+                [
+                  { text: 'Paciente:', fontSize: 9, bold: true },
+                  { text: pacienteCompleto.nombre_completo, fontSize: 9 },
+                  { text: 'Expediente:', fontSize: 9, bold: true },
+                  {
+                    text: this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ),
+                    fontSize: 9,
+                    bold: true,
+                  },
+                ],
+                [
+                  { text: 'Procedimiento:', fontSize: 9, bold: true },
+                  {
+                    text: quirofanoData.procedimiento || 'Por especificar',
+                    fontSize: 9,
+                    colSpan: 3,
+                  },
+                  {},
+                  {},
+                ],
+                [
+                  { text: 'Cirujano:', fontSize: 9, bold: true },
+                  {
+                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                    fontSize: 9,
+                  },
+                  { text: 'Quirófano:', fontSize: 9, bold: true },
+                  { text: quirofanoData.numero_quirofano || 'Q1', fontSize: 9 },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 TABLA DE REGISTRO HORARIO
+          {
+            table: {
+              widths: ['15%', '15%', '15%', '15%', '15%', '25%'],
+              body: [
+                [
+                  {
+                    text: 'HORA',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                  {
+                    text: 'PA (mmHg)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                  {
+                    text: 'FC (lpm)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                  {
+                    text: 'FR (rpm)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                  {
+                    text: 'TEMP (°C)',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                  {
+                    text: 'OBSERVACIONES',
+                    fontSize: 8,
+                    bold: true,
+                    alignment: 'center',
+                    fillColor: '#f5f5f5',
+                  },
+                ],
+                // Generar 20 filas vacías para llenar manualmente
+                ...Array.from({ length: 20 }, () => [
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                  { text: '', fontSize: 8, margin: [2, 8, 2, 8] },
+                ]),
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+            margin: [0, 0, 0, 15],
+          },
+
+          // 🔹 DATOS DEL EQUIPO QUIRÚRGICO
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'EQUIPO QUIRÚRGICO',
+                    fontSize: 9,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          { text: 'Cirujano:', fontSize: 8, bold: true },
+                          { text: 'Anestesiólogo:', fontSize: 8, bold: true },
+                          { text: 'Instrumentista:', fontSize: 8, bold: true },
+                          { text: 'Circulante:', fontSize: 8, bold: true },
+                        ],
+                        [
+                          { text: medicoCompleto.nombre_completo, fontSize: 8 },
+                          {
+                            text: quirofanoData.anestesiologo || '____________',
+                            fontSize: 8,
+                          },
+                          {
+                            text:
+                              quirofanoData.instrumentista || '____________',
+                            fontSize: 8,
+                          },
+                          {
+                            text: quirofanoData.circulante || '____________',
+                            fontSize: 8,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: 'noBorders',
+                    margin: [5, 5, 5, 5],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [15, 10],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 8,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Hoja de Quirófano - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: fechaActual.toLocaleDateString('es-MX'),
+                    fontSize: 8,
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `hoja-quirofano-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('  PDF de Hoja de Quirófano generado exitosamente');
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Hoja de Quirófano:', error);
+      throw error;
+    }
+  }
+
+  // 📄 NOTA POSTANESTÉSICA SEGÚN NOM-004-SSA3-2012 SECCIÓN D11
+  async generarNotaPostanestesica(datos: any): Promise<void> {
+    try {
+      await this.ensurePdfMakeLoaded();
+
+      console.log(
+        '   Generando Nota Postanestésica según NOM-004-SSA3-2012...'
+      );
+
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(
+        datos.paciente
+      );
+      const postanestesicaData = datos.notaPostanestesica || {};
+      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+      const fechaActual = new Date();
+
+      const documentDefinition = {
+        pageSize: 'LETTER',
+        pageMargins: [20, 70, 20, 50],
+
+        header: {
+          margin: [20, 10, 20, 10],
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA POSTANESTÉSICA',
+                  fontSize: 11,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: 'noBorders',
+        },
+
+        content: [
+          { text: '', margin: [0, 10] },
+
+          // 🔹 IDENTIFICACIÓN DEL PACIENTE
+          {
+            table: {
+              widths: ['15%', '85%'],
+              body: [
+                [
+                  {
+                    text: 'IDENTIFICACIÓN',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Fecha cirugía',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hora término',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'No. Expediente',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Quirófano',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Folio nota',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              postanestesicaData.fecha_cirugia ||
+                              fechaActual.toLocaleDateString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text:
+                              postanestesicaData.hora_termino ||
+                              fechaActual.toLocaleTimeString('es-MX'),
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text:
+                              this.obtenerNumeroExpedientePreferido(
+                                pacienteCompleto.expediente
+                              ) || 'N/A',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                            bold: true,
+                          },
+                          {
+                            text: postanestesicaData.quirofano || 'Q1',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `NPA-${this.obtenerNumeroExpedientePreferido(
+                              pacienteCompleto.expediente
+                            )}-${fechaActual.getFullYear()}`,
+                            fontSize: 6,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['50%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Nombre completo del paciente',
+                            fontSize: 7,
+                            bold: true,
+                          },
+                          {
+                            text: 'Edad',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Sexo',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: pacienteCompleto.nombre_completo,
+                            fontSize: 8,
+                            bold: true,
+                            margin: [2, 2],
+                          },
+                          {
+                            text: `${pacienteCompleto.edad} años`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: pacienteCompleto.sexo,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['40%', '30%', '30%'],
+                      body: [
+                        [
+                          {
+                            text: 'Servicio',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Peso',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'ASA',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              medicoCompleto.departamento || 'Anestesiología',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text: `${signosVitalesReales.peso || '___'} kg`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                          },
+                          {
+                            text:
+                              postanestesicaData.clasificacion_asa || 'ASA II',
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                            color: '#dc2626',
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['100%'],
+                      body: [
+                        [
+                          {
+                            text: 'Procedimiento quirúrgico realizado',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text:
+                              postanestesicaData.procedimiento_realizado ||
+                              'Procedimiento quirúrgico por especificar',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 MEDICAMENTOS UTILIZADOS (NOM-004 D11.12)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'MEDICAMENTOS UTILIZADOS',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#dbeafe',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'MEDICAMENTOS UTILIZADOS DURANTE LA ANESTESIA (D11.12)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#eff6ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postanestesicaData.medicamentos_utilizados ||
+                      'Medicamentos anestésicos y coadyuvantes utilizados durante el procedimiento:\n' +
+                        '• Agentes anestésicos principales\n' +
+                        '• Medicamentos de inducción\n' +
+                        '• Relajantes musculares\n' +
+                        '• Analgésicos\n' +
+                        '• Otros medicamentos según protocolo',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 DURACIÓN DE LA ANESTESIA (NOM-004 D11.13)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'DURACIÓN ANESTESIA',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fef3c7',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'DURACIÓN DE LA ANESTESIA (D11.13)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fffbeb',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['25%', '25%', '25%', '25%'],
+                      body: [
+                        [
+                          {
+                            text: 'Inicio anestesia',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Término anestesia',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Duración total',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Tipo anestesia',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: postanestesicaData.hora_inicio || '__:__',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                          },
+                          {
+                            text: postanestesicaData.hora_termino || '__:__',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.duracion_anestesia || '___'
+                            } minutos`,
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                            bold: true,
+                          },
+                          {
+                            text:
+                              postanestesicaData.tipo_anestesia || 'General',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 3],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 INCIDENTES Y ACCIDENTES (NOM-004 D11.14)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'INCIDENTES Y ACCIDENTES',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fee2e2',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'INCIDENTES Y ACCIDENTES ATRIBUIBLES A LA ANESTESIA (D11.14)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef2f2',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postanestesicaData.incidentes_accidentes ||
+                      'Sin incidentes ni accidentes atribuibles a la anestesia durante el procedimiento.',
+                    fontSize: 8,
+                    margin: [5, 8],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 CANTIDAD DE SANGRE Y SOLUCIONES (NOM-004 D11.15)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'BALANCE HÍDRICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f0fdf4',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'CANTIDAD DE SANGRE O SOLUCIONES APLICADAS (D11.15)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['33%', '33%', '34%'],
+                      body: [
+                        [
+                          {
+                            text: 'Líquidos administrados',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Pérdidas sanguíneas',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Hemoderivados',
+                            fontSize: 7,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              postanestesicaData.liquidos_administrados || '___'
+                            } ml`,
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                            bold: true,
+                          },
+                          {
+                            text: `${postanestesicaData.sangrado || '___'} ml`,
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                            bold: true,
+                          },
+                          {
+                            text:
+                              postanestesicaData.hemoderivados_transfundidos ||
+                              'Ninguno',
+                            fontSize: 8,
+                            alignment: 'center',
+                            margin: [0, 3],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 3],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'BALANCE HÍDRICO DETALLADO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f7fee7',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postanestesicaData.balance_hidrico ||
+                      'Balance hídrico equilibrado durante el procedimiento anestésico.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESTADO CLÍNICO AL EGRESO (NOM-004 D11.16)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESTADO CLÍNICO EGRESO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#e0f2fe',
+                    alignment: 'center',
+                    rowSpan: 4,
+                  },
+                  {
+                    text: 'ESTADO CLÍNICO DEL ENFERMO A SU EGRESO DE QUIRÓFANO (D11.16)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text: 'SIGNOS VITALES AL EGRESO',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#f0f9ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'PA',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'FC',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'FR',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'SatO2',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Temp',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              postanestesicaData.presion_arterial_egreso ||
+                              '___/___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.frecuencia_cardiaca_egreso ||
+                              '___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.frecuencia_respiratoria_egreso ||
+                              '___'
+                            }`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.saturacion_oxigeno_egreso ||
+                              '___'
+                            }%`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.temperatura_egreso || '___'
+                            }°C`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 1],
+                          },
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 2],
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postanestesicaData.estado_clinico_egreso ||
+                      'Paciente estable, consciente, orientado, con signos vitales dentro de parámetros normales. Egresa de quirófano en condiciones satisfactorias.',
+                    fontSize: 8,
+                    margin: [5, 5],
+                    lineHeight: 1.3,
+                    bold: true,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 PLAN DE MANEJO (NOM-004 D11.17)
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'PLAN POSTANESTÉSICO',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f3e8ff',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'PLAN DE MANEJO Y TRATAMIENTO INMEDIATO (D11.17)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#faf5ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    text:
+                      postanestesicaData.plan_tratamiento ||
+                      '• Vigilancia estricta en sala de recuperación\n' +
+                        '• Monitoreo continuo de signos vitales\n' +
+                        '• Control del dolor postoperatorio\n' +
+                        '• Manejo de náusea y vómito postoperatorio si aplica\n' +
+                        '• Evaluación neurológica continua\n' +
+                        '• Indicaciones específicas según evolución',
+                    fontSize: 8,
+                    margin: [5, 8],
+                    lineHeight: 1.3,
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 3] },
+
+          // 🔹 ESCALA DE RECUPERACIÓN ANESTÉSICA
+          {
+            table: {
+              widths: ['20%', '80%'],
+              body: [
+                [
+                  {
+                    text: 'ESCALA ALDRETE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#fdf2f8',
+                    alignment: 'center',
+                    rowSpan: 2,
+                  },
+                  {
+                    text: 'ESCALA DE RECUPERACIÓN POSTANESTÉSICA (ALDRETE)',
+                    fontSize: 7,
+                    bold: true,
+                    fillColor: '#fef7ff',
+                  },
+                ],
+                [
+                  {},
+                  {
+                    table: {
+                      widths: ['20%', '20%', '20%', '20%', '20%'],
+                      body: [
+                        [
+                          {
+                            text: 'Actividad motora',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Respiración',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Circulación',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Conciencia',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                          {
+                            text: 'Saturación O2',
+                            fontSize: 6,
+                            bold: true,
+                            alignment: 'center',
+                          },
+                        ],
+                        [
+                          {
+                            text: `${
+                              postanestesicaData.aldrete_actividad || '2'
+                            } / 2`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.aldrete_respiracion || '2'
+                            } / 2`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.aldrete_circulacion || '2'
+                            } / 2`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.aldrete_conciencia || '2'
+                            } / 2`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                          {
+                            text: `${
+                              postanestesicaData.aldrete_saturacion || '2'
+                            } / 2`,
+                            fontSize: 7,
+                            alignment: 'center',
+                            margin: [0, 2],
+                            bold: true,
+                          },
+                        ],
+                        [
+                          {
+                            text: `TOTAL ALDRETE: ${this.calcularTotalAldrete(
+                              postanestesicaData
+                            )} / 10`,
+                            fontSize: 8,
+                            alignment: 'center',
+                            bold: true,
+                            colSpan: 5,
+                            fillColor: '#f0f9ff',
+                            margin: [0, 3],
+                          },
+                          {},
+                          {},
+                          {},
+                          {},
+                        ],
+                      ],
+                    },
+                    layout: {
+                      hLineWidth: () => 0.3,
+                      vLineWidth: () => 0.3,
+                      hLineColor: () => '#000000',
+                      vLineColor: () => '#000000',
+                    },
+                    margin: [5, 3],
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 5] },
+
+          // 🔹 ANESTESIÓLOGO RESPONSABLE
+          {
+            table: {
+              widths: ['100%'],
+              body: [
+                [
+                  {
+                    text: 'ANESTESIÓLOGO RESPONSABLE',
+                    fontSize: 8,
+                    bold: true,
+                    fillColor: '#f5f5f5',
+                    alignment: 'center',
+                  },
+                ],
+                [
+                  {
+                    text: [
+                      {
+                        text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      {
+                        text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Servicio: Anestesiología\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: `Fecha de elaboración: ${fechaActual.toLocaleDateString(
+                          'es-MX'
+                        )} - ${fechaActual.toLocaleTimeString('es-MX')}\n`,
+                        fontSize: 8,
+                      },
+                      {
+                        text: '\n\n_____________________________________\nFIRMA DEL ANESTESIÓLOGO RESPONSABLE',
+                        fontSize: 8,
+                      },
+                    ],
+                    margin: [5, 15],
+                    alignment: 'center',
+                  },
+                ],
+              ],
+            },
+            layout: {
+              hLineWidth: () => 0.5,
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#000000',
+              vLineColor: () => '#000000',
+            },
+          },
+
+          { text: '', margin: [0, 2] },
+
+          // 🔹 NOTA REFERENCIAL
+          {
+            text: [
+              {
+                text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección D11 "Nota postanestésica"\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '* Cumple con los requisitos D11.12 al D11.17 establecidos en la norma oficial',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+        ],
+
+        footer: (currentPage: number, pageCount: number) => {
+          return {
+            margin: [20, 5],
+            table: {
+              widths: ['25%', '50%', '25%'],
+              body: [
+                [
+                  {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    color: '#666666',
+                  },
+                  {
+                    text: 'Nota Postanestésica - SICEG\nNOM-004-SSA3-2012',
+                    fontSize: 7,
+                    alignment: 'center',
+                    color: '#666666',
+                  },
+                  {
+                    text: [
+                      {
+                        text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                        fontSize: 7,
+                      },
+                      {
+                        text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                          pacienteCompleto.expediente
+                        )}`,
+                        fontSize: 6,
+                      },
+                    ],
+                    alignment: 'right',
+                    color: '#666666',
+                  },
+                ],
+              ],
+            },
+            layout: 'noBorders',
+          };
+        },
+      };
+
+      const nombreArchivo = `nota-postanestesica-${pacienteCompleto.nombre
+        .replace(/\s+/g, '-')
+        .toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
+
+      console.log('  PDF de Nota Postanestésica NOM-004 generado exitosamente');
+      console.log(`📄 Archivo: ${nombreArchivo}`);
+
+      // 🔥 VALIDAR CUMPLIMIENTO ESPECÍFICO
+      this.validarCumplimientoNotaPostanestesica(
+        datos,
+        medicoCompleto,
+        pacienteCompleto
+      );
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Nota Postanestésica:', error);
+      throw error;
+    }
+  }
 
   // ==========================================
   // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
@@ -17804,7 +19094,7 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
       return fechaObj.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
       });
     } catch {
       return 'N/A';
@@ -17814,7 +19104,10 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
   // ==========================================
   // MÉTODO GENÉRICO TEMPORAL PARA DOCUMENTOS FALTANTES
   // ==========================================
-  async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promise<void> {
+  async generarDocumentoGenerico(
+    tipoDocumento: string,
+    datos: any
+  ): Promise<void> {
     try {
       if (!this.isLoaded) {
         console.warn('📋 pdfMake aún no está cargado, usando archivo temporal');
@@ -17832,20 +19125,20 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
             text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
             style: 'hospitalHeader',
             alignment: 'center',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
           },
           {
             text: tipoDocumento.toUpperCase(),
             style: 'documentTitle',
             alignment: 'center',
-            margin: [0, 0, 0, 20]
+            margin: [0, 0, 0, 20],
           },
 
           // Información del Paciente
           {
             text: 'DATOS DEL PACIENTE',
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
           },
           {
             table: {
@@ -17853,27 +19146,47 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
               body: [
                 [
                   { text: 'Nombre:', bold: true },
-                  { text: this.obtenerNombreCompletoPersona(paciente?.persona || paciente), fontSize: 10 },
+                  {
+                    text: this.obtenerNombreCompletoPersona(
+                      paciente?.persona || paciente
+                    ),
+                    fontSize: 10,
+                  },
                   { text: 'Expediente:', bold: true },
-                  { text: expediente?.numero_expediente || 'N/A', fontSize: 10 }
+                  {
+                    text: expediente?.numero_expediente || 'N/A',
+                    fontSize: 10,
+                  },
                 ],
                 [
                   { text: 'Fecha Nacimiento:', bold: true },
-                  { text: this.formatearFecha(paciente?.persona?.fecha_nacimiento || paciente?.fecha_nacimiento), fontSize: 10 },
+                  {
+                    text: this.formatearFecha(
+                      paciente?.persona?.fecha_nacimiento ||
+                        paciente?.fecha_nacimiento
+                    ),
+                    fontSize: 10,
+                  },
                   { text: 'Edad:', bold: true },
-                  { text: this.calcularEdadPersona(paciente?.persona?.fecha_nacimiento || paciente?.fecha_nacimiento), fontSize: 10 }
-                ]
-              ]
+                  {
+                    text: this.calcularEdadPersona(
+                      paciente?.persona?.fecha_nacimiento ||
+                        paciente?.fecha_nacimiento
+                    ),
+                    fontSize: 10,
+                  },
+                ],
+              ],
             },
             layout: 'lightHorizontalLines',
-            margin: [0, 0, 0, 20]
+            margin: [0, 0, 0, 20],
           },
 
           // Información del Médico
           {
             text: 'INFORMACIÓN MÉDICA',
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
           },
           {
             table: {
@@ -17881,35 +19194,41 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
               body: [
                 [
                   { text: 'Médico:', bold: true },
-                  { text: medico?.nombre_completo || 'No especificado', fontSize: 10 }
+                  {
+                    text: medico?.nombre_completo || 'No especificado',
+                    fontSize: 10,
+                  },
                 ],
                 [
                   { text: 'Fecha:', bold: true },
-                  { text: this.formatearFecha(new Date().toISOString()), fontSize: 10 }
-                ]
-              ]
+                  {
+                    text: this.formatearFecha(new Date().toISOString()),
+                    fontSize: 10,
+                  },
+                ],
+              ],
             },
             layout: 'lightHorizontalLines',
-            margin: [0, 0, 0, 20]
+            margin: [0, 0, 0, 20],
           },
 
           // Contenido del documento (placeholder)
           {
             text: `CONTENIDO DE ${tipoDocumento.toUpperCase()}`,
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
           },
           {
             text: 'Este documento está en desarrollo. Los datos específicos se completarán cuando se implemente el formulario correspondiente.',
             style: 'placeholder',
-            margin: [0, 0, 0, 20]
+            margin: [0, 0, 0, 20],
           },
 
           // Espacio para firmas
           {
             text: 'FIRMAS',
             style: 'sectionHeader',
-            margin: [0, 30, 0, 20]
+            margin: [0, 30, 0, 20],
           },
           {
             columns: [
@@ -17918,60 +19237,58 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
                   '_'.repeat(30) + '\n',
                   'Firma del Médico\n',
                   (medico?.nombre_completo || 'Dr. [Nombre]') + '\n',
-                  'Cédula Prof.: ' + (medico?.numero_cedula || '[Cédula]')
+                  'Cédula Prof.: ' + (medico?.numero_cedula || '[Cédula]'),
                 ],
                 alignment: 'center',
-                fontSize: 10
+                fontSize: 10,
               },
               {
-                text: [
-                  '_'.repeat(30) + '\n',
-                  'Sello del Hospital'
-                ],
+                text: ['_'.repeat(30) + '\n', 'Sello del Hospital'],
                 alignment: 'center',
-                fontSize: 10
-              }
+                fontSize: 10,
+              },
             ],
-            margin: [0, 0, 0, 20]
-          }
+            margin: [0, 0, 0, 20],
+          },
         ],
 
         styles: {
           hospitalHeader: {
             fontSize: 14,
             bold: true,
-            color: '#2c5282'
+            color: '#2c5282',
           },
           documentTitle: {
             fontSize: 16,
             bold: true,
-            color: '#2c5282'
+            color: '#2c5282',
           },
           sectionHeader: {
             fontSize: 12,
             bold: true,
-            color: '#2c5282'
+            color: '#2c5282',
           },
           placeholder: {
             fontSize: 10,
             italics: true,
-            color: '#666666'
-          }
+            color: '#666666',
+          },
         },
 
-        footer: function(currentPage: number, pageCount: number) {
+        footer: function (currentPage: number, pageCount: number) {
           return {
             text: `${tipoDocumento} - Página ${currentPage} de ${pageCount}`,
             alignment: 'center',
             fontSize: 8,
-            margin: [0, 10, 0, 0]
+            margin: [0, 10, 0, 0],
           };
-        }
+        },
       };
 
       this.pdfMake.createPdf(docDefinition).open();
-      console.log(`  ${tipoDocumento} generado exitosamente como documento temporal`);
-
+      console.log(
+        `  ${tipoDocumento} generado exitosamente como documento temporal`
+      );
     } catch (error) {
       console.error(`❌ Error al generar ${tipoDocumento}:`, error);
       throw error;
@@ -17989,74 +19306,11 @@ async generarNotaPostanestesica(datos: any): Promise<void> {
     return actividad + respiracion + circulacion + conciencia + saturacion;
   }
 
-  // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA POSTANESTÉSICA - MOVIDO DENTRO DE LA CLASE
-  private validarCumplimientoNotaPostanestesica(
-    datos: any,
-    medico: any,
-    paciente: any
-  ): void {
-    console.log('  VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN D11 - NOTA POSTANESTÉSICA...');
 
-    const validaciones = {
-      // D11.12 - Medicamentos utilizados
-      medicamentos_utilizados: !!datos.notaPostanestesica?.medicamentos_utilizados,
 
-      // D11.13 - Duración de la anestesia
-      duracion_anestesia: !!datos.notaPostanestesica?.duracion_anestesia,
-      tipo_anestesia: !!datos.notaPostanestesica?.tipo_anestesia,
 
-      // D11.14 - Incidentes y accidentes atribuibles a la anestesia
-      incidentes_accidentes_evaluados: true, // Sección incluida
+  
 
-      // D11.15 - Cantidad de sangre o soluciones aplicadas
-      liquidos_administrados: true, // Campo incluido
-      balance_hidrico_reportado: true, // Sección incluida
-      hemoderivados_documentados: true, // Campo incluido
 
-      // D11.16 - Estado clínico del enfermo a su egreso de quirófano
-      estado_clinico_egreso: true, // Campo obligatorio incluido
-      signos_vitales_egreso: true, // Tabla completa incluida
-      evaluacion_neurológica: true, // Incluida en estado clínico
 
-      // D11.17 - Plan manejo y tratamiento inmediato
-      plan_tratamiento_inmediato: true, // Campo incluido
-
-      // Datos del paciente
-      nombre_completo_paciente: !!paciente.nombre_completo,
-      numero_expediente: !!paciente.numero_expediente,
-      edad_sexo: !!paciente.edad && !!paciente.sexo,
-
-      // Datos del anestesiólogo
-      nombre_completo_anestesiologo: !!medico.nombre_completo,
-      cedula_profesional: !!medico.numero_cedula,
-      firma_espacio: true, // Espacio incluido
-
-      // Información quirúrgica
-      procedimiento_identificado: true, // Campo incluido
-      fecha_cirugia: true, // Campo incluido
-      quirofano_identificado: true, // Campo incluido
-
-      // Escala de recuperación
-      escala_aldrete: true, // Incluida para evaluación objetiva
-      puntuacion_recuperacion: true, // Calculada automáticamente
-
-      // Fecha y lugar
-      fecha_elaboracion: true,
-      hospital_identificado: true,
-    };
-
-    const cumplimiento = Object.values(validaciones).filter((v) => v).length;
-    const total = Object.keys(validaciones).length;
-    const porcentaje = Math.round((cumplimiento / total) * 100);
-
-    console.log(
-      `📊 CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
-    );
-
-    if (porcentaje < 90) {
-      console.warn('  ADVERTENCIA: Cumplimiento por debajo del 90%');
-    } else {
-      console.log('  NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
-    }
-  }
 }

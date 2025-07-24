@@ -970,7 +970,7 @@ export class Login implements OnInit, OnDestroy {
     }
   }
 
-  // 🏥 Consejos de salud profesionales
+  //    Consejos de salud profesionales
   private async loadHealthTips(): Promise<void> {
     try {
       const response = await fetch(

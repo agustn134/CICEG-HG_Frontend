@@ -77,7 +77,7 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('🏥 Módulo de Pacientes SICEG-HG inicializado');
+    console.log('   Módulo de Pacientes SICEG-HG inicializado');
     this.inicializarComponente();
     this.configurarBusquedaEnTiempoReal();
     this.suscribirAEstadoDelServicio();

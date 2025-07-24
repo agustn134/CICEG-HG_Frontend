@@ -90,7 +90,7 @@ export class Dashboard implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🏥 Dashboard SICEG-HG inicializado correctamente');
+    console.log('   Dashboard SICEG-HG inicializado correctamente');
     this.inicializarDashboard();
   }
 

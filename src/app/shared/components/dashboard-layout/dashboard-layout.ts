@@ -551,12 +551,12 @@ onDropdownItemClick(action: string, event: Event): void {
   }
 
   // private handleProfileClick(): void {
-  //   console.log('🏥 Abriendo perfil del usuario');
+  //   console.log('   Abriendo perfil del usuario');
   //  this.router.navigate(['/app/personas/administradores']);
   // }
 // En dashboard-layout.component.ts, cambiar handleProfileClick():
 private handleProfileClick(): void {
-  console.log('🏥 Abriendo perfil del usuario');
+  console.log('   Abriendo perfil del usuario');
 
   if (this.currentUser?.tipo_usuario === 'medico') {
     // Ir al perfil médico
