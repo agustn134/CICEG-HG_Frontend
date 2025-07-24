@@ -289,6 +289,199 @@ tamizajeNeonatalForm!: FormGroup;
 
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
+  
+  // Propiedades para navegación mejorada
+  grupoExpandido: string | null = 'basicos';
+  mostrarTodosFormularios = false;
+  busquedaFormulario = '';
+  filtroActivo: 'todos' | 'frecuentes' | 'obligatorios' = 'todos';
+  formulariosVisibles: string[] = [];
+
+  // Configuración de grupos de formularios
+  gruposFormularios = {
+    basicos: {
+      nombre: 'Documentos Básicos',
+      icono: 'fas fa-file-medical',
+      color: 'blue',
+      formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion']
+    },
+    quirurgicos: {
+      nombre: 'Documentos Quirúrgicos',
+      icono: 'fas fa-procedures',
+      color: 'orange',
+      formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica']
+    },
+    solicitudes: {
+      nombre: 'Solicitudes de Estudios',
+      icono: 'fas fa-vial',
+      color: 'green',
+      formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']
+    },
+    pediatricos: {
+      nombre: 'Documentos Pediátricos',
+      icono: 'fas fa-baby',
+      color: 'pink',
+      formularios: ['controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz'],
+      condition: () => this.esPacientePediatrico
+    },
+    prescripciones: {
+      nombre: 'Prescripciones',
+      icono: 'fas fa-pills',
+      color: 'purple',
+      formularios: ['prescripcionMedicamento', 'registroTransfusion']
+    },
+    especiales: {
+      nombre: 'Documentos Especiales',
+      icono: 'fas fa-folder-open',
+      color: 'gray',
+      formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado']
+    }
+  };
+
+  // Configuración de formularios con metadata
+  configFormularios: { [key: string]: any } = {
+    signosVitales: { 
+      nombre: 'Signos Vitales', 
+      icono: 'fas fa-heartbeat', 
+      obligatorio: true, 
+      frecuente: true,
+      completado: false 
+    },
+    historiaClinica: { 
+      nombre: 'Historia Clínica', 
+      icono: 'fas fa-file-medical-alt', 
+      obligatorio: true, 
+      frecuente: true,
+      completado: false 
+    },
+    notaUrgencias: { 
+      nombre: 'Nota Urgencias', 
+      icono: 'fas fa-ambulance', 
+      obligatorio: true, 
+      frecuente: true,
+      completado: false 
+    },
+    notaEvolucion: { 
+      nombre: 'Evolución', 
+      icono: 'fas fa-chart-line', 
+      obligatorio: false, 
+      frecuente: true,
+      completado: false 
+    },
+    notaPreoperatoria: { 
+      nombre: 'Preoperatoria', 
+      icono: 'fas fa-user-md', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    notaPreanestesica: { 
+      nombre: 'Preanestésica', 
+      icono: 'fas fa-syringe', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    notaPostoperatoria: { 
+      nombre: 'Postoperatoria', 
+      icono: 'fas fa-bed', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    notaPostanestesica: { 
+      nombre: 'Postanestésica', 
+      icono: 'fas fa-clock', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    consentimiento: { 
+      nombre: 'Consentimiento', 
+      icono: 'fas fa-signature', 
+      obligatorio: true, 
+      frecuente: false,
+      completado: false 
+    },
+    solicitudEstudio: { 
+      nombre: 'Solicitud Estudio', 
+      icono: 'fas fa-microscope', 
+      obligatorio: false, 
+      frecuente: true,
+      completado: false 
+    },
+    solicitudCultivo: { 
+      nombre: 'Solicitud Cultivo', 
+      icono: 'fas fa-flask', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    solicitudGasometria: { 
+      nombre: 'Gasometría', 
+      icono: 'fas fa-lungs', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    controlCrecimiento: { 
+      nombre: 'Control Crecimiento', 
+      icono: 'fas fa-child', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    esquemaVacunacion: { 
+      nombre: 'Vacunas', 
+      icono: 'fas fa-shield-alt', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    desarrolloPsicomotriz: { 
+      nombre: 'Desarrollo', 
+      icono: 'fas fa-brain', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    prescripcionMedicamento: { 
+      nombre: 'Prescripción', 
+      icono: 'fas fa-prescription-bottle-alt', 
+      obligatorio: false, 
+      frecuente: true,
+      completado: false 
+    },
+    registroTransfusion: { 
+      nombre: 'Transfusión', 
+      icono: 'fas fa-tint', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    hojaFrontal: { 
+      nombre: 'Hoja Frontal', 
+      icono: 'fas fa-file-alt', 
+      obligatorio: true, 
+      frecuente: false,
+      completado: false 
+    },
+    altaVoluntaria: { 
+      nombre: 'Alta Voluntaria', 
+      icono: 'fas fa-door-open', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    },
+    referenciaTraslado: { 
+      nombre: 'Referencia', 
+      icono: 'fas fa-share', 
+      obligatorio: false, 
+      frecuente: false,
+      completado: false 
+    }
+  };
+
   formularioEstado: FormularioEstado = {
     signosVitales: false,
     historiaClinica: false,
@@ -1198,45 +1391,85 @@ private obtenerIdMedicoActual(): number | undefined {
   documentosDisponiblesFiltrados: TipoDocumentoConfig[] = [];
 
 
-  private inicializarFormularios(): void {
-    // Formularios clínicos principales
-    this.signosVitalesForm = this.initializeSignosVitalesForm();
-    this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
-    this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
-    this.notaEvolucionForm = this.initializeNotaEvolucionForm();
+//   private inicializarFormularios(): void {
+//     // Formularios clínicos principales
+//     this.signosVitalesForm = this.initializeSignosVitalesForm();
+//     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
+//     this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
+//     this.notaEvolucionForm = this.initializeNotaEvolucionForm();
 
-    // Formularios de consentimiento y procedimientos
-    this.consentimientoForm = this.initializeConsentimientoForm();
-    this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
-    this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
-    this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
-    this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
+//     // Formularios de consentimiento y procedimientos
+//     this.consentimientoForm = this.initializeConsentimientoForm();
+//     this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
+//     this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
+//     this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
+//     this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
 
-    // Formularios adicionales
-    this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
-    this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
-    this.prescripcionForm = this.initializePrescripcionForm();
-    this.referenciaForm = this.initializeReferenciaForm();
-    this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
-    this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
+//     // Formularios adicionales
+//     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
+//     this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
+//     this.prescripcionForm = this.initializePrescripcionForm();
+//     this.referenciaForm = this.initializeReferenciaForm();
+//     this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
+//     this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
 
-     // Formularios pediátricos
+//      // Formularios pediátricos
+//   this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
+//   this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
+//   this.historiaClinicaPediatricaForm = this.initializeHistoriaClinicaPediatricaForm();
+//   this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
+//   this.alimentacionPediatricaForm = this.initializeAlimentacionPediatricaForm();
+//   this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
+// // Dentro de inicializarFormularios() o una función similar
+// this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
+// this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
+// this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
+// this.inmunizacionesForm = this.initializeInmunizacionesForm();
+// this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
+//     console.log(
+//       '- Todos los formularios han sido inicializados correctamente.'
+//     );
+//   }
+
+private inicializarFormularios(): void {
+  // Formularios clínicos principales (EXISTENTES)
+  this.signosVitalesForm = this.initializeSignosVitalesForm();
+  this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
+  this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
+  this.notaEvolucionForm = this.initializeNotaEvolucionForm();
+
+  // Formularios de consentimiento y procedimientos (EXISTENTES)
+  this.consentimientoForm = this.initializeConsentimientoForm();
+  this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
+  this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
+  this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
+  this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
+
+  // Formularios adicionales (EXISTENTES)
+  this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
+  
+  // 🔥 CORREGIR: Estos ya están definidos pero faltaba inicializarlos aquí
+  this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
+  this.prescripcionForm = this.initializePrescripcionForm();
+  this.referenciaForm = this.initializeReferenciaForm();
   this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
   this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
+
+  // Formularios pediátricos (EXISTENTES)
   this.historiaClinicaPediatricaForm = this.initializeHistoriaClinicaPediatricaForm();
   this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
   this.alimentacionPediatricaForm = this.initializeAlimentacionPediatricaForm();
   this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
-// Dentro de inicializarFormularios() o una función similar
-this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
-this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
-this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
-this.inmunizacionesForm = this.initializeInmunizacionesForm();
-this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
-    console.log(
-      '- Todos los formularios han sido inicializados correctamente.'
-    );
-  }
+  this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
+  this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
+  this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
+  this.inmunizacionesForm = this.initializeInmunizacionesForm();
+  this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
+
+  console.log('✅ Todos los formularios han sido inicializados correctamente.');
+}
+
+
 
   private ejecutarSiFormularioValido(callback: (form: Exclude<FormularioActivo, null>) => void): void {
   if (this.formularioActivo !== null) {
@@ -1572,6 +1805,9 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   ngOnInit(): void {
+    // Inicializar navegación mejorada
+    this.inicializarFormulariosVisibles();
+    
     // 1. Suscripción a parámetros de ruta
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -2353,14 +2589,82 @@ this.error = `Error al procesar ${nombreFormulario}`;
     });
   }
 
-  private initializeNotaPostoperatoriaForm(): FormGroup {
-    return this.fb.group({
-      hallazgos_transoperatorios: ['', Validators.required],
-      tecnica_quirurgica: ['', Validators.required],
-      sangrado: [''],
-      complicaciones: [''],
-    });
-  }
+  // private initializeNotaPostoperatoriaForm(): FormGroup {
+  //   return this.fb.group({
+  //     hallazgos_transoperatorios: ['', Validators.required],
+  //     tecnica_quirurgica: ['', Validators.required],
+  //     sangrado: [''],
+  //     complicaciones: [''],
+  //   });
+  // }
+private initializeNotaPostoperatoriaForm(): FormGroup {
+  return this.fb.group({
+    // Información básica
+    fecha_cirugia: ['', Validators.required],
+    duracion_cirugia: [null],
+
+    // Diagnósticos (NOM-004: 8.8.1 y 8.8.4)
+    diagnostico_preoperatorio: ['', Validators.required],
+    diagnostico_postoperatorio: ['', Validators.required],
+
+    // Procedimientos (NOM-004: 8.8.2 y 8.8.3)
+    operacion_planeada: ['', Validators.required],
+    operacion_realizada: ['', Validators.required],
+
+    // Técnica y hallazgos (NOM-004: 8.8.5 y 8.8.6)
+    descripcion_tecnica: ['', Validators.required],
+    hallazgos_transoperatorios: ['', Validators.required],
+
+    // Conteo (NOM-004: 8.8.7)
+    conteo_gasas_completo: ['', Validators.required],
+    conteo_instrumental_completo: ['', Validators.required],
+    observaciones_conteo: [''],
+
+    // Incidentes y sangrado (NOM-004: 8.8.8 y 8.8.9)
+    incidentes_accidentes: ['', Validators.required],
+    sangrado: [0, [Validators.required, Validators.min(0)]],
+    transfusiones_realizadas: [false],
+    detalles_transfusiones: [''],
+
+    // Estudios (NOM-004: 8.8.10)
+    estudios_transoperatorios: ['', Validators.required],
+
+    // Equipo quirúrgico (NOM-004: 8.8.11)
+    cirujano_principal: ['', Validators.required],
+    ayudantes: ['', Validators.required],
+    instrumentista: ['', Validators.required],
+    anestesiologo: ['', Validators.required],
+    circulante: ['', Validators.required],
+
+    // Estado y plan (NOM-004: 8.8.12 y 8.8.13)
+    estado_postquirurgico: ['', Validators.required],
+    plan_postoperatorio: ['', Validators.required],
+
+    // Pronóstico (NOM-004: 8.8.14)
+    pronostico: ['', Validators.required],
+
+    // Piezas (NOM-004: 8.8.15)
+    piezas_enviadas_patologia: ['', Validators.required],
+    se_enviaron_piezas: [false],
+    numero_registro_patologia: [''],
+
+    // Otros hallazgos (NOM-004: 8.8.16)
+    otros_hallazgos: ['', Validators.required],
+
+    // Responsabilidad (NOM-004: 8.8.17)
+    nombre_responsable_cirugia: ['', Validators.required],
+    cedula_responsable_cirugia: [''],
+    especialidad_responsable: [''],
+    firma_responsable_verificada: [false],
+
+    // Información adicional
+    quirofano: [''],
+    tipo_anestesia: [''],
+    hora_inicio: [''],
+    hora_fin: [''],
+    observaciones_adicionales: ['']
+  });
+}
 
   private initializeNotaPreanestesicaForm(): FormGroup {
     return this.fb.group({
@@ -3076,6 +3380,24 @@ createVacunaAdicionalGroup(): FormGroup {
           this.formularioEstado['esquemaVacunacion'] = true;
           break;
 
+        case 'solicitudEstudio':
+        await this.guardarSolicitudEstudio();
+        this.formularioEstado['solicitudEstudio'] = true;
+        this.success = 'Solicitud de Estudio guardada correctamente';
+        break;
+
+      case 'referenciaTraslado':
+        await this.guardarReferenciaTraslado();
+        this.formularioEstado['referenciaTraslado'] = true;
+        this.success = 'Referencia y Traslado guardado correctamente';
+        break;
+
+      case 'prescripcionMedicamento':
+        await this.guardarPrescripcionMedicamento();
+        this.formularioEstado['prescripcionMedicamento'] = true;
+        this.success = 'Prescripción de Medicamentos guardada correctamente';
+        break;
+
       case 'historiaClinicaPediatrica':
         await this.guardarHistoriaClinicaPediatrica();
         this.formularioEstado['historiaClinicaPediatrica'] = true;
@@ -3137,6 +3459,85 @@ private async guardarEsquemaVacunacion(): Promise<void> {
   await firstValueFrom(this.esquemaVacunacionService.registrarVacuna(datosVacunacion));
 }
 
+
+// 🔥 MÉTODOS DE GUARDADO FALTANTES
+private async guardarSolicitudEstudio(): Promise<void> {
+  if (!this.solicitudEstudioForm.valid) {
+    throw new Error('Formulario de solicitud de estudio inválido');
+  }
+
+  const tipoSolicitud = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Solicitud de Estudio'
+  );
+  if (!tipoSolicitud) {
+    throw new Error('Tipo de documento de solicitud de estudio no encontrado');
+  }
+
+  const documentoSolicitud = await this.crearDocumentoEspecifico(
+    tipoSolicitud.id_tipo_documento
+  );
+
+  const solicitudData = {
+    id_documento: documentoSolicitud.id_documento,
+    ...this.solicitudEstudioForm.value,
+  };
+
+  await firstValueFrom(
+    this.solicitudesEstudioService.createSolicitud(solicitudData)
+  );
+}
+
+private async guardarReferenciaTraslado(): Promise<void> {
+  if (!this.referenciaForm.valid) {
+    throw new Error('Formulario de referencia y traslado inválido');
+  }
+
+  const tipoReferencia = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Referencia y Traslado'
+  );
+  if (!tipoReferencia) {
+    throw new Error('Tipo de documento de referencia no encontrado');
+  }
+
+  const documentoReferencia = await this.crearDocumentoEspecifico(
+    tipoReferencia.id_tipo_documento
+  );
+
+  const referenciaData = {
+    id_documento: documentoReferencia.id_documento,
+    ...this.referenciaForm.value,
+  };
+
+  await firstValueFrom(
+    this.referenciasTrasladoService.createReferencia(referenciaData)
+  );
+}
+
+private async guardarPrescripcionMedicamento(): Promise<void> {
+  if (!this.prescripcionForm.valid) {
+    throw new Error('Formulario de prescripción de medicamentos inválido');
+  }
+
+  const tipoPrescripcion = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Prescripción de Medicamentos'
+  );
+  if (!tipoPrescripcion) {
+    throw new Error('Tipo de documento de prescripción no encontrado');
+  }
+
+  const documentoPrescripcion = await this.crearDocumentoEspecifico(
+    tipoPrescripcion.id_tipo_documento
+  );
+
+  const prescripcionData = {
+    id_documento: documentoPrescripcion.id_documento,
+    ...this.prescripcionForm.value,
+  };
+
+  await firstValueFrom(
+    this.prescripcionesMedicamentoService.createPrescripcion(prescripcionData)
+  );
+}
 
 // Método para guardar Historia Clínica Pediátrica
 private async guardarHistoriaClinicaPediatrica(): Promise<void> {
@@ -3619,6 +4020,14 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
       'notaInterconsulta',
       'controlCrecimiento',
       'esquemaVacunacion',
+       // 🔥 AGREGAR LOS FORMULARIOS FALTANTES
+    'solicitudEstudio',
+    'referenciaTraslado',
+    'prescripcionMedicamento',
+    'solicitudCultivo',
+    'solicitudGasometria',
+    'hojaFrontal',
+    'altaVoluntaria'
     ];
 
     if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
@@ -5206,7 +5615,144 @@ get puedeAvanzar(): boolean {
     return 'Datos inválidos';
   }
 
+  // ===============================
+  // MÉTODOS PARA NAVEGACIÓN MEJORADA
+  // ===============================
 
+  private inicializarFormulariosVisibles(): void {
+    this.formulariosVisibles = Object.keys(this.configFormularios);
+  }
 
+  // Método para expandir/contraer grupos
+  toggleGrupo(nombreGrupo: string): void {
+    this.grupoExpandido = this.grupoExpandido === nombreGrupo ? null : nombreGrupo;
+  }
 
+  // Método para mostrar/ocultar todos los formularios
+  toggleMostrarTodos(): void {
+    this.mostrarTodosFormularios = !this.mostrarTodosFormularios;
+    if (this.mostrarTodosFormularios) {
+      this.grupoExpandido = null;
+    }
+  }
+
+  // Filtrado de formularios por búsqueda
+  filtrarFormularios(): void {
+    if (!this.busquedaFormulario.trim()) {
+      this.formulariosVisibles = Object.keys(this.configFormularios);
+      return;
+    }
+
+    const termino = this.busquedaFormulario.toLowerCase();
+    this.formulariosVisibles = Object.keys(this.configFormularios).filter(key =>
+      this.configFormularios[key].nombre.toLowerCase().includes(termino)
+    );
+  }
+
+  // Filtrado por categoría
+  filtrarPorCategoria(categoria: 'todos' | 'frecuentes' | 'obligatorios'): void {
+    this.filtroActivo = categoria;
+    
+    switch (categoria) {
+      case 'frecuentes':
+        this.formulariosVisibles = Object.keys(this.configFormularios)
+          .filter(key => this.configFormularios[key].frecuente);
+        break;
+      case 'obligatorios':
+        this.formulariosVisibles = Object.keys(this.configFormularios)
+          .filter(key => this.configFormularios[key].obligatorio);
+        break;
+      default:
+        this.formulariosVisibles = Object.keys(this.configFormularios);
+    }
+  }
+
+  // Obtener clase CSS para botones de formulario
+  getClaseBotonFormulario(formulario: string): string {
+    const isActive = this.formularioActivo === formulario;
+    const config = this.configFormularios[formulario];
+    
+    if (isActive) {
+      return 'bg-blue-500 text-white shadow-lg transform scale-105';
+    }
+    
+    let clases = 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-300';
+    
+    if (config?.completado) {
+      clases += ' ring-2 ring-green-200';
+    }
+    
+    if (config?.obligatorio && !config?.completado) {
+      clases += ' ring-2 ring-red-200';
+    }
+    
+    return clases;
+  }
+
+  // Obtener grupos visibles (filtrados por condiciones)
+  getGruposVisibles() {
+    return Object.entries(this.gruposFormularios)
+      .filter(([_, grupo]) => !(grupo as any).condition || (grupo as any).condition())
+      .map(([key, data]) => ({ key, data }));
+  }
+
+  // Obtener formularios visibles en un grupo específico
+  getFormulariosVisiblesEnGrupo(formulariosGrupo: string[]) {
+    return formulariosGrupo
+      .filter(f => this.formulariosVisibles.includes(f))
+      .filter(f => this.configFormularios[f])
+      .map(key => ({ key, ...this.configFormularios[key] }));
+  }
+
+  // Obtener todos los formularios visibles (para vista completa)
+  getFormulariosVisibles() {
+    return this.formulariosVisibles
+      .filter(key => this.configFormularios[key])
+      .map(key => ({ key, ...this.configFormularios[key] }));
+  }
+
+  // Navegación con teclado (opcional)
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    // Solo procesar si estamos en el tab de crear
+    if (this.tabActiva !== 'crear') return;
+
+    // Ctrl/Cmd + número para acceso rápido
+    if ((event.ctrlKey || event.metaKey) && event.key >= '1' && event.key <= '9') {
+      event.preventDefault();
+      const index = parseInt(event.key) - 1;
+      const formularios = this.getFormulariosVisibles();
+      if (formularios[index]) {
+        this.cambiarFormulario(formularios[index].key);
+      }
+    }
+    
+    // Flecha izquierda/derecha para navegar
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.navegarFormulario(event.key === 'ArrowRight' ? 'siguiente' : 'anterior');
+    }
+  }
+
+  // Navegación secuencial entre formularios
+  navegarFormulario(direccion: 'anterior' | 'siguiente'): void {
+    const formularios = this.getFormulariosVisibles();
+    const actual = formularios.findIndex(f => f.key === this.formularioActivo);
+    
+    if (actual === -1) return;
+    
+    let nuevo = direccion === 'siguiente' ? actual + 1 : actual - 1;
+    
+    if (nuevo >= formularios.length) nuevo = 0;
+    if (nuevo < 0) nuevo = formularios.length - 1;
+    
+    this.cambiarFormulario(formularios[nuevo].key);
+  }
+
+  // Actualizar estado de completado de formularios
+  actualizarEstadoFormulario(formulario: string, completado: boolean): void {
+    if (this.configFormularios[formulario]) {
+      this.configFormularios[formulario].completado = completado;
+    }
+  }
 }
