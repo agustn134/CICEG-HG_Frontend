@@ -188,6 +188,7 @@ interface FormularioEstado {
   solicitudGasometria: boolean;
   hojaFrontal: boolean;
   altaVoluntaria: boolean;
+  
 }
 
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
@@ -276,6 +277,12 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   prescripcionForm!: FormGroup;
   controlCrecimientoForm!: FormGroup;
   esquemaVacunacionForm!: FormGroup;
+  
+  // NUEVOS FORMULARIOS AGREGADOS
+  solicitudCultivoForm!: FormGroup;
+  solicitudGasometriaForm!: FormGroup;
+  registroTransfusionForm!: FormGroup;
+  altaVoluntariaForm!: FormGroup;
 
 historiaClinicaPediatricaForm!: FormGroup;
 desarrolloPsicomotrizForm!: FormGroup;
@@ -294,7 +301,7 @@ tamizajeNeonatalForm!: FormGroup;
   grupoExpandido: string | null = 'basicos';
   mostrarTodosFormularios = false;
   busquedaFormulario = '';
-  filtroActivo: 'todos' | 'frecuentes' | 'obligatorios' = 'todos';
+  filtroActivo: 'todos' | 'frecuentes' | 'obligatorios' | 'pediatricos' = 'todos';
   formulariosVisibles: string[] = [];
 
   // Configuración de grupos de formularios
@@ -321,8 +328,20 @@ tamizajeNeonatalForm!: FormGroup;
       nombre: 'Documentos Pediátricos',
       icono: 'fas fa-baby',
       color: 'pink',
-      formularios: ['controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz'],
-      condition: () => this.esPacientePediatrico
+      formularios: [
+      'historiaClinicaPediatrica',
+      'controlCrecimiento', 
+      'esquemaVacunacion', 
+      'desarrolloPsicomotriz',
+      'antecedentesHeredoFamiliares',
+      'antecedentesPerinatales',
+      'estadoNutricionalPediatrico',
+      'inmunizaciones',
+      'vacunasAdicionales',
+      'alimentacionPediatrica',
+      'tamizajeNeonatal'
+    ],
+    condition: () => this.esPacientePediatrico
     },
     prescripciones: {
       nombre: 'Prescripciones',
@@ -479,7 +498,64 @@ tamizajeNeonatalForm!: FormGroup;
       obligatorio: false, 
       frecuente: false,
       completado: false 
-    }
+    },
+    // DOCUMENTOS PEDIÁTRICOS
+  historiaClinicaPediatrica: { 
+    nombre: 'Historia Clínica Pediátrica', 
+    icono: 'fas fa-baby-carriage', 
+    obligatorio: true, 
+    frecuente: true,
+    completado: false 
+  },
+  antecedentesHeredoFamiliares: { 
+    nombre: 'Antecedentes Heredo-Familiares', 
+    icono: 'fas fa-dna', 
+    obligatorio: true, 
+    frecuente: true,
+    completado: false 
+  },
+  antecedentesPerinatales: { 
+    nombre: 'Antecedentes Perinatales', 
+    icono: 'fas fa-baby', 
+    obligatorio: true, 
+    frecuente: true,
+    completado: false 
+  },
+  estadoNutricionalPediatrico: { 
+    nombre: 'Estado Nutricional', 
+    icono: 'fas fa-weight', 
+    obligatorio: false, 
+    frecuente: true,
+    completado: false 
+  },
+  inmunizaciones: { 
+    nombre: 'Inmunizaciones', 
+    icono: 'fas fa-syringe', 
+    obligatorio: true, 
+    frecuente: true,
+    completado: false 
+  },
+  vacunasAdicionales: { 
+    nombre: 'Vacunas Adicionales', 
+    icono: 'fas fa-plus-square', 
+    obligatorio: false, 
+    frecuente: false,
+    completado: false 
+  },
+  alimentacionPediatrica: { 
+    nombre: 'Alimentación Pediátrica', 
+    icono: 'fas fa-utensils', 
+    obligatorio: false, 
+    frecuente: true,
+    completado: false 
+  },
+  tamizajeNeonatal: { 
+    nombre: 'Tamizaje Neonatal', 
+    icono: 'fas fa-microscope', 
+    obligatorio: false, 
+    frecuente: false,
+    completado: false 
+  }
   };
 
   formularioEstado: FormularioEstado = {
@@ -955,6 +1031,107 @@ numeroAdministrativoTemporal = '';
   },
 
 
+
+
+
+  // DOCUMENTOS PEDIÁTRICOS
+
+  {
+    id: 'antecedentesHeredoFamiliares',
+    nombre: 'Antecedentes Heredo-Familiares',
+    descripcion: 'Antecedentes familiares detallados',
+    icono: 'fas fa-dna',
+    color: 'purple',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 53,
+  },
+  {
+    id: 'antecedentesPerinatales',
+    nombre: 'Antecedentes Perinatales',
+    descripcion: 'Antecedentes del embarazo y parto',
+    icono: 'fas fa-baby',
+    color: 'pink',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 54,
+  },
+  {
+    id: 'desarrolloPsicomotriz',
+    nombre: 'Desarrollo Psicomotriz',
+    descripcion: 'Evaluación del desarrollo psicomotor',
+    icono: 'fas fa-brain',
+    color: 'indigo',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 55,
+  },
+  {
+    id: 'estadoNutricionalPediatrico',
+    nombre: 'Estado Nutricional Pediátrico',
+    descripcion: 'Evaluación nutricional especializada',
+    icono: 'fas fa-weight',
+    color: 'emerald',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 56,
+  },
+  {
+    id: 'inmunizaciones',
+    nombre: 'Inmunizaciones',
+    descripcion: 'Control del esquema de vacunación',
+    icono: 'fas fa-syringe',
+    color: 'blue',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 57,
+  },
+  {
+    id: 'vacunasAdicionales',
+    nombre: 'Vacunas Adicionales',
+    descripcion: 'Vacunas fuera del esquema básico',
+    icono: 'fas fa-plus-square',
+    color: 'teal',
+    requiereInternamiento: false,
+    soloAdultos: false,
+    soloPediatrico: true,
+    requiereQuirurgico: false,
+    orden: 58,
+  },
+  // {
+  //   id: 'alimentacionPediatrica',
+  //   nombre: 'Alimentación Pediátrica',
+  //   descripcion: 'Evaluación nutricional y alimentaria',
+  //   icono: 'fas fa-utensils',
+  //   color: 'green',
+  //   requiereInternamiento: false,
+  //   soloAdultos: false,
+  //   soloPediatrico: true,
+  //   requiereQuirurgico: false,
+  //   orden: 59,
+  // },
+  // {
+  //   id: 'tamizajeNeonatal',
+  //   nombre: 'Tamizaje Neonatal',
+  //   descripcion: 'Pruebas de detección neonatal',
+  //   icono: 'fas fa-microscope',
+  //   color: 'yellow',
+  //   requiereInternamiento: false,
+  //   soloAdultos: false,
+  //   soloPediatrico: true,
+  //   requiereQuirurgico: false,
+  //   orden: 60,
+  // }
 
   ];
 
@@ -1465,6 +1642,12 @@ private inicializarFormularios(): void {
   this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
   this.inmunizacionesForm = this.initializeInmunizacionesForm();
   this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
+  
+  // 🔥 NUEVOS FORMULARIOS AGREGADOS
+  this.solicitudCultivoForm = this.initializeSolicitudCultivoForm();
+  this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
+  this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
+  this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
 
   console.log('✅ Todos los formularios han sido inicializados correctamente.');
 }
@@ -3214,7 +3397,77 @@ createVacunaAdicionalGroup(): FormGroup {
     });
 }
 
+  // NUEVOS MÉTODOS DE INICIALIZACIÓN PARA LOS FORMULARIOS AGREGADOS
 
+  private initializeSolicitudCultivoForm(): FormGroup {
+    return this.fb.group({
+        tipo_cultivo: ['', Validators.required],
+        muestra_requerida: ['', Validators.required], 
+        informacion_clinica: ['', Validators.required],
+        sospecha_diagnostica: [''],
+        prioridad: ['Normal', Validators.required],
+        instrucciones_toma: [''],
+        antibioticos_previos: [false],
+        antibiotico_usado: [''],
+        fecha_solicitud: [new Date().toISOString().split('T')[0], Validators.required],
+        medico_solicitante: [''],
+        observaciones: ['']
+    });
+  }
+
+  private initializeSolicitudGasometriaForm(): FormGroup {
+    return this.fb.group({
+        tipo_gasometria: ['', Validators.required],
+        sitio_puncion: ['', Validators.required],
+        temperatura_corporal: [null, [Validators.min(30), Validators.max(45)]],
+        fio2: [21, [Validators.min(21), Validators.max(100)]],
+        soporte_ventilatorio: ['Aire ambiente'],
+        prioridad: ['Normal', Validators.required],
+        informacion_clinica: ['', Validators.required],
+        sospecha_diagnostica: [''],
+        fecha_solicitud: [new Date().toISOString().split('T')[0], Validators.required],
+        medico_solicitante: [''],
+        observaciones: ['']
+    });
+  }
+
+  private initializeRegistroTransfusionForm(): FormGroup {
+    return this.fb.group({
+        tipo_componente: ['', Validators.required],
+        numero_unidad: ['', Validators.required],
+        volumen: [null, [Validators.required, Validators.min(50), Validators.max(2000)]],
+        grupo_sanguineo: ['', Validators.required],
+        banco_sangre: ['', Validators.required],
+        fecha_hora_inicio: ['', Validators.required],
+        fecha_hora_fin: [''],
+        presion_arterial_inicial: [''],
+        temperatura_inicial: [null, [Validators.min(30), Validators.max(45)]],
+        pulso_inicial: [null, [Validators.min(40), Validators.max(200)]],
+        medico_responsable: ['', Validators.required],
+        presenta_reacciones: [false],
+        reacciones_adversas: [''],
+        observaciones: ['']
+    });
+  }
+
+  private initializeAltaVoluntariaForm(): FormGroup {
+    return this.fb.group({
+        fecha_egreso: ['', Validators.required],
+        hora_egreso: ['', Validators.required],
+        nombre_solicitante: ['', Validators.required],
+        parentesco: ['', Validators.required],
+        edad_solicitante: [null, [Validators.required, Validators.min(18), Validators.max(120)]],
+        resumen_clinico: ['', Validators.required],
+        motivo_egreso: [''],
+        recomendaciones_medicas: ['', Validators.required],
+        factores_riesgo: [''],
+        continua_tratamiento_externo: [false],
+        establecimiento_destino: [''],
+        testigo1_nombre: ['', Validators.required],
+        testigo2_nombre: ['', Validators.required],
+        medico_autoriza: ['', Validators.required]
+    });
+  }
 
   private cargarDatosPaciente(): Observable<any> {
     if (!this.pacienteId) {
@@ -3404,6 +3657,55 @@ createVacunaAdicionalGroup(): FormGroup {
         this.success = 'Historia Clínica Pediátrica guardada correctamente';
         break;
 
+      // CASOS PEDIÁTRICOS
+  case 'antecedentesHeredoFamiliares':
+    await this.guardarAntecedentesHeredoFamiliares();
+    this.formularioEstado['antecedentesHeredoFamiliares'] = true;
+    this.success = 'Antecedentes Heredo-Familiares guardados correctamente';
+    break;
+
+  case 'antecedentesPerinatales':
+    await this.guardarAntecedentesPerinatales();
+    this.formularioEstado['antecedentesPerinatales'] = true;
+    this.success = 'Antecedentes Perinatales guardados correctamente';
+    break;
+
+  case 'desarrolloPsicomotriz':
+    await this.guardarDesarrolloPsicomotriz();
+    this.formularioEstado['desarrolloPsicomotriz'] = true;
+    this.success = 'Desarrollo Psicomotriz guardado correctamente';
+    break;
+
+  case 'estadoNutricionalPediatrico':
+    await this.guardarEstadoNutricionalPediatrico();
+    this.formularioEstado['estadoNutricionalPediatrico'] = true;
+    this.success = 'Estado Nutricional Pediátrico guardado correctamente';
+    break;
+
+  case 'inmunizaciones':
+    await this.guardarInmunizaciones();
+    this.formularioEstado['inmunizaciones'] = true;
+    this.success = 'Inmunizaciones guardadas correctamente';
+    break;
+
+  case 'vacunasAdicionales':
+    await this.guardarVacunasAdicionales();
+    this.formularioEstado['vacunasAdicionales'] = true;
+    this.success = 'Vacunas Adicionales guardadas correctamente';
+    break;
+
+  case 'alimentacionPediatrica':
+    await this.guardarAlimentacionPediatrica();
+    this.formularioEstado['alimentacionPediatrica'] = true;
+    this.success = 'Alimentación Pediátrica guardada correctamente';
+    break;
+
+  case 'tamizajeNeonatal':
+    await this.guardarTamizajeNeonatal();
+    this.formularioEstado['tamizajeNeonatal'] = true;
+    this.success = 'Tamizaje Neonatal guardado correctamente';
+    break;
+
 
         default:
           throw new Error('Tipo de formulario no válido');
@@ -3556,6 +3858,101 @@ private async guardarHistoriaClinicaPediatrica(): Promise<void> {
 
   await firstValueFrom(this.historiasClinicasService.createHistoriaClinica(datosHistoria));
 }
+
+// Métodos de guardado pediátricos
+private async guardarAntecedentesHeredoFamiliares(): Promise<void> {
+  if (this.antecedentesHeredoFamiliaresForm.invalid) {
+    this.marcarCamposInvalidos(this.antecedentesHeredoFamiliaresForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosAntecedentes = this.prepararDatosAntecedentesHeredoFamiliares();
+  await firstValueFrom(this.antecedentesHeredoFamiliaresService.crear(datosAntecedentes));
+}
+
+private async guardarAntecedentesPerinatales(): Promise<void> {
+  if (this.antecedentesPerinatalesForm.invalid) {
+    this.marcarCamposInvalidos(this.antecedentesPerinatalesForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosAntecedentes = this.prepararDatosAntecedentesPerinatales();
+  await firstValueFrom(this.antecedentesPerinatalesService.crear(datosAntecedentes));
+}
+
+private async guardarDesarrolloPsicomotriz(): Promise<void> {
+  if (this.desarrolloPsicomotrizForm.invalid) {
+    this.marcarCamposInvalidos(this.desarrolloPsicomotrizForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosDesarrollo = this.prepararDatosDesarrolloPsicomotriz();
+  await firstValueFrom(this.desarrolloPsicomotrizService.crear(datosDesarrollo));
+}
+
+private async guardarEstadoNutricionalPediatrico(): Promise<void> {
+  if (this.estadoNutricionalPediatricoForm.invalid) {
+    this.marcarCamposInvalidos(this.estadoNutricionalPediatricoForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosNutricional = this.prepararDatosEstadoNutricionalPediatrico();
+  await firstValueFrom(this.estadoNutricionalPediatricoService.crear(datosNutricional));
+}
+
+private async guardarInmunizaciones(): Promise<void> {
+  if (this.inmunizacionesForm.invalid) {
+    this.marcarCamposInvalidos(this.inmunizacionesForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosInmunizaciones = this.prepararDatosInmunizaciones();
+  await firstValueFrom(this.inmunizacionesService.crear(datosInmunizaciones));
+}
+
+private async guardarVacunasAdicionales(): Promise<void> {
+  if (this.vacunasAdicionalesForm.invalid) {
+    this.marcarCamposInvalidos(this.vacunasAdicionalesForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosVacunas = this.prepararDatosVacunasAdicionales();
+  await firstValueFrom(this.vacunasAdicionalesService.agregar(datosVacunas));
+}
+
+private async guardarAlimentacionPediatrica(): Promise<void> {
+  if (this.alimentacionPediatricaForm.invalid) {
+    this.marcarCamposInvalidos(this.alimentacionPediatricaForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosAlimentacion = {
+    ...this.alimentacionPediatricaForm.value,
+    id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+    id_personal_medico: this.medicoActual,
+  };
+  
+  // Nota: Podrías necesitar un servicio específico para alimentación pediátrica
+  // o usar el servicio de historia clínica pediátrica
+}
+
+private async guardarTamizajeNeonatal(): Promise<void> {
+  if (this.tamizajeNeonatalForm.invalid) {
+    this.marcarCamposInvalidos(this.tamizajeNeonatalForm);
+    throw new Error('Por favor, complete todos los campos obligatorios');
+  }
+
+  const datosTamizaje = {
+    ...this.tamizajeNeonatalForm.value,
+    id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+    id_personal_medico: this.medicoActual,
+  };
+  
+  // Nota: Podrías necesitar un servicio específico para tamizaje neonatal
+}
+
+
+
 
   private async guardarConsentimiento(): Promise<void> {
     console.log('🔄 Guardando consentimiento informado...');
@@ -4513,6 +4910,44 @@ resetearFormularioActual(): void {
         });
         this.formularioEstado.notaInterconsulta = false;
         break;
+        
+      case 'solicitudCultivo':
+        this.solicitudCultivoForm.reset();
+        this.solicitudCultivoForm.patchValue({
+          prioridad: 'Normal',
+          antibioticos_previos: false,
+          fecha_solicitud: new Date().toISOString().split('T')[0]
+        });
+        this.formularioEstado.solicitudCultivo = false;
+        break;
+        
+      case 'solicitudGasometria':
+        this.solicitudGasometriaForm.reset();
+        this.solicitudGasometriaForm.patchValue({
+          fio2: 21,
+          soporte_ventilatorio: 'Aire ambiente',
+          prioridad: 'Normal',
+          fecha_solicitud: new Date().toISOString().split('T')[0]
+        });
+        this.formularioEstado.solicitudGasometria = false;
+        break;
+        
+      case 'registroTransfusion':
+        this.registroTransfusionForm.reset();
+        this.registroTransfusionForm.patchValue({
+          presenta_reacciones: false
+        });
+        this.formularioEstado.registroTransfusion = false;
+        break;
+        
+      case 'altaVoluntaria':
+        this.altaVoluntariaForm.reset();
+        this.altaVoluntariaForm.patchValue({
+          continua_tratamiento_externo: false
+        });
+        this.formularioEstado.altaVoluntaria = false;
+        break;
+        
       default:
         console.warn('Tipo de formulario no reconocido para limpiar:', tipoFormulario);
     }
@@ -5650,7 +6085,7 @@ get puedeAvanzar(): boolean {
   }
 
   // Filtrado por categoría
-  filtrarPorCategoria(categoria: 'todos' | 'frecuentes' | 'obligatorios'): void {
+  filtrarPorCategoria(categoria: 'todos' | 'frecuentes' | 'obligatorios'| 'pediatricos'): void {
     this.filtroActivo = categoria;
     
     switch (categoria) {
@@ -5662,10 +6097,32 @@ get puedeAvanzar(): boolean {
         this.formulariosVisibles = Object.keys(this.configFormularios)
           .filter(key => this.configFormularios[key].obligatorio);
         break;
+      case 'pediatricos':
+      this.formulariosVisibles = Object.keys(this.configFormularios)
+        .filter(key => this.esFormularioPediatrico(key));
+      break;
       default:
         this.formulariosVisibles = Object.keys(this.configFormularios);
     }
   }
+
+  // Método para verificar si un formulario es pediátrico
+esFormularioPediatrico(formulario: string): boolean {
+  const formulariosPediatricos = [
+    'historiaClinicaPediatrica',
+    'antecedentesHeredoFamiliares',
+    'antecedentesPerinatales',
+    'desarrolloPsicomotriz',
+    'estadoNutricionalPediatrico',
+    'inmunizaciones',
+    'vacunasAdicionales',
+    'alimentacionPediatrica',
+    'tamizajeNeonatal',
+    'controlCrecimiento',
+    'esquemaVacunacion'
+  ];
+  return formulariosPediatricos.includes(formulario);
+}
 
   // Obtener clase CSS para botones de formulario
   getClaseBotonFormulario(formulario: string): string {
@@ -5755,4 +6212,7 @@ get puedeAvanzar(): boolean {
       this.configFormularios[formulario].completado = completado;
     }
   }
+
+
+
 }

@@ -293,7 +293,6 @@
 
     <!-- NAVEGACIÓN DE FORMULARIOS MEJORADA (SOLO EN TAB CREAR) -->
     <div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
-      
       <!-- BARRA DE HERRAMIENTAS SUPERIOR -->
       <div class="p-4 border-b border-gray-200">
         <div class="flex flex-col sm:flex-row gap-4">
@@ -337,6 +336,15 @@
               <i [class]="mostrarTodosFormularios ? 'fas fa-th-list' : 'fas fa-th-large'" class="mr-1"></i>
               {{ mostrarTodosFormularios ? 'Agrupar' : 'Ver Todo' }}
             </button>
+
+            <button
+          *ngIf="esPacientePediatrico"
+          (click)="filtrarPorCategoria('pediatricos')"
+          [class]="filtroActivo === 'pediatricos' ? 'bg-pink-100 text-pink-800' : 'bg-gray-100 text-gray-700'"
+          class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-pink-50">
+          <i class="fas fa-baby mr-1"></i>
+          Pediátricos
+        </button>
           </div>
         </div>
       </div>
@@ -355,6 +363,11 @@
               <i [class]="grupo.data.icono + ' text-' + grupo.data.color + '-600 mr-3'"></i>
               <span class="font-medium text-gray-900">{{ grupo.data.nombre }}</span>
               <span class="ml-2 text-sm text-gray-500">({{ getFormulariosVisiblesEnGrupo(grupo.data.formularios).length }})</span>
+             <span *ngIf="grupo.key === 'pediatricos'" 
+            class="ml-2 px-2 py-1 text-xs bg-pink-100 text-pink-700 rounded-full">
+            <i class="fas fa-baby mr-1"></i>
+            Solo Pediatría
+          </span>
             </div>
             
             <i 
@@ -379,6 +392,10 @@
                 
                 <!-- Indicador de completado -->
                 <i *ngIf="formulario.completado" class="fas fa-check-circle ml-2 text-green-500"></i>
+                <!-- 🔥 NUEVO: Indicador de obligatorio -->
+                 <i *ngIf="formulario.obligatorio && !formulario.completado" 
+              class="fas fa-exclamation-circle ml-2 text-red-500" 
+              title="Obligatorio"></i>
               </button>
             </div>
           </div>
@@ -402,6 +419,12 @@
               <div *ngIf="formulario.obligatorio" class="w-2 h-2 bg-red-500 rounded-full" title="Obligatorio"></div>
               <div *ngIf="formulario.completado" class="w-2 h-2 bg-green-500 rounded-full" title="Completado"></div>
             </div>
+
+            <!-- 🔥 NUEVO: Badge pediátrico en vista completa -->
+        <div *ngIf="esPacientePediatrico && esFormularioPediatrico(formulario.key)" 
+          class="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
+          <i class="fas fa-baby text-white text-xs"></i>
+        </div>
           </button>
         </div>
       </div>
@@ -1710,7 +1733,7 @@
                   Médico Solicitante
                 </label>
                 <input type="text" formControlName="medico_solicitante" readonly
-                  [value]="medicoCompleto?.nombre_completo || 'No especificado'"
+                  [value]="medicoCompleto?.['nombre_completo'] || 'No especificado'"
                   class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100">
               </div>
       
@@ -3670,6 +3693,766 @@
       </form>
     </div>
 
+
+    <!-- FORMULARIO DE SOLICITUD DE CULTIVO -->
+    <div *ngIf="formularioActivo === 'solicitudCultivo'" class="bg-white shadow rounded-lg mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-microscope mr-2 text-green-500"></i>
+          Solicitud de Cultivo - NOM-004 Sección 9.2
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">
+          Solicitud de estudio microbiológico para identificación de agentes patógenos
+        </p>
+        <div class="mt-2 text-xs text-blue-700 bg-blue-50 rounded px-2 py-1 inline-block">
+          <i class="fas fa-info-circle mr-1"></i>
+          Campos obligatorios según NOM-004-SSA3-2012 para servicios auxiliares de diagnóstico
+        </div>
+      </div>
+
+      <form [formGroup]="solicitudCultivoForm" class="px-6 py-4">
+        <div class="space-y-6">
+          
+          <!-- Información del Estudio -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cultivo *</label>
+              <select formControlName="tipo_cultivo"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione el tipo de cultivo...</option>
+                <option value="Urocultivo">Urocultivo</option>
+                <option value="Hemocultivo">Hemocultivo</option>
+                <option value="Coprocultivo">Coprocultivo</option>
+                <option value="Cultivo de expectoración">Cultivo de expectoración</option>
+                <option value="Cultivo de herida">Cultivo de herida</option>
+                <option value="Cultivo de líquido cefalorraquídeo">Cultivo de líquido cefalorraquídeo</option>
+                <option value="Cultivo vaginal">Cultivo vaginal</option>
+                <option value="Cultivo faríngeo">Cultivo faríngeo</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <div *ngIf="solicitudCultivoForm.get('tipo_cultivo')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Muestra Requerida *</label>
+              <input type="text" formControlName="muestra_requerida"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Especifique el tipo de muestra...">
+              <div *ngIf="solicitudCultivoForm.get('muestra_requerida')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Clínica -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Información Clínica Relevante *</label>
+            <textarea formControlName="informacion_clinica" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Síntomas, signos clínicos, sospecha diagnóstica..."></textarea>
+            <div *ngIf="solicitudCultivoForm.get('informacion_clinica')?.errors?.['required']"
+              class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004
+            </div>
+          </div>
+
+          <!-- Sospecha Diagnóstica y Prioridad -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Sospecha Diagnóstica</label>
+              <input type="text" formControlName="sospecha_diagnostica"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Diagnóstico presuntivo...">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad *</label>
+              <select formControlName="prioridad"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Normal">Normal</option>
+                <option value="Urgente">Urgente</option>
+                <option value="Stat">Stat (inmediato)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Instrucciones de Toma -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Instrucciones para la Toma de Muestra</label>
+            <textarea formControlName="instrucciones_toma" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Condiciones de ayuno, asepsia, momento de toma, etc."></textarea>
+          </div>
+
+          <!-- Antibióticos -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-pills text-yellow-600 mr-2"></i>
+              <h4 class="text-sm font-semibold text-yellow-800">Uso de Antibióticos</h4>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label class="flex items-center text-sm">
+                  <input type="checkbox" formControlName="antibioticos_previos" class="mr-2">
+                  <span>Paciente con antibióticos previos</span>
+                </label>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Antibiótico Utilizado</label>
+                <input type="text" formControlName="antibiotico_usado"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre del antibiótico...">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-8 border-t border-gray-200 pt-6">
+          <div class="flex justify-end space-x-3">
+            <button type="button" (click)="limpiarFormulario('solicitudCultivo')"
+              class="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+            
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!solicitudCultivoForm.valid || isCreatingDocument"
+              class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Solicitud' }}
+            </button>
+
+            <button type="button" (click)="generarPDF('Solicitud de Cultivo')"
+              [disabled]="!formularioEstado.solicitudCultivo"
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              <span *ngIf="formularioEstado.solicitudCultivo">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.solicitudCultivo">Guardar primero</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORMULARIO DE SOLICITUD DE GASOMETRÍA -->
+    <div *ngIf="formularioActivo === 'solicitudGasometria'" class="bg-white shadow rounded-lg mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-lungs mr-2 text-teal-500"></i>
+          Solicitud de Gasometría - NOM-004 Sección 9.2
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">
+          Solicitud de análisis de gases arteriales para evaluación del estado ácido-base
+        </p>
+        <div class="mt-2 text-xs text-blue-700 bg-blue-50 rounded px-2 py-1 inline-block">
+          <i class="fas fa-info-circle mr-1"></i>
+          Campos obligatorios según NOM-004-SSA3-2012 para servicios auxiliares de diagnóstico
+        </div>
+      </div>
+
+      <form [formGroup]="solicitudGasometriaForm" class="px-6 py-4">
+        <div class="space-y-6">
+          
+          <!-- Tipo de Gasometría -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Gasometría *</label>
+              <select formControlName="tipo_gasometria"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione el tipo...</option>
+                <option value="Arterial">Gasometría Arterial</option>
+                <option value="Venosa">Gasometría Venosa</option>
+                <option value="Capilar">Gasometría Capilar</option>
+              </select>
+              <div *ngIf="solicitudGasometriaForm.get('tipo_gasometria')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Sitio de Punción *</label>
+              <select formControlName="sitio_puncion"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione el sitio...</option>
+                <option value="Arteria radial">Arteria radial</option>
+                <option value="Arteria braquial">Arteria braquial</option>
+                <option value="Arteria femoral">Arteria femoral</option>
+                <option value="Vena periférica">Vena periférica</option>
+                <option value="Línea arterial">Línea arterial</option>
+                <option value="Capilar">Capilar (talón/dedo)</option>
+              </select>
+              <div *ngIf="solicitudGasometriaForm.get('sitio_puncion')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+          </div>
+
+          <!-- Condiciones del Paciente -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-blue-800 mb-3">
+              <i class="fas fa-user-injured mr-2"></i>
+              Condiciones del Paciente
+            </h4>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Temperatura Corporal (°C)</label>
+                <input type="number" step="0.1" min="30" max="45" formControlName="temperatura_corporal"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="36.5">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">FiO2 (%)</label>
+                <input type="number" min="21" max="100" formControlName="fio2"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="21">
+              </div>
+            </div>
+          </div>
+
+          <!-- Soporte Ventilatorio -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Soporte Ventilatorio</label>
+              <select formControlName="soporte_ventilatorio"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Aire ambiente">Aire ambiente</option>
+                <option value="Oxígeno suplementario">Oxígeno suplementario</option>
+                <option value="Ventilación mecánica">Ventilación mecánica</option>
+                <option value="CPAP">CPAP</option>
+                <option value="BiPAP">BiPAP</option>
+                <option value="Cánula nasal de alto flujo">Cánula nasal de alto flujo</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad *</label>
+              <select formControlName="prioridad"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Normal">Normal</option>
+                <option value="Urgente">Urgente</option>
+                <option value="Stat">Stat (inmediato)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Información Clínica -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Información Clínica Relevante *</label>
+            <textarea formControlName="informacion_clinica" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Estado respiratorio, sospecha diagnóstica, alteraciones ácido-base..."></textarea>
+            <div *ngIf="solicitudGasometriaForm.get('informacion_clinica')?.errors?.['required']"
+              class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004
+            </div>
+          </div>
+
+          <!-- Sospecha Diagnóstica -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sospecha Diagnóstica</label>
+            <input type="text" formControlName="sospecha_diagnostica"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Insuficiencia respiratoria, acidosis metabólica, etc.">
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <textarea formControlName="observaciones" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Observaciones adicionales..."></textarea>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-8 border-t border-gray-200 pt-6">
+          <div class="flex justify-end space-x-3">
+            <button type="button" (click)="limpiarFormulario('solicitudGasometria')"
+              class="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+            
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!solicitudGasometriaForm.valid || isCreatingDocument"
+              class="bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Solicitud' }}
+            </button>
+
+            <button type="button" (click)="generarPDF('Solicitud de Gasometría')"
+              [disabled]="!formularioEstado.solicitudGasometria"
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              <span *ngIf="formularioEstado.solicitudGasometria">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.solicitudGasometria">Guardar primero</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORMULARIO DE REGISTRO DE TRANSFUSIÓN -->
+    <div *ngIf="formularioActivo === 'registroTransfusion'" class="bg-white shadow rounded-lg mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-tint mr-2 text-red-500"></i>
+          Registro de Transfusión - NOM-003-SSA2-1993 y NOM-004 Sección D15
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">
+          Registro obligatorio de transfusión de sangre o sus componentes según normatividad vigente
+        </p>
+        <div class="mt-2 text-xs text-blue-700 bg-blue-50 rounded px-2 py-1 inline-block">
+          <i class="fas fa-info-circle mr-1"></i>
+          Campos obligatorios según NOM-003-SSA2-1993 y NOM-004-SSA3-2012
+        </div>
+      </div>
+
+      <form [formGroup]="registroTransfusionForm" class="px-6 py-4">
+        <div class="space-y-6">
+          
+          <!-- Información del Componente -->
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-red-800 mb-3">
+              <i class="fas fa-flask mr-2"></i>
+              Información del Componente Sanguíneo
+            </h4>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Componente *</label>
+                <select formControlName="tipo_componente"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccione el componente...</option>
+                  <option value="Sangre total">Sangre total</option>
+                  <option value="Concentrado eritrocitario">Concentrado eritrocitario</option>
+                  <option value="Plasma fresco congelado">Plasma fresco congelado</option>
+                  <option value="Concentrado plaquetario">Concentrado plaquetario</option>
+                  <option value="Crioprecipitado">Crioprecipitado</option>
+                  <option value="Albúmina">Albúmina</option>
+                  <option value="Inmunoglobulina">Inmunoglobulina</option>
+                </select>
+                <div *ngIf="registroTransfusionForm.get('tipo_componente')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-003-SSA2-1993
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Unidad *</label>
+                <input type="text" formControlName="numero_unidad"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Número de identificación de la unidad">
+                <div *ngIf="registroTransfusionForm.get('numero_unidad')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-003-SSA2-1993
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Volumen (mL) *</label>
+                <input type="number" min="50" max="2000" formControlName="volumen"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="250">
+                <div *ngIf="registroTransfusionForm.get('volumen')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-003-SSA2-1993
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Grupo Sanguíneo *</label>
+                <select formControlName="grupo_sanguineo"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccione grupo sanguíneo...</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+                <div *ngIf="registroTransfusionForm.get('grupo_sanguineo')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-003-SSA2-1993
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Banco de Sangre *</label>
+                <input type="text" formControlName="banco_sangre"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre del banco de sangre">
+              </div>
+            </div>
+          </div>
+
+          <!-- Fechas y Horarios -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha y Hora de Inicio *</label>
+              <input type="datetime-local" formControlName="fecha_hora_inicio"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="registroTransfusionForm.get('fecha_hora_inicio')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha y Hora de Finalización</label>
+              <input type="datetime-local" formControlName="fecha_hora_fin"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <!-- Signos Vitales -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-yellow-800 mb-3">
+              <i class="fas fa-heartbeat mr-2"></i>
+              Control de Signos Vitales (Antes, Durante y Después)
+            </h4>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Presión Arterial Inicial</label>
+                <input type="text" formControlName="presion_arterial_inicial"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="120/80">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Temperatura Inicial (°C)</label>
+                <input type="number" step="0.1" min="30" max="45" formControlName="temperatura_inicial"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="36.5">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pulso Inicial (lpm)</label>
+                <input type="number" min="40" max="200" formControlName="pulso_inicial"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="72">
+              </div>
+            </div>
+          </div>
+
+          <!-- Médico Responsable -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Médico que Indica la Transfusión *</label>
+            <input type="text" formControlName="medico_responsable"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Dr. Juan Pérez García"
+              [value]="pacienteCompleto?.persona?.['nombre_completo'] || 'Dr. ' + (pacienteCompleto?.persona?.nombre || '')">
+            <div *ngIf="registroTransfusionForm.get('medico_responsable')?.errors?.['required']"
+              class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004
+            </div>
+          </div>
+
+          <!-- Reacciones Adversas -->
+          <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <div class="flex items-center mb-3">
+              <input type="checkbox" formControlName="presenta_reacciones" class="mr-2">
+              <label class="text-sm font-semibold text-orange-800">
+                El paciente presentó reacciones adversas durante la transfusión
+              </label>
+            </div>
+            <div *ngIf="registroTransfusionForm.get('presenta_reacciones')?.value">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de Reacciones Adversas</label>
+              <textarea formControlName="reacciones_adversas" rows="3"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Descripción detallada de las reacciones presentadas..."></textarea>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <textarea formControlName="observaciones" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Observaciones adicionales sobre el procedimiento..."></textarea>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-8 border-t border-gray-200 pt-6">
+          <div class="flex justify-end space-x-3">
+            <button type="button" (click)="limpiarFormulario('registroTransfusion')"
+              class="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+            
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!registroTransfusionForm.valid || isCreatingDocument"
+              class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Registro' }}
+            </button>
+
+            <button type="button" (click)="generarPDF('Registro de Transfusión')"
+              [disabled]="!formularioEstado.registroTransfusion"
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              <span *ngIf="formularioEstado.registroTransfusion">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.registroTransfusion">Guardar primero</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORMULARIO DE ALTA VOLUNTARIA -->
+    <div *ngIf="formularioActivo === 'altaVoluntaria'" class="bg-white shadow rounded-lg mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-sign-out-alt mr-2 text-orange-500"></i>
+          Hoja de Egreso Voluntario - NOM-004 Sección 10.2
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">
+          Documento mediante el cual el paciente solicita el egreso voluntario con conocimiento de las consecuencias
+        </p>
+        <div class="mt-2 text-xs text-blue-700 bg-blue-50 rounded px-2 py-1 inline-block">
+          <i class="fas fa-info-circle mr-1"></i>
+          Campos obligatorios según NOM-004-SSA3-2012 Sección 10.2
+        </div>
+        <div class="mt-2 text-xs text-red-700 bg-red-50 rounded px-2 py-1 inline-block">
+          <i class="fas fa-exclamation-triangle mr-1"></i>
+          Este documento exime de responsabilidad al establecimiento y al médico tratante
+        </div>
+      </div>
+
+      <form [formGroup]="altaVoluntariaForm" class="px-6 py-4">
+        <div class="space-y-6">
+          
+          <!-- Información del Egreso -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Egreso *</label>
+              <input type="date" formControlName="fecha_egreso"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="altaVoluntariaForm.get('fecha_egreso')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Egreso *</label>
+              <input type="time" formControlName="hora_egreso"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="altaVoluntariaForm.get('hora_egreso')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+          </div>
+
+          <!-- Persona que Solicita -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-blue-800 mb-3">
+              <i class="fas fa-user mr-2"></i>
+              Persona que Solicita el Egreso
+            </h4>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                <input type="text" formControlName="nombre_solicitante"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre completo de quien solicita">
+                <div *ngIf="altaVoluntariaForm.get('nombre_solicitante')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-004
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco con el Paciente *</label>
+                <select formControlName="parentesco"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccione parentesco...</option>
+                  <option value="Paciente">El mismo paciente</option>
+                  <option value="Padre">Padre</option>
+                  <option value="Madre">Madre</option>
+                  <option value="Esposo(a)">Esposo(a)</option>
+                  <option value="Hijo(a)">Hijo(a)</option>
+                  <option value="Hermano(a)">Hermano(a)</option>
+                  <option value="Tutor">Tutor legal</option>
+                  <option value="Representante legal">Representante legal</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <div *ngIf="altaVoluntariaForm.get('parentesco')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-004
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Edad del Solicitante *</label>
+              <input type="number" min="18" max="120" formControlName="edad_solicitante"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Edad en años">
+              <div *ngIf="altaVoluntariaForm.get('edad_solicitante')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen Clínico -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Resumen Clínico *</label>
+            <textarea formControlName="resumen_clinico" rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Motivo de ingreso, diagnóstico actual, tratamiento proporcionado..."></textarea>
+            <div *ngIf="altaVoluntariaForm.get('resumen_clinico')?.errors?.['required']"
+              class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004 Sección 6.4.3
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Debe incluir: motivo de envío, impresión diagnóstica y terapéutica empleada</p>
+          </div>
+
+          <!-- Motivo del Egreso Voluntario -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del Egreso Voluntario</label>
+            <textarea formControlName="motivo_egreso" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Razón por la cual se solicita el egreso voluntario..."></textarea>
+          </div>
+
+          <!-- Recomendaciones Médicas -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-yellow-800 mb-3">
+              <i class="fas fa-stethoscope mr-2"></i>
+              Medidas Recomendadas para la Protección de la Salud
+            </h4>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Recomendaciones Médicas *</label>
+              <textarea formControlName="recomendaciones_medicas" rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Cuidados específicos, medicamentos, signos de alarma, cuándo acudir a urgencias..."></textarea>
+              <div *ngIf="altaVoluntariaForm.get('recomendaciones_medicas')?.errors?.['required']"
+                class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Atención de Factores de Riesgo</label>
+              <textarea formControlName="factores_riesgo" rows="2"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Factores de riesgo a vigilar y controlar..."></textarea>
+            </div>
+          </div>
+
+          <!-- Continuidad del Tratamiento -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" formControlName="continua_tratamiento_externo" class="mr-2">
+                <span>Continuará tratamiento en otro establecimiento</span>
+              </label>
+            </div>
+            <div *ngIf="altaVoluntariaForm.get('continua_tratamiento_externo')?.value">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Establecimiento de Destino</label>
+              <input type="text" formControlName="establecimiento_destino"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Nombre del establecimiento donde continuará tratamiento">
+            </div>
+          </div>
+
+          <!-- Testigos -->
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h4 class="text-sm font-semibold text-gray-800 mb-3">
+              <i class="fas fa-users mr-2"></i>
+              Testigos (2 requeridos)
+            </h4>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Primer Testigo *</label>
+                <input type="text" formControlName="testigo1_nombre"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre completo del primer testigo">
+                <div *ngIf="altaVoluntariaForm.get('testigo1_nombre')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-004
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Segundo Testigo *</label>
+                <input type="text" formControlName="testigo2_nombre"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre completo del segundo testigo">
+                <div *ngIf="altaVoluntariaForm.get('testigo2_nombre')?.errors?.['required']"
+                  class="text-red-500 text-xs mt-1">
+                  Campo obligatorio según NOM-004
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Médico que Autoriza -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Médico que Emite la Hoja *</label>
+            <input type="text" formControlName="medico_autoriza"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Dr. Juan Pérez García"
+              [value]="pacienteCompleto?.persona?.['nombre_completo'] || 'Dr. ' + (pacienteCompleto?.persona?.nombre || '')">
+            <div *ngIf="altaVoluntariaForm.get('medico_autoriza')?.errors?.['required']"
+              class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-8 border-t border-gray-200 pt-6">
+          <div class="flex justify-end space-x-3">
+            <button type="button" (click)="limpiarFormulario('altaVoluntaria')"
+              class="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+            
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!altaVoluntariaForm.valid || isCreatingDocument"
+              class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Hoja de Egreso' }}
+            </button>
+
+            <button type="button" (click)="generarPDF('Hoja de Egreso Voluntario')"
+              [disabled]="!formularioEstado.altaVoluntaria"
+              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              <span *ngIf="formularioEstado.altaVoluntaria">📄 Descargar PDF</span>
+              <span *ngIf="!formularioEstado.altaVoluntaria">Guardar primero</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
 
 
     <!-- ==========================================
