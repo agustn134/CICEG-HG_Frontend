@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -73,13 +80,28 @@ import { AltaVoluntariaService } from '../../services/documentos-clinicos/alta-v
 import { CultivosService } from '../../services/documentos-clinicos/cultivos-service';
 import { GasometriaService } from '../../services/documentos-clinicos/gasometria';
 
-
 // AGREGAR ESTAS IMPORTACIONES A perfil-paciente.ts
-import { SolicitudEstudio, CreateSolicitudEstudioDto } from '../../models/solicitud-estudio.model';
-import { ReferenciaTraslado, CreateReferenciaTraladoDto } from '../../models/referencia-traslado.model';
-import { PrescripcionMedicamento, CreatePrescripcionMedicamentoDto } from '../../models/prescripcion-medicamento.model';
-import { ControlCrecimiento, CreateControlCrecimientoDto } from '../../models/control-crecimiento.model';
-import { EsquemaVacunacion, RegistroVacuna, CreateEsquemaVacunacionDto } from '../../models/esquema-vacunacion.model';
+import {
+  SolicitudEstudio,
+  CreateSolicitudEstudioDto,
+} from '../../models/solicitud-estudio.model';
+import {
+  ReferenciaTraslado,
+  CreateReferenciaTraladoDto,
+} from '../../models/referencia-traslado.model';
+import {
+  PrescripcionMedicamento,
+  CreatePrescripcionMedicamentoDto,
+} from '../../models/prescripcion-medicamento.model';
+import {
+  ControlCrecimiento,
+  CreateControlCrecimientoDto,
+} from '../../models/control-crecimiento.model';
+import {
+  EsquemaVacunacion,
+  RegistroVacuna,
+  CreateEsquemaVacunacionDto,
+} from '../../models/esquema-vacunacion.model';
 import { HojaFrontal } from '../../models/hoja-frontal.model';
 import { AltaVoluntaria } from '../../models/alta-voluntaria.model';
 import { SolicitudCultivo } from '../../models/solicitud-cultivo.model';
@@ -188,7 +210,6 @@ interface FormularioEstado {
   solicitudGasometria: boolean;
   hojaFrontal: boolean;
   altaVoluntaria: boolean;
-  
 }
 
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
@@ -226,10 +247,6 @@ type FormularioActivo =
   | 'altaVoluntaria'
   | null;
 
-
-
-  
-
 @Component({
   selector: 'app-perfil-paciente',
   standalone: true,
@@ -237,11 +254,8 @@ type FormularioActivo =
   templateUrl: './perfil-paciente.html',
   styleUrl: './perfil-paciente.css',
 })
-
-
 export class PerfilPaciente implements OnInit, OnDestroy {
-
-    // ViewChild para el contenedor de navegación
+  // ViewChild para el contenedor de navegación
   @ViewChild('formNav') formNav!: ElementRef;
 
   private destroy$ = new Subject<void>();
@@ -277,17 +291,17 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   prescripcionForm!: FormGroup;
   controlCrecimientoForm!: FormGroup;
   esquemaVacunacionForm!: FormGroup;
-  
+
   // NUEVOS FORMULARIOS AGREGADOS
   solicitudCultivoForm!: FormGroup;
   solicitudGasometriaForm!: FormGroup;
   registroTransfusionForm!: FormGroup;
   altaVoluntariaForm!: FormGroup;
 
-historiaClinicaPediatricaForm!: FormGroup;
-desarrolloPsicomotrizForm!: FormGroup;
-alimentacionPediatricaForm!: FormGroup;
-tamizajeNeonatalForm!: FormGroup;
+  historiaClinicaPediatricaForm!: FormGroup;
+  desarrolloPsicomotrizForm!: FormGroup;
+  alimentacionPediatricaForm!: FormGroup;
+  tamizajeNeonatalForm!: FormGroup;
   antecedentesHeredoFamiliaresForm!: FormGroup;
   antecedentesPerinatalesForm!: FormGroup;
   estadoNutricionalPediatricoForm!: FormGroup;
@@ -296,12 +310,13 @@ tamizajeNeonatalForm!: FormGroup;
 
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
-  
+
   // Propiedades para navegación mejorada
   grupoExpandido: string | null = 'basicos';
   mostrarTodosFormularios = false;
   busquedaFormulario = '';
-  filtroActivo: 'todos' | 'frecuentes' | 'obligatorios' | 'pediatricos' = 'todos';
+  filtroActivo: 'todos' | 'frecuentes' | 'obligatorios' | 'pediatricos' =
+    'todos';
   formulariosVisibles: string[] = [];
 
   // Configuración de grupos de formularios
@@ -310,252 +325,271 @@ tamizajeNeonatalForm!: FormGroup;
       nombre: 'Documentos Básicos',
       icono: 'fas fa-file-medical',
       color: 'blue',
-      formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion']
+      formularios: [
+        'signosVitales',
+        'historiaClinica',
+        'notaUrgencias',
+        'notaEvolucion',
+      ],
     },
     quirurgicos: {
       nombre: 'Documentos Quirúrgicos',
       icono: 'fas fa-procedures',
       color: 'orange',
-      formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica']
+      formularios: [
+        'notaPreoperatoria',
+        'notaPreanestesica',
+        'notaPostoperatoria',
+        'notaPostanestesica',
+      ],
     },
     solicitudes: {
       nombre: 'Solicitudes de Estudios',
       icono: 'fas fa-vial',
       color: 'green',
-      formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']
+      formularios: [
+        'solicitudEstudio',
+        'solicitudCultivo',
+        'solicitudGasometria',
+      ],
     },
     pediatricos: {
       nombre: 'Documentos Pediátricos',
       icono: 'fas fa-baby',
       color: 'pink',
       formularios: [
-      'historiaClinicaPediatrica',
-      'controlCrecimiento', 
-      'esquemaVacunacion', 
-      'desarrolloPsicomotriz',
-      'antecedentesHeredoFamiliares',
-      'antecedentesPerinatales',
-      'estadoNutricionalPediatrico',
-      'inmunizaciones',
-      'vacunasAdicionales',
-      'alimentacionPediatrica',
-      'tamizajeNeonatal'
-    ],
-    condition: () => this.esPacientePediatrico
+        'historiaClinicaPediatrica',
+        'controlCrecimiento',
+        'esquemaVacunacion',
+        'desarrolloPsicomotriz',
+        'antecedentesHeredoFamiliares',
+        'antecedentesPerinatales',
+        'estadoNutricionalPediatrico',
+        'inmunizaciones',
+        'vacunasAdicionales',
+        'alimentacionPediatrica',
+        'tamizajeNeonatal',
+      ],
+      condition: () => this.esPacientePediatrico,
     },
     prescripciones: {
       nombre: 'Prescripciones',
       icono: 'fas fa-pills',
       color: 'purple',
-      formularios: ['prescripcionMedicamento', 'registroTransfusion']
+      formularios: ['prescripcionMedicamento', 'registroTransfusion'],
     },
     especiales: {
       nombre: 'Documentos Especiales',
       icono: 'fas fa-folder-open',
       color: 'gray',
-      formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado']
-    }
+      formularios: [
+        'hojaFrontal',
+        'altaVoluntaria',
+        'consentimiento',
+        'referenciaTraslado',
+      ],
+    },
   };
 
   // Configuración de formularios con metadata
   configFormularios: { [key: string]: any } = {
-    signosVitales: { 
-      nombre: 'Signos Vitales', 
-      icono: 'fas fa-heartbeat', 
-      obligatorio: true, 
+    signosVitales: {
+      nombre: 'Signos Vitales',
+      icono: 'fas fa-heartbeat',
+      obligatorio: true,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    historiaClinica: { 
-      nombre: 'Historia Clínica', 
-      icono: 'fas fa-file-medical-alt', 
-      obligatorio: true, 
+    historiaClinica: {
+      nombre: 'Historia Clínica',
+      icono: 'fas fa-file-medical-alt',
+      obligatorio: true,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    notaUrgencias: { 
-      nombre: 'Nota Urgencias', 
-      icono: 'fas fa-ambulance', 
-      obligatorio: true, 
+    notaUrgencias: {
+      nombre: 'Nota Urgencias',
+      icono: 'fas fa-ambulance',
+      obligatorio: true,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    notaEvolucion: { 
-      nombre: 'Evolución', 
-      icono: 'fas fa-chart-line', 
-      obligatorio: false, 
+    notaEvolucion: {
+      nombre: 'Evolución',
+      icono: 'fas fa-chart-line',
+      obligatorio: false,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    notaPreoperatoria: { 
-      nombre: 'Preoperatoria', 
-      icono: 'fas fa-user-md', 
-      obligatorio: false, 
+    notaPreoperatoria: {
+      nombre: 'Preoperatoria',
+      icono: 'fas fa-user-md',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    notaPreanestesica: { 
-      nombre: 'Preanestésica', 
-      icono: 'fas fa-syringe', 
-      obligatorio: false, 
+    notaPreanestesica: {
+      nombre: 'Preanestésica',
+      icono: 'fas fa-syringe',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    notaPostoperatoria: { 
-      nombre: 'Postoperatoria', 
-      icono: 'fas fa-bed', 
-      obligatorio: false, 
+    notaPostoperatoria: {
+      nombre: 'Postoperatoria',
+      icono: 'fas fa-bed',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    notaPostanestesica: { 
-      nombre: 'Postanestésica', 
-      icono: 'fas fa-clock', 
-      obligatorio: false, 
+    notaPostanestesica: {
+      nombre: 'Postanestésica',
+      icono: 'fas fa-clock',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    consentimiento: { 
-      nombre: 'Consentimiento', 
-      icono: 'fas fa-signature', 
-      obligatorio: true, 
+    consentimiento: {
+      nombre: 'Consentimiento',
+      icono: 'fas fa-signature',
+      obligatorio: true,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    solicitudEstudio: { 
-      nombre: 'Solicitud Estudio', 
-      icono: 'fas fa-microscope', 
-      obligatorio: false, 
+    solicitudEstudio: {
+      nombre: 'Solicitud Estudio',
+      icono: 'fas fa-microscope',
+      obligatorio: false,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    solicitudCultivo: { 
-      nombre: 'Solicitud Cultivo', 
-      icono: 'fas fa-flask', 
-      obligatorio: false, 
+    solicitudCultivo: {
+      nombre: 'Solicitud Cultivo',
+      icono: 'fas fa-flask',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    solicitudGasometria: { 
-      nombre: 'Gasometría', 
-      icono: 'fas fa-lungs', 
-      obligatorio: false, 
+    solicitudGasometria: {
+      nombre: 'Gasometría',
+      icono: 'fas fa-lungs',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    controlCrecimiento: { 
-      nombre: 'Control Crecimiento', 
-      icono: 'fas fa-child', 
-      obligatorio: false, 
+    controlCrecimiento: {
+      nombre: 'Control Crecimiento',
+      icono: 'fas fa-child',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    esquemaVacunacion: { 
-      nombre: 'Vacunas', 
-      icono: 'fas fa-shield-alt', 
-      obligatorio: false, 
+    esquemaVacunacion: {
+      nombre: 'Vacunas',
+      icono: 'fas fa-shield-alt',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    desarrolloPsicomotriz: { 
-      nombre: 'Desarrollo', 
-      icono: 'fas fa-brain', 
-      obligatorio: false, 
+    desarrolloPsicomotriz: {
+      nombre: 'Desarrollo',
+      icono: 'fas fa-brain',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    prescripcionMedicamento: { 
-      nombre: 'Prescripción', 
-      icono: 'fas fa-prescription-bottle-alt', 
-      obligatorio: false, 
+    prescripcionMedicamento: {
+      nombre: 'Prescripción',
+      icono: 'fas fa-prescription-bottle-alt',
+      obligatorio: false,
       frecuente: true,
-      completado: false 
+      completado: false,
     },
-    registroTransfusion: { 
-      nombre: 'Transfusión', 
-      icono: 'fas fa-tint', 
-      obligatorio: false, 
+    registroTransfusion: {
+      nombre: 'Transfusión',
+      icono: 'fas fa-tint',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    hojaFrontal: { 
-      nombre: 'Hoja Frontal', 
-      icono: 'fas fa-file-alt', 
-      obligatorio: true, 
+    hojaFrontal: {
+      nombre: 'Hoja Frontal',
+      icono: 'fas fa-file-alt',
+      obligatorio: true,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    altaVoluntaria: { 
-      nombre: 'Alta Voluntaria', 
-      icono: 'fas fa-door-open', 
-      obligatorio: false, 
+    altaVoluntaria: {
+      nombre: 'Alta Voluntaria',
+      icono: 'fas fa-door-open',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
-    referenciaTraslado: { 
-      nombre: 'Referencia', 
-      icono: 'fas fa-share', 
-      obligatorio: false, 
+    referenciaTraslado: {
+      nombre: 'Referencia',
+      icono: 'fas fa-share',
+      obligatorio: false,
       frecuente: false,
-      completado: false 
+      completado: false,
     },
     // DOCUMENTOS PEDIÁTRICOS
-  historiaClinicaPediatrica: { 
-    nombre: 'Historia Clínica Pediátrica', 
-    icono: 'fas fa-baby-carriage', 
-    obligatorio: true, 
-    frecuente: true,
-    completado: false 
-  },
-  antecedentesHeredoFamiliares: { 
-    nombre: 'Antecedentes Heredo-Familiares', 
-    icono: 'fas fa-dna', 
-    obligatorio: true, 
-    frecuente: true,
-    completado: false 
-  },
-  antecedentesPerinatales: { 
-    nombre: 'Antecedentes Perinatales', 
-    icono: 'fas fa-baby', 
-    obligatorio: true, 
-    frecuente: true,
-    completado: false 
-  },
-  estadoNutricionalPediatrico: { 
-    nombre: 'Estado Nutricional', 
-    icono: 'fas fa-weight', 
-    obligatorio: false, 
-    frecuente: true,
-    completado: false 
-  },
-  inmunizaciones: { 
-    nombre: 'Inmunizaciones', 
-    icono: 'fas fa-syringe', 
-    obligatorio: true, 
-    frecuente: true,
-    completado: false 
-  },
-  vacunasAdicionales: { 
-    nombre: 'Vacunas Adicionales', 
-    icono: 'fas fa-plus-square', 
-    obligatorio: false, 
-    frecuente: false,
-    completado: false 
-  },
-  alimentacionPediatrica: { 
-    nombre: 'Alimentación Pediátrica', 
-    icono: 'fas fa-utensils', 
-    obligatorio: false, 
-    frecuente: true,
-    completado: false 
-  },
-  tamizajeNeonatal: { 
-    nombre: 'Tamizaje Neonatal', 
-    icono: 'fas fa-microscope', 
-    obligatorio: false, 
-    frecuente: false,
-    completado: false 
-  }
+    historiaClinicaPediatrica: {
+      nombre: 'Historia Clínica Pediátrica',
+      icono: 'fas fa-baby-carriage',
+      obligatorio: true,
+      frecuente: true,
+      completado: false,
+    },
+    antecedentesHeredoFamiliares: {
+      nombre: 'Antecedentes Heredo-Familiares',
+      icono: 'fas fa-dna',
+      obligatorio: true,
+      frecuente: true,
+      completado: false,
+    },
+    antecedentesPerinatales: {
+      nombre: 'Antecedentes Perinatales',
+      icono: 'fas fa-baby',
+      obligatorio: true,
+      frecuente: true,
+      completado: false,
+    },
+    estadoNutricionalPediatrico: {
+      nombre: 'Estado Nutricional',
+      icono: 'fas fa-weight',
+      obligatorio: false,
+      frecuente: true,
+      completado: false,
+    },
+    inmunizaciones: {
+      nombre: 'Inmunizaciones',
+      icono: 'fas fa-syringe',
+      obligatorio: true,
+      frecuente: true,
+      completado: false,
+    },
+    vacunasAdicionales: {
+      nombre: 'Vacunas Adicionales',
+      icono: 'fas fa-plus-square',
+      obligatorio: false,
+      frecuente: false,
+      completado: false,
+    },
+    alimentacionPediatrica: {
+      nombre: 'Alimentación Pediátrica',
+      icono: 'fas fa-utensils',
+      obligatorio: false,
+      frecuente: true,
+      completado: false,
+    },
+    tamizajeNeonatal: {
+      nombre: 'Tamizaje Neonatal',
+      icono: 'fas fa-microscope',
+      obligatorio: false,
+      frecuente: false,
+      completado: false,
+    },
   };
 
   formularioEstado: FormularioEstado = {
@@ -586,19 +620,17 @@ tamizajeNeonatalForm!: FormGroup;
     inmunizaciones: false,
     vacunasAdicionales: false,
     solicitudCultivo: false,
-  solicitudGasometria: false,
-  hojaFrontal: false,
-  altaVoluntaria: false,
+    solicitudGasometria: false,
+    hojaFrontal: false,
+    altaVoluntaria: false,
   };
-
 
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
   documentosExistentes: { [key: string]: any } = {};
   formularios: { [key: string]: FormGroup } = {};
 
-
   mostrarModalEditarExpediente = false;
-numeroAdministrativoTemporal = '';
+  numeroAdministrativoTemporal = '';
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
@@ -651,8 +683,6 @@ numeroAdministrativoTemporal = '';
     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
     this.inicializarFormularios();
   }
-
-  
 
   private documentosDisponibles: TipoDocumentoConfig[] = [
     {
@@ -956,400 +986,391 @@ numeroAdministrativoTemporal = '';
       orden: 25,
     },
 
-     // Documentos pediátricos
-  {
-    id: 'controlCrecimiento',
-    nombre: 'Control de Crecimiento',
-    descripcion: 'Seguimiento del desarrollo pediátrico',
-    icono: 'fas fa-chart-area',
-    color: 'cyan',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 50,
-  },
-  {
-    id: 'esquemaVacunacion',
-    nombre: 'Esquema de Vacunación',
-    descripcion: 'Registro de vacunas aplicadas',
-    icono: 'fas fa-shield-alt',
-    color: 'emerald',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 51,
-  },
-  {
-    id: 'historiaClinicaPediatrica',
-    nombre: 'Historia Clínica Pediátrica',
-    descripcion: 'Historia clínica específica para pacientes pediátricos',
-    icono: 'fas fa-baby',
-    color: 'purple',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 52,
-  },
-  {
-    id: 'desarrolloPsicomotriz',
-    nombre: 'Desarrollo Psicomotriz',
-    descripcion: 'Evaluación del desarrollo psicomotor',
-    icono: 'fas fa-child',
-    color: 'indigo',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 53,
-  },
-  {
-    id: 'alimentacionPediatrica',
-    nombre: 'Alimentación Pediátrica',
-    descripcion: 'Evaluación nutricional pediátrica',
-    icono: 'fas fa-utensils',
-    color: 'green',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 54,
-  },
-  {
-    id: 'tamizajeNeonatal',
-    nombre: 'Tamizaje Neonatal',
-    descripcion: 'Pruebas de detección neonatal',
-    icono: 'fas fa-microscope',
-    color: 'yellow',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 55,
-  },
+    // Documentos pediátricos
+    {
+      id: 'controlCrecimiento',
+      nombre: 'Control de Crecimiento',
+      descripcion: 'Seguimiento del desarrollo pediátrico',
+      icono: 'fas fa-chart-area',
+      color: 'cyan',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 50,
+    },
+    {
+      id: 'esquemaVacunacion',
+      nombre: 'Esquema de Vacunación',
+      descripcion: 'Registro de vacunas aplicadas',
+      icono: 'fas fa-shield-alt',
+      color: 'emerald',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 51,
+    },
+    {
+      id: 'historiaClinicaPediatrica',
+      nombre: 'Historia Clínica Pediátrica',
+      descripcion: 'Historia clínica específica para pacientes pediátricos',
+      icono: 'fas fa-baby',
+      color: 'purple',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 52,
+    },
+    {
+      id: 'desarrolloPsicomotriz',
+      nombre: 'Desarrollo Psicomotriz',
+      descripcion: 'Evaluación del desarrollo psicomotor',
+      icono: 'fas fa-child',
+      color: 'indigo',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 53,
+    },
+    {
+      id: 'alimentacionPediatrica',
+      nombre: 'Alimentación Pediátrica',
+      descripcion: 'Evaluación nutricional pediátrica',
+      icono: 'fas fa-utensils',
+      color: 'green',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 54,
+    },
+    {
+      id: 'tamizajeNeonatal',
+      nombre: 'Tamizaje Neonatal',
+      descripcion: 'Pruebas de detección neonatal',
+      icono: 'fas fa-microscope',
+      color: 'yellow',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 55,
+    },
 
+    // DOCUMENTOS PEDIÁTRICOS
 
-
-
-
-  // DOCUMENTOS PEDIÁTRICOS
-
-  {
-    id: 'antecedentesHeredoFamiliares',
-    nombre: 'Antecedentes Heredo-Familiares',
-    descripcion: 'Antecedentes familiares detallados',
-    icono: 'fas fa-dna',
-    color: 'purple',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 53,
-  },
-  {
-    id: 'antecedentesPerinatales',
-    nombre: 'Antecedentes Perinatales',
-    descripcion: 'Antecedentes del embarazo y parto',
-    icono: 'fas fa-baby',
-    color: 'pink',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 54,
-  },
-  {
-    id: 'desarrolloPsicomotriz',
-    nombre: 'Desarrollo Psicomotriz',
-    descripcion: 'Evaluación del desarrollo psicomotor',
-    icono: 'fas fa-brain',
-    color: 'indigo',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 55,
-  },
-  {
-    id: 'estadoNutricionalPediatrico',
-    nombre: 'Estado Nutricional Pediátrico',
-    descripcion: 'Evaluación nutricional especializada',
-    icono: 'fas fa-weight',
-    color: 'emerald',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 56,
-  },
-  {
-    id: 'inmunizaciones',
-    nombre: 'Inmunizaciones',
-    descripcion: 'Control del esquema de vacunación',
-    icono: 'fas fa-syringe',
-    color: 'blue',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 57,
-  },
-  {
-    id: 'vacunasAdicionales',
-    nombre: 'Vacunas Adicionales',
-    descripcion: 'Vacunas fuera del esquema básico',
-    icono: 'fas fa-plus-square',
-    color: 'teal',
-    requiereInternamiento: false,
-    soloAdultos: false,
-    soloPediatrico: true,
-    requiereQuirurgico: false,
-    orden: 58,
-  },
-  // {
-  //   id: 'alimentacionPediatrica',
-  //   nombre: 'Alimentación Pediátrica',
-  //   descripcion: 'Evaluación nutricional y alimentaria',
-  //   icono: 'fas fa-utensils',
-  //   color: 'green',
-  //   requiereInternamiento: false,
-  //   soloAdultos: false,
-  //   soloPediatrico: true,
-  //   requiereQuirurgico: false,
-  //   orden: 59,
-  // },
-  // {
-  //   id: 'tamizajeNeonatal',
-  //   nombre: 'Tamizaje Neonatal',
-  //   descripcion: 'Pruebas de detección neonatal',
-  //   icono: 'fas fa-microscope',
-  //   color: 'yellow',
-  //   requiereInternamiento: false,
-  //   soloAdultos: false,
-  //   soloPediatrico: true,
-  //   requiereQuirurgico: false,
-  //   orden: 60,
-  // }
-
+    {
+      id: 'antecedentesHeredoFamiliares',
+      nombre: 'Antecedentes Heredo-Familiares',
+      descripcion: 'Antecedentes familiares detallados',
+      icono: 'fas fa-dna',
+      color: 'purple',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 53,
+    },
+    {
+      id: 'antecedentesPerinatales',
+      nombre: 'Antecedentes Perinatales',
+      descripcion: 'Antecedentes del embarazo y parto',
+      icono: 'fas fa-baby',
+      color: 'pink',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 54,
+    },
+    {
+      id: 'desarrolloPsicomotriz',
+      nombre: 'Desarrollo Psicomotriz',
+      descripcion: 'Evaluación del desarrollo psicomotor',
+      icono: 'fas fa-brain',
+      color: 'indigo',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 55,
+    },
+    {
+      id: 'estadoNutricionalPediatrico',
+      nombre: 'Estado Nutricional Pediátrico',
+      descripcion: 'Evaluación nutricional especializada',
+      icono: 'fas fa-weight',
+      color: 'emerald',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 56,
+    },
+    {
+      id: 'inmunizaciones',
+      nombre: 'Inmunizaciones',
+      descripcion: 'Control del esquema de vacunación',
+      icono: 'fas fa-syringe',
+      color: 'blue',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 57,
+    },
+    {
+      id: 'vacunasAdicionales',
+      nombre: 'Vacunas Adicionales',
+      descripcion: 'Vacunas fuera del esquema básico',
+      icono: 'fas fa-plus-square',
+      color: 'teal',
+      requiereInternamiento: false,
+      soloAdultos: false,
+      soloPediatrico: true,
+      requiereQuirurgico: false,
+      orden: 58,
+    },
+    // {
+    //   id: 'alimentacionPediatrica',
+    //   nombre: 'Alimentación Pediátrica',
+    //   descripcion: 'Evaluación nutricional y alimentaria',
+    //   icono: 'fas fa-utensils',
+    //   color: 'green',
+    //   requiereInternamiento: false,
+    //   soloAdultos: false,
+    //   soloPediatrico: true,
+    //   requiereQuirurgico: false,
+    //   orden: 59,
+    // },
+    // {
+    //   id: 'tamizajeNeonatal',
+    //   nombre: 'Tamizaje Neonatal',
+    //   descripcion: 'Pruebas de detección neonatal',
+    //   icono: 'fas fa-microscope',
+    //   color: 'yellow',
+    //   requiereInternamiento: false,
+    //   soloAdultos: false,
+    //   soloPediatrico: true,
+    //   requiereQuirurgico: false,
+    //   orden: 60,
+    // }
   ];
 
-
   // Métodos para manejar documentos existentes
-getDocumentosExistentesArray(): any[] {
-  if (!this.documentosExistentes) return [];
-  return Object.keys(this.documentosExistentes).map(key => ({
-    ...this.documentosExistentes[key],
-    tipoDocumento: key
-  }));
-}
+  getDocumentosExistentesArray(): any[] {
+    if (!this.documentosExistentes) return [];
+    return Object.keys(this.documentosExistentes).map((key) => ({
+      ...this.documentosExistentes[key],
+      tipoDocumento: key,
+    }));
+  }
 
+  abrirModalEditarExpediente(): void {
+    this.numeroAdministrativoTemporal =
+      this.pacienteCompleto?.expediente?.numero_expediente_administrativo || '';
+    this.mostrarModalEditarExpediente = true;
+  }
 
-abrirModalEditarExpediente(): void {
-  this.numeroAdministrativoTemporal =
-    this.pacienteCompleto?.expediente?.numero_expediente_administrativo || '';
-  this.mostrarModalEditarExpediente = true;
-}
-
-cancelarEditarExpediente(): void {
-  this.mostrarModalEditarExpediente = false;
-  this.numeroAdministrativoTemporal = '';
-}
-
-async guardarNumeroAdministrativo(): Promise<void> {
-  try {
-    await this.actualizarNumeroAdministrativo(this.numeroAdministrativoTemporal);
+  cancelarEditarExpediente(): void {
     this.mostrarModalEditarExpediente = false;
     this.numeroAdministrativoTemporal = '';
-  } catch (error) {
-    // El error ya se maneja en actualizarNumeroAdministrativo
   }
-}
 
-
-getTituloDocumento(documento: any): string {
-  const titulos: { [key: string]: string } = {
-    'historiaClinica': this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
-    'signosVitales': 'Signos Vitales',
-    'notaUrgencias': 'Nota de Urgencias',
-    'notaEvolucion': 'Nota de Evolución',
-    'consentimiento': 'Consentimiento Informado',
-    'notaInterconsulta': 'Nota de Interconsulta',
-    'notaPreoperatoria': 'Nota Preoperatoria',
-    'notaPostoperatoria': 'Nota Postoperatoria',
-    'notaPreanestesica': 'Nota Preanestésica',
-    'notaPostanestesica': 'Nota Postanestésica',
-    'solicitudEstudio': 'Solicitud de Estudio',
-    'referenciaTraslado': 'Referencia y Traslado',
-    'controlCrecimiento': 'Control de Crecimiento',
-    'esquemaVacunacion': 'Esquema de Vacunación',
-    'hojaFrontal': 'Hoja Frontal',
-    'altaVoluntaria': 'Alta Voluntaria',
-    'solicitudCultivo': 'Solicitud de Cultivo',
-    'solicitudGasometria': 'Solicitud de Gasometría',
-    // Nuevos documentos
-    'notaEgreso': 'Nota de Egreso',
-    'consentimientoProcedimientos': 'Consentimiento Procedimientos',
-    'consentimientoHospitalizacion': 'Consentimiento Hospitalización',
-    'consentimientoTransfusion': 'Consentimiento Transfusión',
-    'hojaAltaVoluntaria': 'Hoja Alta Voluntaria',
-    'hojaFrontalExpediente': 'Hoja Frontal Expediente',
-    'solicitudLaboratorio': 'Solicitud Laboratorio',
-    'solicitudImagenologia': 'Solicitud Imagenología',
-    'prescripcionMedicamentos': 'Prescripción Medicamentos'
-  };
-
-  return titulos[documento.tipoDocumento] ||
-         documento.nombre_tipo_documento ||
-         documento.tipo_documento?.nombre ||
-         'Documento Clínico';
-}
-
-getColorClaseDocumento(documento: any): string {
-  const colores: { [key: string]: string } = {
-    'historiaClinica': 'bg-blue-50 text-blue-600',
-    'signosVitales': 'bg-red-50 text-red-600',
-    'notaUrgencias': 'bg-red-50 text-red-600',
-    'notaEvolucion': 'bg-green-50 text-green-600',
-    'consentimiento': 'bg-orange-50 text-orange-600',
-    'notaInterconsulta': 'bg-purple-50 text-purple-600',
-    'solicitudEstudio': 'bg-gray-50 text-gray-600',
-    'referenciaTraslado': 'bg-amber-50 text-amber-600',
-    'controlCrecimiento': 'bg-pink-50 text-pink-600',
-    'esquemaVacunacion': 'bg-emerald-50 text-emerald-600',
-    // Nuevos documentos
-    'notaEgreso': 'bg-green-50 text-green-600',
-    'consentimientoProcedimientos': 'bg-orange-50 text-orange-600',
-    'consentimientoHospitalizacion': 'bg-blue-50 text-blue-600',
-    'consentimientoTransfusion': 'bg-red-50 text-red-600',
-    'hojaAltaVoluntaria': 'bg-yellow-50 text-yellow-600',
-    'hojaFrontalExpediente': 'bg-gray-50 text-gray-600',
-    'solicitudLaboratorio': 'bg-blue-50 text-blue-600',
-    'solicitudImagenologia': 'bg-purple-50 text-purple-600',
-    'solicitudCultivo': 'bg-green-50 text-green-600',
-    'prescripcionMedicamentos': 'bg-indigo-50 text-indigo-600',
-    'solicitudGasometria': 'bg-teal-50 text-teal-600'
-  };
-
-  return colores[documento.tipoDocumento] || 'bg-gray-50 text-gray-600';
-}
-
-getIconoDocumento(documento: any): string {
-  const iconos: { [key: string]: string } = {
-    'historiaClinica': 'fas fa-file-medical-alt',
-    'signosVitales': 'fas fa-heartbeat',
-    'notaUrgencias': 'fas fa-ambulance',
-    'notaEvolucion': 'fas fa-chart-line',
-    'consentimiento': 'fas fa-file-signature',
-    'notaInterconsulta': 'fas fa-user-md',
-    'notaPreoperatoria': 'fas fa-procedures',
-    'notaPostoperatoria': 'fas fa-band-aid',
-    'notaPreanestesica': 'fas fa-syringe',
-    'notaPostanestesica': 'fas fa-bed',
-    'solicitudEstudio': 'fas fa-vial',
-    'referenciaTraslado': 'fas fa-ambulance',
-    'controlCrecimiento': 'fas fa-baby',
-    'esquemaVacunacion': 'fas fa-shield-virus',
-    'hojaFrontal': 'fas fa-file-alt',
-    'altaVoluntaria': 'fas fa-sign-out-alt',
-    'solicitudCultivo': 'fas fa-microscope',
-    'solicitudGasometria': 'fas fa-lungs'
-  };
-
-  return iconos[documento.tipoDocumento] || 'fas fa-file-alt';
-}
-
-getClaseEstadoDocumento(estado: string): string {
-  const clases: { [key: string]: string } = {
-    'Activo': 'bg-green-100 text-green-800',
-    'ACTIVO': 'bg-green-100 text-green-800',
-    'Inactivo': 'bg-gray-100 text-gray-800',
-    'INACTIVO': 'bg-gray-100 text-gray-800',
-    'Pendiente': 'bg-yellow-100 text-yellow-800',
-    'PENDIENTE': 'bg-yellow-100 text-yellow-800',
-    'Borrador': 'bg-blue-100 text-blue-800',
-    'BORRADOR': 'bg-blue-100 text-blue-800'
-  };
-
-  return clases[estado] || 'bg-gray-100 text-gray-800';
-}
-
-// Métodos para acciones de documentos
-verDocumento(documento: any): void {
-  console.log('Ver documento:', documento);
-  // Aquí puedes implementar la lógica para ver el documento
-  // Por ejemplo, abrir un modal con los detalles
-}
-
-generarPDFDocumento(documento: any): void {
-  const titulo = this.getTituloDocumento(documento);
-  this.generarPDF(titulo);
-}
-
-// editarDocumento(documento: any): void {
-//   console.log('Editar documento:', documento);
-//   // Aquí puedes implementar la lógica para editar
-//   // Por ejemplo, cambiar al tab crear y cargar los datos
-//   this.tabActiva = 'crear';
-//   this.formularioActivo = documento.tipoDocumento as FormularioActivo;
-
-//   // Cargar datos en el formulario correspondiente
-//   this.cargarDatosEnFormulario(documento);
-// }
-
-private cargarDatosEnFormulario(documento: any): void {
-  switch (documento.tipoDocumento) {
-    case 'historiaClinica':
-      if (this.historiaClinicaForm) {
-        this.historiaClinicaForm.patchValue(documento);
-      }
-      break;
-    case 'signosVitales':
-      if (this.signosVitalesForm) {
-        this.signosVitalesForm.patchValue(documento);
-      }
-      break;
-    case 'notaUrgencias':
-      if (this.notaUrgenciasForm) {
-        this.notaUrgenciasForm.patchValue(documento);
-      }
-      break;
-    case 'notaEvolucion':
-      if (this.notaEvolucionForm) {
-        this.notaEvolucionForm.patchValue(documento);
-      }
-      break;
-    // Agregar más casos según necesites
-    default:
-      console.warn('Tipo de documento no soportado para edición:', documento.tipoDocumento);
-  }
-}
-
-// Hacer público el getter de documentosDisponibles
-get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
-  return this.documentosDisponibles;
-}
-
-
-//   get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
-//   return this.documentosDisponibles;
-// }
-
-  getEstadoDocumento(tipoDoc: string): 'crear' | 'editar' | 'pdf' | 'no_disponible' {
-  const documentoExiste = this.documentosExistentes[tipoDoc];
-  if (documentoExiste) {
-    if (this.documentoTieneDatosCompletos(tipoDoc)) {
-      return 'pdf';
-    } else {
-      return 'editar';
+  async guardarNumeroAdministrativo(): Promise<void> {
+    try {
+      await this.actualizarNumeroAdministrativo(
+        this.numeroAdministrativoTemporal
+      );
+      this.mostrarModalEditarExpediente = false;
+      this.numeroAdministrativoTemporal = '';
+    } catch (error) {
+      // El error ya se maneja en actualizarNumeroAdministrativo
     }
   }
-  if (this.formularioActivo !== null && this.puedeCrearDocumento(tipoDoc)) {
-    return 'crear';
+
+  getTituloDocumento(documento: any): string {
+    const titulos: { [key: string]: string } = {
+      historiaClinica: this.esPacientePediatrico
+        ? 'Historia Clínica Pediátrica'
+        : 'Historia Clínica',
+      signosVitales: 'Signos Vitales',
+      notaUrgencias: 'Nota de Urgencias',
+      notaEvolucion: 'Nota de Evolución',
+      consentimiento: 'Consentimiento Informado',
+      notaInterconsulta: 'Nota de Interconsulta',
+      notaPreoperatoria: 'Nota Preoperatoria',
+      notaPostoperatoria: 'Nota Postoperatoria',
+      notaPreanestesica: 'Nota Preanestésica',
+      notaPostanestesica: 'Nota Postanestésica',
+      solicitudEstudio: 'Solicitud de Estudio',
+      referenciaTraslado: 'Referencia y Traslado',
+      controlCrecimiento: 'Control de Crecimiento',
+      esquemaVacunacion: 'Esquema de Vacunación',
+      hojaFrontal: 'Hoja Frontal',
+      altaVoluntaria: 'Alta Voluntaria',
+      solicitudCultivo: 'Solicitud de Cultivo',
+      solicitudGasometria: 'Solicitud de Gasometría',
+      // Nuevos documentos
+      notaEgreso: 'Nota de Egreso',
+      consentimientoProcedimientos: 'Consentimiento Procedimientos',
+      consentimientoHospitalizacion: 'Consentimiento Hospitalización',
+      consentimientoTransfusion: 'Consentimiento Transfusión',
+      hojaAltaVoluntaria: 'Hoja Alta Voluntaria',
+      hojaFrontalExpediente: 'Hoja Frontal Expediente',
+      solicitudLaboratorio: 'Solicitud Laboratorio',
+      solicitudImagenologia: 'Solicitud Imagenología',
+      prescripcionMedicamentos: 'Prescripción Medicamentos',
+    };
+
+    return (
+      titulos[documento.tipoDocumento] ||
+      documento.nombre_tipo_documento ||
+      documento.tipo_documento?.nombre ||
+      'Documento Clínico'
+    );
   }
-  return 'no_disponible';
-}
+
+  getColorClaseDocumento(documento: any): string {
+    const colores: { [key: string]: string } = {
+      historiaClinica: 'bg-blue-50 text-blue-600',
+      signosVitales: 'bg-red-50 text-red-600',
+      notaUrgencias: 'bg-red-50 text-red-600',
+      notaEvolucion: 'bg-green-50 text-green-600',
+      consentimiento: 'bg-orange-50 text-orange-600',
+      notaInterconsulta: 'bg-purple-50 text-purple-600',
+      solicitudEstudio: 'bg-gray-50 text-gray-600',
+      referenciaTraslado: 'bg-amber-50 text-amber-600',
+      controlCrecimiento: 'bg-pink-50 text-pink-600',
+      esquemaVacunacion: 'bg-emerald-50 text-emerald-600',
+      // Nuevos documentos
+      notaEgreso: 'bg-green-50 text-green-600',
+      consentimientoProcedimientos: 'bg-orange-50 text-orange-600',
+      consentimientoHospitalizacion: 'bg-blue-50 text-blue-600',
+      consentimientoTransfusion: 'bg-red-50 text-red-600',
+      hojaAltaVoluntaria: 'bg-yellow-50 text-yellow-600',
+      hojaFrontalExpediente: 'bg-gray-50 text-gray-600',
+      solicitudLaboratorio: 'bg-blue-50 text-blue-600',
+      solicitudImagenologia: 'bg-purple-50 text-purple-600',
+      solicitudCultivo: 'bg-green-50 text-green-600',
+      prescripcionMedicamentos: 'bg-indigo-50 text-indigo-600',
+      solicitudGasometria: 'bg-teal-50 text-teal-600',
+    };
+
+    return colores[documento.tipoDocumento] || 'bg-gray-50 text-gray-600';
+  }
+
+  getIconoDocumento(documento: any): string {
+    const iconos: { [key: string]: string } = {
+      historiaClinica: 'fas fa-file-medical-alt',
+      signosVitales: 'fas fa-heartbeat',
+      notaUrgencias: 'fas fa-ambulance',
+      notaEvolucion: 'fas fa-chart-line',
+      consentimiento: 'fas fa-file-signature',
+      notaInterconsulta: 'fas fa-user-md',
+      notaPreoperatoria: 'fas fa-procedures',
+      notaPostoperatoria: 'fas fa-band-aid',
+      notaPreanestesica: 'fas fa-syringe',
+      notaPostanestesica: 'fas fa-bed',
+      solicitudEstudio: 'fas fa-vial',
+      referenciaTraslado: 'fas fa-ambulance',
+      controlCrecimiento: 'fas fa-baby',
+      esquemaVacunacion: 'fas fa-shield-virus',
+      hojaFrontal: 'fas fa-file-alt',
+      altaVoluntaria: 'fas fa-sign-out-alt',
+      solicitudCultivo: 'fas fa-microscope',
+      solicitudGasometria: 'fas fa-lungs',
+    };
+
+    return iconos[documento.tipoDocumento] || 'fas fa-file-alt';
+  }
+
+  getClaseEstadoDocumento(estado: string): string {
+    const clases: { [key: string]: string } = {
+      Activo: 'bg-green-100 text-green-800',
+      ACTIVO: 'bg-green-100 text-green-800',
+      Inactivo: 'bg-gray-100 text-gray-800',
+      INACTIVO: 'bg-gray-100 text-gray-800',
+      Pendiente: 'bg-yellow-100 text-yellow-800',
+      PENDIENTE: 'bg-yellow-100 text-yellow-800',
+      Borrador: 'bg-blue-100 text-blue-800',
+      BORRADOR: 'bg-blue-100 text-blue-800',
+    };
+
+    return clases[estado] || 'bg-gray-100 text-gray-800';
+  }
+
+  // Métodos para acciones de documentos
+  verDocumento(documento: any): void {
+    console.log('Ver documento:', documento);
+    // Aquí puedes implementar la lógica para ver el documento
+    // Por ejemplo, abrir un modal con los detalles
+  }
+
+  generarPDFDocumento(documento: any): void {
+    const titulo = this.getTituloDocumento(documento);
+    this.generarPDF(titulo);
+  }
+
+  private cargarDatosEnFormulario(documento: any): void {
+    switch (documento.tipoDocumento) {
+      case 'historiaClinica':
+        if (this.historiaClinicaForm) {
+          this.historiaClinicaForm.patchValue(documento);
+        }
+        break;
+      case 'signosVitales':
+        if (this.signosVitalesForm) {
+          this.signosVitalesForm.patchValue(documento);
+        }
+        break;
+      case 'notaUrgencias':
+        if (this.notaUrgenciasForm) {
+          this.notaUrgenciasForm.patchValue(documento);
+        }
+        break;
+      case 'notaEvolucion':
+        if (this.notaEvolucionForm) {
+          this.notaEvolucionForm.patchValue(documento);
+        }
+        break;
+      // Agregar más casos según necesites
+      default:
+        console.warn(
+          'Tipo de documento no soportado para edición:',
+          documento.tipoDocumento
+        );
+    }
+  }
+
+  // Hacer público el getter de documentosDisponibles
+  get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
+    return this.documentosDisponibles;
+  }
+
+  //   get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
+  //   return this.documentosDisponibles;
+  // }
+
+  getEstadoDocumento(
+    tipoDoc: string
+  ): 'crear' | 'editar' | 'pdf' | 'no_disponible' {
+    const documentoExiste = this.documentosExistentes[tipoDoc];
+    if (documentoExiste) {
+      if (this.documentoTieneDatosCompletos(tipoDoc)) {
+        return 'pdf';
+      } else {
+        return 'editar';
+      }
+    }
+    if (this.formularioActivo !== null && this.puedeCrearDocumento(tipoDoc)) {
+      return 'crear';
+    }
+    return 'no_disponible';
+  }
 
   private documentoTieneDatosCompletos(tipoDoc: string): boolean {
     const documento = this.documentosExistentes[tipoDoc];
@@ -1445,102 +1466,105 @@ get documentosDisponiblesPublicos(): TipoDocumentoConfig[] {
     }
   }
 
-
   obtenerNumeroExpedientePreferido(): string {
-  if (!this.pacienteCompleto?.expediente) return 'Sin expediente';
+    if (!this.pacienteCompleto?.expediente) return 'Sin expediente';
 
-  const expediente = this.pacienteCompleto.expediente;
-  return expediente.numero_expediente_administrativo ||
-         expediente.numero_expediente ||
-         'Sin número';
-}
-
-// - MÉTODO PARA ACTUALIZAR NÚMERO ADMINISTRATIVO
-async actualizarNumeroAdministrativo(nuevoNumero: string): Promise<void> {
-  if (!this.pacienteCompleto?.expediente?.id_expediente) {
-    throw new Error('No hay expediente válido');
-  }
-
-  try {
-    //   DEBUG COMPLETO
-    const usuario = this.authService.getCurrentUser();
-    console.log('  Usuario completo del AuthService:', usuario);
-    console.log('  Propiedades del usuario:', Object.keys(usuario || {}));
-    console.log('  ID usuario:', usuario?.id);
-    console.log('  ID referencia:', usuario?.id_referencia);
-    console.log('  Tipo usuario:', usuario?.tipo_usuario);
-    console.log('  medicoActual (this.medicoActual):', this.medicoActual);
-
-    // 🔧 Determinar qué ID usar
-    let medicoId: number | undefined;
-
-    if (usuario?.tipo_usuario === 'medico') {
-      // Intentar usar id_referencia primero, luego id como fallback
-      medicoId = usuario.id_referencia || usuario.id;
-      console.log('- Usando ID del usuario médico:', medicoId);
-    } else if (this.medicoActual) {
-      medicoId = this.medicoActual;
-      console.log('- Usando medicoActual:', medicoId);
-    }
-
-    const updateData: any = {
-      numero_expediente_administrativo: nuevoNumero.trim() || undefined
-    };
-
-    // Solo agregar ID del médico si lo tenemos
-    if (medicoId) {
-      updateData.id_medico_modificador = medicoId;
-      console.log('- Enviando con id_medico_modificador:', medicoId);
-    } else {
-      console.warn('  No se encontró ID de médico válido');
-    }
-
-    console.log('📤 Datos finales a enviar:', updateData);
-
-    const response = await firstValueFrom(
-      this.expedientesService.update(
-        this.pacienteCompleto.expediente.id_expediente,
-        updateData
-      )
+    const expediente = this.pacienteCompleto.expediente;
+    return (
+      expediente.numero_expediente_administrativo ||
+      expediente.numero_expediente ||
+      'Sin número'
     );
+  }
 
-    // Actualizar el objeto local
-    if (this.pacienteCompleto.expediente) {
-      this.pacienteCompleto.expediente.numero_expediente_administrativo =
-        nuevoNumero.trim() || undefined;
+  // - MÉTODO PARA ACTUALIZAR NÚMERO ADMINISTRATIVO
+  async actualizarNumeroAdministrativo(nuevoNumero: string): Promise<void> {
+    if (!this.pacienteCompleto?.expediente?.id_expediente) {
+      throw new Error('No hay expediente válido');
     }
 
-    this.success = 'Número de expediente administrativo actualizado correctamente';
-    console.log('- Número administrativo actualizado:', nuevoNumero);
+    try {
+      //   DEBUG COMPLETO
+      const usuario = this.authService.getCurrentUser();
+      console.log('  Usuario completo del AuthService:', usuario);
+      console.log('  Propiedades del usuario:', Object.keys(usuario || {}));
+      console.log('  ID usuario:', usuario?.id);
+      console.log('  ID referencia:', usuario?.id_referencia);
+      console.log('  Tipo usuario:', usuario?.tipo_usuario);
+      console.log('  medicoActual (this.medicoActual):', this.medicoActual);
 
-  } catch (error) {
-    console.error('❌ Error al actualizar número administrativo:', error);
-    this.error = 'Error al actualizar el número administrativo';
-    throw error;
+      // 🔧 Determinar qué ID usar
+      let medicoId: number | undefined;
+
+      if (usuario?.tipo_usuario === 'medico') {
+        // Intentar usar id_referencia primero, luego id como fallback
+        medicoId = usuario.id_referencia || usuario.id;
+        console.log('- Usando ID del usuario médico:', medicoId);
+      } else if (this.medicoActual) {
+        medicoId = this.medicoActual;
+        console.log('- Usando medicoActual:', medicoId);
+      }
+
+      const updateData: any = {
+        numero_expediente_administrativo: nuevoNumero.trim() || undefined,
+      };
+
+      // Solo agregar ID del médico si lo tenemos
+      if (medicoId) {
+        updateData.id_medico_modificador = medicoId;
+        console.log('- Enviando con id_medico_modificador:', medicoId);
+      } else {
+        console.warn('  No se encontró ID de médico válido');
+      }
+
+      console.log('📤 Datos finales a enviar:', updateData);
+
+      const response = await firstValueFrom(
+        this.expedientesService.update(
+          this.pacienteCompleto.expediente.id_expediente,
+          updateData
+        )
+      );
+
+      // Actualizar el objeto local
+      if (this.pacienteCompleto.expediente) {
+        this.pacienteCompleto.expediente.numero_expediente_administrativo =
+          nuevoNumero.trim() || undefined;
+      }
+
+      this.success =
+        'Número de expediente administrativo actualizado correctamente';
+      console.log('- Número administrativo actualizado:', nuevoNumero);
+    } catch (error) {
+      console.error('❌ Error al actualizar número administrativo:', error);
+      this.error = 'Error al actualizar el número administrativo';
+      throw error;
+    }
   }
-}
 
-// 🔧 AGREGAR ESTE MÉTODO SI NO EXISTE
-private obtenerIdMedicoActual(): number | undefined {
-  // Intentar obtener del servicio de autenticación
-  const usuario = this.authService.getCurrentUser();
-  console.log('  Verificando usuario en obtenerIdMedicoActual:', usuario);
+  // 🔧 AGREGAR ESTE MÉTODO SI NO EXISTE
+  private obtenerIdMedicoActual(): number | undefined {
+    // Intentar obtener del servicio de autenticación
+    const usuario = this.authService.getCurrentUser();
+    console.log('  Verificando usuario en obtenerIdMedicoActual:', usuario);
 
-  if (usuario?.tipo_usuario === 'medico' && usuario?.id_referencia) {
-    console.log('- Médico obtenido del usuario autenticado:', usuario.id_referencia);
-    return usuario.id_referencia;
+    if (usuario?.tipo_usuario === 'medico' && usuario?.id_referencia) {
+      console.log(
+        '- Médico obtenido del usuario autenticado:',
+        usuario.id_referencia
+      );
+      return usuario.id_referencia;
+    }
+
+    // Fallback: usar this.medicoActual si está disponible
+    if (this.medicoActual) {
+      console.log('- Médico obtenido de medicoActual:', this.medicoActual);
+      return this.medicoActual;
+    }
+
+    console.warn('  No se pudo obtener ID del médico');
+    return undefined;
   }
-
-  // Fallback: usar this.medicoActual si está disponible
-  if (this.medicoActual) {
-    console.log('- Médico obtenido de medicoActual:', this.medicoActual);
-    return this.medicoActual;
-  }
-
-  console.warn('  No se pudo obtener ID del médico');
-  return undefined;
-}
-
 
   // - MAPEAR TIPO DE DOCUMENTO DEL BACKEND AL FRONTEND
   private mapearTipoDocumento(documento: any): string | null {
@@ -1567,98 +1591,64 @@ private obtenerIdMedicoActual(): number | undefined {
 
   documentosDisponiblesFiltrados: TipoDocumentoConfig[] = [];
 
+  private inicializarFormularios(): void {
+    // Formularios clínicos principales (EXISTENTES)
+    this.signosVitalesForm = this.initializeSignosVitalesForm();
+    this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
+    this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
+    this.notaEvolucionForm = this.initializeNotaEvolucionForm();
 
-//   private inicializarFormularios(): void {
-//     // Formularios clínicos principales
-//     this.signosVitalesForm = this.initializeSignosVitalesForm();
-//     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
-//     this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
-//     this.notaEvolucionForm = this.initializeNotaEvolucionForm();
+    // Formularios de consentimiento y procedimientos (EXISTENTES)
+    this.consentimientoForm = this.initializeConsentimientoForm();
+    this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
+    this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
+    this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
+    this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
 
-//     // Formularios de consentimiento y procedimientos
-//     this.consentimientoForm = this.initializeConsentimientoForm();
-//     this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
-//     this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
-//     this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
-//     this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
+    // Formularios adicionales (EXISTENTES)
+    this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
 
-//     // Formularios adicionales
-//     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
-//     this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
-//     this.prescripcionForm = this.initializePrescripcionForm();
-//     this.referenciaForm = this.initializeReferenciaForm();
-//     this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
-//     this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
+    // 🔥 CORREGIR: Estos ya están definidos pero faltaba inicializarlos aquí
+    this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
+    this.prescripcionForm = this.initializePrescripcionForm();
+    this.referenciaForm = this.initializeReferenciaForm();
+    this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
+    this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
 
-//      // Formularios pediátricos
-//   this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
-//   this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
-//   this.historiaClinicaPediatricaForm = this.initializeHistoriaClinicaPediatricaForm();
-//   this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
-//   this.alimentacionPediatricaForm = this.initializeAlimentacionPediatricaForm();
-//   this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
-// // Dentro de inicializarFormularios() o una función similar
-// this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
-// this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
-// this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
-// this.inmunizacionesForm = this.initializeInmunizacionesForm();
-// this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
-//     console.log(
-//       '- Todos los formularios han sido inicializados correctamente.'
-//     );
-//   }
+    // Formularios pediátricos (EXISTENTES)
+    this.historiaClinicaPediatricaForm =
+      this.initializeHistoriaClinicaPediatricaForm();
+    this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
+    this.alimentacionPediatricaForm =
+      this.initializeAlimentacionPediatricaForm();
+    this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
+    this.antecedentesHeredoFamiliaresForm =
+      this.initializeAntecedentesHeredoFamiliaresForm();
+    this.antecedentesPerinatalesForm =
+      this.initializeAntecedentesPerinatalesForm();
+    this.estadoNutricionalPediatricoForm =
+      this.initializeEstadoNutricionalPediatricoForm();
+    this.inmunizacionesForm = this.initializeInmunizacionesForm();
+    this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
 
-private inicializarFormularios(): void {
-  // Formularios clínicos principales (EXISTENTES)
-  this.signosVitalesForm = this.initializeSignosVitalesForm();
-  this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
-  this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
-  this.notaEvolucionForm = this.initializeNotaEvolucionForm();
+    // 🔥 NUEVOS FORMULARIOS AGREGADOS
+    this.solicitudCultivoForm = this.initializeSolicitudCultivoForm();
+    this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
+    this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
+    this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
 
-  // Formularios de consentimiento y procedimientos (EXISTENTES)
-  this.consentimientoForm = this.initializeConsentimientoForm();
-  this.notaPreoperatoriaForm = this.initializeNotaPreoperatoriaForm();
-  this.notaPostoperatoriaForm = this.initializeNotaPostoperatoriaForm();
-  this.notaPreanestesicaForm = this.initializeNotaPreanestesicaForm();
-  this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
-
-  // Formularios adicionales (EXISTENTES)
-  this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
-  
-  // 🔥 CORREGIR: Estos ya están definidos pero faltaba inicializarlos aquí
-  this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
-  this.prescripcionForm = this.initializePrescripcionForm();
-  this.referenciaForm = this.initializeReferenciaForm();
-  this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
-  this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
-
-  // Formularios pediátricos (EXISTENTES)
-  this.historiaClinicaPediatricaForm = this.initializeHistoriaClinicaPediatricaForm();
-  this.desarrolloPsicomotrizForm = this.initializeDesarrolloPsicomotrizForm();
-  this.alimentacionPediatricaForm = this.initializeAlimentacionPediatricaForm();
-  this.tamizajeNeonatalForm = this.initializeTamizajeNeonatalForm();
-  this.antecedentesHeredoFamiliaresForm = this.initializeAntecedentesHeredoFamiliaresForm();
-  this.antecedentesPerinatalesForm = this.initializeAntecedentesPerinatalesForm();
-  this.estadoNutricionalPediatricoForm = this.initializeEstadoNutricionalPediatricoForm();
-  this.inmunizacionesForm = this.initializeInmunizacionesForm();
-  this.vacunasAdicionalesForm = this.initializeVacunasAdicionalesForm();
-  
-  // 🔥 NUEVOS FORMULARIOS AGREGADOS
-  this.solicitudCultivoForm = this.initializeSolicitudCultivoForm();
-  this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
-  this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
-  this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
-
-  console.log('✅ Todos los formularios han sido inicializados correctamente.');
-}
-
-
-
-  private ejecutarSiFormularioValido(callback: (form: Exclude<FormularioActivo, null>) => void): void {
-  if (this.formularioActivo !== null) {
-      this.formularioEstado[this.formularioActivo] = true;
+    console.log(
+      '✅ Todos los formularios han sido inicializados correctamente.'
+    );
   }
-}
+
+  private ejecutarSiFormularioValido(
+    callback: (form: Exclude<FormularioActivo, null>) => void
+  ): void {
+    if (this.formularioActivo !== null) {
+      this.formularioEstado[this.formularioActivo] = true;
+    }
+  }
 
   async guardarDocumento(tipoDocumento: string): Promise<void> {
     try {
@@ -1766,9 +1756,9 @@ private inicializarFormularios(): void {
       }
     } catch (error) {
       const nombreFormulario = this.formularioActivo
-  ? this.getTituloFormulario(this.formularioActivo)
-  : 'documento';
-this.error = `Error al procesar ${nombreFormulario}`;
+        ? this.getTituloFormulario(this.formularioActivo)
+        : 'documento';
+      this.error = `Error al procesar ${nombreFormulario}`;
     } finally {
       this.isCreatingDocument = false;
     }
@@ -1939,7 +1929,6 @@ this.error = `Error al procesar ${nombreFormulario}`;
     };
   }
 
-
   personalMedico: any[] = [];
   servicios: Servicio[] = [];
   documentoClinicoActual: number | null = null;
@@ -1990,7 +1979,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
   ngOnInit(): void {
     // Inicializar navegación mejorada
     this.inicializarFormulariosVisibles();
-    
+
     // 1. Suscripción a parámetros de ruta
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -2237,16 +2226,16 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   editarDocumento(tipoDoc: string): void {
-  const documento = this.documentosExistentes[tipoDoc];
-  if (!documento) return;
-  const formulario = this.formularios[tipoDoc];
-  if (formulario) {
-    formulario.patchValue(documento);
-    if (this.formularioActivo !== null) {
-      this.activarFormulario(this.formularioActivo);
+    const documento = this.documentosExistentes[tipoDoc];
+    if (!documento) return;
+    const formulario = this.formularios[tipoDoc];
+    if (formulario) {
+      formulario.patchValue(documento);
+      if (this.formularioActivo !== null) {
+        this.activarFormulario(this.formularioActivo);
+      }
     }
   }
-}
 
   async generarPDFDirecto(tipoDoc: string): Promise<void> {
     const documento = this.documentosExistentes[tipoDoc];
@@ -2365,7 +2354,7 @@ this.error = `Error al procesar ${nombreFormulario}`;
   }
 
   private marcarCamposInvalidos(form: FormGroup): void {
-    Object.keys(form.controls).forEach(field => {
+    Object.keys(form.controls).forEach((field) => {
       const control = form.get(field);
       if (control) {
         control.markAsTouched();
@@ -2780,74 +2769,74 @@ this.error = `Error al procesar ${nombreFormulario}`;
   //     complicaciones: [''],
   //   });
   // }
-private initializeNotaPostoperatoriaForm(): FormGroup {
-  return this.fb.group({
-    // Información básica
-    fecha_cirugia: ['', Validators.required],
-    duracion_cirugia: [null],
+  private initializeNotaPostoperatoriaForm(): FormGroup {
+    return this.fb.group({
+      // Información básica
+      fecha_cirugia: ['', Validators.required],
+      duracion_cirugia: [null],
 
-    // Diagnósticos (NOM-004: 8.8.1 y 8.8.4)
-    diagnostico_preoperatorio: ['', Validators.required],
-    diagnostico_postoperatorio: ['', Validators.required],
+      // Diagnósticos (NOM-004: 8.8.1 y 8.8.4)
+      diagnostico_preoperatorio: ['', Validators.required],
+      diagnostico_postoperatorio: ['', Validators.required],
 
-    // Procedimientos (NOM-004: 8.8.2 y 8.8.3)
-    operacion_planeada: ['', Validators.required],
-    operacion_realizada: ['', Validators.required],
+      // Procedimientos (NOM-004: 8.8.2 y 8.8.3)
+      operacion_planeada: ['', Validators.required],
+      operacion_realizada: ['', Validators.required],
 
-    // Técnica y hallazgos (NOM-004: 8.8.5 y 8.8.6)
-    descripcion_tecnica: ['', Validators.required],
-    hallazgos_transoperatorios: ['', Validators.required],
+      // Técnica y hallazgos (NOM-004: 8.8.5 y 8.8.6)
+      descripcion_tecnica: ['', Validators.required],
+      hallazgos_transoperatorios: ['', Validators.required],
 
-    // Conteo (NOM-004: 8.8.7)
-    conteo_gasas_completo: ['', Validators.required],
-    conteo_instrumental_completo: ['', Validators.required],
-    observaciones_conteo: [''],
+      // Conteo (NOM-004: 8.8.7)
+      conteo_gasas_completo: ['', Validators.required],
+      conteo_instrumental_completo: ['', Validators.required],
+      observaciones_conteo: [''],
 
-    // Incidentes y sangrado (NOM-004: 8.8.8 y 8.8.9)
-    incidentes_accidentes: ['', Validators.required],
-    sangrado: [0, [Validators.required, Validators.min(0)]],
-    transfusiones_realizadas: [false],
-    detalles_transfusiones: [''],
+      // Incidentes y sangrado (NOM-004: 8.8.8 y 8.8.9)
+      incidentes_accidentes: ['', Validators.required],
+      sangrado: [0, [Validators.required, Validators.min(0)]],
+      transfusiones_realizadas: [false],
+      detalles_transfusiones: [''],
 
-    // Estudios (NOM-004: 8.8.10)
-    estudios_transoperatorios: ['', Validators.required],
+      // Estudios (NOM-004: 8.8.10)
+      estudios_transoperatorios: ['', Validators.required],
 
-    // Equipo quirúrgico (NOM-004: 8.8.11)
-    cirujano_principal: ['', Validators.required],
-    ayudantes: ['', Validators.required],
-    instrumentista: ['', Validators.required],
-    anestesiologo: ['', Validators.required],
-    circulante: ['', Validators.required],
+      // Equipo quirúrgico (NOM-004: 8.8.11)
+      cirujano_principal: ['', Validators.required],
+      ayudantes: ['', Validators.required],
+      instrumentista: ['', Validators.required],
+      anestesiologo: ['', Validators.required],
+      circulante: ['', Validators.required],
 
-    // Estado y plan (NOM-004: 8.8.12 y 8.8.13)
-    estado_postquirurgico: ['', Validators.required],
-    plan_postoperatorio: ['', Validators.required],
+      // Estado y plan (NOM-004: 8.8.12 y 8.8.13)
+      estado_postquirurgico: ['', Validators.required],
+      plan_postoperatorio: ['', Validators.required],
 
-    // Pronóstico (NOM-004: 8.8.14)
-    pronostico: ['', Validators.required],
+      // Pronóstico (NOM-004: 8.8.14)
+      pronostico: ['', Validators.required],
 
-    // Piezas (NOM-004: 8.8.15)
-    piezas_enviadas_patologia: ['', Validators.required],
-    se_enviaron_piezas: [false],
-    numero_registro_patologia: [''],
+      // Piezas (NOM-004: 8.8.15)
+      piezas_enviadas_patologia: ['', Validators.required],
+      se_enviaron_piezas: [false],
+      numero_registro_patologia: [''],
 
-    // Otros hallazgos (NOM-004: 8.8.16)
-    otros_hallazgos: ['', Validators.required],
+      // Otros hallazgos (NOM-004: 8.8.16)
+      otros_hallazgos: ['', Validators.required],
 
-    // Responsabilidad (NOM-004: 8.8.17)
-    nombre_responsable_cirugia: ['', Validators.required],
-    cedula_responsable_cirugia: [''],
-    especialidad_responsable: [''],
-    firma_responsable_verificada: [false],
+      // Responsabilidad (NOM-004: 8.8.17)
+      nombre_responsable_cirugia: ['', Validators.required],
+      cedula_responsable_cirugia: [''],
+      especialidad_responsable: [''],
+      firma_responsable_verificada: [false],
 
-    // Información adicional
-    quirofano: [''],
-    tipo_anestesia: [''],
-    hora_inicio: [''],
-    hora_fin: [''],
-    observaciones_adicionales: ['']
-  });
-}
+      // Información adicional
+      quirofano: [''],
+      tipo_anestesia: [''],
+      hora_inicio: [''],
+      hora_fin: [''],
+      observaciones_adicionales: [''],
+    });
+  }
 
   private initializeNotaPreanestesicaForm(): FormGroup {
     return this.fb.group({
@@ -2927,67 +2916,65 @@ private initializeNotaPostoperatoriaForm(): FormGroup {
     });
   }
 
-
   // Dentro de tu clase PerfilPaciente
-private prepararDatosAntecedentesHeredoFamiliares(): any {
+  private prepararDatosAntecedentesHeredoFamiliares(): any {
     return {
-        ...this.antecedentesHeredoFamiliaresForm.value,
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_personal_registro: this.medicoActual,
-        id_paciente: this.pacienteId,
+      ...this.antecedentesHeredoFamiliaresForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_personal_registro: this.medicoActual,
+      id_paciente: this.pacienteId,
     };
-}
+  }
 
-private prepararDatosAntecedentesPerinatales(): any {
+  private prepararDatosAntecedentesPerinatales(): any {
     return {
-        ...this.antecedentesPerinatalesForm.value,
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_personal_registro: this.medicoActual,
-        id_paciente: this.pacienteId,
+      ...this.antecedentesPerinatalesForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_personal_registro: this.medicoActual,
+      id_paciente: this.pacienteId,
     };
-}
+  }
 
-private prepararDatosDesarrolloPsicomotriz(): any {
+  private prepararDatosDesarrolloPsicomotriz(): any {
     return {
-        ...this.desarrolloPsicomotrizForm.value,
-        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
-        id_personal_registro: this.medicoActual,
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_paciente: this.pacienteId,
+      ...this.desarrolloPsicomotrizForm.value,
+      id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+      id_personal_registro: this.medicoActual,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
     };
-}
+  }
 
-private prepararDatosEstadoNutricionalPediatrico(): any {
+  private prepararDatosEstadoNutricionalPediatrico(): any {
     return {
-        ...this.estadoNutricionalPediatricoForm.value,
-        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
-        id_personal_registro: this.medicoActual,
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_paciente: this.pacienteId,
-        fecha_evaluacion: new Date().toISOString().split('T')[0], // Fecha actual
+      ...this.estadoNutricionalPediatricoForm.value,
+      id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+      id_personal_registro: this.medicoActual,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      fecha_evaluacion: new Date().toISOString().split('T')[0], // Fecha actual
     };
-}
+  }
 
-private prepararDatosInmunizaciones(): any {
+  private prepararDatosInmunizaciones(): any {
     return {
-        ...this.inmunizacionesForm.value,
-        id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
-        id_personal_registro: this.medicoActual,
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_paciente: this.pacienteId,
+      ...this.inmunizacionesForm.value,
+      id_historia_clinica: this.pacienteCompleto?.expediente?.id_expediente, // Usar id_expediente como fallback
+      id_personal_registro: this.medicoActual,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
     };
-}
+  }
 
-private prepararDatosVacunasAdicionales(): any {
+  private prepararDatosVacunasAdicionales(): any {
     return {
-        ...this.vacunasAdicionalesForm.value,
-        id_inmunizacion: 1, // Esto podría necesitar ser obtenido dinámicamente
-        id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-        id_paciente: this.pacienteId,
-        id_personal_registro: this.medicoActual,
+      ...this.vacunasAdicionalesForm.value,
+      id_inmunizacion: 1, // Esto podría necesitar ser obtenido dinámicamente
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_registro: this.medicoActual,
     };
-}
-
+  }
 
   private initializeControlCrecimientoForm(): FormGroup {
     return this.fb.group({
@@ -3026,446 +3013,466 @@ private prepararDatosVacunasAdicionales(): any {
     });
   }
 
-
-
   // Nuevo: Historia Clínica Pediátrica
-private initializeHistoriaClinicaPediatricaForm(): FormGroup {
-  return this.fb.group({
-    // Antecedentes perinatales
-    semanas_gestacion: ['', [Validators.min(20), Validators.max(45)]],
-    peso_nacer: ['', [Validators.min(500), Validators.max(6000)]],
-    talla_nacer: ['', [Validators.min(25), Validators.max(60)]],
-    apgar_1min: ['', [Validators.min(0), Validators.max(10)]],
-    apgar_5min: ['', [Validators.min(0), Validators.max(10)]],
-    tipo_parto: ['', Validators.required],
-    complicaciones_parto: [''],
-
-    // Antecedentes familiares pediátricos
-    diabetes_familiar: [false],
-    hipertension_familiar: [false],
-    cardiopatias_familiar: [false],
-    malformaciones_familiar: [false],
-    otros_antecedentes_familiar: [''],
-
-    // Desarrollo actual
-    desarrollo_motor: [''],
-    desarrollo_lenguaje: [''],
-    desarrollo_social: [''],
-    hitos_desarrollo: [''],
-
-    // Alimentación
-    lactancia_materna: [false],
-    lactancia_duracion_meses: [''],
-    edad_ablactacion_meses: [''],
-    alimentacion_actual: [''],
-
-    // Padecimiento actual pediátrico
-    motivo_consulta: ['', Validators.required],
-    tiempo_evolucion: [''],
-    sintomas_asociados: [''],
-
-    // Exploración física pediátrica
-    estado_general: [''],
-    estado_hidratacion: [''],
-    palidez_tegumentos: [false],
-    ictericia: [false],
-    cianosis: [false],
-
-    // Sistemas
-    respiratorio: [''],
-    cardiovascular: [''],
-    digestivo: [''],
-    genitourinario: [''],
-    neurologico: [''],
-    musculoesqueletico: [''],
-
-    // Diagnósticos
-    diagnostico_principal: ['', Validators.required],
-    diagnosticos_secundarios: [''],
-
-    // Plan
-    plan_manejo: ['', Validators.required],
-    medicamentos: [''],
-    citas_seguimiento: [''],
-    recomendaciones_padres: ['']
-  });
-}
-
-
-// Nuevo: Alimentación Pediátrica
-private initializeAlimentacionPediatricaForm(): FormGroup {
-  return this.fb.group({
-    // Lactancia
-    lactancia_materna_exclusiva: [false],
-    edad_inicio_lactancia: [''],
-    duracion_lactancia_meses: [''],
-    dificultades_lactancia: [''],
-
-    // Fórmula
-    uso_formula: [false],
-    tipo_formula: [''],
-    cantidad_formula_ml: [''],
-    frecuencia_formula: [''],
-
-    // Ablactación
-    edad_inicio_ablactacion_meses: ['', [Validators.min(3), Validators.max(12)]],
-    primeros_alimentos: [''],
-    alergias_alimentarias: [''],
-    intolerancias: [''],
-
-    // Alimentación actual
-    tipo_alimentacion_actual: ['', Validators.required],
-    numero_comidas_dia: ['', [Validators.min(1), Validators.max(8)]],
-    apetito: [''],
-    preferencias_alimentarias: [''],
-    rechazos_alimentarios: [''],
-
-    // Suplementos
-    vitaminas: [false],
-    tipo_vitaminas: [''],
-    hierro: [false],
-    otros_suplementos: [''],
-
-    // Evaluación nutricional
-    estado_nutricional: [''],
-    signos_desnutricion: [false],
-    signos_sobrepeso: [false],
-
-    // Recomendaciones
-    plan_alimentario: [''],
-    recomendaciones_padres: [''],
-    proxima_evaluacion: ['']
-  });
-}
-
-// Nuevo: Tamizaje Neonatal
-private initializeTamizajeNeonatalForm(): FormGroup {
-  return this.fb.group({
-    // Datos del tamizaje
-    fecha_toma_muestra: ['', Validators.required],
-    edad_horas_toma: ['', [Validators.required, Validators.min(24), Validators.max(168)]],
-    lugar_toma: [''],
-
-    // Tamizaje metabólico
-    hipotiroidismo_congenito: [''],
-    fenilcetonuria: [''],
-    galactosemia: [''],
-    hiperplasia_suprarrenal: [''],
-    fibrosis_quistica: [''],
-    deficiencia_biotinidasa: [''],
-
-    // Resultados
-    resultados_normales: [true],
-    alteraciones_encontradas: [''],
-    requiere_confirmacion: [false],
-
-    // Tamizaje auditivo
-    tamizaje_auditivo_realizado: [false],
-    resultado_auditivo: [''],
-    fecha_tamizaje_auditivo: [''],
-
-    // Tamizaje visual
-    reflejo_rojo_presente: [true],
-    cataratas_congenitas: [false],
-    otras_alteraciones_visuales: [''],
-
-    // Seguimiento
-    requiere_seguimiento: [false],
-    tipo_seguimiento: [''],
-    fecha_proxima_cita: [''],
-
-    // Observaciones
-    observaciones: [''],
-    medico_responsable: ['']
-  });
-}
-
-
-
-private initializeAntecedentesHeredoFamiliaresForm(): FormGroup {
+  private initializeHistoriaClinicaPediatricaForm(): FormGroup {
     return this.fb.group({
-        // Inicializa con valores por defecto o vacíos
-        // Basado en CreateAntecedentesHeredoFamiliaresDto
-        antecedentes_paternos: this.fb.group({
-            diabetes: [false],
-            hipertension: [false],
-            cardiopatias: [false],
-            cancer: [false],
-            enfermedades_mentales: [false],
-            malformaciones_congenitas: [false],
-            otros: ['']
-        }),
-        antecedentes_maternos: this.fb.group({
-            diabetes: [false],
-            hipertension: [false],
-            cardiopatias: [false],
-            cancer: [false],
-            enfermedades_mentales: [false],
-            malformaciones_congenitas: [false],
-            otros: ['']
-        }),
-        numero_hermanos: [null, [Validators.min(0)]],
-        antecedentes_hermanos: [''],
-        otros_antecedentes_familiares: [''],
-        observaciones: ['']
-        // id_personal_registro se asignará al guardar
-    });
-}
+      // Antecedentes perinatales
+      semanas_gestacion: ['', [Validators.min(20), Validators.max(45)]],
+      peso_nacer: ['', [Validators.min(500), Validators.max(6000)]],
+      talla_nacer: ['', [Validators.min(25), Validators.max(60)]],
+      apgar_1min: ['', [Validators.min(0), Validators.max(10)]],
+      apgar_5min: ['', [Validators.min(0), Validators.max(10)]],
+      tipo_parto: ['', Validators.required],
+      complicaciones_parto: [''],
 
-private initializeAntecedentesPerinatalesForm(): FormGroup {
+      // Antecedentes familiares pediátricos
+      diabetes_familiar: [false],
+      hipertension_familiar: [false],
+      cardiopatias_familiar: [false],
+      malformaciones_familiar: [false],
+      otros_antecedentes_familiar: [''],
+
+      // Desarrollo actual
+      desarrollo_motor: [''],
+      desarrollo_lenguaje: [''],
+      desarrollo_social: [''],
+      hitos_desarrollo: [''],
+
+      // Alimentación
+      lactancia_materna: [false],
+      lactancia_duracion_meses: [''],
+      edad_ablactacion_meses: [''],
+      alimentacion_actual: [''],
+
+      // Padecimiento actual pediátrico
+      motivo_consulta: ['', Validators.required],
+      tiempo_evolucion: [''],
+      sintomas_asociados: [''],
+
+      // Exploración física pediátrica
+      estado_general: [''],
+      estado_hidratacion: [''],
+      palidez_tegumentos: [false],
+      ictericia: [false],
+      cianosis: [false],
+
+      // Sistemas
+      respiratorio: [''],
+      cardiovascular: [''],
+      digestivo: [''],
+      genitourinario: [''],
+      neurologico: [''],
+      musculoesqueletico: [''],
+
+      // Diagnósticos
+      diagnostico_principal: ['', Validators.required],
+      diagnosticos_secundarios: [''],
+
+      // Plan
+      plan_manejo: ['', Validators.required],
+      medicamentos: [''],
+      citas_seguimiento: [''],
+      recomendaciones_padres: [''],
+    });
+  }
+
+  // Nuevo: Alimentación Pediátrica
+  private initializeAlimentacionPediatricaForm(): FormGroup {
     return this.fb.group({
-         // Basado en CreateAntecedentesPerinatalesDto
-        embarazo_planeado: [false],
-        numero_embarazo: [null, [Validators.min(1)]],
-        control_prenatal: [false],
-        numero_consultas_prenatales: [null, [Validators.min(0)]],
-        complicaciones_embarazo: [''],
-        tipo_parto: ['', Validators.required], // 'Vaginal' | 'Cesarea'
-        semanas_gestacion: [null, [Validators.min(0)]],
-        peso_nacimiento: [null, [Validators.min(0)]], // DECIMAL
-        talla_nacimiento: [null, [Validators.min(0)]], // DECIMAL
-        apgar_1_min: [null, [Validators.min(0), Validators.max(10)]],
-        apgar_5_min: [null, [Validators.min(0), Validators.max(10)]],
-        llanto_inmediato: [false],
-        hospitalizacion_neonatal: [false],
-        dias_hospitalizacion_neonatal: [null, [Validators.min(0)]],
-        problemas_neonatales: [''],
-        alimentacion_neonatal: [''], // 'Seno materno' | 'Fórmula' | 'Mixta'
-        peso_2_meses: [null], // DECIMAL
-        peso_4_meses: [null], // DECIMAL
-        peso_6_meses: [null], // DECIMAL
-        observaciones: ['']
-        // id_personal_registro se asignará al guardar
+      // Lactancia
+      lactancia_materna_exclusiva: [false],
+      edad_inicio_lactancia: [''],
+      duracion_lactancia_meses: [''],
+      dificultades_lactancia: [''],
+
+      // Fórmula
+      uso_formula: [false],
+      tipo_formula: [''],
+      cantidad_formula_ml: [''],
+      frecuencia_formula: [''],
+
+      // Ablactación
+      edad_inicio_ablactacion_meses: [
+        '',
+        [Validators.min(3), Validators.max(12)],
+      ],
+      primeros_alimentos: [''],
+      alergias_alimentarias: [''],
+      intolerancias: [''],
+
+      // Alimentación actual
+      tipo_alimentacion_actual: ['', Validators.required],
+      numero_comidas_dia: ['', [Validators.min(1), Validators.max(8)]],
+      apetito: [''],
+      preferencias_alimentarias: [''],
+      rechazos_alimentarios: [''],
+
+      // Suplementos
+      vitaminas: [false],
+      tipo_vitaminas: [''],
+      hierro: [false],
+      otros_suplementos: [''],
+
+      // Evaluación nutricional
+      estado_nutricional: [''],
+      signos_desnutricion: [false],
+      signos_sobrepeso: [false],
+
+      // Recomendaciones
+      plan_alimentario: [''],
+      recomendaciones_padres: [''],
+      proxima_evaluacion: [''],
     });
-}
+  }
 
-
-
-// Dentro de tu clase PerfilPaciente
-// Asumiendo que tienes acceso a `this.fb: FormBuilder` desde el constructor
-
-// ... (initializeAntecedentesHeredoFamiliaresForm e initializeAntecedentesPerinatalesForm como antes) ...
-
-private initializeDesarrolloPsicomotrizForm(): FormGroup {
+  // Nuevo: Tamizaje Neonatal
+  private initializeTamizajeNeonatalForm(): FormGroup {
     return this.fb.group({
-        // Desarrollo motor grueso
-        sostuvo_cabeza_meses: [null, [Validators.min(0)]],
-        se_sento_meses: [null, [Validators.min(0)]],
-        gateo_meses: [null, [Validators.min(0)]],
-        camino_meses: [null, [Validators.min(0)]],
-        // Puedes añadir más hitos de motor grueso según tu modelo/BD
+      // Datos del tamizaje
+      fecha_toma_muestra: ['', Validators.required],
+      edad_horas_toma: [
+        '',
+        [Validators.required, Validators.min(24), Validators.max(168)],
+      ],
+      lugar_toma: [''],
 
-        // Desarrollo del lenguaje
-        primera_palabra_meses: [null, [Validators.min(0)]],
-        primeras_frases_meses: [null, [Validators.min(0)]],
+      // Tamizaje metabólico
+      hipotiroidismo_congenito: [''],
+      fenilcetonuria: [''],
+      galactosemia: [''],
+      hiperplasia_suprarrenal: [''],
+      fibrosis_quistica: [''],
+      deficiencia_biotinidasa: [''],
 
-        // Desarrollo social y otros
-        sonrisa_social_meses: [null, [Validators.min(0)]],
-        reconocimiento_padres_meses: [null, [Validators.min(0)]],
-        control_diurno_meses: [null, [Validators.min(0)]],
-        control_nocturno_meses: [null, [Validators.min(0)]],
-        juego_simbolico_meses: [null, [Validators.min(0)]],
-        seguimiento_instrucciones_meses: [null, [Validators.min(0)]],
+      // Resultados
+      resultados_normales: [true],
+      alteraciones_encontradas: [''],
+      requiere_confirmacion: [false],
 
-        // Evaluación actual
-        desarrollo_normal: [true],
-        observaciones_desarrollo: [''],
-        necesita_estimulacion: [false],
-        tipo_estimulacion: [''],
-        areas_retraso: [''],
-        recomendaciones: ['']
-        // id_personal_registro se asignará al guardar
+      // Tamizaje auditivo
+      tamizaje_auditivo_realizado: [false],
+      resultado_auditivo: [''],
+      fecha_tamizaje_auditivo: [''],
+
+      // Tamizaje visual
+      reflejo_rojo_presente: [true],
+      cataratas_congenitas: [false],
+      otras_alteraciones_visuales: [''],
+
+      // Seguimiento
+      requiere_seguimiento: [false],
+      tipo_seguimiento: [''],
+      fecha_proxima_cita: [''],
+
+      // Observaciones
+      observaciones: [''],
+      medico_responsable: [''],
     });
-}
+  }
 
-private initializeEstadoNutricionalPediatricoForm(): FormGroup {
+  private initializeAntecedentesHeredoFamiliaresForm(): FormGroup {
     return this.fb.group({
-        // Datos antropométricos
-        peso_kg: [null, [Validators.required, Validators.min(0.1)]],
-        talla_cm: [null, [Validators.required, Validators.min(20)]],
-        perimetro_cefalico_cm: [null, [Validators.min(0)]],
-        perimetro_brazo_cm: [null, [Validators.min(0)]],
-
-        // Índices nutricionales (pueden ser calculados o ingresados)
-        percentil_peso: [null, [Validators.min(0), Validators.max(100)]],
-        percentil_talla: [null, [Validators.min(0), Validators.max(100)]],
-        percentil_perimetro_cefalico: [null, [Validators.min(0), Validators.max(100)]],
-        peso_para_edad: [''],
-        talla_para_edad: [''],
-        peso_para_talla: [''],
-        imc: [null, [Validators.min(0)]],
-        // imc_percentil podría calcularse
-
-        // Evaluación clínica
-        aspecto_general: [''],
-        estado_hidratacion: [''],
-        palidez_mucosas: [false],
-        edemas: [false],
-        masa_muscular: [''],
-        tejido_adiposo: [''],
-
-        // Clasificación nutricional
-        diagnostico_nutricional: [''], // Este podría ser un select basado en cálculos
-        riesgo_nutricional: [false],
-
-        // Alimentación
-        tipo_alimentacion: [''], // Considera usar un select con las opciones del enum
-        numero_comidas_dia: [null, [Validators.min(1)]],
-        apetito: [''], // Considera usar un select: 'BUENO', 'REGULAR', 'MALO'
-
-        // Síntomas relacionados
-        nauseas: [false],
-        vomitos: [false],
-        diarrea: [false],
-        estrenimiento: [false],
-
-        // Plan nutricional
-        recomendaciones_nutricionales: [''],
-        suplementos_vitaminicos: [''],
-        observaciones: [''],
-
-        // Fecha de evaluación (se puede manejar automáticamente o permitir selección)
-        fecha_evaluacion: [new Date().toISOString().split('T')[0]]
-        // id_personal_registro se asignará al guardar
+      // Inicializa con valores por defecto o vacíos
+      // Basado en CreateAntecedentesHeredoFamiliaresDto
+      antecedentes_paternos: this.fb.group({
+        diabetes: [false],
+        hipertension: [false],
+        cardiopatias: [false],
+        cancer: [false],
+        enfermedades_mentales: [false],
+        malformaciones_congenitas: [false],
+        otros: [''],
+      }),
+      antecedentes_maternos: this.fb.group({
+        diabetes: [false],
+        hipertension: [false],
+        cardiopatias: [false],
+        cancer: [false],
+        enfermedades_mentales: [false],
+        malformaciones_congenitas: [false],
+        otros: [''],
+      }),
+      numero_hermanos: [null, [Validators.min(0)]],
+      antecedentes_hermanos: [''],
+      otros_antecedentes_familiares: [''],
+      observaciones: [''],
+      // id_personal_registro se asignará al guardar
     });
-}
+  }
 
-// Para Inmunizaciones, dado que maneja múltiples vacunas y dosis,
-// es más complejo. Una opción es manejar las vacunas como un FormArray
-// o tener campos específicos. Aquí un ejemplo básico con campos principales.
-private initializeInmunizacionesForm(): FormGroup {
+  private initializeAntecedentesPerinatalesForm(): FormGroup {
     return this.fb.group({
-        // Campos generales del esquema
-        esquema_completo_edad: [false],
-        esquema_incompleto_razon: [''],
-        porcentaje_completado: [null, [Validators.min(0), Validators.max(100)]],
-        reacciones_adversas: [''],
-        observaciones: [''],
-
-        // Campos para vacunas individuales (esto es simplificado)
-        // En la práctica, podrías necesitar un FormArray para manejar múltiples dosis
-        // o estructuras anidadas. Esto es un ejemplo básico.
-        bcg_fecha: [''],
-        bcg_observaciones: [''],
-        // ... otros campos de vacunas según tu estructura de BD ...
-
-        // id_personal_registro se asignará al guardar
+      // Basado en CreateAntecedentesPerinatalesDto
+      embarazo_planeado: [false],
+      numero_embarazo: [null, [Validators.min(1)]],
+      control_prenatal: [false],
+      numero_consultas_prenatales: [null, [Validators.min(0)]],
+      complicaciones_embarazo: [''],
+      tipo_parto: ['', Validators.required], // 'Vaginal' | 'Cesarea'
+      semanas_gestacion: [null, [Validators.min(0)]],
+      peso_nacimiento: [null, [Validators.min(0)]], // DECIMAL
+      talla_nacimiento: [null, [Validators.min(0)]], // DECIMAL
+      apgar_1_min: [null, [Validators.min(0), Validators.max(10)]],
+      apgar_5_min: [null, [Validators.min(0), Validators.max(10)]],
+      llanto_inmediato: [false],
+      hospitalizacion_neonatal: [false],
+      dias_hospitalizacion_neonatal: [null, [Validators.min(0)]],
+      problemas_neonatales: [''],
+      alimentacion_neonatal: [''], // 'Seno materno' | 'Fórmula' | 'Mixta'
+      peso_2_meses: [null], // DECIMAL
+      peso_4_meses: [null], // DECIMAL
+      peso_6_meses: [null], // DECIMAL
+      observaciones: [''],
+      // id_personal_registro se asignará al guardar
     });
-}
+  }
 
-// VacunasAdicionales está más relacionado con registros individuales de vacunas aplicadas
-// que con un esquema general. Es posible que no necesites un formulario grande aquí,
-// sino una forma de agregar/eliminar vacunas adicionales una por una.
-// Si necesitas un formulario para esto, podría ser algo como:
-private initializeVacunasAdicionalesForm(): FormGroup {
+  // Dentro de tu clase PerfilPaciente
+  // Asumiendo que tienes acceso a `this.fb: FormBuilder` desde el constructor
+
+  // ... (initializeAntecedentesHeredoFamiliaresForm e initializeAntecedentesPerinatalesForm como antes) ...
+
+  private initializeDesarrolloPsicomotrizForm(): FormGroup {
+    return this.fb.group({
+      // Desarrollo motor grueso
+      sostuvo_cabeza_meses: [null, [Validators.min(0)]],
+      se_sento_meses: [null, [Validators.min(0)]],
+      gateo_meses: [null, [Validators.min(0)]],
+      camino_meses: [null, [Validators.min(0)]],
+      // Puedes añadir más hitos de motor grueso según tu modelo/BD
+
+      // Desarrollo del lenguaje
+      primera_palabra_meses: [null, [Validators.min(0)]],
+      primeras_frases_meses: [null, [Validators.min(0)]],
+
+      // Desarrollo social y otros
+      sonrisa_social_meses: [null, [Validators.min(0)]],
+      reconocimiento_padres_meses: [null, [Validators.min(0)]],
+      control_diurno_meses: [null, [Validators.min(0)]],
+      control_nocturno_meses: [null, [Validators.min(0)]],
+      juego_simbolico_meses: [null, [Validators.min(0)]],
+      seguimiento_instrucciones_meses: [null, [Validators.min(0)]],
+
+      // Evaluación actual
+      desarrollo_normal: [true],
+      observaciones_desarrollo: [''],
+      necesita_estimulacion: [false],
+      tipo_estimulacion: [''],
+      areas_retraso: [''],
+      recomendaciones: [''],
+      // id_personal_registro se asignará al guardar
+    });
+  }
+
+  private initializeEstadoNutricionalPediatricoForm(): FormGroup {
+    return this.fb.group({
+      // Datos antropométricos
+      peso_kg: [null, [Validators.required, Validators.min(0.1)]],
+      talla_cm: [null, [Validators.required, Validators.min(20)]],
+      perimetro_cefalico_cm: [null, [Validators.min(0)]],
+      perimetro_brazo_cm: [null, [Validators.min(0)]],
+
+      // Índices nutricionales (pueden ser calculados o ingresados)
+      percentil_peso: [null, [Validators.min(0), Validators.max(100)]],
+      percentil_talla: [null, [Validators.min(0), Validators.max(100)]],
+      percentil_perimetro_cefalico: [
+        null,
+        [Validators.min(0), Validators.max(100)],
+      ],
+      peso_para_edad: [''],
+      talla_para_edad: [''],
+      peso_para_talla: [''],
+      imc: [null, [Validators.min(0)]],
+      // imc_percentil podría calcularse
+
+      // Evaluación clínica
+      aspecto_general: [''],
+      estado_hidratacion: [''],
+      palidez_mucosas: [false],
+      edemas: [false],
+      masa_muscular: [''],
+      tejido_adiposo: [''],
+
+      // Clasificación nutricional
+      diagnostico_nutricional: [''], // Este podría ser un select basado en cálculos
+      riesgo_nutricional: [false],
+
+      // Alimentación
+      tipo_alimentacion: [''], // Considera usar un select con las opciones del enum
+      numero_comidas_dia: [null, [Validators.min(1)]],
+      apetito: [''], // Considera usar un select: 'BUENO', 'REGULAR', 'MALO'
+
+      // Síntomas relacionados
+      nauseas: [false],
+      vomitos: [false],
+      diarrea: [false],
+      estrenimiento: [false],
+
+      // Plan nutricional
+      recomendaciones_nutricionales: [''],
+      suplementos_vitaminicos: [''],
+      observaciones: [''],
+
+      // Fecha de evaluación (se puede manejar automáticamente o permitir selección)
+      fecha_evaluacion: [new Date().toISOString().split('T')[0]],
+      // id_personal_registro se asignará al guardar
+    });
+  }
+
+  // Para Inmunizaciones, dado que maneja múltiples vacunas y dosis,
+  // es más complejo. Una opción es manejar las vacunas como un FormArray
+  // o tener campos específicos. Aquí un ejemplo básico con campos principales.
+  private initializeInmunizacionesForm(): FormGroup {
+    return this.fb.group({
+      // Campos generales del esquema
+      esquema_completo_edad: [false],
+      esquema_incompleto_razon: [''],
+      porcentaje_completado: [null, [Validators.min(0), Validators.max(100)]],
+      reacciones_adversas: [''],
+      observaciones: [''],
+
+      // Campos para vacunas individuales (esto es simplificado)
+      // En la práctica, podrías necesitar un FormArray para manejar múltiples dosis
+      // o estructuras anidadas. Esto es un ejemplo básico.
+      bcg_fecha: [''],
+      bcg_observaciones: [''],
+      // ... otros campos de vacunas según tu estructura de BD ...
+
+      // id_personal_registro se asignará al guardar
+    });
+  }
+
+  // VacunasAdicionales está más relacionado con registros individuales de vacunas aplicadas
+  // que con un esquema general. Es posible que no necesites un formulario grande aquí,
+  // sino una forma de agregar/eliminar vacunas adicionales una por una.
+  // Si necesitas un formulario para esto, podría ser algo como:
+  private initializeVacunasAdicionalesForm(): FormGroup {
     // Este formulario podría representar una *única* vacuna adicional a agregar
     return this.fb.group({
-        // id_inmunizacion: [null, Validators.required], // Se necesitaría el ID del esquema
-        nombre_vacuna: ['', Validators.required],
-        laboratorio: [''],
-        lote: [''],
-        fecha_aplicacion: [new Date().toISOString().split('T')[0], Validators.required],
-        dosis: [1, [Validators.required, Validators.min(1)]],
-        via_aplicacion: [''],
-        sitio_aplicacion: [''],
-        reacciones_adversas: [''],
-        observaciones: ['']
-        // id_personal_registro se asignará al guardar
+      // id_inmunizacion: [null, Validators.required], // Se necesitaría el ID del esquema
+      nombre_vacuna: ['', Validators.required],
+      laboratorio: [''],
+      lote: [''],
+      fecha_aplicacion: [
+        new Date().toISOString().split('T')[0],
+        Validators.required,
+      ],
+      dosis: [1, [Validators.required, Validators.min(1)]],
+      via_aplicacion: [''],
+      sitio_aplicacion: [''],
+      reacciones_adversas: [''],
+      observaciones: [''],
+      // id_personal_registro se asignará al guardar
     });
-}
+  }
 
-// O si necesitas manejar varias vacunas adicionales en un solo formulario:
-private initializeVacunasAdicionalesListForm(): FormGroup {
+  // O si necesitas manejar varias vacunas adicionales en un solo formulario:
+  private initializeVacunasAdicionalesListForm(): FormGroup {
     return this.fb.group({
-        vacunas: this.fb.array([]) // Un FormArray para manejar múltiples VacunaAdicional
+      vacunas: this.fb.array([]), // Un FormArray para manejar múltiples VacunaAdicional
     });
-}
+  }
 
-// Helper para crear un FormGroup para una vacuna adicional individual (para usar con FormArray)
-createVacunaAdicionalGroup(): FormGroup {
+  // Helper para crear un FormGroup para una vacuna adicional individual (para usar con FormArray)
+  createVacunaAdicionalGroup(): FormGroup {
     return this.fb.group({
-        // id_vacuna_adicional: [null], // Para ediciones
-        nombre_vacuna: ['', Validators.required],
-        laboratorio: [''],
-        lote: [''],
-        fecha_aplicacion: [new Date().toISOString().split('T')[0], Validators.required],
-        dosis: [1, [Validators.required, Validators.min(1)]],
-        via_aplicacion: [''],
-        sitio_aplicacion: [''],
-        reacciones_adversas: [''],
-        observaciones: ['']
+      // id_vacuna_adicional: [null], // Para ediciones
+      nombre_vacuna: ['', Validators.required],
+      laboratorio: [''],
+      lote: [''],
+      fecha_aplicacion: [
+        new Date().toISOString().split('T')[0],
+        Validators.required,
+      ],
+      dosis: [1, [Validators.required, Validators.min(1)]],
+      via_aplicacion: [''],
+      sitio_aplicacion: [''],
+      reacciones_adversas: [''],
+      observaciones: [''],
     });
-}
+  }
 
   // NUEVOS MÉTODOS DE INICIALIZACIÓN PARA LOS FORMULARIOS AGREGADOS
 
   private initializeSolicitudCultivoForm(): FormGroup {
     return this.fb.group({
-        tipo_cultivo: ['', Validators.required],
-        muestra_requerida: ['', Validators.required], 
-        informacion_clinica: ['', Validators.required],
-        sospecha_diagnostica: [''],
-        prioridad: ['Normal', Validators.required],
-        instrucciones_toma: [''],
-        antibioticos_previos: [false],
-        antibiotico_usado: [''],
-        fecha_solicitud: [new Date().toISOString().split('T')[0], Validators.required],
-        medico_solicitante: [''],
-        observaciones: ['']
+      tipo_cultivo: ['', Validators.required],
+      muestra_requerida: ['', Validators.required],
+      informacion_clinica: ['', Validators.required],
+      sospecha_diagnostica: [''],
+      prioridad: ['Normal', Validators.required],
+      instrucciones_toma: [''],
+      antibioticos_previos: [false],
+      antibiotico_usado: [''],
+      fecha_solicitud: [
+        new Date().toISOString().split('T')[0],
+        Validators.required,
+      ],
+      medico_solicitante: [''],
+      observaciones: [''],
     });
   }
 
   private initializeSolicitudGasometriaForm(): FormGroup {
     return this.fb.group({
-        tipo_gasometria: ['', Validators.required],
-        sitio_puncion: ['', Validators.required],
-        temperatura_corporal: [null, [Validators.min(30), Validators.max(45)]],
-        fio2: [21, [Validators.min(21), Validators.max(100)]],
-        soporte_ventilatorio: ['Aire ambiente'],
-        prioridad: ['Normal', Validators.required],
-        informacion_clinica: ['', Validators.required],
-        sospecha_diagnostica: [''],
-        fecha_solicitud: [new Date().toISOString().split('T')[0], Validators.required],
-        medico_solicitante: [''],
-        observaciones: ['']
+      tipo_gasometria: ['', Validators.required],
+      sitio_puncion: ['', Validators.required],
+      temperatura_corporal: [null, [Validators.min(30), Validators.max(45)]],
+      fio2: [21, [Validators.min(21), Validators.max(100)]],
+      soporte_ventilatorio: ['Aire ambiente'],
+      prioridad: ['Normal', Validators.required],
+      informacion_clinica: ['', Validators.required],
+      sospecha_diagnostica: [''],
+      fecha_solicitud: [
+        new Date().toISOString().split('T')[0],
+        Validators.required,
+      ],
+      medico_solicitante: [''],
+      observaciones: [''],
     });
   }
 
   private initializeRegistroTransfusionForm(): FormGroup {
     return this.fb.group({
-        tipo_componente: ['', Validators.required],
-        numero_unidad: ['', Validators.required],
-        volumen: [null, [Validators.required, Validators.min(50), Validators.max(2000)]],
-        grupo_sanguineo: ['', Validators.required],
-        banco_sangre: ['', Validators.required],
-        fecha_hora_inicio: ['', Validators.required],
-        fecha_hora_fin: [''],
-        presion_arterial_inicial: [''],
-        temperatura_inicial: [null, [Validators.min(30), Validators.max(45)]],
-        pulso_inicial: [null, [Validators.min(40), Validators.max(200)]],
-        medico_responsable: ['', Validators.required],
-        presenta_reacciones: [false],
-        reacciones_adversas: [''],
-        observaciones: ['']
+      tipo_componente: ['', Validators.required],
+      numero_unidad: ['', Validators.required],
+      volumen: [
+        null,
+        [Validators.required, Validators.min(50), Validators.max(2000)],
+      ],
+      grupo_sanguineo: ['', Validators.required],
+      banco_sangre: ['', Validators.required],
+      fecha_hora_inicio: ['', Validators.required],
+      fecha_hora_fin: [''],
+      presion_arterial_inicial: [''],
+      temperatura_inicial: [null, [Validators.min(30), Validators.max(45)]],
+      pulso_inicial: [null, [Validators.min(40), Validators.max(200)]],
+      medico_responsable: ['', Validators.required],
+      presenta_reacciones: [false],
+      reacciones_adversas: [''],
+      observaciones: [''],
     });
   }
 
   private initializeAltaVoluntariaForm(): FormGroup {
     return this.fb.group({
-        fecha_egreso: ['', Validators.required],
-        hora_egreso: ['', Validators.required],
-        nombre_solicitante: ['', Validators.required],
-        parentesco: ['', Validators.required],
-        edad_solicitante: [null, [Validators.required, Validators.min(18), Validators.max(120)]],
-        resumen_clinico: ['', Validators.required],
-        motivo_egreso: [''],
-        recomendaciones_medicas: ['', Validators.required],
-        factores_riesgo: [''],
-        continua_tratamiento_externo: [false],
-        establecimiento_destino: [''],
-        testigo1_nombre: ['', Validators.required],
-        testigo2_nombre: ['', Validators.required],
-        medico_autoriza: ['', Validators.required]
+      fecha_egreso: ['', Validators.required],
+      hora_egreso: ['', Validators.required],
+      nombre_solicitante: ['', Validators.required],
+      parentesco: ['', Validators.required],
+      edad_solicitante: [
+        null,
+        [Validators.required, Validators.min(18), Validators.max(120)],
+      ],
+      resumen_clinico: ['', Validators.required],
+      motivo_egreso: [''],
+      recomendaciones_medicas: ['', Validators.required],
+      factores_riesgo: [''],
+      continua_tratamiento_externo: [false],
+      establecimiento_destino: [''],
+      testigo1_nombre: ['', Validators.required],
+      testigo2_nombre: ['', Validators.required],
+      medico_autoriza: ['', Validators.required],
     });
   }
 
@@ -3556,9 +3563,17 @@ createVacunaAdicionalGroup(): FormGroup {
   }
 
   private tieneFormularioActivo(): boolean {
-  const formularios = ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion'];
-  return this.formularioActivo !== null && formularios.includes(this.formularioActivo);
-}
+    const formularios = [
+      'signosVitales',
+      'historiaClinica',
+      'notaUrgencias',
+      'notaEvolucion',
+    ];
+    return (
+      this.formularioActivo !== null &&
+      formularios.includes(this.formularioActivo)
+    );
+  }
 
   async guardarFormularioActivo(): Promise<void> {
     if (this.isCreatingDocument) return;
@@ -3634,78 +3649,78 @@ createVacunaAdicionalGroup(): FormGroup {
           break;
 
         case 'solicitudEstudio':
-        await this.guardarSolicitudEstudio();
-        this.formularioEstado['solicitudEstudio'] = true;
-        this.success = 'Solicitud de Estudio guardada correctamente';
-        break;
+          await this.guardarSolicitudEstudio();
+          this.formularioEstado['solicitudEstudio'] = true;
+          this.success = 'Solicitud de Estudio guardada correctamente';
+          break;
 
-      case 'referenciaTraslado':
-        await this.guardarReferenciaTraslado();
-        this.formularioEstado['referenciaTraslado'] = true;
-        this.success = 'Referencia y Traslado guardado correctamente';
-        break;
+        case 'referenciaTraslado':
+          await this.guardarReferenciaTraslado();
+          this.formularioEstado['referenciaTraslado'] = true;
+          this.success = 'Referencia y Traslado guardado correctamente';
+          break;
 
-      case 'prescripcionMedicamento':
-        await this.guardarPrescripcionMedicamento();
-        this.formularioEstado['prescripcionMedicamento'] = true;
-        this.success = 'Prescripción de Medicamentos guardada correctamente';
-        break;
+        case 'prescripcionMedicamento':
+          await this.guardarPrescripcionMedicamento();
+          this.formularioEstado['prescripcionMedicamento'] = true;
+          this.success = 'Prescripción de Medicamentos guardada correctamente';
+          break;
 
-      case 'historiaClinicaPediatrica':
-        await this.guardarHistoriaClinicaPediatrica();
-        this.formularioEstado['historiaClinicaPediatrica'] = true;
-        this.success = 'Historia Clínica Pediátrica guardada correctamente';
-        break;
+        case 'historiaClinicaPediatrica':
+          await this.guardarHistoriaClinicaPediatrica();
+          this.formularioEstado['historiaClinicaPediatrica'] = true;
+          this.success = 'Historia Clínica Pediátrica guardada correctamente';
+          break;
 
-      // CASOS PEDIÁTRICOS
-  case 'antecedentesHeredoFamiliares':
-    await this.guardarAntecedentesHeredoFamiliares();
-    this.formularioEstado['antecedentesHeredoFamiliares'] = true;
-    this.success = 'Antecedentes Heredo-Familiares guardados correctamente';
-    break;
+        // CASOS PEDIÁTRICOS
+        case 'antecedentesHeredoFamiliares':
+          await this.guardarAntecedentesHeredoFamiliares();
+          this.formularioEstado['antecedentesHeredoFamiliares'] = true;
+          this.success =
+            'Antecedentes Heredo-Familiares guardados correctamente';
+          break;
 
-  case 'antecedentesPerinatales':
-    await this.guardarAntecedentesPerinatales();
-    this.formularioEstado['antecedentesPerinatales'] = true;
-    this.success = 'Antecedentes Perinatales guardados correctamente';
-    break;
+        case 'antecedentesPerinatales':
+          await this.guardarAntecedentesPerinatales();
+          this.formularioEstado['antecedentesPerinatales'] = true;
+          this.success = 'Antecedentes Perinatales guardados correctamente';
+          break;
 
-  case 'desarrolloPsicomotriz':
-    await this.guardarDesarrolloPsicomotriz();
-    this.formularioEstado['desarrolloPsicomotriz'] = true;
-    this.success = 'Desarrollo Psicomotriz guardado correctamente';
-    break;
+        case 'desarrolloPsicomotriz':
+          await this.guardarDesarrolloPsicomotriz();
+          this.formularioEstado['desarrolloPsicomotriz'] = true;
+          this.success = 'Desarrollo Psicomotriz guardado correctamente';
+          break;
 
-  case 'estadoNutricionalPediatrico':
-    await this.guardarEstadoNutricionalPediatrico();
-    this.formularioEstado['estadoNutricionalPediatrico'] = true;
-    this.success = 'Estado Nutricional Pediátrico guardado correctamente';
-    break;
+        case 'estadoNutricionalPediatrico':
+          await this.guardarEstadoNutricionalPediatrico();
+          this.formularioEstado['estadoNutricionalPediatrico'] = true;
+          this.success = 'Estado Nutricional Pediátrico guardado correctamente';
+          break;
 
-  case 'inmunizaciones':
-    await this.guardarInmunizaciones();
-    this.formularioEstado['inmunizaciones'] = true;
-    this.success = 'Inmunizaciones guardadas correctamente';
-    break;
+        case 'inmunizaciones':
+          await this.guardarInmunizaciones();
+          this.formularioEstado['inmunizaciones'] = true;
+          this.success = 'Inmunizaciones guardadas correctamente';
+          break;
 
-  case 'vacunasAdicionales':
-    await this.guardarVacunasAdicionales();
-    this.formularioEstado['vacunasAdicionales'] = true;
-    this.success = 'Vacunas Adicionales guardadas correctamente';
-    break;
+        case 'vacunasAdicionales':
+          await this.guardarVacunasAdicionales();
+          this.formularioEstado['vacunasAdicionales'] = true;
+          this.success = 'Vacunas Adicionales guardadas correctamente';
+          break;
 
-  case 'alimentacionPediatrica':
-    await this.guardarAlimentacionPediatrica();
-    this.formularioEstado['alimentacionPediatrica'] = true;
-    this.success = 'Alimentación Pediátrica guardada correctamente';
-    break;
+        case 'alimentacionPediatrica':
+          await this.guardarAlimentacionPediatrica();
+          this.formularioEstado['alimentacionPediatrica'] = true;
+          this.success = 'Alimentación Pediátrica guardada correctamente';
+          break;
 
-  case 'tamizajeNeonatal':
-    await this.guardarTamizajeNeonatal();
-    this.formularioEstado['tamizajeNeonatal'] = true;
-    this.success = 'Tamizaje Neonatal guardado correctamente';
-    break;
-
+        case 'tamizajeNeonatal':
+          await this.guardarTamizajeNeonatal();
+          this.formularioEstado['tamizajeNeonatal'] = true;
+          this.success = 'Tamizaje Neonatal guardado correctamente';
+          break;
 
         default:
           throw new Error('Tipo de formulario no válido');
@@ -3715,244 +3730,256 @@ createVacunaAdicionalGroup(): FormGroup {
         this.formularioActivo !== 'signosVitales' &&
         this.formularioActivo !== null
       ) {
-        this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
+        this.mostrarConfirmacionPDF(
+          this.getTituloFormulario(this.formularioActivo)
+        );
       }
 
       localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
-    console.log('- Formulario completado:', this.formularioActivo);
-    this.cargarDatosPaciente().subscribe((data) => {
-      this.construirPacienteCompleto(data);
-    });
-  } catch (error: any) {
-    console.error(
-      `❌ Error al guardar ${this.formularioActivo ?? 'desconocido'}:`,
-      error
-    );
-    if (this.formularioActivo !== null) {
-      this.formularioEstado[this.formularioActivo] = true;
-    } else {
-      this.error = 'Error al procesar un formulario no especificado';
+      console.log('- Formulario completado:', this.formularioActivo);
+      this.cargarDatosPaciente().subscribe((data) => {
+        this.construirPacienteCompleto(data);
+      });
+    } catch (error: any) {
+      console.error(
+        `❌ Error al guardar ${this.formularioActivo ?? 'desconocido'}:`,
+        error
+      );
+      if (this.formularioActivo !== null) {
+        this.formularioEstado[this.formularioActivo] = true;
+      } else {
+        this.error = 'Error al procesar un formulario no especificado';
+      }
+      this.manejarError(error, 'guardar formulario');
+    } finally {
+      this.isCreatingDocument = false;
     }
-    this.manejarError(error, 'guardar formulario');
-  } finally {
-    this.isCreatingDocument = false;
   }
-}
 
   // Método para guardar Control de Crecimiento
-private async guardarControlCrecimiento(): Promise<void> {
-  if (this.controlCrecimientoForm.invalid) {
-    this.marcarCamposInvalidos(this.controlCrecimientoForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+  private async guardarControlCrecimiento(): Promise<void> {
+    if (this.controlCrecimientoForm.invalid) {
+      this.marcarCamposInvalidos(this.controlCrecimientoForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
+
+    const datosControl = this.prepararDatosControlCrecimiento();
+    await firstValueFrom(this.controlCrecimientoService.create(datosControl));
   }
 
-  const datosControl = this.prepararDatosControlCrecimiento();
-  await firstValueFrom(this.controlCrecimientoService.create(datosControl));
-}
+  // Método para guardar Esquema de Vacunación
+  private async guardarEsquemaVacunacion(): Promise<void> {
+    if (this.esquemaVacunacionForm.invalid) {
+      this.marcarCamposInvalidos(this.esquemaVacunacionForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-// Método para guardar Esquema de Vacunación
-private async guardarEsquemaVacunacion(): Promise<void> {
-  if (this.esquemaVacunacionForm.invalid) {
-    this.marcarCamposInvalidos(this.esquemaVacunacionForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosVacunacion = this.prepararDatosEsquemaVacunacion();
+    await firstValueFrom(
+      this.esquemaVacunacionService.registrarVacuna(datosVacunacion)
+    );
   }
 
-  const datosVacunacion = this.prepararDatosEsquemaVacunacion();
-  await firstValueFrom(this.esquemaVacunacionService.registrarVacuna(datosVacunacion));
-}
+  // 🔥 MÉTODOS DE GUARDADO FALTANTES
+  private async guardarSolicitudEstudio(): Promise<void> {
+    if (!this.solicitudEstudioForm.valid) {
+      throw new Error('Formulario de solicitud de estudio inválido');
+    }
 
+    const tipoSolicitud = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Solicitud de Estudio'
+    );
+    if (!tipoSolicitud) {
+      throw new Error(
+        'Tipo de documento de solicitud de estudio no encontrado'
+      );
+    }
 
-// 🔥 MÉTODOS DE GUARDADO FALTANTES
-private async guardarSolicitudEstudio(): Promise<void> {
-  if (!this.solicitudEstudioForm.valid) {
-    throw new Error('Formulario de solicitud de estudio inválido');
+    const documentoSolicitud = await this.crearDocumentoEspecifico(
+      tipoSolicitud.id_tipo_documento
+    );
+
+    const solicitudData = {
+      id_documento: documentoSolicitud.id_documento,
+      ...this.solicitudEstudioForm.value,
+    };
+
+    await firstValueFrom(
+      this.solicitudesEstudioService.createSolicitud(solicitudData)
+    );
   }
 
-  const tipoSolicitud = this.tiposDocumentosDisponibles.find(
-    (t) => t.nombre === 'Solicitud de Estudio'
-  );
-  if (!tipoSolicitud) {
-    throw new Error('Tipo de documento de solicitud de estudio no encontrado');
+  private async guardarReferenciaTraslado(): Promise<void> {
+    if (!this.referenciaForm.valid) {
+      throw new Error('Formulario de referencia y traslado inválido');
+    }
+
+    const tipoReferencia = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Referencia y Traslado'
+    );
+    if (!tipoReferencia) {
+      throw new Error('Tipo de documento de referencia no encontrado');
+    }
+
+    const documentoReferencia = await this.crearDocumentoEspecifico(
+      tipoReferencia.id_tipo_documento
+    );
+
+    const referenciaData = {
+      id_documento: documentoReferencia.id_documento,
+      ...this.referenciaForm.value,
+    };
+
+    await firstValueFrom(
+      this.referenciasTrasladoService.createReferencia(referenciaData)
+    );
   }
 
-  const documentoSolicitud = await this.crearDocumentoEspecifico(
-    tipoSolicitud.id_tipo_documento
-  );
+  private async guardarPrescripcionMedicamento(): Promise<void> {
+    if (!this.prescripcionForm.valid) {
+      throw new Error('Formulario de prescripción de medicamentos inválido');
+    }
 
-  const solicitudData = {
-    id_documento: documentoSolicitud.id_documento,
-    ...this.solicitudEstudioForm.value,
-  };
+    const tipoPrescripcion = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Prescripción de Medicamentos'
+    );
+    if (!tipoPrescripcion) {
+      throw new Error('Tipo de documento de prescripción no encontrado');
+    }
 
-  await firstValueFrom(
-    this.solicitudesEstudioService.createSolicitud(solicitudData)
-  );
-}
+    const documentoPrescripcion = await this.crearDocumentoEspecifico(
+      tipoPrescripcion.id_tipo_documento
+    );
 
-private async guardarReferenciaTraslado(): Promise<void> {
-  if (!this.referenciaForm.valid) {
-    throw new Error('Formulario de referencia y traslado inválido');
+    const prescripcionData = {
+      id_documento: documentoPrescripcion.id_documento,
+      ...this.prescripcionForm.value,
+    };
+
+    await firstValueFrom(
+      this.prescripcionesMedicamentoService.createPrescripcion(prescripcionData)
+    );
   }
 
-  const tipoReferencia = this.tiposDocumentosDisponibles.find(
-    (t) => t.nombre === 'Referencia y Traslado'
-  );
-  if (!tipoReferencia) {
-    throw new Error('Tipo de documento de referencia no encontrado');
+  // Método para guardar Historia Clínica Pediátrica
+  private async guardarHistoriaClinicaPediatrica(): Promise<void> {
+    if (this.historiaClinicaPediatricaForm.invalid) {
+      this.marcarCamposInvalidos(this.historiaClinicaPediatricaForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
+
+    const datosHistoria = {
+      ...this.historiaClinicaPediatricaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_paciente: this.pacienteId,
+      id_personal_medico: this.medicoActual,
+      fecha_elaboracion: new Date().toISOString(),
+    };
+
+    await firstValueFrom(
+      this.historiasClinicasService.createHistoriaClinica(datosHistoria)
+    );
   }
 
-  const documentoReferencia = await this.crearDocumentoEspecifico(
-    tipoReferencia.id_tipo_documento
-  );
+  // Métodos de guardado pediátricos
+  private async guardarAntecedentesHeredoFamiliares(): Promise<void> {
+    if (this.antecedentesHeredoFamiliaresForm.invalid) {
+      this.marcarCamposInvalidos(this.antecedentesHeredoFamiliaresForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-  const referenciaData = {
-    id_documento: documentoReferencia.id_documento,
-    ...this.referenciaForm.value,
-  };
-
-  await firstValueFrom(
-    this.referenciasTrasladoService.createReferencia(referenciaData)
-  );
-}
-
-private async guardarPrescripcionMedicamento(): Promise<void> {
-  if (!this.prescripcionForm.valid) {
-    throw new Error('Formulario de prescripción de medicamentos inválido');
+    const datosAntecedentes = this.prepararDatosAntecedentesHeredoFamiliares();
+    await firstValueFrom(
+      this.antecedentesHeredoFamiliaresService.crear(datosAntecedentes)
+    );
   }
 
-  const tipoPrescripcion = this.tiposDocumentosDisponibles.find(
-    (t) => t.nombre === 'Prescripción de Medicamentos'
-  );
-  if (!tipoPrescripcion) {
-    throw new Error('Tipo de documento de prescripción no encontrado');
+  private async guardarAntecedentesPerinatales(): Promise<void> {
+    if (this.antecedentesPerinatalesForm.invalid) {
+      this.marcarCamposInvalidos(this.antecedentesPerinatalesForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
+
+    const datosAntecedentes = this.prepararDatosAntecedentesPerinatales();
+    await firstValueFrom(
+      this.antecedentesPerinatalesService.crear(datosAntecedentes)
+    );
   }
 
-  const documentoPrescripcion = await this.crearDocumentoEspecifico(
-    tipoPrescripcion.id_tipo_documento
-  );
+  private async guardarDesarrolloPsicomotriz(): Promise<void> {
+    if (this.desarrolloPsicomotrizForm.invalid) {
+      this.marcarCamposInvalidos(this.desarrolloPsicomotrizForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-  const prescripcionData = {
-    id_documento: documentoPrescripcion.id_documento,
-    ...this.prescripcionForm.value,
-  };
-
-  await firstValueFrom(
-    this.prescripcionesMedicamentoService.createPrescripcion(prescripcionData)
-  );
-}
-
-// Método para guardar Historia Clínica Pediátrica
-private async guardarHistoriaClinicaPediatrica(): Promise<void> {
-  if (this.historiaClinicaPediatricaForm.invalid) {
-    this.marcarCamposInvalidos(this.historiaClinicaPediatricaForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosDesarrollo = this.prepararDatosDesarrolloPsicomotriz();
+    await firstValueFrom(
+      this.desarrolloPsicomotrizService.crear(datosDesarrollo)
+    );
   }
 
-  const datosHistoria = {
-    ...this.historiaClinicaPediatricaForm.value,
-    id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-    id_paciente: this.pacienteId,
-    id_personal_medico: this.medicoActual,
-    fecha_elaboracion: new Date().toISOString(),
-  };
+  private async guardarEstadoNutricionalPediatrico(): Promise<void> {
+    if (this.estadoNutricionalPediatricoForm.invalid) {
+      this.marcarCamposInvalidos(this.estadoNutricionalPediatricoForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-  await firstValueFrom(this.historiasClinicasService.createHistoriaClinica(datosHistoria));
-}
-
-// Métodos de guardado pediátricos
-private async guardarAntecedentesHeredoFamiliares(): Promise<void> {
-  if (this.antecedentesHeredoFamiliaresForm.invalid) {
-    this.marcarCamposInvalidos(this.antecedentesHeredoFamiliaresForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosNutricional = this.prepararDatosEstadoNutricionalPediatrico();
+    await firstValueFrom(
+      this.estadoNutricionalPediatricoService.crear(datosNutricional)
+    );
   }
 
-  const datosAntecedentes = this.prepararDatosAntecedentesHeredoFamiliares();
-  await firstValueFrom(this.antecedentesHeredoFamiliaresService.crear(datosAntecedentes));
-}
+  private async guardarInmunizaciones(): Promise<void> {
+    if (this.inmunizacionesForm.invalid) {
+      this.marcarCamposInvalidos(this.inmunizacionesForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-private async guardarAntecedentesPerinatales(): Promise<void> {
-  if (this.antecedentesPerinatalesForm.invalid) {
-    this.marcarCamposInvalidos(this.antecedentesPerinatalesForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosInmunizaciones = this.prepararDatosInmunizaciones();
+    await firstValueFrom(this.inmunizacionesService.crear(datosInmunizaciones));
   }
 
-  const datosAntecedentes = this.prepararDatosAntecedentesPerinatales();
-  await firstValueFrom(this.antecedentesPerinatalesService.crear(datosAntecedentes));
-}
+  private async guardarVacunasAdicionales(): Promise<void> {
+    if (this.vacunasAdicionalesForm.invalid) {
+      this.marcarCamposInvalidos(this.vacunasAdicionalesForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-private async guardarDesarrolloPsicomotriz(): Promise<void> {
-  if (this.desarrolloPsicomotrizForm.invalid) {
-    this.marcarCamposInvalidos(this.desarrolloPsicomotrizForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosVacunas = this.prepararDatosVacunasAdicionales();
+    await firstValueFrom(this.vacunasAdicionalesService.agregar(datosVacunas));
   }
 
-  const datosDesarrollo = this.prepararDatosDesarrolloPsicomotriz();
-  await firstValueFrom(this.desarrolloPsicomotrizService.crear(datosDesarrollo));
-}
+  private async guardarAlimentacionPediatrica(): Promise<void> {
+    if (this.alimentacionPediatricaForm.invalid) {
+      this.marcarCamposInvalidos(this.alimentacionPediatricaForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-private async guardarEstadoNutricionalPediatrico(): Promise<void> {
-  if (this.estadoNutricionalPediatricoForm.invalid) {
-    this.marcarCamposInvalidos(this.estadoNutricionalPediatricoForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosAlimentacion = {
+      ...this.alimentacionPediatricaForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_personal_medico: this.medicoActual,
+    };
+
+    // Nota: Podrías necesitar un servicio específico para alimentación pediátrica
+    // o usar el servicio de historia clínica pediátrica
   }
 
-  const datosNutricional = this.prepararDatosEstadoNutricionalPediatrico();
-  await firstValueFrom(this.estadoNutricionalPediatricoService.crear(datosNutricional));
-}
+  private async guardarTamizajeNeonatal(): Promise<void> {
+    if (this.tamizajeNeonatalForm.invalid) {
+      this.marcarCamposInvalidos(this.tamizajeNeonatalForm);
+      throw new Error('Por favor, complete todos los campos obligatorios');
+    }
 
-private async guardarInmunizaciones(): Promise<void> {
-  if (this.inmunizacionesForm.invalid) {
-    this.marcarCamposInvalidos(this.inmunizacionesForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
+    const datosTamizaje = {
+      ...this.tamizajeNeonatalForm.value,
+      id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
+      id_personal_medico: this.medicoActual,
+    };
+
+    // Nota: Podrías necesitar un servicio específico para tamizaje neonatal
   }
-
-  const datosInmunizaciones = this.prepararDatosInmunizaciones();
-  await firstValueFrom(this.inmunizacionesService.crear(datosInmunizaciones));
-}
-
-private async guardarVacunasAdicionales(): Promise<void> {
-  if (this.vacunasAdicionalesForm.invalid) {
-    this.marcarCamposInvalidos(this.vacunasAdicionalesForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
-  }
-
-  const datosVacunas = this.prepararDatosVacunasAdicionales();
-  await firstValueFrom(this.vacunasAdicionalesService.agregar(datosVacunas));
-}
-
-private async guardarAlimentacionPediatrica(): Promise<void> {
-  if (this.alimentacionPediatricaForm.invalid) {
-    this.marcarCamposInvalidos(this.alimentacionPediatricaForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
-  }
-
-  const datosAlimentacion = {
-    ...this.alimentacionPediatricaForm.value,
-    id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-    id_personal_medico: this.medicoActual,
-  };
-  
-  // Nota: Podrías necesitar un servicio específico para alimentación pediátrica
-  // o usar el servicio de historia clínica pediátrica
-}
-
-private async guardarTamizajeNeonatal(): Promise<void> {
-  if (this.tamizajeNeonatalForm.invalid) {
-    this.marcarCamposInvalidos(this.tamizajeNeonatalForm);
-    throw new Error('Por favor, complete todos los campos obligatorios');
-  }
-
-  const datosTamizaje = {
-    ...this.tamizajeNeonatalForm.value,
-    id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
-    id_personal_medico: this.medicoActual,
-  };
-  
-  // Nota: Podrías necesitar un servicio específico para tamizaje neonatal
-}
-
-
-
 
   private async guardarConsentimiento(): Promise<void> {
     console.log('🔄 Guardando consentimiento informado...');
@@ -3965,15 +3992,21 @@ private async guardarTamizajeNeonatal(): Promise<void> {
 
     // ✅ PASO 1: Buscar el tipo de documento de consentimiento informado
     const tipoConsentimiento = this.tiposDocumentosDisponibles.find(
-      (t) => t.nombre === 'Consentimiento Informado' ||
-             t.nombre === 'Consentimientos Informados' ||
-             t.nombre.toLowerCase().includes('consentimiento')
+      (t) =>
+        t.nombre === 'Consentimiento Informado' ||
+        t.nombre === 'Consentimientos Informados' ||
+        t.nombre.toLowerCase().includes('consentimiento')
     );
 
     if (!tipoConsentimiento) {
       console.error('❌ Tipo de documento de consentimiento no encontrado');
-      console.log('🔍 Tipos disponibles:', this.tiposDocumentosDisponibles.map(t => t.nombre));
-      throw new Error('Tipo de documento de consentimiento informado no encontrado');
+      console.log(
+        '🔍 Tipos disponibles:',
+        this.tiposDocumentosDisponibles.map((t) => t.nombre)
+      );
+      throw new Error(
+        'Tipo de documento de consentimiento informado no encontrado'
+      );
     }
 
     console.log('✅ Tipo de documento encontrado:', tipoConsentimiento);
@@ -3988,38 +4021,61 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     // ✅ PASO 3: Crear el consentimiento informado con el id_documento
     const consentimientoData = {
       id_documento: documentoConsentimiento.id_documento,
-      tipo_consentimiento: this.consentimientoForm.value.tipo_consentimiento || 'General',
-      procedimiento_autorizado: this.consentimientoForm.value.procedimiento_autorizado || '',
-      riesgos_explicados: this.consentimientoForm.value.riesgos_explicados || '',
-      alternativas_explicadas: this.consentimientoForm.value.alternativas_explicadas || '',
-      autorizacion_procedimientos: this.consentimientoForm.value.autorizacion_procedimientos || false,
-      autorizacion_anestesia: this.consentimientoForm.value.autorizacion_anestesia || false,
+      tipo_consentimiento:
+        this.consentimientoForm.value.tipo_consentimiento || 'General',
+      procedimiento_autorizado:
+        this.consentimientoForm.value.procedimiento_autorizado || '',
+      riesgos_explicados:
+        this.consentimientoForm.value.riesgos_explicados || '',
+      alternativas_explicadas:
+        this.consentimientoForm.value.alternativas_explicadas || '',
+      autorizacion_procedimientos:
+        this.consentimientoForm.value.autorizacion_procedimientos || false,
+      autorizacion_anestesia:
+        this.consentimientoForm.value.autorizacion_anestesia || false,
       firma_paciente: this.consentimientoForm.value.firma_paciente || false,
-      firma_responsable: this.consentimientoForm.value.firma_responsable || false,
-      nombre_responsable: this.consentimientoForm.value.nombre_responsable || '',
-      parentesco_responsable: this.consentimientoForm.value.parentesco_responsable || '',
+      firma_responsable:
+        this.consentimientoForm.value.firma_responsable || false,
+      nombre_responsable:
+        this.consentimientoForm.value.nombre_responsable || '',
+      parentesco_responsable:
+        this.consentimientoForm.value.parentesco_responsable || '',
       testigos: this.consentimientoForm.value.testigos || [],
-      fecha_consentimiento: this.consentimientoForm.value.fecha_consentimiento || new Date().toISOString(),
+      fecha_consentimiento:
+        this.consentimientoForm.value.fecha_consentimiento ||
+        new Date().toISOString(),
     };
 
     console.log('🚀 Datos del consentimiento a enviar:', consentimientoData);
     console.log('🔍 Campos verificados:');
     console.log('  - id_documento:', consentimientoData.id_documento);
-    console.log('  - tipo_consentimiento:', consentimientoData.tipo_consentimiento);
-    console.log('  - procedimiento_autorizado:', consentimientoData.procedimiento_autorizado);
-    console.log('  - riesgos_explicados:', consentimientoData.riesgos_explicados);
+    console.log(
+      '  - tipo_consentimiento:',
+      consentimientoData.tipo_consentimiento
+    );
+    console.log(
+      '  - procedimiento_autorizado:',
+      consentimientoData.procedimiento_autorizado
+    );
+    console.log(
+      '  - riesgos_explicados:',
+      consentimientoData.riesgos_explicados
+    );
 
     try {
       const response = await firstValueFrom(
         this.consentimientosService.createConsentimiento(consentimientoData)
       );
-      console.log('✅ Consentimiento informado guardado exitosamente:', response);
+      console.log(
+        '✅ Consentimiento informado guardado exitosamente:',
+        response
+      );
     } catch (error: any) {
       console.error('❌ Error al guardar consentimiento informado:', error);
       console.error('📋 Detalles del error:', {
         status: error?.status,
         message: error?.message,
-        error: error?.error
+        error: error?.error,
       });
       throw error;
     }
@@ -4094,29 +4150,28 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       this.error = 'Por favor complete todos los campos requeridos';
       return;
     }
-    
+
     try {
       this.guardandoFormulario = true;
       this.error = null;
-      
+
       const payload = {
         ...this.notaInterconsultaForm.value,
         id_paciente: this.pacienteId,
         id_personal_medico: this.medicoActual,
       };
-      
+
       const response = await firstValueFrom(
         this.notasInterconsultaService.createNotaInterconsulta(payload)
       );
-      
+
       this.formularioEstado.notaInterconsulta = true;
       this.success = 'Nota de interconsulta guardada correctamente';
-      
+
       // Limpiar el mensaje de éxito después de 5 segundos
       setTimeout(() => {
         this.success = '';
       }, 5000);
-      
     } catch (error) {
       console.error('Error al guardar nota de interconsulta:', error);
       this.error = 'Error al guardar la nota de interconsulta';
@@ -4157,7 +4212,7 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       solicitudImagenologia: 'Solicitud Imagenología',
       solicitudCultivo: 'Solicitud Cultivo',
       prescripcionMedicamentos: 'Prescripción Medicamentos',
-      solicitudGasometria: 'Solicitud Gasometría'
+      solicitudGasometria: 'Solicitud Gasometría',
     };
     return titulos[formulario] || formulario;
   }
@@ -4219,9 +4274,9 @@ private async guardarTamizajeNeonatal(): Promise<void> {
         inmunizaciones: false,
         vacunasAdicionales: false,
         solicitudCultivo: false,
-  solicitudGasometria: false,
-  hojaFrontal: false,
-  altaVoluntaria: false,
+        solicitudGasometria: false,
+        hojaFrontal: false,
+        altaVoluntaria: false,
       };
 
       setTimeout(() => {
@@ -4293,27 +4348,37 @@ private async guardarTamizajeNeonatal(): Promise<void> {
   }
 
   // Método para obtener estado de salud general
-  getEstadoSaludGeneral(): { nivel: 'critico' | 'precaucion' | 'normal'; mensaje: string } {
-  const alertas: string[] = this.resumenGeneral?.alertasMedicas || [];
+  getEstadoSaludGeneral(): {
+    nivel: 'critico' | 'precaucion' | 'normal';
+    mensaje: string;
+  } {
+    const alertas: string[] = this.resumenGeneral?.alertasMedicas || [];
 
-  // 🔧 Verificar alertas críticas
-  const tieneAlertaCritica = alertas.some((alerta: string) =>
-    alerta.toLowerCase().includes('crítica') ||
-    alerta.toLowerCase().includes('critica') ||
-    alerta.toLowerCase().includes('hipotermia') ||
-    alerta.toLowerCase().includes('hipoxemia')
-  );
+    // 🔧 Verificar alertas críticas
+    const tieneAlertaCritica = alertas.some(
+      (alerta: string) =>
+        alerta.toLowerCase().includes('crítica') ||
+        alerta.toLowerCase().includes('critica') ||
+        alerta.toLowerCase().includes('hipotermia') ||
+        alerta.toLowerCase().includes('hipoxemia')
+    );
 
-  if (tieneAlertaCritica) {
-    return { nivel: 'critico', mensaje: 'Requiere atención médica inmediata' };
+    if (tieneAlertaCritica) {
+      return {
+        nivel: 'critico',
+        mensaje: 'Requiere atención médica inmediata',
+      };
+    }
+
+    if (alertas.length > 0) {
+      return { nivel: 'precaucion', mensaje: 'Requiere monitoreo médico' };
+    }
+
+    return {
+      nivel: 'normal',
+      mensaje: 'Signos vitales dentro de parámetros normales',
+    };
   }
-
-  if (alertas.length > 0) {
-    return { nivel: 'precaucion', mensaje: 'Requiere monitoreo médico' };
-  }
-
-  return { nivel: 'normal', mensaje: 'Signos vitales dentro de parámetros normales' };
-}
 
   private extraerAlergias(): string[] {
     const alergias: string[] = [];
@@ -4347,10 +4412,19 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       }
 
       // Alertas de presión arterial
-      if (ultimosSignos.presion_arterial_sistolica && ultimosSignos.presion_arterial_diastolica) {
-        if (ultimosSignos.presion_arterial_sistolica > 140 || ultimosSignos.presion_arterial_diastolica > 90) {
+      if (
+        ultimosSignos.presion_arterial_sistolica &&
+        ultimosSignos.presion_arterial_diastolica
+      ) {
+        if (
+          ultimosSignos.presion_arterial_sistolica > 140 ||
+          ultimosSignos.presion_arterial_diastolica > 90
+        ) {
           alertas.push('   Hipertensión arterial');
-        } else if (ultimosSignos.presion_arterial_sistolica < 90 || ultimosSignos.presion_arterial_diastolica < 60) {
+        } else if (
+          ultimosSignos.presion_arterial_sistolica < 90 ||
+          ultimosSignos.presion_arterial_diastolica < 60
+        ) {
           alertas.push('   Hipotensión arterial');
         }
       }
@@ -4386,7 +4460,7 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     // Verificar si hay signos vitales recientes
     const ahora = new Date();
     const hace24Horas = new Date(ahora.getTime() - 24 * 60 * 60 * 1000);
-    const signosRecientes = this.signosVitalesDisponibles.filter(signo => {
+    const signosRecientes = this.signosVitalesDisponibles.filter((signo) => {
       const fechaSigno = new Date(signo.fecha_toma || signo.created_at || 0);
       return fechaSigno > hace24Horas;
     });
@@ -4400,7 +4474,11 @@ private async guardarTamizajeNeonatal(): Promise<void> {
 
   cambiarFormulario(tipoFormulario: string): void {
     if (this.formularioActivo === tipoFormulario) return;
-
+// 🔥 AGREGAR VALIDACIÓN AQUÍ
+  if (!this.puedeAccederFormulario(tipoFormulario)) {
+    this.mostrarMensajeValidacion(tipoFormulario);
+    return;
+  }
     console.log(
       `🔄 Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`
     );
@@ -4417,14 +4495,14 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       'notaInterconsulta',
       'controlCrecimiento',
       'esquemaVacunacion',
-       // 🔥 AGREGAR LOS FORMULARIOS FALTANTES
-    'solicitudEstudio',
-    'referenciaTraslado',
-    'prescripcionMedicamento',
-    'solicitudCultivo',
-    'solicitudGasometria',
-    'hojaFrontal',
-    'altaVoluntaria'
+      // 🔥 AGREGAR LOS FORMULARIOS FALTANTES
+      'solicitudEstudio',
+      'referenciaTraslado',
+      'prescripcionMedicamento',
+      'solicitudCultivo',
+      'solicitudGasometria',
+      'hojaFrontal',
+      'altaVoluntaria',
     ];
 
     if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
@@ -4436,7 +4514,31 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     }
   }
 
-  private puedeAccederFormulario(formulario: string): boolean {
+private mostrarMensajeValidacion(formulario: string): void {
+  let mensaje = '';
+  
+  switch (formulario) {
+    case 'historiaClinica':
+      mensaje = 'Debe completar los Signos Vitales antes de acceder a la Historia Clínica.';
+      break;
+    case 'notaEvolucion':
+      if (!this.formularioEstado.signosVitales) {
+        mensaje = 'Debe completar los Signos Vitales antes de crear una Nota de Evolución.';
+      } else if (!this.formularioEstado.historiaClinica) {
+        mensaje = 'Debe completar la Historia Clínica antes de crear una Nota de Evolución.';
+      }
+      break;
+    default:
+      mensaje = `No puede acceder a ${this.getTituloFormulario(formulario)} en este momento.`;
+  }
+  
+  this.error = mensaje;
+  setTimeout(() => {
+    this.error = null;
+  }, 5000);
+}
+
+   puedeAccederFormulario(formulario: string): boolean {
     const secuenciaFormularios = [
       'signosVitales',
       'historiaClinica',
@@ -4459,68 +4561,66 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     }
   }
 
-
-resetearFormularioActual(): void {
-  if (this.formularioActivo === null) {
-    this.error = 'No hay un formulario activo para resetear.';
-    return;
-  }
-
-  if (
-    confirm(
-      `¿Está seguro de que desea resetear ${this.getTituloFormulario(
-        this.formularioActivo
-      )}?`
-    )
-  ) {
-    switch (this.formularioActivo) {
-      case 'signosVitales':
-        this.signosVitalesForm.reset();
-        break;
-      case 'historiaClinica':
-        this.historiaClinicaForm.reset();
-        break;
-      case 'notaUrgencias':
-        this.notaUrgenciasForm.reset();
-        break;
-      case 'notaEvolucion':
-        this.notaEvolucionForm.reset();
-        break;
-      case 'consentimiento':
-        this.consentimientoForm.reset();
-        break;
-      case 'notaPreoperatoria':
-        this.notaPreoperatoriaForm.reset();
-        break;
-      case 'notaPostoperatoria':
-        this.notaPostoperatoriaForm.reset();
-        break;
-      case 'notaPreanestesica':
-        this.notaPreanestesicaForm.reset();
-        break;
-      case 'notaPostanestesica':
-        this.notaPostanestesicaForm.reset();
-        break;
-      case 'notaInterconsulta':
-        this.notaInterconsultaForm.reset();
-        break;
-      case 'controlCrecimiento':
-        this.controlCrecimientoForm.reset();
-        break;
-      case 'esquemaVacunacion':
-        this.esquemaVacunacionForm.reset();
-        break;
-      default:
-        console.warn(`Formulario no reconocido: ${this.formularioActivo}`);
-        return;
+  resetearFormularioActual(): void {
+    if (this.formularioActivo === null) {
+      this.error = 'No hay un formulario activo para resetear.';
+      return;
     }
-    this.formularioEstado[this.formularioActivo] = false;
-    this.success = `Formulario ${this.getTituloFormulario(
-      this.formularioActivo
-    )} reseteado`;
-  }
-}
 
+    if (
+      confirm(
+        `¿Está seguro de que desea resetear ${this.getTituloFormulario(
+          this.formularioActivo
+        )}?`
+      )
+    ) {
+      switch (this.formularioActivo) {
+        case 'signosVitales':
+          this.signosVitalesForm.reset();
+          break;
+        case 'historiaClinica':
+          this.historiaClinicaForm.reset();
+          break;
+        case 'notaUrgencias':
+          this.notaUrgenciasForm.reset();
+          break;
+        case 'notaEvolucion':
+          this.notaEvolucionForm.reset();
+          break;
+        case 'consentimiento':
+          this.consentimientoForm.reset();
+          break;
+        case 'notaPreoperatoria':
+          this.notaPreoperatoriaForm.reset();
+          break;
+        case 'notaPostoperatoria':
+          this.notaPostoperatoriaForm.reset();
+          break;
+        case 'notaPreanestesica':
+          this.notaPreanestesicaForm.reset();
+          break;
+        case 'notaPostanestesica':
+          this.notaPostanestesicaForm.reset();
+          break;
+        case 'notaInterconsulta':
+          this.notaInterconsultaForm.reset();
+          break;
+        case 'controlCrecimiento':
+          this.controlCrecimientoForm.reset();
+          break;
+        case 'esquemaVacunacion':
+          this.esquemaVacunacionForm.reset();
+          break;
+        default:
+          console.warn(`Formulario no reconocido: ${this.formularioActivo}`);
+          return;
+      }
+      this.formularioEstado[this.formularioActivo] = false;
+      this.success = `Formulario ${this.getTituloFormulario(
+        this.formularioActivo
+      )} reseteado`;
+    }
+  }
 
   get progresoFormularios(): {
     completados: number;
@@ -4889,7 +4989,8 @@ resetearFormularioActual(): void {
   async generarPDFInterconsulta(): Promise<void> {
     try {
       if (!this.formularioEstado.notaInterconsulta) {
-        this.error = 'Debe guardar la nota de interconsulta antes de generar el PDF';
+        this.error =
+          'Debe guardar la nota de interconsulta antes de generar el PDF';
         return;
       }
       await this.generarPDF('Nota de Interconsulta');
@@ -4906,50 +5007,53 @@ resetearFormularioActual(): void {
         this.notaInterconsultaForm.patchValue({
           prioridad: 'media',
           examenes_laboratorio: false,
-          examenes_gabinete: false
+          examenes_gabinete: false,
         });
         this.formularioEstado.notaInterconsulta = false;
         break;
-        
+
       case 'solicitudCultivo':
         this.solicitudCultivoForm.reset();
         this.solicitudCultivoForm.patchValue({
           prioridad: 'Normal',
           antibioticos_previos: false,
-          fecha_solicitud: new Date().toISOString().split('T')[0]
+          fecha_solicitud: new Date().toISOString().split('T')[0],
         });
         this.formularioEstado.solicitudCultivo = false;
         break;
-        
+
       case 'solicitudGasometria':
         this.solicitudGasometriaForm.reset();
         this.solicitudGasometriaForm.patchValue({
           fio2: 21,
           soporte_ventilatorio: 'Aire ambiente',
           prioridad: 'Normal',
-          fecha_solicitud: new Date().toISOString().split('T')[0]
+          fecha_solicitud: new Date().toISOString().split('T')[0],
         });
         this.formularioEstado.solicitudGasometria = false;
         break;
-        
+
       case 'registroTransfusion':
         this.registroTransfusionForm.reset();
         this.registroTransfusionForm.patchValue({
-          presenta_reacciones: false
+          presenta_reacciones: false,
         });
         this.formularioEstado.registroTransfusion = false;
         break;
-        
+
       case 'altaVoluntaria':
         this.altaVoluntariaForm.reset();
         this.altaVoluntariaForm.patchValue({
-          continua_tratamiento_externo: false
+          continua_tratamiento_externo: false,
         });
         this.formularioEstado.altaVoluntaria = false;
         break;
-        
+
       default:
-        console.warn('Tipo de formulario no reconocido para limpiar:', tipoFormulario);
+        console.warn(
+          'Tipo de formulario no reconocido para limpiar:',
+          tipoFormulario
+        );
     }
   }
 
@@ -5098,12 +5202,14 @@ resetearFormularioActual(): void {
 
         // Consentimientos Informados
         case 'Consentimiento Procedimientos':
-          await this.pdfGeneratorService.generarNotaConsentimientoProcedimientos({
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            consentimiento: this.consentimientoForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarNotaConsentimientoProcedimientos(
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              consentimiento: this.consentimientoForm?.value || {},
+            }
+          );
           break;
 
         case 'Consentimiento Hospitalización':
@@ -5116,30 +5222,36 @@ resetearFormularioActual(): void {
           break;
 
         case 'Consentimiento Referencia':
-          await this.pdfGeneratorService.generarConsentimientoReferenciaPacientes({
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            consentimiento: this.consentimientoForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarConsentimientoReferenciaPacientes(
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              consentimiento: this.consentimientoForm?.value || {},
+            }
+          );
           break;
 
         case 'Consentimiento Transfusión':
-          await this.pdfGeneratorService.generarConsentimientoTransfusionSanguinea({
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            consentimiento: this.consentimientoForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarConsentimientoTransfusionSanguinea(
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              consentimiento: this.consentimientoForm?.value || {},
+            }
+          );
           break;
 
         case 'Consentimiento Tratamiento':
-          await this.pdfGeneratorService.generarConsentimientoTratamientoMedico({
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            consentimiento: this.consentimientoForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarConsentimientoTratamientoMedico(
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              consentimiento: this.consentimientoForm?.value || {},
+            }
+          );
           break;
 
         // Hojas y Documentos Especiales
@@ -5200,63 +5312,81 @@ resetearFormularioActual(): void {
           break;
 
         case 'Referencia Traslado':
-          await this.pdfGeneratorService.generarDocumentoPDF('Referencia Traslado', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            referencia: this.referenciaForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Referencia Traslado',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              referencia: this.referenciaForm?.value || {},
+            }
+          );
           break;
 
         // Documentos Pediátricos
         case 'Control Crecimiento':
-          await this.pdfGeneratorService.generarDocumentoPDF('Control Crecimiento', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            control: this.controlCrecimientoForm?.value || {},
-            signosVitales: this.signosVitalesForm.value,
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Control Crecimiento',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              control: this.controlCrecimientoForm?.value || {},
+              signosVitales: this.signosVitalesForm.value,
+            }
+          );
           break;
 
         case 'Esquema Vacunación':
-          await this.pdfGeneratorService.generarDocumentoPDF('Esquema Vacunación', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            esquema: this.esquemaVacunacionForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Esquema Vacunación',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              esquema: this.esquemaVacunacionForm?.value || {},
+            }
+          );
           break;
 
         // Solicitudes Especiales
         case 'Solicitud Gasometría':
-          await this.pdfGeneratorService.generarDocumentoPDF('Solicitud Gasometría', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            solicitud: this.solicitudEstudioForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Solicitud Gasometría',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              solicitud: this.solicitudEstudioForm?.value || {},
+            }
+          );
           break;
 
         // Consentimiento Informado genérico
         case 'Consentimiento Informado':
-          await this.pdfGeneratorService.generarDocumentoPDF('Consentimiento Tratamiento', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            consentimientoTratamiento: this.consentimientoForm?.value || {},
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Consentimiento Tratamiento',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              consentimientoTratamiento: this.consentimientoForm?.value || {},
+            }
+          );
           break;
 
         // Nota de Interconsulta (NOM-004)
         case 'Nota de Interconsulta':
-          await this.pdfGeneratorService.generarDocumentoPDF('Nota Interconsulta', {
-            paciente: datosPacienteEstructurados,
-            medico: medicoCompleto,
-            expediente: this.pacienteCompleto?.expediente,
-            interconsulta: this.notaInterconsultaForm?.value || {},
-            signosVitales: this.signosVitalesForm.value,
-          });
+          await this.pdfGeneratorService.generarDocumentoPDF(
+            'Nota Interconsulta',
+            {
+              paciente: datosPacienteEstructurados,
+              medico: medicoCompleto,
+              expediente: this.pacienteCompleto?.expediente,
+              interconsulta: this.notaInterconsultaForm?.value || {},
+              signosVitales: this.signosVitalesForm.value,
+            }
+          );
           break;
 
         default:
@@ -5694,14 +5824,13 @@ resetearFormularioActual(): void {
     }
   }
 
-
-get puedeAvanzar(): boolean {
-  if (this.formularioActivo === null) {
-    return false;
+  get puedeAvanzar(): boolean {
+    if (this.formularioActivo === null) {
+      return false;
+    }
+    const estadoFormulario = this.formularioEstado[this.formularioActivo];
+    return estadoFormulario || this.formularioActualValido;
   }
-  const estadoFormulario = this.formularioEstado[this.formularioActivo];
-  return estadoFormulario || this.formularioActualValido;
-}
 
   get mostrarCargando(): boolean {
     return this.isLoading;
@@ -5752,27 +5881,27 @@ get puedeAvanzar(): boolean {
   }
 
   private esFormularioValido(
-  formulario: string | null
-): formulario is FormularioActivo {
-  if (formulario === null) {
-    return false;
+    formulario: string | null
+  ): formulario is FormularioActivo {
+    if (formulario === null) {
+      return false;
+    }
+    const formulariosValidos: FormularioActivo[] = [
+      'signosVitales',
+      'historiaClinica',
+      'notaUrgencias',
+      'notaEvolucion',
+      'consentimiento',
+      'notaPreoperatoria',
+      'notaPostoperatoria',
+      'notaPreanestesica',
+      'notaPostanestesica',
+      'notaInterconsulta',
+      'controlCrecimiento',
+      'esquemaVacunacion',
+    ];
+    return formulariosValidos.includes(formulario as FormularioActivo);
   }
-  const formulariosValidos: FormularioActivo[] = [
-    'signosVitales',
-    'historiaClinica',
-    'notaUrgencias',
-    'notaEvolucion',
-    'consentimiento',
-    'notaPreoperatoria',
-    'notaPostoperatoria',
-    'notaPreanestesica',
-    'notaPostanestesica',
-    'notaInterconsulta',
-    'controlCrecimiento',
-    'esquemaVacunacion',
-  ];
-  return formulariosValidos.includes(formulario as FormularioActivo);
-}
 
   private esTabValida(
     tab: string
@@ -6060,7 +6189,8 @@ get puedeAvanzar(): boolean {
 
   // Método para expandir/contraer grupos
   toggleGrupo(nombreGrupo: string): void {
-    this.grupoExpandido = this.grupoExpandido === nombreGrupo ? null : nombreGrupo;
+    this.grupoExpandido =
+      this.grupoExpandido === nombreGrupo ? null : nombreGrupo;
   }
 
   // Método para mostrar/ocultar todos los formularios
@@ -6079,93 +6209,107 @@ get puedeAvanzar(): boolean {
     }
 
     const termino = this.busquedaFormulario.toLowerCase();
-    this.formulariosVisibles = Object.keys(this.configFormularios).filter(key =>
-      this.configFormularios[key].nombre.toLowerCase().includes(termino)
+    this.formulariosVisibles = Object.keys(this.configFormularios).filter(
+      (key) =>
+        this.configFormularios[key].nombre.toLowerCase().includes(termino)
     );
   }
 
   // Filtrado por categoría
-  filtrarPorCategoria(categoria: 'todos' | 'frecuentes' | 'obligatorios'| 'pediatricos'): void {
+  filtrarPorCategoria(
+    categoria: 'todos' | 'frecuentes' | 'obligatorios' | 'pediatricos'
+  ): void {
     this.filtroActivo = categoria;
-    
+
     switch (categoria) {
       case 'frecuentes':
-        this.formulariosVisibles = Object.keys(this.configFormularios)
-          .filter(key => this.configFormularios[key].frecuente);
+        this.formulariosVisibles = Object.keys(this.configFormularios).filter(
+          (key) => this.configFormularios[key].frecuente
+        );
         break;
       case 'obligatorios':
-        this.formulariosVisibles = Object.keys(this.configFormularios)
-          .filter(key => this.configFormularios[key].obligatorio);
+        this.formulariosVisibles = Object.keys(this.configFormularios).filter(
+          (key) => this.configFormularios[key].obligatorio
+        );
         break;
       case 'pediatricos':
-      this.formulariosVisibles = Object.keys(this.configFormularios)
-        .filter(key => this.esFormularioPediatrico(key));
-      break;
+        this.formulariosVisibles = Object.keys(this.configFormularios).filter(
+          (key) => this.esFormularioPediatrico(key)
+        );
+        break;
       default:
         this.formulariosVisibles = Object.keys(this.configFormularios);
     }
   }
 
   // Método para verificar si un formulario es pediátrico
-esFormularioPediatrico(formulario: string): boolean {
-  const formulariosPediatricos = [
-    'historiaClinicaPediatrica',
-    'antecedentesHeredoFamiliares',
-    'antecedentesPerinatales',
-    'desarrolloPsicomotriz',
-    'estadoNutricionalPediatrico',
-    'inmunizaciones',
-    'vacunasAdicionales',
-    'alimentacionPediatrica',
-    'tamizajeNeonatal',
-    'controlCrecimiento',
-    'esquemaVacunacion'
-  ];
-  return formulariosPediatricos.includes(formulario);
-}
+  esFormularioPediatrico(formulario: string): boolean {
+    const formulariosPediatricos = [
+      'historiaClinicaPediatrica',
+      'antecedentesHeredoFamiliares',
+      'antecedentesPerinatales',
+      'desarrolloPsicomotriz',
+      'estadoNutricionalPediatrico',
+      'inmunizaciones',
+      'vacunasAdicionales',
+      'alimentacionPediatrica',
+      'tamizajeNeonatal',
+      'controlCrecimiento',
+      'esquemaVacunacion',
+    ];
+    return formulariosPediatricos.includes(formulario);
+  }
 
   // Obtener clase CSS para botones de formulario
   getClaseBotonFormulario(formulario: string): string {
-    const isActive = this.formularioActivo === formulario;
-    const config = this.configFormularios[formulario];
-    
-    if (isActive) {
-      return 'bg-blue-500 text-white shadow-lg transform scale-105';
-    }
-    
-    let clases = 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-300';
-    
-    if (config?.completado) {
-      clases += ' ring-2 ring-green-200';
-    }
-    
-    if (config?.obligatorio && !config?.completado) {
-      clases += ' ring-2 ring-red-200';
-    }
-    
-    return clases;
+  const isActive = this.formularioActivo === formulario;
+  const config = this.configFormularios[formulario];
+  const puedeAcceder = this.puedeAccederFormulario(formulario);
+
+  if (isActive) {
+    return 'bg-blue-500 text-white shadow-lg transform scale-105';
   }
+
+  // 🔥 Si no puede acceder, mostrar deshabilitado
+  if (!puedeAcceder) {
+    return 'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed opacity-60';
+  }
+
+  let clases = 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-300';
+
+  if (config?.completado) {
+    clases += ' ring-2 ring-green-200';
+  }
+
+  if (config?.obligatorio && !config?.completado) {
+    clases += ' ring-2 ring-red-200';
+  }
+
+  return clases;
+}
 
   // Obtener grupos visibles (filtrados por condiciones)
   getGruposVisibles() {
     return Object.entries(this.gruposFormularios)
-      .filter(([_, grupo]) => !(grupo as any).condition || (grupo as any).condition())
+      .filter(
+        ([_, grupo]) => !(grupo as any).condition || (grupo as any).condition()
+      )
       .map(([key, data]) => ({ key, data }));
   }
 
   // Obtener formularios visibles en un grupo específico
   getFormulariosVisiblesEnGrupo(formulariosGrupo: string[]) {
     return formulariosGrupo
-      .filter(f => this.formulariosVisibles.includes(f))
-      .filter(f => this.configFormularios[f])
-      .map(key => ({ key, ...this.configFormularios[key] }));
+      .filter((f) => this.formulariosVisibles.includes(f))
+      .filter((f) => this.configFormularios[f])
+      .map((key) => ({ key, ...this.configFormularios[key] }));
   }
 
   // Obtener todos los formularios visibles (para vista completa)
   getFormulariosVisibles() {
     return this.formulariosVisibles
-      .filter(key => this.configFormularios[key])
-      .map(key => ({ key, ...this.configFormularios[key] }));
+      .filter((key) => this.configFormularios[key])
+      .map((key) => ({ key, ...this.configFormularios[key] }));
   }
 
   // Navegación con teclado (opcional)
@@ -6175,7 +6319,11 @@ esFormularioPediatrico(formulario: string): boolean {
     if (this.tabActiva !== 'crear') return;
 
     // Ctrl/Cmd + número para acceso rápido
-    if ((event.ctrlKey || event.metaKey) && event.key >= '1' && event.key <= '9') {
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      event.key >= '1' &&
+      event.key <= '9'
+    ) {
       event.preventDefault();
       const index = parseInt(event.key) - 1;
       const formularios = this.getFormulariosVisibles();
@@ -6183,26 +6331,30 @@ esFormularioPediatrico(formulario: string): boolean {
         this.cambiarFormulario(formularios[index].key);
       }
     }
-    
+
     // Flecha izquierda/derecha para navegar
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      this.navegarFormulario(event.key === 'ArrowRight' ? 'siguiente' : 'anterior');
+      this.navegarFormulario(
+        event.key === 'ArrowRight' ? 'siguiente' : 'anterior'
+      );
     }
   }
 
   // Navegación secuencial entre formularios
   navegarFormulario(direccion: 'anterior' | 'siguiente'): void {
     const formularios = this.getFormulariosVisibles();
-    const actual = formularios.findIndex(f => f.key === this.formularioActivo);
-    
+    const actual = formularios.findIndex(
+      (f) => f.key === this.formularioActivo
+    );
+
     if (actual === -1) return;
-    
+
     let nuevo = direccion === 'siguiente' ? actual + 1 : actual - 1;
-    
+
     if (nuevo >= formularios.length) nuevo = 0;
     if (nuevo < 0) nuevo = formularios.length - 1;
-    
+
     this.cambiarFormulario(formularios[nuevo].key);
   }
 
@@ -6212,7 +6364,4 @@ esFormularioPediatrico(formulario: string): boolean {
       this.configFormularios[formulario].completado = completado;
     }
   }
-
-
-
 }
