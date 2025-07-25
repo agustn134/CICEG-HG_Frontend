@@ -550,27 +550,32 @@ export class PdfGeneratorService {
   }
 
   // 🔥 MÉTODO MEJORADO PARA FORMATEAR DIRECCIÓN (ya existe pero lo optimizo)
-  private formatearDireccionMejorada(paciente: any): string {
-    if (!paciente) return 'Sin dirección registrada';
+private formatearDireccionMejorada(paciente: any): string {
+  // ✅ DEBUG TEMPORAL - Verificar qué datos llegan
+  console.log('🏠 DEBUG - Datos del paciente recibidos:', {
+    domicilio: paciente.domicilio,
+    direccion: paciente.direccion,
+    persona_domicilio: paciente.persona?.domicilio,
+    estructura_completa: Object.keys(paciente)
+  });
+  
+  if (!paciente) return 'Sin dirección registrada';
+  
+  const domicilio = 
+    paciente.domicilio || 
+    paciente.direccion ||
+    paciente.persona?.domicilio || 
+    paciente.persona?.direccion ||
+    '';
 
-    const partes = [
-      paciente.calle,
-      paciente.numero_exterior ? `#${paciente.numero_exterior}` : '',
-      paciente.numero_interior ? `Int. ${paciente.numero_interior}` : '',
-      paciente.colonia,
-      paciente.municipio || paciente.ciudad,
-      paciente.estado,
-      paciente.codigo_postal ? `C.P. ${paciente.codigo_postal}` : '',
-    ].filter(
-      (parte) =>
-        parte &&
-        parte.trim() !== '' &&
-        parte.trim() !== 'null' &&
-        parte.trim() !== 'undefined'
-    );
-
-    return partes.length > 0 ? partes.join(', ') : 'Sin dirección registrada';
-  }
+  const domicilioLimpio = domicilio.toString().trim();
+  
+  return domicilioLimpio !== '' && 
+         domicilioLimpio !== 'null' && 
+         domicilioLimpio !== 'undefined' 
+    ? domicilioLimpio 
+    : 'Sin dirección registrada';
+}
 
   // 🔥 MÉTODO MEJORADO PARA OBTENER DATOS DE PADRES
   private obtenerDatosPadres(datos: any): DatosPadres {
@@ -1359,6 +1364,54 @@ export class PdfGeneratorService {
     return '#059669';
   }
 
+    // ==========================================
+  // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
+  // ==========================================
+  private obtenerNombreCompletoPersona(persona: any): string {
+    if (!persona) return 'N/A';
+    const nombre = persona.nombre || '';
+    const apellidoPaterno = persona.apellido_paterno || '';
+    const apellidoMaterno = persona.apellido_materno || '';
+    return `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
+  }
+
+  private calcularEdadPersona(fechaNacimiento: string): string {
+    if (!fechaNacimiento) return 'N/A';
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    const edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const meses = hoy.getMonth() - nacimiento.getMonth();
+
+    if (meses < 0 || (meses === 0 && hoy.getDate() < nacimiento.getDate())) {
+      return `${edad - 1} años`;
+    }
+    return `${edad} años`;
+  }
+
+  private formatearFecha(fecha: string): string {
+    if (!fecha) return 'N/A';
+    try {
+      const fechaObj = new Date(fecha);
+      return fechaObj.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    } catch {
+      return 'N/A';
+    }
+  }
+    // 🔧 MÉTODO AUXILIAR PARA CALCULAR TOTAL ALDRETE - MOVIDO DENTRO DE LA CLASE
+  private calcularTotalAldrete(postanestesicaData: any): number {
+    const actividad = parseInt(postanestesicaData.aldrete_actividad) || 2;
+    const respiracion = parseInt(postanestesicaData.aldrete_respiracion) || 2;
+    const circulacion = parseInt(postanestesicaData.aldrete_circulacion) || 2;
+    const conciencia = parseInt(postanestesicaData.aldrete_conciencia) || 2;
+    const saturacion = parseInt(postanestesicaData.aldrete_saturacion) || 2;
+
+    return actividad + respiracion + circulacion + conciencia + saturacion;
+  }
+  
   // .......................................................    VALIDACIONES  .........................
 
   // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE URGENCIAS
@@ -2474,6 +2527,9 @@ export class PdfGeneratorService {
       console.log('  NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
     }
   }
+
+
+
 
   /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 
@@ -19071,43 +19127,7 @@ export class PdfGeneratorService {
     }
   }
 
-  // ==========================================
-  // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
-  // ==========================================
-  private obtenerNombreCompletoPersona(persona: any): string {
-    if (!persona) return 'N/A';
-    const nombre = persona.nombre || '';
-    const apellidoPaterno = persona.apellido_paterno || '';
-    const apellidoMaterno = persona.apellido_materno || '';
-    return `${nombre} ${apellidoPaterno} ${apellidoMaterno}`.trim();
-  }
 
-  private calcularEdadPersona(fechaNacimiento: string): string {
-    if (!fechaNacimiento) return 'N/A';
-    const hoy = new Date();
-    const nacimiento = new Date(fechaNacimiento);
-    const edad = hoy.getFullYear() - nacimiento.getFullYear();
-    const meses = hoy.getMonth() - nacimiento.getMonth();
-
-    if (meses < 0 || (meses === 0 && hoy.getDate() < nacimiento.getDate())) {
-      return `${edad - 1} años`;
-    }
-    return `${edad} años`;
-  }
-
-  private formatearFecha(fecha: string): string {
-    if (!fecha) return 'N/A';
-    try {
-      const fechaObj = new Date(fecha);
-      return fechaObj.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-    } catch {
-      return 'N/A';
-    }
-  }
 
   // ==========================================
   // MÉTODO GENÉRICO TEMPORAL PARA DOCUMENTOS FALTANTES
@@ -19303,16 +19323,6 @@ export class PdfGeneratorService {
     }
   }
 
-  // 🔧 MÉTODO AUXILIAR PARA CALCULAR TOTAL ALDRETE - MOVIDO DENTRO DE LA CLASE
-  private calcularTotalAldrete(postanestesicaData: any): number {
-    const actividad = parseInt(postanestesicaData.aldrete_actividad) || 2;
-    const respiracion = parseInt(postanestesicaData.aldrete_respiracion) || 2;
-    const circulacion = parseInt(postanestesicaData.aldrete_circulacion) || 2;
-    const conciencia = parseInt(postanestesicaData.aldrete_conciencia) || 2;
-    const saturacion = parseInt(postanestesicaData.aldrete_saturacion) || 2;
-
-    return actividad + respiracion + circulacion + conciencia + saturacion;
-  }
 
 
 
