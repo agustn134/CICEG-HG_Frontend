@@ -89,53 +89,6 @@ export class PasoPaciente implements OnInit, OnDestroy {
     });
   }
 
-  // private loadCatalogos(): void {
-  //   console.log('🔄 Iniciando carga de catálogos...');
-
-  //   // Cargar tipos de sangre
-  //   this.catalogoService
-  //     .getTiposSangre()
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: (tipos) => {
-  //         this.tiposSangre = tipos;
-  //         console.log('  Tipos de sangre cargados:', tipos);
-  //       },
-  //       error: (error) => {
-  //         console.error('❌ Error cargando tipos de sangre:', error);
-  //         // Fallback manual
-  //         this.tiposSangre = [
-  //           { value: 'A+', label: 'A+' },
-  //           { value: 'A-', label: 'A-' },
-  //           { value: 'B+', label: 'B+' },
-  //           { value: 'B-', label: 'B-' },
-  //           { value: 'AB+', label: 'AB+' },
-  //           { value: 'AB-', label: 'AB-' },
-  //           { value: 'O+', label: 'O+' },
-  //           { value: 'O-', label: 'O-' },
-  //           { value: 'Desconocido', label: 'Desconocido' },
-  //         ];
-  //         console.log(
-  //           '🔄 Usando tipos de sangre de fallback:',
-  //           this.tiposSangre
-  //         );
-  //       },
-  //     });
-
-  //   // Cargar parentescos
-  //   this.catalogoService
-  //     .getParentescos()
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe((parentescos) => (this.parentescos = parentescos));
-
-  //   // Cargar niveles de escolaridad
-  //   this.catalogoService
-  //     .getNivelesEscolaridad()
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe((niveles) => (this.nivelesEscolaridad = niveles));
-  // }
-
-
 private loadCatalogos(): void {
   console.log('🔄 Iniciando carga de catálogos...');
 

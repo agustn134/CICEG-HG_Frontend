@@ -371,7 +371,7 @@
 
             <div class="flex flex-wrap gap-2">
               <button *ngFor="let formulario of getFormulariosVisiblesEnGrupo(grupo.data.formularios)"
-                (click)="cambiarFormulario(formulario.key)" 
+                (click)="cambiarFormulario(formulario.key)"
                 [class]="getClaseBotonFormulario(formulario.key)"
                 [disabled]="!puedeAccederFormulario(formulario.key)"
                 class="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200">
@@ -396,26 +396,26 @@
       <!-- NAVEGACIÓN COMPLETA (cuando se muestra todo) -->
 <div *ngIf="mostrarTodosFormularios" class="p-4">
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-    <button *ngFor="let formulario of getFormulariosVisibles()" 
+    <button *ngFor="let formulario of getFormulariosVisibles()"
             (click)="cambiarFormulario(formulario.key)"
             [class]="getClaseBotonFormulario(formulario.key)"
             [disabled]="!puedeAccederFormulario(formulario.key)"
             class="flex flex-col items-center p-3 rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md">
-      
+
       <i [class]="formulario.icono + ' text-lg mb-1'"></i>
       <span class="text-center leading-tight">{{ formulario.nombre }}</span>
-      
+
       <!-- Indicador de bloqueo -->
       <i *ngIf="!puedeAccederFormulario(formulario.key)"
          class="fas fa-lock text-red-500 text-xs mt-1"
          title="Complete los pasos anteriores primero"></i>
-      
+
       <!-- Indicador de estado -->
       <div class="mt-1 flex items-center gap-1">
         <div *ngIf="formulario.obligatorio" class="w-2 h-2 bg-red-500 rounded-full" title="Obligatorio"></div>
         <div *ngIf="formulario.completado" class="w-2 h-2 bg-green-500 rounded-full" title="Completado"></div>
       </div>
-      
+
       <!-- 🔥 NUEVO: Badge pediátrico en vista completa -->
       <div *ngIf="esPacientePediatrico && esFormularioPediatrico(formulario.key)"
            class="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
@@ -1542,6 +1542,8 @@
 
         </form>
       </div>
+
+
       <!-- ==========================================
        FORMULARIO DE NOTA DE INTERCONSULTA (NOM-004)
        Sección 6.3 - Nota de Interconsulta

@@ -274,7 +274,7 @@ import { RouterOutlet } from '@angular/router';
   `]
 })
 export class App {
-  protected title = 'CICEG-HG-APP';
+  protected title = 'SICEG-HG-APP';
 
   constructor() {
     // Configuración inicial del sistema hospitalario
@@ -283,12 +283,12 @@ export class App {
 
   private initializeHospitalSystem(): void {
     // Log de inicialización del sistema
-    console.log('   CICEG-HG - Sistema de Expedientes Clínicos');
+    console.log('   SICEG-HG - Sistema de Expedientes Clínicos');
     console.log('   Hospital General San Luis de la Paz, Guanajuato');
     console.log('   Iniciando aplicación...');
 
     // Configurar título de la página
-    document.title = 'CICEG-HG - Sistema de Expedientes Clínicos';
+    document.title = 'SICEG-HG - Sistema de Expedientes Clínicos';
 
     // Agregar meta tags específicos del hospital
     this.addHospitalMetaTags();

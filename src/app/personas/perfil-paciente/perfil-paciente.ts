@@ -4474,13 +4474,13 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
   cambiarFormulario(tipoFormulario: string): void {
     if (this.formularioActivo === tipoFormulario) return;
-// 🔥 AGREGAR VALIDACIÓN AQUÍ
+
   if (!this.puedeAccederFormulario(tipoFormulario)) {
     this.mostrarMensajeValidacion(tipoFormulario);
     return;
   }
     console.log(
-      `🔄 Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`
+      `Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`
     );
     const formulariosValidos: FormularioActivo[] = [
       'signosVitales',
@@ -4495,7 +4495,6 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       'notaInterconsulta',
       'controlCrecimiento',
       'esquemaVacunacion',
-      // 🔥 AGREGAR LOS FORMULARIOS FALTANTES
       'solicitudEstudio',
       'referenciaTraslado',
       'prescripcionMedicamento',
@@ -4516,7 +4515,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
 private mostrarMensajeValidacion(formulario: string): void {
   let mensaje = '';
-  
+
   switch (formulario) {
     case 'historiaClinica':
       mensaje = 'Debe completar los Signos Vitales antes de acceder a la Historia Clínica.';
@@ -4531,7 +4530,7 @@ private mostrarMensajeValidacion(formulario: string): void {
     default:
       mensaje = `No puede acceder a ${this.getTituloFormulario(formulario)} en este momento.`;
   }
-  
+
   this.error = mensaje;
   setTimeout(() => {
     this.error = null;
@@ -5144,17 +5143,6 @@ private mostrarMensajeValidacion(formulario: string): void {
             guiaClinica: this.guiaClinicaSeleccionada,
           });
           break;
-
-        // case 'Nota de Interconsulta':
-        //   await this.pdfGeneratorService.generarNotaInterconsulta({
-        //     paciente: datosPacienteEstructurados,
-        //     medico: medicoCompleto,
-        //     expediente: this.pacienteCompleto?.expediente,
-        //     notaInterconsulta: this.notaInterconsultaForm?.value || {},
-        //     signosVitales: this.signosVitalesForm.value,
-        //     guiaClinica: this.guiaClinicaSeleccionada,
-        //   });
-        //   break;
 
         case 'Nota Preoperatoria':
           await this.pdfGeneratorService.generarNotaPreoperatoria({

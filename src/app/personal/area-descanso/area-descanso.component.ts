@@ -1,8 +1,8 @@
-// src/app/personal/area-descanso/area-descanso.component.ts
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { Subject, takeUntil, interval } from 'rxjs';
+import { Subject, takeUntil, Subscription } from 'rxjs';
+
 import {
   EntretenimientoService,
   TriviaQuestion,
@@ -11,8 +11,9 @@ import {
   JokeResponse,
   MusicTrack,
   MotivationalQuote,
-  HealthyMeal,
-  CatImage
+  CatImage,
+  NewsArticle,
+  Achievement
 } from '../../services/entretenimiento/entretenimiento.service';
 
 @Component({
@@ -21,23 +22,16 @@ import {
   imports: [CommonModule, RouterModule],
   templateUrl: './area-descanso.component.html',
   styles: [`
-    @keyframes pulse-soft {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
+    @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+    .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
-    .animate-pulse-soft {
-      animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+    @keyframes bounce-gentle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .animate-bounce-gentle { animation: bounce-gentle 1s ease-in-out; }
 
-    @keyframes bounce-gentle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .animate-bounce-gentle {
-      animation: bounce-gentle 1s ease-in-out;
-    }
+    .answer-option:hover { @apply bg-slate-100 cursor-pointer; }
+    .answer-option.selected { @apply ring-2 ring-blue-500 bg-blue-50; }
+    .answer-option.correct { @apply bg-green-100 border-green-500 text-green-800; }
+    .answer-option.incorrect { @apply bg-red-100 border-red-500 text-red-800; }
   `]
 })
 export class AreaDescansoComponent implements OnInit, OnDestroy {
@@ -45,8 +39,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private sessionStart = new Date();
-  private slideshowInterval?: any;
-  private timeInterval?: any;
+  private slideshowInterval: any;
 
   // ==========================================
   // ESTADOS DE CARGA
@@ -56,7 +49,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   isLoadingQuote = false;
   isLoadingMusic = false;
   isLoadingImage = false;
-  isLoadingMeal = false;
+  isLoadingNews = false;
 
   // ==========================================
   // ESTADOS DE CONTENIDO
@@ -68,40 +61,34 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   isCorrectAnswer = false;
 
   currentJoke: JokeResponse | null = null;
-  jokeReaction = { liked: false, likes: 0, laughs: 0 };
+  jokeReaction = {
+    liked: false,
+    likes: Math.floor(Math.random() * 50) + 10,
+    laughs: Math.floor(Math.random() * 30) + 5
+  };
 
   currentQuote: MotivationalQuote | null = null;
-
+  currentNews: NewsArticle[] = [];
   currentTracks: MusicTrack[] = [];
   selectedTrackIndex = -1;
   currentPlayingTrack: MusicTrack | null = null;
   isPlaying = false;
-  selectedArtist = 'ludovico einaudi';
 
   currentImage: CatImage | null = null;
   imageType: 'cat' | 'dog' = 'cat';
   slideshowActive = false;
-  relaxationTips = [
-    'Observar imágenes relajantes reduce el cortisol en un 23%',
-    'Las mascotas ayudan a reducir la presión arterial',
-    'Sonreír, aunque sea forzado, libera endorfinas',
-    'Contemplar la naturaleza mejora la concentración',
-    'Los animales domésticos reducen la sensación de soledad'
-  ];
-  currentTipIndex = 0;
-
-  currentMeal: HealthyMeal | null = null;
 
   // ==========================================
-  // ESTADÍSTICAS Y TIEMPO
+  // CONFIGURACIÓN DE JUEGO
   // ==========================================
-  currentTime = '';
-  currentDate = '';
-  sessionStartTime = '';
-  relaxationTime = '0 min';
+  selectedCategory = 'random';
+  selectedDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
+  gameMode: 'practice' | 'challenge' = 'practice';
+  timeRemaining = 30;
+  timerInterval: any;
 
   // ==========================================
-  // TRIVIA MEJORADA
+  // ESTADÍSTICAS Y PROGRESO
   // ==========================================
   triviaStats: TriviaStats = {
     answered: 0,
@@ -112,26 +99,20 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
     level: 1,
     accuracy: 0
   };
+  recentAchievements: { icon: string; title: string; description: string }[] = [];
 
-  medicalCategories: MedicalCategory[] = [];
-  selectedCategory = 'random';
-  selectedDifficulty = 'easy';
-  gameMode: 'practice' | 'challenge' = 'practice';
-
-  timeRemaining = 30;
-  timerInterval?: any;
-
-  recentAchievements: any[] = [
-    { icon: '🎯', title: 'Primera Pregunta', description: 'Has respondido tu primera pregunta' },
-    { icon: '🔥', title: 'En Racha', description: 'Respuestas correctas consecutivas' }
+  // UI
+  currentTime = '';
+  currentDate = '';
+  relaxationTime = '0 seg';
+  relaxationTips = [
+    'Observar imágenes relajantes reduce el cortisol en un 23%',
+    'Las mascotas ayudan a reducir la presión arterial',
+    'Reír libera endorfinas y mejora el estado de ánimo',
+    'La música suave reduce la frecuencia cardíaca',
+    'Las frases motivadoras mejoran la resiliencia'
   ];
-
-  // ==========================================
-  // ESTADÍSTICAS ADICIONALES
-  // ==========================================
-  jokeStats = { enjoyed: 0, shared: 0 };
-  musicStats = { played: 0, favorites: 0 };
-  imageStats = { viewed: 0, downloaded: 0 };
+  currentTipIndex = 0;
 
   constructor(
     private router: Router,
@@ -147,19 +128,34 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
     this.stopSlideshow();
     this.stopTimer();
-    if (this.timeInterval) {
-      clearInterval(this.timeInterval);
-    }
+    if (this.slideshowInterval) clearInterval(this.slideshowInterval);
   }
 
   // ==========================================
   // INICIALIZACIÓN
   // ==========================================
   private initializeComponent(): void {
+    this.updateTime();
     this.medicalCategories = this.entretenimientoService.getMedicalCategories();
     this.loadTriviaStats();
+    this.loadUnlockedAchievements();
     this.startTimeTracking();
     this.loadInitialContent();
+  }
+
+  private loadInitialContent(): void {
+    Promise.all([
+      this.obtenerNuevaTrivia(),
+      this.obtenerNuevoChiste(),
+      this.obtenerNuevaFrase(),
+      this.obtenerNuevaImagen(),
+      this.obtenerNoticiasPositivas(),
+      this.obtenerMusicaRelajante()
+    ]).then(() => {
+      console.log('✅ Contenido inicial cargado completamente');
+    }).catch(error => {
+      console.error('❌ Error cargando contenido inicial:', error);
+    });
   }
 
   // ==========================================
@@ -185,38 +181,63 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
     const diffMs = now.getTime() - this.sessionStart.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffSecs = Math.floor((diffMs % 60000) / 1000);
-
-    if (diffMins > 0) {
-      this.relaxationTime = `${diffMins}:${diffSecs.toString().padStart(2, '0')} min`;
-    } else {
-      this.relaxationTime = `${diffSecs} seg`;
-    }
+    this.relaxationTime = diffMins > 0
+      ? `${diffMins}:${diffSecs.toString().padStart(2, '0')} min`
+      : `${diffSecs} seg`;
   }
 
   private startTimeTracking(): void {
-    // Actualizar tiempo cada segundo
-    this.timeInterval = setInterval(() => {
+    setInterval(() => {
       this.updateTime();
       this.updateRelaxationTime();
     }, 1000);
+  }
 
-    // Tracking adicional para estadísticas cada minuto
-    setInterval(() => {
-      console.log('📊 Tracking bienestar:', {
-        tiempo: this.getTotalSessionTime(),
-        actividades: this.getTotalActivities(),
-        nivel: this.getRelaxationLevel()
-      });
-    }, 60000);
+   // Método para manejar cambio de dificultad con tipos correctos
+  onDifficultyChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedDifficulty = target.value as 'easy' | 'medium' | 'hard';
+    this.obtenerNuevaTrivia();
   }
 
   // ==========================================
-  // MÉTODOS DE TEMPORIZADOR
+  // MÉTODOS DE TRIVIA
   // ==========================================
-  startTimer(): void {
-    if (!this.currentTrivia) return;
+  obtenerNuevaTrivia(): void {
+  this.isLoadingTrivia = true;
+  this.showTriviaAnswer = false;
+  this.selectedAnswer = -1;
+  this.isCorrectAnswer = false;
 
-    this.timeRemaining = this.currentTrivia.timeLimit || 30;
+  this.entretenimientoService.getMedicalTrivia(this.selectedDifficulty)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (question: TriviaQuestion) => {
+        // Validación adicional para asegurar que question no sea null
+        if (question && question.incorrect_answers && question.correct_answer) {
+          this.currentTrivia = question;
+          this.triviaOptions = [...question.incorrect_answers, question.correct_answer]
+            .sort(() => Math.random() - 0.5);
+          this.isLoadingTrivia = false;
+          this.startTimer();
+        } else {
+          console.error('❌ Pregunta inválida recibida:', question);
+          this.isLoadingTrivia = false;
+          // Intentar de nuevo o mostrar mensaje de error
+          this.showNotification('Error cargando pregunta. Intenta de nuevo.', 'error');
+        }
+      },
+      error: (error: any) => {
+        console.error('❌ Error cargando trivia:', error);
+        this.isLoadingTrivia = false;
+        this.showNotification('Error de conexión. Usando preguntas locales.', 'info');
+      }
+    });
+}
+
+  startTimer(): void {
+    this.timeRemaining = this.entretenimientoService.getCurrentTriviaTimeLimit();
+    this.stopTimer();
     this.timerInterval = setInterval(() => {
       this.timeRemaining--;
       if (this.timeRemaining <= 0) {
@@ -232,273 +253,81 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
     }
   }
 
-  resetTimer(): void {
-    this.stopTimer();
-    this.timeRemaining = 30;
-  }
-
   onTimeUp(): void {
     if (!this.showTriviaAnswer) {
-      this.selectTriviaAnswer('', -1); // Respuesta incorrecta por tiempo agotado
+      this.selectTriviaAnswer('', -1); // Tiempo agotado = incorrecto
     }
-  }
-
-  // ==========================================
-  // MÉTODOS DE CARGA DE CONTENIDO
-  // ==========================================
-  private loadInitialContent(): void {
-    Promise.all([
-      this.obtenerNuevaTrivia(),
-      this.obtenerNuevoChiste(),
-      this.obtenerNuevaFrase(),
-      this.obtenerNuevaImagen(),
-    ]).then(() => {
-      console.log('  Contenido inicial cargado completamente');
-    }).catch(error => {
-      console.error('❌ Error cargando contenido inicial:', error);
-    });
-  }
-
-  loadRandomContent(): void {
-    const randomActions = [
-      () => this.obtenerNuevaTrivia(),
-      () => this.obtenerNuevoChiste(),
-      () => this.obtenerNuevaFrase(),
-      () => this.obtenerNuevaImagen()
-    ];
-
-    const randomAction = randomActions[Math.floor(Math.random() * randomActions.length)];
-    randomAction();
-  }
-
-  // ==========================================
-  // MÉTODOS DE TRIVIA
-  // ==========================================
-  obtenerNuevaTrivia(): void {
-    this.isLoadingTrivia = true;
-    this.showTriviaAnswer = false;
-    this.selectedAnswer = -1;
-    this.resetTimer();
-
-    this.entretenimientoService.getTriviaQuestion(this.selectedCategory, this.selectedDifficulty)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          if (response.results && response.results.length > 0) {
-            this.currentTrivia = response.results[0];
-            this.triviaOptions = [
-              ...this.currentTrivia.incorrect_answers,
-              this.currentTrivia.correct_answer
-            ].sort(() => Math.random() - 0.5);
-          }
-          this.isLoadingTrivia = false;
-          this.startTimer();
-        },
-        error: (error) => {
-          console.error('Error cargando trivia:', error);
-          this.isLoadingTrivia = false;
-        }
-      });
   }
 
   selectTriviaAnswer(option: string, index: number): void {
-    if (this.showTriviaAnswer) return;
+    if (this.showTriviaAnswer || this.selectedAnswer !== -1) return;
 
-    this.stopTimer();
     this.selectedAnswer = index;
     this.isCorrectAnswer = option === this.currentTrivia?.correct_answer;
     this.showTriviaAnswer = true;
+    this.stopTimer();
 
-    this.updateTriviaStats();
+    this.entretenimientoService.updateStats(this.isCorrectAnswer);
+
+    // Actualizar estadísticas locales
+    this.triviaStats = { ...this.entretenimientoService.triviaStats };
+
+    // Verificar logros
     this.checkAchievements();
 
-    // Auto-avanzar después de 4 segundos para permitir leer la explicación
-    setTimeout(() => {
-      this.obtenerNuevaTrivia();
-    }, 4000);
-  }
-
-  // ==========================================
-  // MÉTODOS DE ESTADÍSTICAS Y PROGRESO
-  // ==========================================
-  updateTriviaStats(): void {
-    this.triviaStats.answered++;
-
+    // Mostrar notificación si es correcto
     if (this.isCorrectAnswer) {
-      this.triviaStats.correct++;
-      this.triviaStats.streak++;
-      this.triviaStats.totalPoints += this.currentTrivia?.points || 0;
-
-      if (this.triviaStats.streak > this.triviaStats.maxStreak) {
-        this.triviaStats.maxStreak = this.triviaStats.streak;
-      }
+      this.showNotification(`+${this.getCurrentTriviaPoints()} puntos`, 'success');
     } else {
-      this.triviaStats.streak = 0;
+      this.showNotification('Sigue intentando', 'info');
     }
-
-    this.triviaStats.accuracy = Math.round((this.triviaStats.correct / this.triviaStats.answered) * 100);
-    this.triviaStats.level = this.entretenimientoService.calculateTriviaLevel(this.triviaStats.totalPoints);
-
-    this.saveTriviaStats();
-  }
-
-  loadTriviaStats(): void {
-    const saved = localStorage.getItem('siceg-trivia-stats');
-    if (saved) {
-      this.triviaStats = { ...this.triviaStats, ...JSON.parse(saved) };
-    }
-  }
-
-  saveTriviaStats(): void {
-    localStorage.setItem('siceg-trivia-stats', JSON.stringify(this.triviaStats));
-  }
-
-  resetGame(): void {
-    this.triviaStats = {
-      answered: 0,
-      correct: 0,
-      streak: 0,
-      maxStreak: this.triviaStats.maxStreak,
-      totalPoints: this.triviaStats.totalPoints,
-      level: this.triviaStats.level,
-      accuracy: 0
-    };
-    this.obtenerNuevaTrivia();
-  }
-
-  getNextLevelPoints(): number {
-    return this.entretenimientoService.getNextLevelPoints(this.triviaStats.level);
-  }
-
-  getLevelProgress(): number {
-    const currentLevelBase = (this.triviaStats.level - 1) * 100;
-    const pointsInCurrentLevel = this.triviaStats.totalPoints - currentLevelBase;
-    return Math.round((pointsInCurrentLevel / 100) * 100);
-  }
-
-  getPointsToNextLevel(): number {
-    return this.getNextLevelPoints() - this.triviaStats.totalPoints;
-  }
-
-  checkAchievements(): void {
-    // Lógica para desbloquear logros
-    if (this.triviaStats.answered === 1) {
-      this.unlockAchievement('🎯', 'Primera Pregunta', 'Has respondido tu primera pregunta');
-    }
-
-    if (this.triviaStats.streak === 5) {
-      this.unlockAchievement('🔥', 'Racha de 5', '5 respuestas correctas seguidas');
-    }
-
-    if (this.triviaStats.totalPoints >= 100) {
-      this.unlockAchievement('⭐', 'Centenario', 'Has alcanzado 100 puntos');
-    }
-  }
-
-  unlockAchievement(icon: string, title: string, description: string): void {
-    const achievement = { icon, title, description };
-    this.recentAchievements.unshift(achievement);
-    if (this.recentAchievements.length > 3) {
-      this.recentAchievements.pop();
-    }
-  }
-
-  // ==========================================
-  // MÉTODOS DE ESTILO PARA COLORES RELAJANTES
-  // ==========================================
-  getOptionButtonClass(index: number): string {
-    if (this.selectedAnswer === index) {
-      return 'bg-blue-500 text-white border-blue-500 shadow-lg';
-    }
-    return 'bg-slate-50 hover:bg-blue-50 text-slate-700 border-slate-200 hover:border-blue-300 hover:shadow-md';
-  }
-
-  getResultCardClass(): string {
-    return this.isCorrectAnswer
-      ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-300'
-      : 'bg-gradient-to-r from-rose-50 to-red-50 border-rose-300';
-  }
-
-  getResultIconClass(): string {
-    return this.isCorrectAnswer
-      ? 'bg-emerald-500 text-white'
-      : 'bg-rose-500 text-white';
-  }
-
-  getResultTextClass(): string {
-    return this.isCorrectAnswer
-      ? 'text-emerald-800'
-      : 'text-rose-800';
-  }
-
-  getResultSubtextClass(): string {
-    return this.isCorrectAnswer
-      ? 'text-emerald-600'
-      : 'text-rose-600';
-  }
-
-  selectCategory(categoryId: string): void {
-    this.selectedCategory = categoryId;
-    this.obtenerNuevaTrivia();
-  }
-
-  onDifficultyChange(event: any): void {
-    this.selectedDifficulty = event.target.value;
-    this.obtenerNuevaTrivia();
-  }
-
-  toggleGameMode(): void {
-    this.gameMode = this.gameMode === 'practice' ? 'challenge' : 'practice';
-    this.resetGame();
   }
 
   // ==========================================
   // MÉTODOS DE CHISTES
   // ==========================================
+   // Método para obtener chiste con tipos correctos
   obtenerNuevoChiste(): void {
     this.isLoadingJoke = true;
-
-    this.entretenimientoService.getJokeInSpanish()
+    this.entretenimientoService.getMedicalJoke()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (joke) => {
+        next: (joke: JokeResponse) => {
           this.currentJoke = joke;
-          this.jokeReaction = { liked: false, likes: Math.floor(Math.random() * 50) + 10, laughs: Math.floor(Math.random() * 30) + 5 };
+          this.jokeReaction = {
+            liked: false,
+            likes: Math.floor(Math.random() * 50) + 10,
+            laughs: Math.floor(Math.random() * 30) + 5
+          };
           this.isLoadingJoke = false;
         },
-        error: (error) => {
-          console.error('Error cargando chiste:', error);
+        error: (error: any) => {
+          console.error('❌ Error cargando chiste:', error);
           this.isLoadingJoke = false;
         }
       });
   }
 
+
   likeJoke(): void {
     if (!this.jokeReaction.liked) {
       this.jokeReaction.liked = true;
       this.jokeReaction.likes++;
-      this.jokeStats.enjoyed++;
     }
   }
 
   laughReaction(event: Event): void {
     this.jokeReaction.laughs++;
-    this.jokeStats.enjoyed++;
-
-    // Efecto visual de risa
     const button = event.target as HTMLElement;
-    button.classList.add('animate-bounce');
-    setTimeout(() => {
-      button.classList.remove('animate-bounce');
-    }, 1000);
+    button.classList.add('animate-bounce-gentle');
+    setTimeout(() => button.classList.remove('animate-bounce-gentle'), 1000);
   }
 
   // ==========================================
-  // MÉTODOS DE FRASES MOTIVACIONALES
+  // MÉTODOS DE FRASES
   // ==========================================
   obtenerNuevaFrase(): void {
     this.isLoadingQuote = true;
-
     this.entretenimientoService.getMotivationalQuote()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -507,31 +336,10 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
           this.isLoadingQuote = false;
         },
         error: (error) => {
-          console.error('Error cargando frase:', error);
+          console.error('❌ Error cargando frase:', error);
           this.isLoadingQuote = false;
         }
       });
-  }
-
-  shareQuote(): void {
-    if (this.currentQuote) {
-      const text = `"${this.currentQuote.text}" - ${this.currentQuote.author}`;
-
-      if (navigator.share) {
-        navigator.share({
-          title: 'Frase Inspiradora - SICEG-HG',
-          text: text,
-          url: window.location.href
-        }).catch(console.error);
-      } else {
-        // Fallback: copiar al portapapeles
-        navigator.clipboard.writeText(text).then(() => {
-          alert('¡Frase copiada al portapapeles!');
-        }).catch(() => {
-          alert('Error al copiar la frase');
-        });
-      }
-    }
   }
 
   // ==========================================
@@ -539,27 +347,28 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   // ==========================================
   obtenerNuevaImagen(): void {
     this.isLoadingImage = true;
-
-    const imageService = this.imageType === 'cat'
-      ? this.entretenimientoService.getCatImage()
-      : this.entretenimientoService.getDogImage();
-
-    imageService.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        if (response && response.length > 0) {
-          this.currentImage = response[0];
-          this.imageStats.viewed++;
+    this.entretenimientoService.getCatImage()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (images) => {
+          this.currentImage = images[0];
+          this.isLoadingImage = false;
+          this.currentImage.width = 500;
+          this.currentImage.height = 500;
+        },
+        error: () => {
+          this.currentImage = {
+            id: 'fallback',
+            url: '/assets/images/fallback-zen.jpg',
+            width: 500,
+            height: 500
+          };
+          this.isLoadingImage = false;
         }
-        this.isLoadingImage = false;
-      },
-      error: (error) => {
-        console.error('Error cargando imagen:', error);
-        this.isLoadingImage = false;
-      }
-    });
+      });
   }
 
-  switchImageType(type: 'cat' | 'dog'): void {
+  changeImageType(type: 'cat' | 'dog'): void {
     if (this.imageType !== type) {
       this.imageType = type;
       this.obtenerNuevaImagen();
@@ -567,11 +376,11 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad(): void {
-    console.log('  Imagen cargada correctamente');
+    console.log('✅ Imagen cargada correctamente');
   }
 
   onImageError(): void {
-    console.warn('  Error cargando imagen, usando fallback');
+    console.warn('⚠️ Error cargando imagen, usando fallback');
     this.currentImage = {
       id: 'fallback',
       url: '/assets/images/fallback-zen.jpg',
@@ -586,7 +395,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
       link.href = this.currentImage.url;
       link.download = `siceg-zen-${this.imageType}-${Date.now()}.jpg`;
       link.click();
-      this.imageStats.downloaded++;
+      this.showNotification('Imagen descargada', 'success');
     }
   }
 
@@ -597,9 +406,8 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
       this.slideshowActive = true;
       this.slideshowInterval = setInterval(() => {
         this.obtenerNuevaImagen();
-        // Cambiar tip de relajación
         this.currentTipIndex = (this.currentTipIndex + 1) % this.relaxationTips.length;
-      }, 5000); // Cambiar imagen cada 5 segundos
+      }, 5000);
     }
   }
 
@@ -612,51 +420,117 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   }
 
   // ==========================================
-  // MÉTODOS DE ESTADÍSTICAS
+  // MÉTODOS DE MÚSICA
   // ==========================================
+   // Método para obtener música con tipos correctos
+  obtenerMusicaRelajante(): void {
+    this.isLoadingMusic = true;
+    this.entretenimientoService.getRelaxingMusic()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tracks: MusicTrack[]) => {
+          this.currentTracks = tracks.slice(0, 5);
+          this.isLoadingMusic = false;
+        },
+        error: (error: any) => {
+          console.error('❌ Error cargando música:', error);
+          this.isLoadingMusic = false;
+        }
+      });
+  }
+
+  playTrack(track: MusicTrack, index: number): void {
+    this.selectedTrackIndex = index;
+    this.currentPlayingTrack = track;
+    this.isPlaying = true;
+    this.entretenimientoService.playTrack(track);
+  }
+
+  pauseTrack(): void {
+    this.isPlaying = false;
+    this.entretenimientoService.pauseTrack();
+  }
+
+  // ==========================================
+  // MÉTODOS DE NOTICIAS
+  // ==========================================
+  obtenerNoticiasPositivas(): void {
+    this.isLoadingNews = true;
+    this.entretenimientoService.getPositiveNews()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (news) => {
+          this.currentNews = news;
+          this.isLoadingNews = false;
+        },
+        error: (error) => {
+          console.error('❌ Error cargando noticias:', error);
+          this.isLoadingNews = false;
+        }
+      });
+  }
+
+  // ==========================================
+  // MÉTODOS DE ESTADÍSTICAS Y LOGROS
+  // ==========================================
+  private loadTriviaStats(): void {
+    this.triviaStats = { ...this.entretenimientoService.triviaStats };
+  }
+
+  private loadUnlockedAchievements(): void {
+    const unlocked = this.entretenimientoService.getUnlockedAchievements();
+    this.recentAchievements = unlocked.map(a => ({
+      icon: a.icon,
+      title: a.title,
+      description: a.description
+    }));
+  }
+
+  checkAchievements(): void {
+    const newUnlocks = this.entretenimientoService.getUnlockedAchievements()
+      .filter(ach => !this.recentAchievements.some(ra => ra.title === ach.title));
+
+    newUnlocks.forEach(ach => {
+      this.recentAchievements.push({
+        icon: ach.icon,
+        title: ach.title,
+        description: ach.description
+      });
+      this.showNotification(`🎉 Logro: ${ach.title}`, 'success');
+    });
+  }
+
+  getLevelProgress(): number {
+    const currentLevelBase = (this.triviaStats.level - 1) * 100;
+    const pointsInCurrentLevel = this.triviaStats.totalPoints - currentLevelBase;
+    return Math.min(100, Math.round((pointsInCurrentLevel / 100) * 100));
+  }
+
+  getPointsToNextLevel(): number {
+    return this.triviaStats.level * 100 - this.triviaStats.totalPoints;
+  }
+
   getTotalSessionTime(): string {
     const now = new Date();
     const diffMs = now.getTime() - this.sessionStart.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins >= 60) {
-      const hours = Math.floor(diffMins / 60);
-      const mins = diffMins % 60;
-      return `${hours}h ${mins}m`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours > 0) {
+      return `${diffHours}h ${diffMins % 60}m`;
     }
-
-    return `${diffMins}m`;
-  }
-
-  getTotalActivities(): number {
-    return this.triviaStats.answered +
-           this.jokeStats.enjoyed +
-           this.musicStats.played +
-           this.imageStats.viewed;
+    return `${diffMins} min`;
   }
 
   getRelaxationLevel(): number {
-    const baseLevel = 20; // Nivel base por estar en el área
-    const timeBonus = Math.min(Math.floor((Date.now() - this.sessionStart.getTime()) / 60000) * 2, 40); // 2% por minuto, max 40%
-    const activityBonus = Math.min(this.getTotalActivities() * 5, 40); // 5% por actividad, max 40%
-
-    return Math.min(baseLevel + timeBonus + activityBonus, 100);
-  }
-
-  getWellnessProgress(): number {
-    const activities = this.getTotalActivities();
-    const timeMinutes = Math.floor((Date.now() - this.sessionStart.getTime()) / 60000);
-
-    // Meta: 10 actividades o 20 minutos para 100%
-    const activityProgress = Math.min((activities / 10) * 50, 50);
+    const timeMinutes = Math.floor((new Date().getTime() - this.sessionStart.getTime()) / 60000);
     const timeProgress = Math.min((timeMinutes / 20) * 50, 50);
-
+    const activityCount = [this.currentTrivia, this.currentJoke, this.currentQuote, this.currentImage].filter(Boolean).length;
+    const activityProgress = (activityCount / 4) * 50;
     return Math.round(activityProgress + timeProgress);
   }
 
   getRecommendation(): string {
     const level = this.getRelaxationLevel();
-
     if (level < 30) return 'Continúa relajándote';
     if (level < 60) return 'Buen progreso';
     if (level < 85) return 'Excelente nivel';
@@ -665,64 +539,21 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
 
   getRecommendationEmoji(): string {
     const level = this.getRelaxationLevel();
-
-    if (level < 30) return '🌱';
-    if (level < 60) return '🌿';
-    if (level < 85) return '🌳';
-    return '🏆';
+    return level < 30 ? '🌱' : level < 60 ? '🌿' : level < 85 ? '🌳' : '🏆';
   }
 
   // ==========================================
-  // MÉTODOS DE AUDIO EVENTOS
+  // NOTIFICACIONES
   // ==========================================
-  onAudioEnded(): void {
-    this.isPlaying = false;
-    this.entretenimientoService.setIsPlaying(false);
-    console.log('🎵 Audio terminado');
-  }
-
-  onAudioLoadStart(): void {
-    console.log('🎵 Iniciando carga de audio...');
-  }
-
-  onAudioCanPlay(): void {
-    console.log('🎵 Audio listo para reproducir');
-  }
-
-  onAudioError(event: any): void {
-    console.error('❌ Error de audio:', event);
-    this.isPlaying = false;
-    this.entretenimientoService.setIsPlaying(false);
-    this.showNotification('No se pudo reproducir el audio', 'error');
-  }
-
-  // ==========================================
-  // MÉTODOS DE UTILIDAD
-  // ==========================================
-  regresarDashboard(): void {
-    // Guardar estadísticas de la sesión
-    const sessionData = {
-      duration: this.getTotalSessionTime(),
-      activities: this.getTotalActivities(),
-      relaxationLevel: this.getRelaxationLevel(),
-      timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem('siceg-last-wellness-session', JSON.stringify(sessionData));
-
-    this.router.navigate(['/app/dashboard']);
-  }
-
   private showNotification(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
-    // Crear notificación temporal
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
-      type === 'success' ? 'bg-green-500 text-white' :
-      type === 'error' ? 'bg-red-500 text-white' :
-      'bg-blue-500 text-white'
-    }`;
+    notification.className = `
+      fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full opacity-0
+      ${type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'}
+    `;
     notification.textContent = message;
-
     document.body.appendChild(notification);
 
     // Animar entrada
@@ -735,29 +566,73 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       notification.style.transform = 'translateX(100%)';
       notification.style.opacity = '0';
-
       setTimeout(() => {
-        document.body.removeChild(notification);
+        if (notification.parentElement) {
+          document.body.removeChild(notification);
+        }
       }, 300);
     }, 3000);
   }
 
-  // Método para obtener la letra de la opción (A, B, C, D)
+  // ==========================================
+  // MÉTODOS AUXILIARES
+  // ==========================================
+  regresarDashboard(): void {
+    const sessionData = {
+      duration: this.getTotalSessionTime(),
+      activities: [this.currentTrivia, this.currentJoke, this.currentQuote, this.currentImage].filter(Boolean).length,
+      relaxationLevel: this.getRelaxationLevel(),
+      timestamp: new Date().toISOString(),
+      stats: this.triviaStats
+    };
+    localStorage.setItem('siceg-last-wellness-session', JSON.stringify(sessionData));
+    this.router.navigate(['/app/dashboard']);
+  }
+
   getOptionLetter(index: number): string {
     return String.fromCharCode(65 + index);
   }
 
-  // ==========================================
-  // MÉTODOS AUXILIARES PARA EL TEMPLATE
-  // ==========================================
-
-  // Getter para obtener puntos de manera segura
   getCurrentTriviaPoints(): number {
-    return this.currentTrivia?.points || 0;
+    return this.currentTrivia?.points || 10;
   }
 
-  // Getter para obtener tiempo límite de manera segura
   getCurrentTriviaTimeLimit(): number {
     return this.currentTrivia?.timeLimit || 30;
   }
+
+  // src/app/personal/area-descanso/area-descanso.component.ts
+
+getTotalActivities(): number {
+  return [this.currentTrivia, this.currentJoke, this.currentQuote, this.currentImage]
+    .filter(item => item !== null).length;
+}
+
+shareQuote(): void {
+  if (!this.currentQuote) return;
+
+  const text = `"${this.currentQuote.text}" — ${this.currentQuote.author}`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Frase Inspiradora - SICEG-HG',
+      text: text,
+      url: window.location.href
+    }).catch(err => {
+      console.log('Error al compartir:', err);
+    });
+  } else {
+    // Fallback: copiar al portapapeles
+    navigator.clipboard.writeText(text).then(() => {
+      this.showNotification('Frase copiada al portapapeles', 'success');
+    }).catch(() => {
+      this.showNotification('No se pudo copiar', 'error');
+    });
+  }
+}
+
+  // ==========================================
+  // PROPIEDADES
+  // ==========================================
+  medicalCategories: MedicalCategory[] = [];
 }

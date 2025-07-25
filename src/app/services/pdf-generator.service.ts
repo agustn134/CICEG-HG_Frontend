@@ -11,6 +11,9 @@ import { NotasEvolucionService } from './documentos-clinicos/notas-evolucion';
 import { NotasEgresoService } from './documentos-clinicos/notas-egreso';
 import { DocumentosService } from './documentos-clinicos/documentos';
 
+
+
+
 interface GuiaClinicaData {
   codigo: string | null;
   nombre: string | null;
@@ -41,6 +44,7 @@ interface SignosVitalesData {
 @Injectable({
   providedIn: 'root',
 })
+
 export class PdfGeneratorService {
   private pdfMake: any;
   private isLoaded = false;
@@ -3840,6 +3844,10 @@ export class PdfGeneratorService {
       throw error;
     }
   }
+
+
+
+
 
   // 📄 NOTA DE URGENCIAS
   async generarNotaUrgencias(datos: any): Promise<void> {
@@ -19309,7 +19317,7 @@ export class PdfGeneratorService {
 
 
 
-  
+
 
 
 
