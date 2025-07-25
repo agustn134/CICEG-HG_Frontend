@@ -55,7 +55,7 @@ import { ApiResponse, EstadoDocumento } from '../../models/base.models';
 import { AuthService } from '../../services/auth/auth.service';
 import { GuiasClinicasService } from '../../services/catalogos/guias-clinicas';
 import { GuiaClinica } from '../../models/guia-clinica.model';
-import { PdfGeneratorService } from '../../services/pdf-generator.service';
+import { PdfGeneratorService } from '../../services/pdf/pdf-generator.service';
 import { ConsentimientosInformados } from '../../services/documentos-clinicos/consentimientos-informados';
 import { NotasPreoperatoria } from '../../services/documentos-clinicos/notas-preoperatoria';
 import { NotasPostoperatoria } from '../../services/documentos-clinicos/notas-postoperatoria';

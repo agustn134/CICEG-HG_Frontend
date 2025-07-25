@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './notas-preoperatoria.html',
   styleUrl: './notas-preoperatoria.css'
 })
-export class NotasPreoperatoria {
+export class NotasPreoperatoriaComponent {
 
 }

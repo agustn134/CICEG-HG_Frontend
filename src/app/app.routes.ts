@@ -51,8 +51,8 @@ import { HistoriasClinicasComponent } from './documentos-clinicos/historias-clin
 import { NotasUrgenciasComponent } from './documentos-clinicos/notas-urgencias/notas-urgencias';
 import { NotasEvolucionComponent } from './documentos-clinicos/notas-evolucion/notas-evolucion';
 import { NotasInterconsulta } from './documentos-clinicos/notas-interconsulta/notas-interconsulta';
-import { NotasPreoperatoria } from './documentos-clinicos/notas-preoperatoria/notas-preoperatoria';
-import { NotasPreanestesica } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
+import { NotasPreoperatoriaComponent } from './documentos-clinicos/notas-preoperatoria/notas-preoperatoria';
+import { NotasPreanestesicaComponent } from './documentos-clinicos/notas-preanestesica/notas-preanestesica';
 import { NotasPostoperatoria } from './documentos-clinicos/notas-postoperatoria/notas-postoperatoria';
 import { NotasPostanestesica } from './documentos-clinicos/notas-postanestesica/notas-postanestesica';
 import { NotasEgresoComponent } from './documentos-clinicos/notas-egreso/notas-egreso';
@@ -256,8 +256,8 @@ export const routes: Routes = [
           { path: 'notas-urgencias', component: NotasUrgenciasComponent },
           { path: 'notas-evolucion', component: NotasEvolucionComponent },
           { path: 'notas-interconsulta', component: NotasInterconsulta },
-          { path: 'notas-preoperatoria', component: NotasPreoperatoria },
-          { path: 'notas-preanestesica', component: NotasPreanestesica },
+          { path: 'notas-preoperatoria', component: NotasPreoperatoriaComponent },
+          { path: 'notas-preanestesica', component: NotasPreanestesicaComponent },
           { path: 'notas-postoperatoria', component: NotasPostoperatoria },
           { path: 'notas-postanestesica', component: NotasPostanestesica },
           { path: 'notas-egreso', component: NotasEgresoComponent },
