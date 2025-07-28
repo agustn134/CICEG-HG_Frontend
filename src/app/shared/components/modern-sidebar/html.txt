@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs'; // 🆕 Agregar Subject y takeUntil
 import { ConfiguracionService } from '../../../services/configuracion.service';
 import {
   CONFIGURACION_DEFAULT,
@@ -273,57 +272,44 @@ interface MenuSection {
         </nav>
 
         <!-- User Profile Section -->
-        <div class="flex-shrink-0 px-4 pb-6 mt-4 border-t border-gray-100 pt-4">
-    <div
-      (click)="handleProfileClick()"
-      class="group flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-200 cursor-pointer"
-      [class.justify-center]="isCollapsed"
-    >
-      <!-- Avatar Container - Foto o Fallback -->
-      <div class="relative w-11 h-11 flex-shrink-0">
-        <!-- Foto del usuario si existe -->
-        <img
-                *ngIf="getUserPhoto()"
-                [src]="getUserPhoto()"
-                [alt]="getUserDisplayName()"
-                class="w-11 h-11 rounded-full object-cover shadow-sm ring-2 ring-white"
-                (error)="onImageError($event)"
-              />
-
-        <!-- Fallback con gradiente e iniciales si no hay foto -->
-        <div
-          *ngIf="!getUserPhoto()"
-          class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-blue-800 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white"
-        >
-          <!-- Mostrar iniciales en lugar del icono -->
-          <span class="text-white text-sm font-bold">
-            {{ getUserInitials() }}
-          </span>
-        </div>
-
-        <!-- Indicador de estado en línea -->
-        <div class="absolute -bottom-0 -right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
-            </div>
-
-      <!-- Información del usuario -->
-      <div class="ml-4 flex-1" [class.hidden]="isCollapsed">
-              <p class="text-sm font-bold text-gray-800">
-                {{ getUserDisplayName() }}
-              </p>
+        <!-- <div class="flex-shrink-0 px-4 pb-6 mt-4 border-t border-gray-100 pt-4">
+          <div
+            class="group flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-200 cursor-pointer"
+            [class.justify-center]="isCollapsed"
+          >
+            <div
+              class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-blue-800 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+              >
+                <path
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div> -->
+            <!-- <div class="ml-4 flex-1" [class.hidden]="isCollapsed">
+              <p class="text-sm font-bold text-gray-800">Dr. Administrador</p>
               <div class="flex items-center space-x-2">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <div
+                  class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"
+                ></div>
                 <p class="text-xs text-gray-500 font-medium">En línea</p>
               </div>
-            </div>
+            </div> -->
 
-      <!-- Tooltip for collapsed state -->
-      <div *ngIf="isCollapsed" class="tooltip">
-        {{ getUserDisplayName() }}
-      </div>
-    </div>
-  </div>
-
-
+            <!-- Tooltip for collapsed state -->
+            <!-- <div *ngIf="isCollapsed" class="tooltip">
+              Dr. Administrador
+            </div> -->
+          <!-- </div>
+        </div> -->
       </div>
     </aside>
 
@@ -469,14 +455,12 @@ interface MenuSection {
   ],
 })
 export class ModernSidebarComponent implements OnInit {
-    private destroy$ = new Subject<void>(); // 🆕 Para limpiar suscripciones
-
   @Output() sidebarStateChange = new EventEmitter<boolean>();
 
   isCollapsed = false;
   isMobile = false;
   isMobileOpen = false;
-  currentUser: Usuario | null = null;
+
   menuSections: MenuSection[] = [
     {
       title: 'Registro de Pacientes',
@@ -601,33 +585,18 @@ export class ModernSidebarComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private configuracionService: ConfiguracionService,
-    private authService: AuthService // Inyectar el AuthService
+    private configuracionService: ConfiguracionService
   ) {}
 
   configuracion: ConfiguracionLogos = CONFIGURACION_DEFAULT;
 
   ngOnInit(): void {
-   this.checkScreenSize();
-   this.emitSidebarState();
-
-   this.configuracionService.configuracion$.subscribe((config) => {
-     this.configuracion = config;
-   });
-
-   // 🆕 Suscribirse a cambios del usuario en tiempo real
-   this.authService.currentUser$
-     .pipe(takeUntil(this.destroy$))
-     .subscribe((user) => {
-       this.currentUser = user;
-       console.log('🔄 Usuario actualizado en Sidebar:', user?.foto);
-     });
- }
-
- ngOnDestroy(): void { // 🆕 Limpiar suscripciones
-   this.destroy$.next();
-   this.destroy$.complete();
- }
+    this.checkScreenSize();
+    this.emitSidebarState();
+    this.configuracionService.configuracion$.subscribe((config) => {
+      this.configuracion = config;
+    });
+  }
 
   @HostListener('window:resize')
   onResize(): void {
@@ -647,32 +616,6 @@ export class ModernSidebarComponent implements OnInit {
     }
 
     this.emitSidebarState();
-  }
-
-  // Métodos para mostrar información del usuario
-  getUserDisplayName(): string {
-    if (!this.currentUser) return 'Usuario';
-
-    const { nombre_completo, tipo_usuario } = this.currentUser;
-    const prefix = tipo_usuario === 'medico' ? 'Dr.' : '';
-
-    return `${prefix} ${nombre_completo}`.trim();
-  }
-
-  // Nuevo método para manejar el click en el perfil
-  handleProfileClick(): void {
-    console.log('🔍 Abriendo perfil del usuario');
-
-    if (this.currentUser?.tipo_usuario === 'medico') {
-      // Ir al perfil médico
-      this.router.navigate([
-        '/app/personas/perfil-medico',
-        this.currentUser.id,
-      ]);
-    } else {
-      // Ir a administradores
-      this.router.navigate(['/app/personas/administradores']);
-    }
   }
 
   toggleCollapse(): void {
@@ -746,30 +689,4 @@ export class ModernSidebarComponent implements OnInit {
     const isOpen = !this.isMobile || (this.isMobile && this.isMobileOpen);
     this.sidebarStateChange.emit(!this.isMobile && !this.isCollapsed);
   }
-
-
-   // 🆕 Métodos para manejo de fotos
-  getUserPhoto(): string | null {
-    return this.currentUser?.foto || null;
-  }
-
-  getUserInitials(): string {
-    if (!this.currentUser?.nombre_completo) return 'U';
-
-    const names = this.currentUser.nombre_completo.trim().split(' ');
-    if (names.length >= 2) {
-      return (names[0][0] + names[1][0]).toUpperCase();
-    }
-    return names[0][0].toUpperCase();
-  }
-
-  onImageError(event: any): void {
-  console.warn('Error cargando imagen de perfil:', event);
-  // Si la imagen falla, quitar la foto para mostrar fallback
-  if (this.currentUser) {
-    this.currentUser.foto= undefined;
-  }
-}
-
-
 }

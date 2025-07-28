@@ -66,6 +66,7 @@ export interface PersonalMedicoActivo {
   cargo?: string;
   departamento?: string;
   nombre_completo: string;
+    foto?: string; // 🆕 AGREGAR ESTA LÍNEA SI ES NECESARIA
 }
 
 // ==========================================

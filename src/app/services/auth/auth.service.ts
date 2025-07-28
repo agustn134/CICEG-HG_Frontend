@@ -20,7 +20,8 @@ export interface Usuario {
   cargo?: string;
   departamento?: string;
   nivel_acceso?: string;
-    id_referencia?: number;  //   AGREGAR ESTA LÍNEA
+  id_referencia?: number;
+  foto?: string | null;
 }
 
 export interface LoginResponse {

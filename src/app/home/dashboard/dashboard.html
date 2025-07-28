@@ -148,38 +148,7 @@
        ========================================== -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Alertas Urgentes -->
-    <div *ngIf="urgentAlerts.length > 0" class="mb-8">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.232 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-        </svg>
-        Alertas del Sistema
-      </h2>
 
-      <div class="grid gap-3">
-        <div *ngFor="let alert of urgentAlerts; trackBy: trackById"
-             [ngClass]="getAlertClasses(alert.type)"
-             class="p-4 rounded-lg border-l-4">
-          <div class="flex items-start justify-between">
-            <div class="flex items-start space-x-3">
-              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getAlertIcon(alert.type)"/>
-              </svg>
-              <div>
-                <p class="font-semibold">{{ alert.message }}</p>
-                <p *ngIf="alert.patient" class="text-sm opacity-80">{{ alert.patient }}</p>
-                <p class="text-xs opacity-70 mt-1">{{ alert.time }}</p>
-              </div>
-            </div>
-            <button (click)="handleUrgentAlert(alert)"
-                    class="text-sm font-medium hover:underline focus:outline-none px-3 py-1 rounded-lg hover:bg-white hover:bg-opacity-50">
-              {{ alert.action }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Grid Principal -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

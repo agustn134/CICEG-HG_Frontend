@@ -105,7 +105,7 @@ export interface MedicoConPacientes {
   especialidad: string;
   cargo: string;
   departamento: string;
-
+ foto?: string;
   // Estadísticas
   total_documentos_creados: number;
   documentos_mes_actual: number;
@@ -250,6 +250,39 @@ export class PersonalMedicoService {
         })
       );
   }
+
+// src/app/services/personas/personal-medico.service.ts
+
+/**
+ * Actualizar foto del personal médico
+ * PATCH /api/personas/personal-medico/:id/foto
+ */
+updateFotoPersonalMedico(id: number, fotoUrl: string | null): Observable<ApiResponse<{ foto: string | null }>> {
+  this.setLoading(true);
+  this.clearError();
+
+  const body = { foto: fotoUrl };
+
+  return this.http.patch<ApiResponse<{ foto: string | null }>>(`${this.API_URL}/${id}/foto`, body)
+    .pipe(
+      tap(response => {
+        if (response.success) {
+          // Actualizar la lista local si existe
+          const currentPersonal = this.personalMedicoSubject.value;
+          const updatedPersonal = currentPersonal.map(p =>
+            p.id_personal_medico === id ? { ...p, foto: fotoUrl || undefined } : p // 🔧 Cambiar null por undefined
+          );
+          this.personalMedicoSubject.next(updatedPersonal);
+        }
+        this.setLoading(false);
+      }),
+      catchError(error => {
+        this.handleError('Error al actualizar foto', error);
+        return throwError(() => error);
+      })
+    );
+}
+
 
   /**
    * Eliminar personal médico

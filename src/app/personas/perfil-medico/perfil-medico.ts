@@ -2,13 +2,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // 🆕 Para ngModel
 import { Subject, takeUntil } from 'rxjs';
 import { PersonalMedicoService, MedicoConPacientes, PacienteAtendido } from '../../services/personas/personal-medico'; //   Cambiar ruta
 
 @Component({
   selector: 'app-perfil-medico',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './perfil-medico.html',
   styleUrl: './perfil-medico.css'
 })
@@ -19,6 +20,10 @@ export class PerfilMedico implements OnInit, OnDestroy {
   loading = true;
   error = '';
   filtroActivo = 'todos';
+ editandoFoto = false;
+  nuevaFotoUrl = '';
+  esUrlValida = false;
+  guardandoFoto = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -50,7 +55,7 @@ export class PerfilMedico implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.medicoCompleto = response.data || null; //   Cambiar esto
+            this.medicoCompleto = response.data || null;
           } else {
             this.error = response.message || 'Error al cargar el perfil médico';
           }
@@ -64,6 +69,114 @@ export class PerfilMedico implements OnInit, OnDestroy {
       });
   }
 
+  // 🆕 Métodos para manejo de foto
+  toggleEditarFoto(): void {
+    this.editandoFoto = true;
+    this.nuevaFotoUrl = this.medicoCompleto?.foto || '';
+    this.validarUrlFoto();
+  }
+
+  cancelarEdicionFoto(): void {
+    this.editandoFoto = false;
+    this.nuevaFotoUrl = '';
+    this.esUrlValida = false;
+  }
+
+  validarUrlFoto(): void {
+    if (!this.nuevaFotoUrl) {
+      this.esUrlValida = false;
+      return;
+    }
+
+    // Validación básica de URL
+    try {
+      new URL(this.nuevaFotoUrl);
+      this.esUrlValida = true;
+    } catch {
+      this.esUrlValida = false;
+    }
+  }
+
+  onPreviewError(): void {
+    this.esUrlValida = false;
+  }
+
+  onImageError(): void {
+    if (this.medicoCompleto) {
+      this.medicoCompleto.foto = undefined;
+    }
+  }
+
+  async guardarFoto(): Promise<void> {
+  if (!this.medicoCompleto) return;
+
+  this.guardandoFoto = true;
+
+  try {
+    // Llamada real al backend
+    const response = await this.personalMedicoService
+      .updateFotoPersonalMedico(this.medicoCompleto.id_personal_medico, this.nuevaFotoUrl || null)
+      .toPromise();
+
+    if (response?.success) {
+      // Actualizar la foto local
+      this.medicoCompleto.foto = this.nuevaFotoUrl || undefined;
+      console.log('✅ Foto actualizada:', this.nuevaFotoUrl);
+    } else {
+      throw new Error(response?.message || 'Error al guardar foto');
+    }
+
+    // Cerrar el modal
+    this.editandoFoto = false;
+    this.nuevaFotoUrl = '';
+
+  } catch (error) {
+    console.error('❌ Error al guardar foto:', error);
+    this.error = 'Error al actualizar la foto';
+  } finally {
+    this.guardandoFoto = false;
+  }
+}
+
+  async eliminarFoto(): Promise<void> {
+  if (!this.medicoCompleto) return;
+
+  this.guardandoFoto = true;
+
+  try {
+    // Llamada real al backend para eliminar foto
+    const response = await this.personalMedicoService
+      .updateFotoPersonalMedico(this.medicoCompleto.id_personal_medico, null)
+      .toPromise();
+
+    if (response?.success) {
+      // Eliminar la foto local
+      this.medicoCompleto.foto = undefined;
+      console.log('🗑️ Foto eliminada');
+    } else {
+      throw new Error(response?.message || 'Error al eliminar foto');
+    }
+
+    // Cerrar el modal
+    this.editandoFoto = false;
+    this.nuevaFotoUrl = '';
+
+  } catch (error) {
+    console.error('❌ Error al eliminar foto:', error);
+    this.error = 'Error al eliminar la foto';
+  } finally {
+    this.guardandoFoto = false;
+  }
+}
+ getInitials(nombreCompleto: string): string {
+    if (!nombreCompleto) return 'DR';
+
+    const names = nombreCompleto.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  }
   get pacientesFiltrados(): PacienteAtendido[] {
     if (!this.medicoCompleto?.pacientes_atendidos) return [];
 

@@ -550,11 +550,6 @@ onDropdownItemClick(action: string, event: Event): void {
     this.showLogoutModal = true; // Mostrar modal en lugar de confirm()
   }
 
-  // private handleProfileClick(): void {
-  //   console.log('   Abriendo perfil del usuario');
-  //  this.router.navigate(['/app/personas/administradores']);
-  // }
-// En dashboard-layout.component.ts, cambiar handleProfileClick():
 private handleProfileClick(): void {
   console.log('   Abriendo perfil del usuario');
 
