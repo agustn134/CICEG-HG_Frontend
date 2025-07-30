@@ -1,14 +1,3 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class TiposSangre {
-
-//   private readonly API_URL = 'http://localhost:3000/api/catalogos/tipos-sangre';
-
-//   constructor() { }
-// }
 // src/app/services/catalogos/tipos-sangre.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';

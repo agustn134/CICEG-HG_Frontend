@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // 🆕 Para ngModel
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { PersonalMedicoService, MedicoConPacientes, PacienteAtendido } from '../../services/personas/personal-medico'; //   Cambiar ruta
 
 @Component({
@@ -114,10 +114,16 @@ export class PerfilMedico implements OnInit, OnDestroy {
 
   try {
     // Llamada real al backend
-    const response = await this.personalMedicoService
-      .updateFotoPersonalMedico(this.medicoCompleto.id_personal_medico, this.nuevaFotoUrl || null)
-      .toPromise();
+    // const response = await this.personalMedicoService
+    //   .updateFotoPersonalMedico(this.medicoCompleto.id_personal_medico, this.nuevaFotoUrl || null)
+    //   .toPromise();
 
+    const response = await firstValueFrom(
+  this.personalMedicoService.updateFotoPersonalMedico(this.medicoCompleto.id_personal_medico, this.nuevaFotoUrl || null)
+);
+// const response = await firstValueFrom(
+//   this.personalMedicoService.updateFotoPersonalMedico(...)
+// );
     if (response?.success) {
       // Actualizar la foto local
       this.medicoCompleto.foto = this.nuevaFotoUrl || undefined;
@@ -168,15 +174,15 @@ export class PerfilMedico implements OnInit, OnDestroy {
     this.guardandoFoto = false;
   }
 }
- getInitials(nombreCompleto: string): string {
-    if (!nombreCompleto) return 'DR';
+ getInitials(nombreCompleto?: string): string {
+  if (!nombreCompleto) return 'DR';
 
-    const names = nombreCompleto.trim().split(' ');
-    if (names.length >= 2) {
-      return (names[0][0] + names[1][0]).toUpperCase();
-    }
-    return names[0][0].toUpperCase();
+  const names = nombreCompleto.trim().split(' ');
+  if (names.length >= 2) {
+    return (names[0][0] + names[1][0]).toUpperCase();
   }
+  return names[0][0].toUpperCase();
+}
   get pacientesFiltrados(): PacienteAtendido[] {
     if (!this.medicoCompleto?.pacientes_atendidos) return [];
 

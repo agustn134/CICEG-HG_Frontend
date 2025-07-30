@@ -828,104 +828,174 @@
 
       <!-- FORMULARIO DE HISTORIA CLÍNICA -->
       <div *ngIf="formularioActivo === 'historiaClinica'" class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-file-medical-alt mr-2 text-blue-500"></i>
-            Historia Clínica
-          </h3>
-          <p class="text-sm text-gray-600 mt-1">Complete la historia clínica del paciente</p>
+      <div class="px-6 py-4 border-b border-gray-200"><h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-file-medical-alt mr-2 text-blue-500"></i>
+      Historia Clínica <span *ngIf="esPacientePediatrico" class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-md ml-2">Pediátrica</span>
+    </h3><p class="text-sm text-gray-600 mt-1">Complete la historia clínica del paciente</p></div>
+      <form [formGroup]="historiaClinicaForm" class="px-6 py-4">
+      <div class="mb-6"><h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes</h4>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes Heredo-Familiares *</label>
+          <textarea formControlName="antecedentes_heredo_familiares" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enfermedades familiares relevantes (diabetes, hipertensión, cardiopatías, neoplasias...)"></textarea>
+          <div *ngIf="historiaClinicaForm.get('antecedentes_heredo_familiares')?.errors?.['required']"
+            class="text-red-500 text-xs mt-1">
+            Campo obligatorio
+          </div>
         </div>
 
-        <form [formGroup]="historiaClinicaForm" class="px-6 py-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Higiénicos</label>
+          <textarea formControlName="habitos_higienicos" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Baño diario, aseo dental, cambio de ropa..."></textarea>
+        </div>
 
-          <!-- Antecedentes -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes</h4>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Alimenticios</label>
+          <textarea formControlName="habitos_alimenticios" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tipo de dieta, frecuencia de comidas, preferencias..."></textarea>
+        </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes Heredo-Familiares *</label>
-                <textarea formControlName="antecedentes_heredo_familiares" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enfermedades familiares relevantes..."></textarea>
-                <div *ngIf="historiaClinicaForm.get('antecedentes_heredo_familiares')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio
-                </div>
-              </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Actividad Física</label>
+          <textarea formControlName="actividad_fisica" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tipo y frecuencia de ejercicio..."></textarea>
+        </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Higiénicos</label>
-                <textarea formControlName="habitos_higienicos" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Baño diario, aseo dental, etc..."></textarea>
-              </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Vivienda</label>
+          <textarea formControlName="vivienda" rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tipo de vivienda, servicios básicos..."></textarea>
+        </div>
+<div *ngIf="esPacienteAdulto()"><label class="block text-sm font-medium text-gray-700 mb-1">Toxicomanías</label>
+          <textarea formControlName="toxicomanias" rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tabaquismo, alcoholismo, drogas..."></textarea>
+        </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Alimenticios</label>
-                <textarea formControlName="habitos_alimenticios" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo de dieta, frecuencia de comidas..."></textarea>
-              </div>
+      </div>
+    </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Actividad Física</label>
-                <textarea formControlName="actividad_fisica" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo y frecuencia de ejercicio..."></textarea>
-              </div>
+    <!-- ANTECEDENTES PERINATALES (SOLO PEDIÁTRICOS) -->
+<div *ngIf="esPacientePediatrico" class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3"><i class="fas fa-baby mr-2 text-green-500"></i>
+        Antecedentes Perinatales
+      </h4>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Control Prenatal</label>
+          <select formControlName="control_prenatal"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Seleccionar</option>
+            <option value="Sí">Sí</option>
+            <option value="No">No</option>
+            <option value="Irregular">Irregular</option>
+          </select>
+        </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Toxicomanías</label>
-                <textarea formControlName="toxicomanias" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tabaquismo, alcoholismo, drogas..."></textarea>
-              </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Parto</label>
+          <select formControlName="tipo_parto"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Seleccionar</option>
+            <option value="Vaginal">Vaginal</option>
+            <option value="Cesárea">Cesárea</option>
+            <option value="Fórceps">Fórceps</option>
+          </select>
+        </div>
 
-            </div>
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Peso al Nacer (kg)</label>
+          <input type="number" formControlName="peso_nacer" step="0.1" min="0" max="10"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="3.5">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Edad Gestacional (semanas)</label>
+          <input type="number" formControlName="edad_gestacional" min="20" max="45"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="40">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">APGAR</label>
+          <input type="text" formControlName="apgar"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="9/10">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Complicaciones Neonatales</label>
+          <textarea formControlName="complicaciones_neonatales" rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ictericia, dificultad respiratoria, etc."></textarea>
+        </div>
+
+      </div>
+    </div>
 
           <!-- Antecedentes Personales Patológicos -->
-<div class="mb-6">
-  <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes Personales Patológicos</h4>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en la Infancia</label>
-      <textarea formControlName="enfermedades_infancia" rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Sarampión, varicela, rubeola..."></textarea>
-    </div>
+<!-- ANTECEDENTES PERSONALES PATOLÓGICOS MEJORADOS -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes Personales Patológicos</h4>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en el Adulto</label>
-      <textarea formControlName="enfermedades_adulto" rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Diabetes, hipertensión, etc..."></textarea>
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en la Infancia</label>
+          <textarea formControlName="enfermedades_infancia" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Sarampión, varicela, rubeola, parotiditis..."></textarea>
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Cirugías Previas</label>
-      <textarea formControlName="cirugias_previas" rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Tipo de cirugía, fecha, complicaciones..."></textarea>
-    </div>
+        <!-- Solo para adultos -->
+<div *ngIf="esPacienteAdulto()">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en el Adulto</label>
+          <textarea formControlName="enfermedades_adulto" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Diabetes, hipertensión, cardiopatías..."></textarea>
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Alergias</label>
-      <textarea formControlName="alergias" rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Medicamentos, alimentos, sustancias..."></textarea>
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cirugías Previas</label>
+          <textarea formControlName="cirugias_previas" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tipo de cirugía, fecha, complicaciones..."></textarea>
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Traumatismos</label>
-      <textarea formControlName="traumatismos" rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Fracturas, contusiones, accidentes..."></textarea>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Alergias *</label>
+          <textarea formControlName="alergias" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Medicamentos, alimentos, sustancias... (escribir 'Negadas' si no tiene)"></textarea>
+          <div *ngIf="historiaClinicaForm.get('alergias')?.errors?.['required']"
+            class="text-red-500 text-xs mt-1">
+            Campo obligatorio para seguridad del paciente
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Traumatismos</label>
+          <textarea formControlName="traumatismos" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Fracturas, contusiones, accidentes..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Transfusiones Previas</label>
+          <textarea formControlName="transfusiones" rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Fecha, motivo, reacciones adversas..."></textarea>
+        </div>
+
+      </div>
     </div>
-  </div>
-</div>
 
           <!-- Padecimiento Actual -->
           <div class="mb-6">
@@ -962,50 +1032,75 @@
             </div>
           </div>
 
-          <!-- Antecedentes Ginecobstétricos (solo para mujeres) -->
-<div *ngIf="pacienteCompleto?.paciente?.persona?.sexo === 'F'" class="mb-6">
-  <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes Ginecobstétricos</h4>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Menarca (años)</label>
-      <input type="number" formControlName="menarca" min="8" max="18"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Edad primera menstruación">
-    </div>
+ <!-- ANTECEDENTES GINECOBSTÉTRICOS (SOLO MUJERES ADULTAS) -->
+<div *ngIf="esMujerAdolescente()" class="mb-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-venus mr-2 text-pink-500"></i>
+        Antecedentes Ginecobstétricos
+      </h4>
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Ritmo Menstrual</label>
-      <input type="text" formControlName="ritmo_menstrual"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Ej: 28x4">
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Menarca (años)</label>
+          <input type="number" formControlName="menarca" min="8" max="18"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="12">
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Gestas</label>
-      <input type="number" formControlName="gestas" min="0"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ritmo Menstrual</label>
+          <input type="text" formControlName="ritmo_menstrual"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="28x4">
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Partos</label>
-      <input type="number" formControlName="partos" min="0"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Gestas</label>
+          <input type="number" formControlName="gestas" min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Cesáreas</label>
-      <input type="number" formControlName="cesareas" min="0"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Partos</label>
+          <input type="number" formControlName="partos" min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Abortos</label>
-      <input type="number" formControlName="abortos" min="0"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cesáreas</label>
+          <input type="number" formControlName="cesareas" min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Abortos</label>
+          <input type="number" formControlName="abortos" min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Método Planificación Familiar</label>
+          <select formControlName="metodo_planificacion"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Seleccionar</option>
+            <option value="Ninguno">Ninguno</option>
+            <option value="Preservativo">Preservativo</option>
+            <option value="Anticonceptivos orales">Anticonceptivos orales</option>
+            <option value="DIU">DIU</option>
+            <option value="Implante subdérmico">Implante subdérmico</option>
+            <option value="Inyección mensual">Inyección mensual</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Última Regla</label>
+          <input type="date" formControlName="fecha_ultima_regla"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+      </div>
     </div>
-  </div>
-</div>
 
           <!-- Exploración Física -->
           <div class="mb-6">
@@ -1074,7 +1169,6 @@
 </div>
 
               </div>
-
             </div>
           </div>
 
@@ -1082,7 +1176,6 @@
           <div class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-3">Impresión Diagnóstica y Plan</h4>
             <div class="grid grid-cols-1 gap-6">
-
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Impresión Diagnóstica *</label>
                 <textarea formControlName="impresion_diagnostica" rows="3"
@@ -1093,9 +1186,6 @@
                   Campo obligatorio
                 </div>
               </div>
-
-
-              <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
               <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                   Guía Clínica de Diagnóstico
@@ -1113,8 +1203,6 @@
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Buscar guía clínica por nombre, código o área..."
                       [readonly]="!!guiaClinicaSeleccionada">
-
-
                     <button type="button" (click)="toggleDropdownGuias()"
                       class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <i class="fas fa-search"></i>
@@ -1198,25 +1286,40 @@
           </div>
 
           <!-- Botón Guardar -->
-          <div class="mt-6 flex justify-end">
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.signosVitales"
-              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Historia Clínica' }}
-            </button>
+           <!-- BOTONES MEJORADOS -->
+    <div class="mt-6 flex justify-between">
+      <div class="flex space-x-3">
+        <button type="button" (click)="limpiarFormulario('historiaClinica')"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-eraser mr-2"></i>
+          Limpiar
+        </button>
 
+        <button type="button" (click)="guardarBorrador()"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-save mr-2"></i>
+          Guardar Borrador
+        </button>
+      </div>
 
-            <!-- 🔥 AGREGAR ESTE BOTÓN PARA HISTORIA CLÍNICA -->
-            <button type="button" (click)="generarPDF('Historia Clínica')"
-              [disabled]="!formularioEstado.historiaClinica"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-              <i class="fas fa-file-pdf mr-2"></i>
-              {{ formularioEstado.historiaClinica ? 'Generar PDF' : 'Guardar primero' }}
-            </button>
+      <div class="flex space-x-3">
+        <button type="button" (click)="guardarFormularioActivo()"
+          [disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.signosVitales"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+          <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+          <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+          {{ isCreatingDocument ? 'Guardando...' : 'Guardar Historia Clínica' }}
+        </button>
 
-          </div>
+        <button type="button" (click)="generarPDF('Historia Clínica')"
+          [disabled]="!formularioEstado.historiaClinica"
+          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          {{ formularioEstado.historiaClinica ? 'Generar PDF' : 'Guardar primero' }}
+        </button>
+      </div>
+    </div>
+
         </form>
       </div>
 

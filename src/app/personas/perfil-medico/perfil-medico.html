@@ -126,8 +126,7 @@
                 class="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center"
               >
                 <span class="text-white text-sm font-bold">
-                  {{ getInitials(medicoCompleto?.nombre_completo || '') }}
-                </span>
+{{ medicoCompleto ? getInitials(medicoCompleto.nombre_completo || '') : getInitials('') }}</span>
               </div>
             </div>
           </div>

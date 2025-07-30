@@ -418,9 +418,9 @@ export class PdfGeneratorService {
       direccion_completa: this.formatearDireccionMejorada(pacienteInfo),
 
       // Información médica
-      tipo_sangre: pacienteInfo?.tipo_sangre || 
-                  datosPaciente?.paciente?.tipo_sangre || 
-                  datosPaciente?.tipo_sangre || 
+      tipo_sangre: pacienteInfo?.tipo_sangre ||
+                  datosPaciente?.paciente?.tipo_sangre ||
+                  datosPaciente?.tipo_sangre ||
                   'No registrado',
       ocupacion:
         pacienteInfo?.ocupacion ||
@@ -648,22 +648,22 @@ private formatearDireccionMejorada(paciente: any): string {
     persona_domicilio: paciente.persona?.domicilio,
     estructura_completa: Object.keys(paciente)
   });
-  
+
   if (!paciente) return 'Sin dirección registrada';
-  
-  const domicilio = 
-    paciente.domicilio || 
+
+  const domicilio =
+    paciente.domicilio ||
     paciente.direccion ||
-    paciente.persona?.domicilio || 
+    paciente.persona?.domicilio ||
     paciente.persona?.direccion ||
     '';
 
   const domicilioLimpio = domicilio.toString().trim();
-  
-  return domicilioLimpio !== '' && 
-         domicilioLimpio !== 'null' && 
-         domicilioLimpio !== 'undefined' 
-    ? domicilioLimpio 
+
+  return domicilioLimpio !== '' &&
+         domicilioLimpio !== 'null' &&
+         domicilioLimpio !== 'undefined'
+    ? domicilioLimpio
     : 'Sin dirección registrada';
 }
 
@@ -749,7 +749,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
   private async loadPdfMake(): Promise<void> {
     if (this.isLoaded) return;
-    
+
     try {
       const pdfMakeModule = await import('pdfmake/build/pdfmake');
       const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
@@ -1501,7 +1501,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
     return actividad + respiracion + circulacion + conciencia + saturacion;
   }
-  
+
   // .......................................................    VALIDACIONES  .........................
 
   // 🔥 VALIDACIÓN ESPECÍFICA PARA NOTA DE URGENCIAS
@@ -2625,10 +2625,14 @@ private formatearDireccionMejorada(paciente: any): string {
   // MÉTODOS REFACTORIZADOS QUE USAN PdfTemplatesService
   // ==========================================
   async generarHistoriaClinica(datos: any): Promise<void> {
-    console.log('🩺 Generando Historia Clínica Pediátrica NOM-004...');
-    
+    console.log('🩺 Generando Historia Clínica NOM-004...');
+
     try {
       await this.ensurePdfMakeLoaded();
+
+      if (!this.pdfMake) {
+      throw new Error('PDFMake no está disponible');
+    }
 
       // 1. Obtener y procesar datos (responsabilidad del generador)
       const medicoCompleto = await this.obtenerDatosMedicoActual();
@@ -2650,6 +2654,14 @@ private formatearDireccionMejorada(paciente: any): string {
       // 3. Obtener definición del documento desde PdfTemplatesService
       const documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);
 
+      if (!documentDefinition || !documentDefinition.content) {
+      throw new Error('Definición del documento inválida');
+    }
+
+    console.log('🔍 Contenido del documento:', documentDefinition.content.length, 'elementos');
+
+
+
       // 4. Generar nombre del archivo
       const fechaActual = new Date();
       const nombreArchivo = `historia-clinica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
@@ -2665,14 +2677,18 @@ private formatearDireccionMejorada(paciente: any): string {
       this.validarCumplimientoNOM004(datos, medicoCompleto, pacienteCompleto);
 
     } catch (error) {
-      console.error('❌ Error al generar PDF de Historia Clínica Pediátrica NOM-004:', error);
-      throw error;
+    console.error('❌ Error al generar PDF:', error);
+    // ✅ MOSTRAR DETALLES DEL ERROR
+    if (error instanceof Error) {
+      console.error('Stack trace:', error.stack);
+    }
+    throw error;
     }
   }
 
    async generarNotaUrgencias(datos: any): Promise<void> {
     console.log('🚨 Generando Nota de Urgencias...');
-    
+
     try {
       await this.ensurePdfMakeLoaded();
 
@@ -2720,7 +2736,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaEvolucion(datos: any): Promise<void> {
   console.log('📈 Generando Nota de Evolución...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2760,7 +2776,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaEgreso(datos: any): Promise<void> {
   console.log('🚪 Generando Nota de Egreso...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2801,7 +2817,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaInterconsulta(datos: any): Promise<void> {
   console.log('🩺 Generando Nota de Interconsulta...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2839,7 +2855,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaPreoperatoria(datos: any): Promise<void> {
   console.log('🔧 Generando Nota Preoperatoria...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2879,7 +2895,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaPostoperatoria(datos: any): Promise<void> {
   console.log('⚕️ Generando Nota Postoperatoria...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2919,7 +2935,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaPreanestesica(datos: any): Promise<void> {
   console.log('💉 Generando Nota Preanestésica...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -2956,7 +2972,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaPostanestesica(datos: any): Promise<void> {
   console.log('🏥 Generando Nota Postanestésica...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3001,7 +3017,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
  async generarNotaConsentimientoProcedimientos(datos: any): Promise<void> {
   console.log('📋 Generando Consentimiento Informado de Procedimientos...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3038,7 +3054,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
  async generarConsentimientoHospitalizacion(datos: any): Promise<void> {
   console.log('🏥 Generando Consentimiento de Hospitalización...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3076,7 +3092,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
  async generarConsentimientoReferenciaPacientes(datos: any): Promise<void> {
   console.log('↗️ Generando Consentimiento de Referencia de Pacientes...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3114,7 +3130,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
  async generarConsentimientoTransfusionSanguinea(datos: any): Promise<void> {
   console.log('🩸 Generando Consentimiento de Transfusión Sanguínea...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3152,7 +3168,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
  async generarConsentimientoTratamientoMedico(datos: any): Promise<void> {
   console.log('💊 Generando Consentimiento de Tratamiento Médico...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3194,7 +3210,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
  async generarHojaAltaVoluntaria(datos: any): Promise<void> {
   console.log('🚪 Generando Hoja de Alta Voluntaria...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3232,7 +3248,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 
 private async generarHojaInformeDiario(datos: any): Promise<void> {
   console.log('📊 Generando Hoja de Informe Diario...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3270,7 +3286,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
  async generarHojaFrontalExpediente(datos: any): Promise<void> {
   console.log('📂 Generando Hoja Frontal de Expediente...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3309,7 +3325,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
  async generarSolicitudLaboratorio(datos: any): Promise<void> {
   console.log('🧪 Generando Solicitud de Laboratorio...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3344,7 +3360,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
  async generarSolicitudImagenologia(datos: any): Promise<void> {
   console.log('📸 Generando Solicitud de Imagenología...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3379,7 +3395,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
  async generarSolicitudCultivo(datos: any): Promise<void> {
   console.log('🦠 Generando Solicitud de Cultivo...');
-  
+
   try {
     await this.ensurePdfMakeLoaded();
 
@@ -3416,7 +3432,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
  async generarPrescripcionMedicamentos(datos: any): Promise<void> {
  console.log('💊 Generando Prescripción de Medicamentos...');
- 
+
  try {
    await this.ensurePdfMakeLoaded();
 
@@ -3454,7 +3470,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
 
 private async generarRegistroTransfusion(datos: any): Promise<void> {
  console.log('🩸 Generando Registro de Transfusión...');
- 
+
  try {
    await this.ensurePdfMakeLoaded();
 
@@ -3494,7 +3510,7 @@ private async generarRegistroTransfusion(datos: any): Promise<void> {
 
 private async generarHojaQuirofano(datos: any): Promise<void> {
  console.log('🏥 Generando Hoja de Quirófano...');
- 
+
  try {
    await this.ensurePdfMakeLoaded();
 
@@ -3535,7 +3551,7 @@ private async generarHojaQuirofano(datos: any): Promise<void> {
 
 private async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promise<void> {
  console.log(`📄 Generando documento genérico: ${tipoDocumento}...`);
- 
+
  try {
    await this.ensurePdfMakeLoaded();
 
@@ -3744,12 +3760,5 @@ private async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promi
    throw error;
  }
 }
-
-
-
-
-
-
-
 
 }
