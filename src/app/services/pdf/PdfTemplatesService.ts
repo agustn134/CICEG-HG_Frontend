@@ -26,10 +26,22 @@ export class PdfTemplatesService {
   }
 
   private formatearDireccionMejorada(paciente: any): string {
-    return (
-      paciente?.domicilio || paciente?.direccion || 'Sin dirección registrada'
-    );
-  }
+  if (!paciente) return 'Sin dirección registrada';
+
+  // Acceso directo al campo domicilio
+  const domicilio = paciente.persona?.domicilio ||
+                   paciente.domicilio ||
+                   paciente.paciente?.domicilio ||
+                   '';
+
+  const domicilioLimpio = domicilio.toString().trim();
+
+  return domicilioLimpio !== '' &&
+         domicilioLimpio !== 'null' &&
+         domicilioLimpio !== 'undefined'
+    ? domicilioLimpio
+    : 'Sin dirección registrada';
+}
 
   // ==========================================
   // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
@@ -73,6 +85,25 @@ export class PdfTemplatesService {
     if (edad < 3) return 'Lactante'; if (edad < 6) return 'Preescolar'; if (edad < 12) return `${edad - 5}° Primaria`;if (edad < 15) return `${edad - 11}° Secundaria`;if (edad < 18) return `${edad - 14}° Preparatoria`;
     return 'No aplica';
   }
+
+  private construirTextoGuiasClinicas(guias: any[]): string {
+  if (!guias || guias.length === 0) {
+    return 'Guía clínica por definir según evolución clínica y estudios complementarios';
+  }
+
+  if (guias.length === 1) {
+    const guia = guias[0];
+    return guia.nombre || guia.nombre_completo || `Guía Clínica ID: ${guia.id_guia_diagnostico}`;
+  }
+
+  // Múltiples guías
+  return guias.map((guia, index) => {
+    const nombre = guia.nombre || guia.nombre_completo || `Guía ID: ${guia.id_guia_diagnostico}`;
+    const codigo = guia.codigo ? ` (${guia.codigo})` : '';
+    return `${index + 1}. ${nombre}${codigo}`;
+  }).join('\n');
+}
+
   /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 
 
@@ -121,8 +152,17 @@ export class PdfTemplatesService {
     const guiaClinicaData = datos.guiaClinica || {};
     const datosPadres = datos.datosPadres || {};
     const fechaActual = new Date();
+    const domicilioPaciente = pacienteCompleto.persona?.domicilio ||
+                           pacienteCompleto.domicilio ||
+                           'Sin dirección registrada';
+const lugarNacimiento = pacienteCompleto.persona?.lugar_nacimiento ||
+                         pacienteCompleto.lugar_nacimiento ||
+                         'No especificado';
     const esPediatrico = pacienteCompleto.edad < 18;
-    const tipoSangre = pacienteCompleto.tipo_sangre || 'No registrado';
+   const tipoSangre = pacienteCompleto.persona?.tipo_sangre ||
+                    pacienteCompleto.tipo_sangre ||
+                    pacienteCompleto.paciente?.tipo_sangre ||
+                    'No especificado';
     const contarFilasIdentificacion = () => { let filas = 7; if (esPediatrico) filas += 1; return filas;
   };
 
@@ -196,7 +236,7 @@ export class PdfTemplatesService {
                 { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center' },
                 { text: fechaActual.toLocaleTimeString('es-MX'), fontSize: 7, alignment: 'center' },
                 { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
-                { text: historiaClinicaData.numero_cama || 'Ambulatorio', fontSize: 7, alignment: 'center' },
+                { text: historiaClinicaData.numero_cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
                 { text: medicoCompleto.departamento || 'No especificado', fontSize: 7, alignment: 'center' }
               ]
             ]
@@ -237,7 +277,7 @@ export class PdfTemplatesService {
             widths: ['100%'],
             body: [
               [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
-              [{ text: this.formatearDireccionMejorada(pacienteCompleto), fontSize: 7, margin: [2, 3] }]
+              [{ text: domicilioPaciente, fontSize: 7, margin: [2, 3] }]
             ]
           },
           layout: {
@@ -252,18 +292,18 @@ export class PdfTemplatesService {
           table: {
             widths: ['25%', '25%', '25%', '25%'],
             body: [
-              [
-                { text: 'Fecha nacimiento', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'CURP', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Lugar de nacimiento', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Teléfono', fontSize: 7, bold: true, alignment: 'center' }
-              ],
-              [
-                { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.curp || 'No registrado', fontSize: 6, alignment: 'center' },
-                { text: pacienteCompleto.lugar_nacimiento || 'No especificado', fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.telefono || 'No registrado', fontSize: 7, alignment: 'center' }
-              ]
+               [
+          { text: 'Fecha nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'CURP', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Lugar de nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Teléfono', fontSize: 7, bold: true, alignment: 'center' }
+        ],
+        [
+          { text: this.formatearFecha(pacienteCompleto.persona?.fecha_nacimiento || pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 7, alignment: 'center' },
+          { text: pacienteCompleto.persona?.curp || pacienteCompleto.curp || 'No registrado', fontSize: 6, alignment: 'center' },
+          { text: lugarNacimiento, fontSize: 7, alignment: 'center' }, // 🔥 USAR VARIABLE
+          { text: pacienteCompleto.persona?.telefono || pacienteCompleto.telefono || 'No registrado', fontSize: 7, alignment: 'center' }
+        ]
             ]
           },
           layout: {
@@ -280,17 +320,17 @@ export class PdfTemplatesService {
             widths: ['25%', '25%', '25%', '25%'],
             body: [
               [
-                { text: esPediatrico ? 'Grado escolar' : 'Ocupación', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Escolaridad', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Estado civil', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Religión', fontSize: 7, bold: true, alignment: 'center' }
-              ],
-              [
-                { text: esPediatrico ? (pacienteCompleto.grado_escolar || this.determinarGradoEscolarPorEdad(pacienteCompleto.edad)) : (pacienteCompleto.ocupacion || 'No registrada'), fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.escolaridad || 'No registrada', fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.estado_civil || 'No registrado', fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.religion || 'No registrada', fontSize: 7, alignment: 'center' }
-              ]
+          { text: esPediatrico ? 'Grado escolar' : 'Ocupación', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Escolaridad', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Estado civil', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Religión', fontSize: 7, bold: true, alignment: 'center' }
+        ],
+        [
+          { text: esPediatrico ? (pacienteCompleto.grado_escolar || this.determinarGradoEscolarPorEdad(pacienteCompleto.edad)) : (pacienteCompleto.ocupacion || pacienteCompleto.paciente?.ocupacion || 'No registrada'), fontSize: 7, alignment: 'center' },
+          { text: pacienteCompleto.escolaridad || pacienteCompleto.paciente?.escolaridad || 'No registrada', fontSize: 7, alignment: 'center' },
+          { text: pacienteCompleto.persona?.estado_civil || pacienteCompleto.estado_civil || 'No registrado', fontSize: 7, alignment: 'center' },
+          { text: pacienteCompleto.persona?.religion || pacienteCompleto.religion || 'No registrada', fontSize: 7, alignment: 'center' } // 🔥 CORREGIR ACCESO
+        ]
             ]
           },
           layout: {
@@ -333,12 +373,14 @@ export class PdfTemplatesService {
           table: {
             widths: ['60%', '40%'],
             body: [
-              [ { text: esPediatrico ? 'Familiar responsable/Tutor' : 'Contacto de emergencia', fontSize: 7, bold: true, alignment: 'center' },
-                { text: 'Teléfono de contacto', fontSize: 7, bold: true, alignment: 'center' }
-              ],
-              [ { text: pacienteCompleto.familiar_responsable || 'No registrado', fontSize: 7, alignment: 'center' },
-                { text: pacienteCompleto.telefono_familiar || 'No registrado', fontSize: 7, alignment: 'center' }
-              ]
+              [
+          { text: esPediatrico ? 'Familiar responsable/Tutor' : 'Contacto de emergencia', fontSize: 7, bold: true, alignment: 'center' },
+          { text: 'Teléfono de contacto', fontSize: 7, bold: true, alignment: 'center' }
+        ],
+        [
+          { text: pacienteCompleto.familiar_responsable || pacienteCompleto.paciente?.familiar_responsable || 'No registrado', fontSize: 7, alignment: 'center' },
+          { text: pacienteCompleto.telefono_familiar || pacienteCompleto.paciente?.telefono_familiar || 'No registrado', fontSize: 7, alignment: 'center' }
+        ]
             ]
           },
           layout: {
@@ -692,8 +734,8 @@ const tablaAntecedentes = {
                 { text: 'GUÍA CLÍNICA DE DIAGNÓSTICO', fontSize: 7, bold: true, fillColor: '#f0f0f0', },
               ],
               [
-                {}, { text: guiaClinicaData.nombre_completo || 'Sin información registrada',
-                  fontSize: 7, margin: [5, 5], italics: !guiaClinicaData.nombre_completo, },
+                {}, { text: this.construirTextoGuiasClinicas(datos.guiasClinicas || (datos.guiaClinica ? [datos.guiaClinica] : [])),
+                  fontSize: 7, margin: [5, 5], italics: !datos.guiasClinicas || datos.guiasClinicas.length === 0, },
               ],
               [
                 {}, { text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS', fontSize: 7, bold: true, fillColor: '#f0f0f0', },

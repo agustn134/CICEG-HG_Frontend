@@ -168,6 +168,50 @@ export interface CreateHistoriaClinicaDto {
   plan_diagnostico?: string;
   plan_terapeutico?: string;
   pronostico?: string;
+  numero_cama?: string; ////YO LO AGREGUE JAJAJA
+
+  // 🔥 NUEVOS CAMPOS QUE AGREGAMOS
+  // Campos de interrogatorio por aparatos y sistemas
+  interrogatorio_cardiovascular?: string;
+  interrogatorio_respiratorio?: string;
+  interrogatorio_digestivo?: string;
+  interrogatorio_genitourinario?: string;
+  interrogatorio_neurologico?: string;
+  interrogatorio_musculoesqueletico?: string;
+  interrogatorio_endocrino?: string;
+  interrogatorio_tegumentario?: string;
+
+  // Campos adicionales de exploración
+  exploracion_neurologico?: string;
+  exploracion_corazon?: string;
+  habitus_exterior?: string;
+  desarrollo_psicomotor_exploracion?: string;
+
+  // Campos de estudios
+  estudios_laboratorio_previos?: string;
+  estudios_gabinete_previos?: string;
+
+  // Campos de tratamiento
+  terapeutica_empleada?: string;
+  indicacion_terapeutica?: string;
+
+  // Campos de antecedentes adicionales
+  hospitalizaciones_previas?: string;
+  transfusiones?: string;
+
+  // Campos pediátricos (antecedentes perinatales)
+  control_prenatal?: string;
+  tipo_parto?: string;
+  peso_nacer?: number;
+  edad_gestacional?: number;
+  apgar?: string;
+  complicaciones_neonatales?: string;
+
+  // Campo para cama (ID además del número)
+  id_cama?: number;
+
+  // Campos para múltiples guías clínicas
+  guias_clinicas_ids?: number[];
 }
 
 // ==========================================
@@ -234,6 +278,66 @@ export interface SeccionHistoriaClinica {
   descripcion: string;
 }
 
+// export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
+//   {
+//     id: 'antecedentes_heredo_familiares',
+//     nombre: 'Antecedentes Heredofamiliares',
+//     campos: ['antecedentes_heredo_familiares'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Historia familiar de enfermedades'
+//   },
+//   {
+//     id: 'antecedentes_personales_no_patologicos',
+//     nombre: 'Antecedentes Personales No Patológicos',
+//     campos: ['habitos_higienicos', 'habitos_alimenticios', 'actividad_fisica', 'ocupacion', 'vivienda', 'toxicomanias'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Hábitos y estilo de vida del paciente'
+//   },
+//   {
+//     id: 'antecedentes_ginecobstetricos',
+//     nombre: 'Antecedentes Ginecobstétricos',
+//     campos: ['menarca', 'ritmo_menstrual', 'inicio_vida_sexual', 'fecha_ultima_regla', 'fecha_ultimo_parto', 'gestas', 'partos', 'cesareas', 'abortos', 'hijos_vivos', 'metodo_planificacion'],
+//     obligatoria: false,
+//     aplicable_genero: 'F',
+//     descripcion: 'Historia ginecológica y obstétrica (solo mujeres)'
+//   },
+//   {
+//     id: 'antecedentes_personales_patologicos',
+//     nombre: 'Antecedentes Personales Patológicos',
+//     campos: ['enfermedades_infancia', 'enfermedades_adulto', 'cirugias_previas', 'traumatismos', 'alergias'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Historia médica previa del paciente'
+//   },
+//   {
+//     id: 'padecimiento_actual',
+//     nombre: 'Padecimiento Actual',
+//     campos: ['padecimiento_actual', 'sintomas_generales', 'aparatos_sistemas'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Motivo de consulta y síntomas actuales'
+//   },
+//   {
+//     id: 'exploracion_fisica',
+//     nombre: 'Exploración Física',
+//     campos: ['exploracion_general', 'exploracion_cabeza', 'exploracion_cuello', 'exploracion_torax', 'exploracion_abdomen', 'exploracion_columna', 'exploracion_extremidades', 'exploracion_genitales'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Hallazgos de la exploración física'
+//   },
+//   {
+//     id: 'impresion_diagnostica',
+//     nombre: 'Impresión Diagnóstica y Plan',
+//     campos: ['impresion_diagnostica', 'plan_diagnostico', 'plan_terapeutico', 'pronostico'],
+//     obligatoria: true,
+//     aplicable_genero: 'ambos',
+//     descripcion: 'Diagnóstico y plan de manejo'
+//   }
+// ];
+
+
 export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
   {
     id: 'antecedentes_heredo_familiares',
@@ -252,6 +356,14 @@ export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
     descripcion: 'Hábitos y estilo de vida del paciente'
   },
   {
+    id: 'antecedentes_perinatales',
+    nombre: 'Antecedentes Perinatales',
+    campos: ['control_prenatal', 'tipo_parto', 'peso_nacer', 'edad_gestacional', 'apgar', 'complicaciones_neonatales'],
+    obligatoria: false,
+    aplicable_genero: 'ambos',
+    descripcion: 'Historia perinatal (solo pediátricos)'
+  },
+  {
     id: 'antecedentes_ginecobstetricos',
     nombre: 'Antecedentes Ginecobstétricos',
     campos: ['menarca', 'ritmo_menstrual', 'inicio_vida_sexual', 'fecha_ultima_regla', 'fecha_ultimo_parto', 'gestas', 'partos', 'cesareas', 'abortos', 'hijos_vivos', 'metodo_planificacion'],
@@ -262,7 +374,7 @@ export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
   {
     id: 'antecedentes_personales_patologicos',
     nombre: 'Antecedentes Personales Patológicos',
-    campos: ['enfermedades_infancia', 'enfermedades_adulto', 'cirugias_previas', 'traumatismos', 'alergias'],
+    campos: ['enfermedades_infancia', 'enfermedades_adulto', 'cirugias_previas', 'traumatismos', 'alergias', 'hospitalizaciones_previas', 'transfusiones'],
     obligatoria: true,
     aplicable_genero: 'ambos',
     descripcion: 'Historia médica previa del paciente'
@@ -276,12 +388,36 @@ export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
     descripcion: 'Motivo de consulta y síntomas actuales'
   },
   {
+    id: 'interrogatorio_sistemas',
+    nombre: 'Interrogatorio por Aparatos y Sistemas',
+    campos: ['interrogatorio_cardiovascular', 'interrogatorio_respiratorio', 'interrogatorio_digestivo', 'interrogatorio_genitourinario', 'interrogatorio_neurologico', 'interrogatorio_musculoesqueletico', 'interrogatorio_endocrino', 'interrogatorio_tegumentario'],
+    obligatoria: false,
+    aplicable_genero: 'ambos',
+    descripcion: 'Interrogatorio detallado por sistemas'
+  },
+  {
     id: 'exploracion_fisica',
     nombre: 'Exploración Física',
-    campos: ['exploracion_general', 'exploracion_cabeza', 'exploracion_cuello', 'exploracion_torax', 'exploracion_abdomen', 'exploracion_columna', 'exploracion_extremidades', 'exploracion_genitales'],
+    campos: ['exploracion_general', 'habitus_exterior', 'exploracion_cabeza', 'exploracion_cuello', 'exploracion_torax', 'exploracion_corazon', 'exploracion_abdomen', 'exploracion_columna', 'exploracion_extremidades', 'exploracion_genitales', 'exploracion_neurologico', 'desarrollo_psicomotor_exploracion'],
     obligatoria: true,
     aplicable_genero: 'ambos',
     descripcion: 'Hallazgos de la exploración física'
+  },
+  {
+    id: 'estudios_complementarios',
+    nombre: 'Estudios Complementarios',
+    campos: ['estudios_laboratorio_previos', 'estudios_gabinete_previos'],
+    obligatoria: false,
+    aplicable_genero: 'ambos',
+    descripcion: 'Estudios de laboratorio y gabinete'
+  },
+  {
+    id: 'tratamiento',
+    nombre: 'Tratamiento y Seguimiento',
+    campos: ['terapeutica_empleada', 'indicacion_terapeutica'],
+    obligatoria: false,
+    aplicable_genero: 'ambos',
+    descripcion: 'Tratamiento aplicado y indicaciones'
   },
   {
     id: 'impresion_diagnostica',
@@ -386,16 +522,66 @@ export const CAMPOS_APLICABLES_MUJERES = [
   'metodo_planificacion'
 ];
 
+// export const CAMPOS_EXPLORACION_FISICA = [
+//   'exploracion_general',
+//   'exploracion_cabeza',
+//   'exploracion_cuello',
+//   'exploracion_torax',
+//   'exploracion_abdomen',
+//   'exploracion_columna',
+//   'exploracion_extremidades',
+//   'exploracion_genitales'
+// ];
+
 export const CAMPOS_EXPLORACION_FISICA = [
   'exploracion_general',
+  'habitus_exterior',
   'exploracion_cabeza',
   'exploracion_cuello',
   'exploracion_torax',
+  'exploracion_corazon',
   'exploracion_abdomen',
   'exploracion_columna',
   'exploracion_extremidades',
-  'exploracion_genitales'
+  'exploracion_genitales',
+  'exploracion_neurologico',
+  'desarrollo_psicomotor_exploracion'
 ];
+
+// 🔥 NUEVA CONSTANTE PARA INTERROGATORIO
+export const CAMPOS_INTERROGATORIO_SISTEMAS = [
+  'interrogatorio_cardiovascular',
+  'interrogatorio_respiratorio',
+  'interrogatorio_digestivo',
+  'interrogatorio_genitourinario',
+  'interrogatorio_neurologico',
+  'interrogatorio_musculoesqueletico',
+  'interrogatorio_endocrino',
+  'interrogatorio_tegumentario'
+];
+
+// 🔥 NUEVA CONSTANTE PARA ESTUDIOS
+export const CAMPOS_ESTUDIOS_COMPLEMENTARIOS = [
+  'estudios_laboratorio_previos',
+  'estudios_gabinete_previos'
+];
+
+// 🔥 NUEVA CONSTANTE PARA TRATAMIENTO
+export const CAMPOS_TRATAMIENTO = [
+  'terapeutica_empleada',
+  'indicacion_terapeutica'
+];
+
+// 🔥 NUEVA CONSTANTE PARA ANTECEDENTES PERINATALES
+export const CAMPOS_ANTECEDENTES_PERINATALES = [
+  'control_prenatal',
+  'tipo_parto',
+  'peso_nacer',
+  'edad_gestacional',
+  'apgar',
+  'complicaciones_neonatales'
+];
+
 
 export const CAMPOS_PLAN_MANEJO = [
   'impresion_diagnostica',

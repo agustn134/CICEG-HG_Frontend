@@ -119,22 +119,44 @@ export class CamasService {
   }
 
   // Obtener camas disponibles
-  async getCamasDisponibles(idServicio?: number): Promise<ApiResponse<Cama[]>> {
-    try {
-      let url = `${this.API_URL}/disponibles`;
-      if (idServicio) {
-        url += `?id_servicio=${idServicio}`;
-      }
+  // async getCamasDisponibles(idServicio?: number): Promise<ApiResponse<Cama[]>> {
+  //   try {
+  //     let url = `${this.API_URL}/disponibles`;
+  //     if (idServicio) {
+  //       url += `?id_servicio=${idServicio}`;
+  //     }
 
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<Cama[]>>(url, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getCamasDisponibles:', error);
-      throw error;
+  //     const response = await firstValueFrom(
+  //       this.http.get<ApiResponse<Cama[]>>(url, this.httpOptions)
+  //     );
+  //     return response;
+  //   } catch (error) {
+  //     console.error('Error in getCamasDisponibles:', error);
+  //     throw error;
+  //   }
+  // }
+
+  // Obtener camas disponibles
+async getCamasDisponibles(idServicio?: number): Promise<ApiResponse<Cama[]>> {
+  try {
+    let url = this.API_URL; // http://localhost:3000/api/gestion-expedientes/camas
+
+    // Usar query parameters
+    if (idServicio) {
+      url += `?id_servicio=${idServicio}&solo_disponibles=true`;
+    } else {
+      url += `?solo_disponibles=true`; // Solo camas disponibles
     }
+
+    const response = await firstValueFrom(
+      this.http.get<ApiResponse<Cama[]>>(url, this.httpOptions)
+    );
+    return response;
+  } catch (error) {
+    console.error('Error in getCamasDisponibles:', error);
+    throw error;
   }
+}
 
   // Obtener camas por servicio
   async getCamasPorServicio(idServicio: number): Promise<ApiResponse<Cama[]>> {

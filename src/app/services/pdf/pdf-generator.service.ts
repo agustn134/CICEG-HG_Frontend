@@ -2624,67 +2624,63 @@ private formatearDireccionMejorada(paciente: any): string {
   // ==========================================
   // MÉTODOS REFACTORIZADOS QUE USAN PdfTemplatesService
   // ==========================================
-  async generarHistoriaClinica(datos: any): Promise<void> {
-    console.log('🩺 Generando Historia Clínica NOM-004...');
-
-    try {
-      await this.ensurePdfMakeLoaded();
-
-      if (!this.pdfMake) {
+ async generarHistoriaClinica(datos: any): Promise<void> {
+  console.log('🩺 Generando Historia Clínica NOM-004...');
+  try {
+    await this.ensurePdfMakeLoaded();
+    if (!this.pdfMake) {
       throw new Error('PDFMake no está disponible');
     }
 
-      // 1. Obtener y procesar datos (responsabilidad del generador)
-      const medicoCompleto = await this.obtenerDatosMedicoActual();
-      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-      const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
-      const guiaClinicaData = this.obtenerGuiaClinicaSeleccionada(datos);
-      const datosPadres = this.obtenerDatosPadres(datos);
+    // 1. Obtener y procesar datos (responsabilidad del generador)
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+    const guiaClinicaData = this.obtenerGuiaClinicaSeleccionada(datos);
+    const datosPadres = this.obtenerDatosPadres(datos);
 
-      // 2. Preparar datos para el template
-      const datosParaTemplate = {
-        ...datos,
-        medicoCompleto,
-        pacienteCompleto,
-        signosVitales: signosVitalesReales,
-        guiaClinica: guiaClinicaData,
-        datosPadres
-      };
+    // 2. Preparar datos para el template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales: signosVitalesReales,
+      guiaClinica: guiaClinicaData,
+      guiasClinicas: datos.guiasClinicas || [], // 🔥 AGREGAR ESTA LÍNEA
+      datosPadres
+    };
 
-      // 3. Obtener definición del documento desde PdfTemplatesService
-      const documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);
+    // 3. Obtener definición del documento desde PdfTemplatesService
+    const documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);
 
-      if (!documentDefinition || !documentDefinition.content) {
+    if (!documentDefinition || !documentDefinition.content) {
       throw new Error('Definición del documento inválida');
     }
 
     console.log('🔍 Contenido del documento:', documentDefinition.content.length, 'elementos');
 
+    // 4. Generar nombre del archivo
+    const fechaActual = new Date();
+    const nombreArchivo = `historia-clinica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
+    // 5. Crear y descargar PDF (responsabilidad del generador)
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
 
-      // 4. Generar nombre del archivo
-      const fechaActual = new Date();
-      const nombreArchivo = `historia-clinica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+    console.log('✅ PDF de Historia Clínica Pediátrica NOM-004 generado exitosamente');
+    console.log(`📄 Archivo: ${nombreArchivo}`);
 
-      // 5. Crear y descargar PDF (responsabilidad del generador)
-      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-      pdfDocGenerator.download(nombreArchivo);
-
-      console.log('✅ PDF de Historia Clínica Pediátrica NOM-004 generado exitosamente');
-      console.log(`📄 Archivo: ${nombreArchivo}`);
-
-      // 6. Validaciones normativas
-      this.validarCumplimientoNOM004(datos, medicoCompleto, pacienteCompleto);
-
-    } catch (error) {
+    // 6. Validaciones normativas
+    this.validarCumplimientoNOM004(datos, medicoCompleto, pacienteCompleto);
+  } catch (error) {
     console.error('❌ Error al generar PDF:', error);
     // ✅ MOSTRAR DETALLES DEL ERROR
     if (error instanceof Error) {
       console.error('Stack trace:', error.stack);
     }
     throw error;
-    }
   }
+}
 
    async generarNotaUrgencias(datos: any): Promise<void> {
     console.log('🚨 Generando Nota de Urgencias...');

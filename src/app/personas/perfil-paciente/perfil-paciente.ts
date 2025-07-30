@@ -64,7 +64,8 @@ import { DesarrolloPsicomotrizService } from '../../services/documentos-clinicos
 import { EstadoNutricionalPediatricoService } from '../../services/documentos-clinicos/estado-nutricional-pediatrico';
 import { InmunizacionesService } from '../../services/documentos-clinicos/inmunizaciones';
 import { VacunasAdicionalesService } from '../../services/documentos-clinicos/vacunas-adicionales';
-
+import { CamasService } from '../../services/gestion-expedientes/camas';
+import { Cama } from '../../models/cama.model';
 
 interface TipoDocumentoConfig {
   id: string;
@@ -78,6 +79,43 @@ interface TipoDocumentoConfig {
   requiereQuirurgico: boolean;
   orden: number;
 }
+
+// interface PacienteCompleto {
+//   persona: {
+//     nombre?: string;
+//     apellido_paterno?: string;
+//     apellido_materno?: string;
+//     fecha_nacimiento?: string;
+//     lugar_nacimiento?: string;
+//     ciudad_nacimiento?: string;
+//     municipio_nacimiento?: string;
+//     estado_nacimiento?: string;
+//     sexo?: string;
+//     telefono?: string;
+//     correo_electronico?: string;
+//     domicilio?: string;
+//     direccion?: string;
+//     calle?: string;
+//     numero_exterior?: string;
+//     numero_interior?: string;
+//     colonia?: string;
+//     ciudad?: string;
+//     estado?: string;
+//     codigo_postal?: string;
+//     curp?: string;
+//     tipo_sangre?: string;
+//     [key: string]: any;
+//   };
+//   paciente: Paciente & {
+//     persona?: any;
+//     fecha_nacimiento?: string;
+//     [key: string]: any;
+//   };
+//   expediente: Expediente;
+//   documentos: DocumentoClinico[] | null;
+//   ultimoInternamiento: any;
+//   signosVitales: SignosVitales[] | null;
+// }
 
 interface PacienteCompleto {
   persona: {
@@ -103,18 +141,32 @@ interface PacienteCompleto {
     codigo_postal?: string;
     curp?: string;
     tipo_sangre?: string;
+    religion?: string;
+    estado_civil?: string;
     [key: string]: any;
   };
   paciente: Paciente & {
     persona?: any;
     fecha_nacimiento?: string;
+    tipo_sangre?: string;
+    ocupacion?: string;
+    escolaridad?: string;
+    familiar_responsable?: string; // 🔥 AGREGAR
+    telefono_familiar?: string; // 🔥 AGREGAR
+    religion?: string; // 🔥 AGREGAR
+    nombre_padre?: string; // 🔥 AGREGAR
+    nombre_madre?: string; // 🔥 AGREGAR
+    edad_padre?: number; // 🔥 AGREGAR
+    edad_madre?: number; // 🔥 AGREGAR
     [key: string]: any;
   };
   expediente: Expediente;
   documentos: DocumentoClinico[] | null;
   ultimoInternamiento: any;
   signosVitales: SignosVitales[] | null;
+  tipo_sangre?: string; // 🔥 AGREGAR ESTA LÍNEA AQUÍ
 }
+
 
 interface TipoDocumentoDisponible {
   id_tipo_documento: number; nombre: string;
@@ -172,7 +224,10 @@ type FormularioActivo =
   templateUrl: './perfil-paciente.html',
   styleUrl: './perfil-paciente.css',
 })
+
+
 export class PerfilPaciente implements OnInit, OnDestroy {
+
   @ViewChild('formNav') formNav!: ElementRef;
   private destroy$ = new Subject<void>();
   private autoguardadoInterval: any;
@@ -192,6 +247,14 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   esPacientePediatrico: boolean = false;
   mostrarDocumentosQuirurgicos: boolean = false;
   success: string | null = null;
+  camas: Cama[] = [];
+  camasDisponibles: Cama[] = [];
+  camaSeleccionada: Cama | null = null;
+  mostrarDropdownCamas = false;
+  filtroCama = '';
+  guiasClinicasSeleccionadas: GuiaClinica[] = [];
+
+
   signosVitalesForm: FormGroup;
   historiaClinicaForm: FormGroup;
   notaUrgenciasForm: FormGroup;
@@ -372,7 +435,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private desarrolloPsicomotrizService: DesarrolloPsicomotrizService,
     private estadoNutricionalPediatricoService: EstadoNutricionalPediatricoService,
     private inmunizacionesService: InmunizacionesService,
-    private vacunasAdicionalesService: VacunasAdicionalesService
+    private vacunasAdicionalesService: VacunasAdicionalesService,
+    private camasService: CamasService
   ) {
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
@@ -1689,10 +1753,10 @@ guardarBorrador(): void {
     }
   }
 
-  ngOnInit(): void {
+   ngOnInit(): void {
     // Inicializar navegación mejorada
     this.inicializarFormulariosVisibles();
-
+    this.cargarCamasDisponibles();
     // 1. Suscripción a parámetros de ruta
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -1723,6 +1787,105 @@ guardarBorrador(): void {
       }
     });
   }
+
+
+   async cargarCamasDisponibles(): Promise<void> {
+    try {
+      const response = await this.camasService.getCamasDisponibles();
+      this.camasDisponibles = response.data || [];
+      this.camas = this.camasDisponibles;
+    } catch (error) {
+      console.error('Error al cargar camas:', error);
+    }
+  }
+
+  trackByCamaId(index: number, cama: Cama): number {
+  return cama.id_cama;
+}
+
+  onCamaInputChange(valor: string): void {
+    this.filtroCama = valor;
+    if (valor.length > 0) {
+      this.camas = this.camasDisponibles.filter(cama =>
+        cama.numero.toLowerCase().includes(valor.toLowerCase()) ||
+        cama.area.toLowerCase().includes(valor.toLowerCase()) ||
+        (cama.subarea && cama.subarea.toLowerCase().includes(valor.toLowerCase()))
+      );
+    } else {
+      this.camas = this.camasDisponibles;
+    }
+  }
+
+  seleccionarCama(cama: Cama): void {
+    this.camaSeleccionada = cama;
+    this.filtroCama = `${cama.numero} - ${cama.area}`;
+    this.mostrarDropdownCamas = false;
+
+    // Actualizar el formulario si existe el campo
+    if (this.historiaClinicaForm.get('numero_cama')) {
+      this.historiaClinicaForm.patchValue({
+        numero_cama: cama.numero,
+        id_cama: cama.id_cama
+      });
+    }
+  }
+
+  limpiarCama(): void {
+    this.camaSeleccionada = null;
+    this.filtroCama = '';
+    if (this.historiaClinicaForm.get('numero_cama')) {
+      this.historiaClinicaForm.patchValue({
+        numero_cama: null,
+        id_cama: null
+      });
+    }
+  }
+
+  toggleDropdownCamas(): void {
+    this.mostrarDropdownCamas = !this.mostrarDropdownCamas;
+  }
+
+
+   // 🔥 MÉTODOS MEJORADOS PARA MÚLTIPLES GUÍAS CLÍNICAS
+  agregarGuiaClinica(guia: GuiaClinica): void {
+    // Verificar si ya está seleccionada
+    const yaSeleccionada = this.guiasClinicasSeleccionadas.find(g => g.id_guia_diagnostico === guia.id_guia_diagnostico);
+
+    if (!yaSeleccionada) {
+      this.guiasClinicasSeleccionadas.push(guia);
+      this.limpiarBusquedaGuia();
+    }
+  }
+
+  // 🔥 MÉTODOS AUXILIARES PARA EL TEMPLATE
+esGuiaSeleccionada(guia: GuiaClinica): boolean {
+  return this.guiasClinicasSeleccionadas.some(g => g.id_guia_diagnostico === guia.id_guia_diagnostico);
+}
+
+trackByGuiaId(index: number, guia: GuiaClinica): number {
+  return guia.id_guia_diagnostico;
+}
+
+
+  eliminarGuiaClinica(guia: GuiaClinica): void {
+    this.guiasClinicasSeleccionadas = this.guiasClinicasSeleccionadas.filter(
+      g => g.id_guia_diagnostico !== guia.id_guia_diagnostico
+    );
+  }
+
+  limpiarBusquedaGuia(): void {
+    this.filtroGuiaClinica = '';
+    this.guiaClinicaSeleccionada = null;
+    this.mostrarDropdownGuias = false;
+  }
+
+  // Modificar el método existente
+  seleccionarGuiaClinica(guia: GuiaClinica): void {
+    this.agregarGuiaClinica(guia);
+  }
+
+
+
 
   // Método auxiliar para organizar el flujo de carga del paciente
   private inicializarFlujoPaciente(): void {
@@ -2225,13 +2388,26 @@ guardarBorrador(): void {
     );
   }
 
-  seleccionarGuiaClinica(guia: GuiaClinica | null): void {
-    if (!guia) return;
-    this.guiaClinicaSeleccionada = guia;
-    this.filtroGuiaClinica = guia.nombre || '';
-    this.mostrarDropdownGuias = false;
-    this.actualizarFormularioConGuia(guia);
+  // Método para filtrar las guías (asegúrate de implementarlo)
+filtrarGuiasClinicas(): void {
+  if (!this.filtroGuiaClinica) {
+    this.guiasClinicasFiltradas = this.guiasClinicas || [];
+  } else {
+    this.guiasClinicasFiltradas = (this.guiasClinicas || []).filter(guia =>
+      guia.nombre.toLowerCase().includes(this.filtroGuiaClinica.toLowerCase()) ||
+      (guia.codigo && guia.codigo.toLowerCase().includes(this.filtroGuiaClinica.toLowerCase())) ||
+      (guia.area && guia.area.toLowerCase().includes(this.filtroGuiaClinica.toLowerCase()))
+    );
   }
+}
+
+  // seleccionarGuiaClinica(guia: GuiaClinica | null): void {
+  //   if (!guia) return;
+  //   this.guiaClinicaSeleccionada = guia;
+  //   this.filtroGuiaClinica = guia.nombre || '';
+  //   this.mostrarDropdownGuias = false;
+  //   this.actualizarFormularioConGuia(guia);
+  // }
 
   private actualizarFormularioConGuia(guia: GuiaClinica): void {
     switch (this.formularioActivo) {
@@ -2283,8 +2459,19 @@ guardarBorrador(): void {
     }
   }
 
-  trackByGuiaId(index: number, guia: GuiaClinica): number {
-    return guia.id_guia_diagnostico;
+  // trackByGuiaId(index: number, guia: GuiaClinica): number {
+  //   return guia.id_guia_diagnostico;
+  // }
+
+  isGuiaSeleccionada(guia: GuiaClinica): boolean {
+    return this.guiasClinicasSeleccionadas.some(g => g.id_guia_diagnostico === guia.id_guia_diagnostico);
+  }
+
+  onCamaInputChangeEvent(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target?.value !== undefined) {
+      this.onCamaInputChange(target.value);
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -2432,7 +2619,7 @@ guardarBorrador(): void {
     traumatismos: [''],
     // alergias: [''],
      alergias: ['', Validators.required], // Obligatorio por seguridad
-    transfusiones: [''],
+    // transfusiones: [''],
 
     // Padecimiento actual
     padecimiento_actual: ['', [Validators.required]],
@@ -2459,8 +2646,46 @@ guardarBorrador(): void {
     pronostico: ['', [Validators.required]],
 
      // Campos adicionales
-    numero_cama: [''],
-    hospitalizaciones_previas: [''],
+    // numero_cama: [''],
+    // hospitalizaciones_previas: [''],
+
+
+    // 🔥 NUEVOS CAMPOS FALTANTES
+      numero_cama: [null],
+      id_cama: [null],
+
+      // Campos de interrogatorio por aparatos y sistemas
+      interrogatorio_cardiovascular: [null],
+      interrogatorio_respiratorio: [null],
+      interrogatorio_digestivo: [null],
+      interrogatorio_genitourinario: [null],
+      interrogatorio_neurologico: [null],
+      interrogatorio_musculoesqueletico: [null],
+      interrogatorio_endocrino: [null],
+      interrogatorio_tegumentario: [null],
+
+      // Campos adicionales de exploración
+      exploracion_neurologico: [null],
+      exploracion_corazon: [null],
+
+      // Campos de estudios
+      estudios_laboratorio_previos: [null],
+      estudios_gabinete_previos: [null],
+
+      // Campos de tratamiento
+      terapeutica_empleada: [null],
+      indicacion_terapeutica: [null],
+
+      // Campos pediátricos adicionales
+      desarrollo_psicomotor_exploracion: [null],
+      habitus_exterior: [null],
+
+      // Campos de antecedentes adicionales
+      hospitalizaciones_previas: [null],
+      transfusiones: [null],
+
+      // Campo para múltiples guías clínicas
+      guias_clinicas_ids: [[]],
 
   });
 }
@@ -4350,6 +4575,43 @@ private mostrarMensajeValidacion(formulario: string): void {
       plan_diagnostico: this.historiaClinicaForm.value.plan_diagnostico || null,
       plan_terapeutico: this.historiaClinicaForm.value.plan_terapeutico || null,
       pronostico: this.historiaClinicaForm.value.pronostico || null,
+
+
+
+      numero_cama: this.historiaClinicaForm.value.numero_cama || null,
+      interrogatorio_cardiovascular: this.historiaClinicaForm.value.interrogatorio_cardiovascular || null,
+      interrogatorio_respiratorio: this.historiaClinicaForm.value.interrogatorio_respiratorio || null,
+      interrogatorio_digestivo: this.historiaClinicaForm.value.interrogatorio_digestivo || null,
+      interrogatorio_genitourinario: this.historiaClinicaForm.value.interrogatorio_genitourinario || null,
+      interrogatorio_neurologico: this.historiaClinicaForm.value.interrogatorio_neurologico || null,
+      interrogatorio_musculoesqueletico: this.historiaClinicaForm.value.interrogatorio_musculoesqueletico || null,
+      interrogatorio_endocrino: this.historiaClinicaForm.value.interrogatorio_endocrino || null,
+      interrogatorio_tegumentario: this.historiaClinicaForm.value.interrogatorio_tegumentario || null,
+
+      exploracion_neurologico: this.historiaClinicaForm.value.exploracion_neurologico || null,
+      exploracion_corazon: this.historiaClinicaForm.value.exploracion_corazon || null,
+
+      estudios_laboratorio_previos: this.historiaClinicaForm.value.estudios_laboratorio_previos || null,
+      estudios_gabinete_previos: this.historiaClinicaForm.value.estudios_gabinete_previos || null,
+
+      terapeutica_empleada: this.historiaClinicaForm.value.terapeutica_empleada || null,
+      indicacion_terapeutica: this.historiaClinicaForm.value.indicacion_terapeutica || null,
+
+      desarrollo_psicomotor_exploracion: this.historiaClinicaForm.value.desarrollo_psicomotor_exploracion || null,
+      habitus_exterior: this.historiaClinicaForm.value.habitus_exterior || null,
+
+      hospitalizaciones_previas: this.historiaClinicaForm.value.hospitalizaciones_previas || null,
+      transfusiones: this.historiaClinicaForm.value.transfusiones || null,
+
+      // IDs de las guías clínicas seleccionadas
+      guias_clinicas_ids: this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico),
+
+
+
+
+
+
+
     };
 
     console.log('📤 Enviando historia clínica al backend:', historiaData);
@@ -4620,7 +4882,9 @@ private mostrarMensajeValidacion(formulario: string): void {
               tipo_historia: datosPacienteEstructurados.edad < 18 ? 'pediatrica' : 'general',
             },
             signosVitales: this.signosVitalesForm.value,
-         guiaClinica: this.guiaClinicaSeleccionada,
+             guiasClinicas: this.guiasClinicasSeleccionadas, // Array de guías
+          guiaClinica: this.guiasClinicasSeleccionadas[0] || null, // Backward compatibility
+        //  guiaClinica: this.guiaClinicaSeleccionada,
          datosPadres: {
            nombre_padre: datosPacienteEstructurados.nombre_padre || 'No registrado',
            nombre_madre: datosPacienteEstructurados.nombre_madre || 'No registrado',
@@ -4760,27 +5024,27 @@ private mostrarMensajeValidacion(formulario: string): void {
     : 'Sin dirección registrada';
 }
 
-  private extraerLugarNacimiento(): string {
-    const objetos = [
-      this.pacienteCompleto?.persona,
-      this.personaInfo,
-      this.pacienteCompleto?.paciente as any,
-    ];
+  // private extraerLugarNacimiento(): string {
+  //   const objetos = [
+  //     this.pacienteCompleto?.persona,
+  //     this.personaInfo,
+  //     this.pacienteCompleto?.paciente as any,
+  //   ];
 
-    const propiedades = [
-      'lugar_nacimiento',
-      'ciudad_nacimiento',
-      'municipio_nacimiento',
-      'estado_nacimiento',
-    ];
+  //   const propiedades = [
+  //     'lugar_nacimiento',
+  //     'ciudad_nacimiento',
+  //     'municipio_nacimiento',
+  //     'estado_nacimiento',
+  //   ];
 
-    for (const propiedad of propiedades) {
-      const valor = this.findPropertyInObjects(objetos, propiedad);
-      if (valor) return valor;
-    }
+  //   for (const propiedad of propiedades) {
+  //     const valor = this.findPropertyInObjects(objetos, propiedad);
+  //     if (valor) return valor;
+  //   }
 
-    return 'No especificado';
-  }
+  //   return 'No especificado';
+  // }
 
   private construirPacienteCompleto(data: any): void {
     console.log('  Datos recibidos para construir paciente completo:', data);
@@ -5623,12 +5887,59 @@ get esPediatrico(): boolean {
 get esMujer(): boolean {return this.pacienteCompleto?.paciente?.persona?.sexo === 'F';}
 
 
+// private extraerDatosPaciente(): any {
+//   if (!this.pacienteCompleto) return {};
+//   const paciente = this.pacienteCompleto.paciente as any;
+//   const persona = paciente?.persona || {};
+//   const edad = this.calcularEdad(persona.fecha_nacimiento || '');
+//   const esPediatrico = edad < 18;
+//   const datosBase = {
+//     id_paciente: paciente?.id_paciente,
+//     nombre: persona.nombre || '',
+//     apellido_paterno: persona.apellido_paterno || '',
+//     apellido_materno: persona.apellido_materno || '',
+//     nombre_completo: this.getNombreCompleto(),
+//     fecha_nacimiento: persona.fecha_nacimiento || '',
+//     edad: edad,
+//     sexo: this.formatearSexo(persona.sexo || ''),
+//     curp: persona.curp || '',
+//     tipo_sangre: persona.tipo_sangre || paciente?.tipo_sangre || 'No especificado',
+//     telefono: persona.telefono || '',
+//     correo_electronico: persona.correo_electronico || '',
+//     domicilio: this.extraerDireccionCompleta(),
+//     lugar_nacimiento: this.extraerLugarNacimiento(),
+//     numero_expediente: this.pacienteCompleto?.expediente?.numero_expediente || '',
+//   };
+
+//     if (esPediatrico) {
+//     return {
+//       ...datosBase,
+//       nombre_padre: paciente?.nombre_padre || 'No registrado',
+//       nombre_madre: paciente?.nombre_madre || 'No registrado',
+//       edad_padre: paciente?.edad_padre || null,
+//       edad_madre: paciente?.edad_madre || null,
+//       grado_escolar: this.determinarGradoEscolarPorEdad(edad),
+//       ocupacion: 'Estudiante',
+//       estado_civil: 'Soltero(a)',
+//     };
+//   }
+//   return {
+//     ...datosBase,
+//     ocupacion: paciente?.ocupacion || '',
+//     estado_civil: persona.estado_civil || '',
+//     escolaridad: paciente?.escolaridad || '',
+//   };
+// }
+
 private extraerDatosPaciente(): any {
   if (!this.pacienteCompleto) return {};
+
   const paciente = this.pacienteCompleto.paciente as any;
-  const persona = paciente?.persona || {};
+  const persona = paciente?.persona || this.pacienteCompleto.persona || {};
+  const expediente = this.pacienteCompleto.expediente || {};
   const edad = this.calcularEdad(persona.fecha_nacimiento || '');
   const esPediatrico = edad < 18;
+
   const datosBase = {
     id_paciente: paciente?.id_paciente,
     nombre: persona.nombre || '',
@@ -5639,15 +5950,47 @@ private extraerDatosPaciente(): any {
     edad: edad,
     sexo: this.formatearSexo(persona.sexo || ''),
     curp: persona.curp || '',
-    tipo_sangre: persona.tipo_sangre || paciente?.tipo_sangre || 'No especificado',
+
+    // 🔥 CORREGIR ACCESO AL TIPO DE SANGRE
+    tipo_sangre: persona.tipo_sangre ||
+                paciente?.tipo_sangre ||
+                (this.pacienteCompleto as any).tipo_sangre || // Cast para evitar error
+                'No especificado',
+
     telefono: persona.telefono || '',
     correo_electronico: persona.correo_electronico || '',
-    domicilio: this.extraerDireccionCompleta(),
+
+    // 🔥 MEJORAR DOMICILIO
+    domicilio: this.extraerDireccionCompleta() ||
+               persona.domicilio ||
+               persona.direccion ||
+               'Sin dirección registrada',
+
     lugar_nacimiento: this.extraerLugarNacimiento(),
-    numero_expediente: this.pacienteCompleto?.expediente?.numero_expediente || '',
+
+    // 🔥 MEJORAR NÚMERO DE EXPEDIENTE
+    numero_expediente: expediente?.numero_expediente_administrativo ||
+                      expediente?.numero_expediente ||
+                      'Sin número',
+
+    // 🔥 AGREGAR CAMPOS FALTANTES
+    religion: persona.religion ||
+              paciente?.religion ||
+              'No registrada',
+
+    familiar_responsable: paciente?.familiar_responsable ||
+                         paciente?.contacto_emergencia ||
+                         'No registrado',
+
+    telefono_familiar: paciente?.telefono_familiar ||
+                      paciente?.telefono_emergencia ||
+                      'No registrado',
+
+    // 🔥 AGREGAR EXPEDIENTE COMPLETO
+    expediente: expediente
   };
 
-    if (esPediatrico) {
+  if (esPediatrico) {
     return {
       ...datosBase,
       nombre_padre: paciente?.nombre_padre || 'No registrado',
@@ -5657,15 +6000,58 @@ private extraerDatosPaciente(): any {
       grado_escolar: this.determinarGradoEscolarPorEdad(edad),
       ocupacion: 'Estudiante',
       estado_civil: 'Soltero(a)',
+      escolaridad: this.determinarGradoEscolarPorEdad(edad),
     };
   }
+
   return {
     ...datosBase,
-    ocupacion: paciente?.ocupacion || '',
-    estado_civil: persona.estado_civil || '',
-    escolaridad: paciente?.escolaridad || '',
+    ocupacion: paciente?.ocupacion || 'No registrada',
+    estado_civil: persona.estado_civil || 'No registrado',
+    escolaridad: paciente?.escolaridad || 'No registrada',
   };
 }
+
+// private extraerDireccionCompleta(): string {
+//   if (!this.pacienteCompleto) return '';
+
+//   const persona = this.pacienteCompleto.paciente?.persona || this.pacienteCompleto.persona || {};
+
+//   // Intentar construir dirección completa
+//   const partes = [
+//     persona.calle,
+//     persona.numero_exterior ? `#${persona.numero_exterior}` : '',
+//     persona.numero_interior ? `Int. ${persona.numero_interior}` : '',
+//     persona.colonia,
+//     persona.municipio,
+//     persona.estado,
+//     persona.codigo_postal ? `C.P. ${persona.codigo_postal}` : ''
+//   ].filter(parte => parte && parte.trim() !== '');
+
+//   if (partes.length > 0) {
+//     return partes.join(', ');
+//   }
+
+//   // Si no se puede construir, buscar campo directo
+//   return persona.domicilio ||
+//          persona.direccion ||
+//          persona.direccion_completa ||
+//          '';
+// }
+
+private extraerLugarNacimiento(): string {
+  if (!this.pacienteCompleto) return 'No especificado';
+
+  const persona = this.pacienteCompleto.paciente?.persona || this.pacienteCompleto.persona || {};
+
+  return persona.lugar_nacimiento ||
+         persona.ciudad_nacimiento ||
+         persona.municipio_nacimiento ||
+         `${persona.municipio || ''}, ${persona.estado || ''}`.replace(', ', '') ||
+         'No especificado';
+}
+
+
 
 private determinarEscolaridadPorEdad(edad: number): string {
   if (edad < 3) return 'Sin estudios';

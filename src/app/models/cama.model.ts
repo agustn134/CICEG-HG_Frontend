@@ -6,7 +6,7 @@ export interface Cama extends BaseEntity, AuditInfo {
   numero: string; // Cambié de numero_cama a numero para consistencia con BD
   estado: EstadoCama; // Cambié disponible por estado más específico
   observaciones?: string;
-  area?: string; // Agregar
+  area: string; // Agregar
   subarea?: string; // Agregar
 
   // Información del servicio
