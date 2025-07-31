@@ -33,7 +33,7 @@ import { InmunizacionesService } from '../documentos-clinicos/inmunizaciones';
 import { VacunasAdicionalesService } from '../documentos-clinicos/vacunas-adicionales';
 import { DesarrolloPsicomotrizService } from '../documentos-clinicos/desarrollo-psicomotriz';
 import { PdfTemplatesService } from './PdfTemplatesService';
-
+import { ConfiguracionService } from '../configuracion.service';
 
 
 interface GuiaClinicaData {
@@ -120,6 +120,7 @@ export class PdfGeneratorService {
 
   // Using inject() to avoid circular dependency issues
   private personalMedicoService = inject(PersonalMedicoService);
+  private configuracionService = inject(ConfiguracionService); // 🔥 NUEVA LÍNEA
   private authService = inject(AuthService);
   private guiasClinicasService = inject(GuiasClinicasService);
   private pacientesService = inject(PacientesService);
@@ -2624,7 +2625,71 @@ private formatearDireccionMejorada(paciente: any): string {
   // ==========================================
   // MÉTODOS REFACTORIZADOS QUE USAN PdfTemplatesService
   // ==========================================
- async generarHistoriaClinica(datos: any): Promise<void> {
+//  async generarHistoriaClinica(datos: any): Promise<void> {
+//   console.log('🩺 Generando Historia Clínica NOM-004...');
+//   try {
+//     await this.ensurePdfMakeLoaded();
+//     if (!this.pdfMake) {
+//       throw new Error('PDFMake no está disponible');
+//     }
+
+//     // 1. Obtener y procesar datos (responsabilidad del generador)
+//     const medicoCompleto = await this.obtenerDatosMedicoActual();
+//    // ✅ CAMBIO CRÍTICO: NO procesar de nuevo, usar los datos ya estructurados
+//     const pacienteCompleto = datos.paciente; // Los datos YA vienen procesados correctamente
+//     const configuracion = await this.configuracionService.getConfiguracionCompleta().toPromise(); // 🔥 CORREGIDA    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+//     const guiaClinicaData = this.obtenerGuiaClinicaSeleccionada(datos);
+//     const datosPadres = this.obtenerDatosPadres(datos);
+
+//     // 2. Preparar datos para el template
+//     const datosParaTemplate = {
+//       ...datos,
+//       medicoCompleto,
+//       pacienteCompleto,
+//       signosVitales: signosVitalesReales,
+//       guiaClinica: guiaClinicaData,
+//       guiasClinicas: datos.guiasClinicas || [], // 🔥 AGREGAR ESTA LÍNEA
+//       datosPadres,
+//   configuracion,
+//     };
+//  // ✅ DEBUG: Verificar que los datos llegan correctamente
+//     console.log('🔍 Datos del paciente que van al template:', pacienteCompleto);
+//     console.log('🏠 Domicilio del paciente:', pacienteCompleto.domicilio);
+//     console.log('🩸 Tipo de sangre:', pacienteCompleto.tipo_sangre);
+
+//     // 3. Obtener definición del documento desde PdfTemplatesService
+//     const documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);
+
+//     if (!documentDefinition || !documentDefinition.content) {
+//       throw new Error('Definición del documento inválida');
+//     }
+
+//     console.log('🔍 Contenido del documento:', documentDefinition.content.length, 'elementos');
+
+//     // 4. Generar nombre del archivo
+//     const fechaActual = new Date();
+//     const nombreArchivo = `historia-clinica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+//     // 5. Crear y descargar PDF (responsabilidad del generador)
+//     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+//     pdfDocGenerator.download(nombreArchivo);
+
+//     console.log('✅ PDF de Historia Clínica Pediátrica NOM-004 generado exitosamente');
+//     console.log(`📄 Archivo: ${nombreArchivo}`);
+
+//     // 6. Validaciones normativas
+//     this.validarCumplimientoNOM004(datos, medicoCompleto, pacienteCompleto);
+//   } catch (error) {
+//     console.error('❌ Error al generar PDF:', error);
+//     // ✅ MOSTRAR DETALLES DEL ERROR
+//     if (error instanceof Error) {
+//       console.error('Stack trace:', error.stack);
+//     }
+//     throw error;
+//   }
+// }
+
+async generarHistoriaClinica(datos: any): Promise<void> {
   console.log('🩺 Generando Historia Clínica NOM-004...');
   try {
     await this.ensurePdfMakeLoaded();
@@ -2634,8 +2699,10 @@ private formatearDireccionMejorada(paciente: any): string {
 
     // 1. Obtener y procesar datos (responsabilidad del generador)
     const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    const signosVitalesReales = this.obtenerSignosVitalesReales(datos);
+    // ✅ CAMBIO CRÍTICO: NO procesar de nuevo, usar los datos ya estructurados
+    const pacienteCompleto = datos.paciente; // Los datos YA vienen procesados correctamente
+    const configuracion = await this.configuracionService.getConfiguracionCompleta().toPromise();
+    const signosVitalesReales = this.obtenerSignosVitalesReales(datos); // 🔥 LÍNEA SEPARADA
     const guiaClinicaData = this.obtenerGuiaClinicaSeleccionada(datos);
     const datosPadres = this.obtenerDatosPadres(datos);
 
@@ -2644,11 +2711,17 @@ private formatearDireccionMejorada(paciente: any): string {
       ...datos,
       medicoCompleto,
       pacienteCompleto,
-      signosVitales: signosVitalesReales,
+      signosVitales: signosVitalesReales, // ✅ AHORA FUNCIONA
       guiaClinica: guiaClinicaData,
-      guiasClinicas: datos.guiasClinicas || [], // 🔥 AGREGAR ESTA LÍNEA
-      datosPadres
+      guiasClinicas: datos.guiasClinicas || [],
+      datosPadres,
+      configuracion,
     };
+
+    // ✅ DEBUG: Verificar que los datos llegan correctamente
+    console.log('🔍 Datos del paciente que van al template:', pacienteCompleto);
+    console.log('🏠 Domicilio del paciente:', pacienteCompleto.domicilio);
+    console.log('🩸 Tipo de sangre:', pacienteCompleto.tipo_sangre);
 
     // 3. Obtener definición del documento desde PdfTemplatesService
     const documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);

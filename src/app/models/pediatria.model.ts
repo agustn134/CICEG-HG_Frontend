@@ -1,346 +1,3 @@
-// // src/app/models/pediatria.model.ts
-// import { BaseEntity, AuditInfo, BaseFilters } from './base.models';
-
-// // ==========================================
-// // ANTECEDENTES HEREDO FAMILIARES
-// // ==========================================
-// export interface AntecedentesHeredoFamiliares extends BaseEntity, AuditInfo {
-//   id_antecedentes_hf: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Antecedentes paternos
-//   antecedentes_paternos?: AntecedentesFamiliares;
-  
-//   // Antecedentes maternos
-//   antecedentes_maternos?: AntecedentesFamiliares;
-
-//   // Hermanos
-//   numero_hermanos?: number;
-//   antecedentes_hermanos?: string;
-
-//   // Otros familiares
-//   otros_antecedentes_familiares?: string;
-  
-//   // Observaciones
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface AntecedentesFamiliares {
-//   diabetes?: boolean;
-//   hipertension?: boolean;
-//   cardiopatias?: boolean;
-//   cancer?: boolean;
-//   enfermedades_mentales?: boolean;
-//   malformaciones_congenitas?: boolean;
-//   otros?: string;
-// }
-
-// // ==========================================
-// // ANTECEDENTES PERINATALES
-// // ==========================================
-// export interface AntecedentesPerinatales extends BaseEntity, AuditInfo {
-//   id_antecedentes_perinatales: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Datos del embarazo
-//   edad_gestacional_semanas?: number;
-//   controles_prenatales?: number;
-//   complicaciones_embarazo?: string;
-  
-//   // Datos del parto
-//   tipo_parto: 'EUTOCICO' | 'CESAREA' | 'FORCEPS' | 'VACUUM';
-//   lugar_nacimiento?: string;
-//   peso_nacer_gramos?: number;
-//   talla_nacer_cm?: number;
-//   perimetro_cefalico_cm?: number;
-//   apgar_1_min?: number;
-//   apgar_5_min?: number;
-  
-//   // Complicaciones neonatales
-//   reanimacion_neonatal?: boolean;
-//   hospitalizacion_neonatal?: boolean;
-//   dias_hospitalizacion?: number;
-//   complicaciones_neonatales?: string;
-  
-//   // Lactancia
-//   lactancia_materna?: boolean;
-//   duracion_lactancia_meses?: number;
-  
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// // ==========================================
-// // DESARROLLO PSICOMOTRIZ
-// // ==========================================
-// export interface DesarrolloPsicomotriz extends BaseEntity, AuditInfo {
-//   id_desarrollo_psicomotriz: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Desarrollo motor grueso
-//   sostiene_cabeza_meses?: number;
-//   se_sienta_meses?: number;
-//   gatea_meses?: number;
-//   camina_meses?: number;
-//   corre_meses?: number;
-//   salta_meses?: number;
-
-//   // Desarrollo motor fino
-//   pinza_meses?: number;
-//   garabatea_meses?: number;
-//   copia_circulo_meses?: number;
-//   copia_cruz_meses?: number;
-
-//   // Desarrollo del lenguaje
-//   primeras_palabras_meses?: number;
-//   frases_dos_palabras_meses?: number;
-//   oraciones_completas_meses?: number;
-
-//   // Desarrollo social
-//   sonrisa_social_meses?: number;
-//   ansiedad_separacion_meses?: number;
-//   juego_simbolico_meses?: number;
-//   control_esfinteres_meses?: number;
-
-//   // Evaluación actual
-//   desarrollo_normal?: boolean;
-//   areas_retraso?: string;
-//   recomendaciones?: string;
-  
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// // ==========================================
-// // INMUNIZACIONES
-// // ==========================================
-// export interface Inmunizaciones extends BaseEntity, AuditInfo {
-//   id_inmunizaciones: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Estado del esquema
-//   esquema_completo_edad?: boolean;
-//   porcentaje_completado?: number;
-  
-//   // Vacunas básicas
-//   bcg?: RegistroVacunaBasica;
-//   hepatitis_b?: RegistroVacunaBasica[];
-//   pentavalente?: RegistroVacunaBasica[];
-//   polio?: RegistroVacunaBasica[];
-//   rotavirus?: RegistroVacunaBasica[];
-//   neumococo?: RegistroVacunaBasica[];
-//   influenza?: RegistroVacunaBasica[];
-//   srp?: RegistroVacunaBasica;
-//   varicela?: RegistroVacunaBasica;
-//   hepatitis_a?: RegistroVacunaBasica;
-//   dpt?: RegistroVacunaBasica[];
-
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface RegistroVacunaBasica {
-//   aplicada: boolean;
-//   fecha_aplicacion?: string;
-//   dosis?: number;
-//   lote?: string;
-//   reacciones?: string;
-// }
-
-// // ==========================================
-// // VACUNAS ADICIONALES
-// // ==========================================
-// export interface VacunasAdicionales extends BaseEntity, AuditInfo {
-//   id_vacunas_adicionales: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Vacunas no incluidas en esquema básico
-//   vacunas_adicionales: VacunaAdicional[];
-  
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface VacunaAdicional {
-//   id_vacuna_adicional?: number;
-//   nombre_vacuna: string;
-//   laboratorio?: string;
-//   lote?: string;
-//   fecha_aplicacion: string;
-//   dosis: number;
-//   via_aplicacion?: string;
-//   sitio_aplicacion?: string;
-//   reacciones_adversas?: string;
-//   observaciones?: string;
-// }
-
-// // ==========================================
-// // ESTADO NUTRICIONAL PEDIÁTRICO
-// // ==========================================
-// export interface EstadoNutricionalPediatrico extends BaseEntity, AuditInfo {
-//   id_estado_nutricional: number;
-//   id_expediente: number;
-//   id_paciente: number;
-
-//   // Datos antropométricos
-//   peso_kg: number;
-//   talla_cm: number;
-//   perimetro_cefalico_cm?: number;
-//   perimetro_braquia_cm?: number;
-  
-//   // Índices nutricionales
-//   peso_para_edad_percentil?: number;
-//   talla_para_edad_percentil?: number;
-//   peso_para_talla_percentil?: number;
-//   imc?: number;
-//   imc_percentil?: number;
-
-//   // Clasificación nutricional
-//   clasificacion_nutricional: ClasificacionNutricional;
-//   riesgo_nutricional?: boolean;
-  
-//   // Alimentación
-//   tipo_alimentacion?: TipoAlimentacion;
-//   numero_comidas_dia?: number;
-//   apetito?: 'BUENO' | 'REGULAR' | 'MALO';
-  
-//   // Síntomas relacionados
-//   nauseas?: boolean;
-//   vomitos?: boolean;
-//   diarrea?: boolean;
-//   estrenimiento?: boolean;
-  
-//   // Plan nutricional
-//   recomendaciones_nutricionales?: string;
-//   suplementos_vitaminicos?: string;
-  
-//   observaciones?: string;
-//   fecha_evaluacion: string;
-//   id_personal_registro: number;
-// }
-
-// export type ClasificacionNutricional =
-//   | 'NORMAL'
-//   | 'SOBREPESO'
-//   | 'OBESIDAD'
-//   | 'DESNUTRICION_LEVE'
-//   | 'DESNUTRICION_MODERADA'
-//   | 'DESNUTRICION_SEVERA'
-//   | 'RIESGO_NUTRICIONAL';
-
-// export type TipoAlimentacion =
-//   | 'LACTANCIA_MATERNA_EXCLUSIVA'
-//   | 'LACTANCIA_MIXTA'
-//   | 'FORMULA_LACTEA'
-//   | 'ALIMENTACION_COMPLEMENTARIA'
-//   | 'ALIMENTACION_FAMILIAR';
-
-// // ==========================================
-// // FILTROS Y DTOs
-// // ==========================================
-// export interface PediatriaFilters extends BaseFilters {
-//   id_expediente?: number;
-//   id_paciente?: number;
-//   fecha_desde?: string;
-//   fecha_hasta?: string;
-// }
-
-// export interface CreateAntecedentesHeredoFamiliaresDto {
-//   id_expediente: number;
-//   id_paciente: number;
-//   antecedentes_paternos?: AntecedentesFamiliares;
-//   antecedentes_maternos?: AntecedentesFamiliares;
-//   numero_hermanos?: number;
-//   antecedentes_hermanos?: string;
-//   otros_antecedentes_familiares?: string;
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface CreateAntecedentesPerinatalesDto {
-//   id_expediente: number;
-//   id_paciente: number;
-//   edad_gestacional_semanas?: number;
-//   controles_prenatales?: number;
-//   complicaciones_embarazo?: string;
-//   tipo_parto: 'EUTOCICO' | 'CESAREA' | 'FORCEPS' | 'VACUUM';
-//   lugar_nacimiento?: string;
-//   peso_nacer_gramos?: number;
-//   talla_nacer_cm?: number;
-//   perimetro_cefalico_cm?: number;
-//   apgar_1_min?: number;
-//   apgar_5_min?: number;
-//   reanimacion_neonatal?: boolean;
-//   hospitalizacion_neonatal?: boolean;
-//   dias_hospitalizacion?: number;
-//   complicaciones_neonatales?: string;
-//   lactancia_materna?: boolean;
-//   duracion_lactancia_meses?: number;
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface CreateDesarrolloPsicomotrizDto {
-//   id_expediente: number;
-//   id_paciente: number;
-//   sostiene_cabeza_meses?: number;
-//   se_sienta_meses?: number;
-//   gatea_meses?: number;
-//   camina_meses?: number;
-//   corre_meses?: number;
-//   salta_meses?: number;
-//   pinza_meses?: number;
-//   garabatea_meses?: number;
-//   copia_circulo_meses?: number;
-//   copia_cruz_meses?: number;
-//   primeras_palabras_meses?: number;
-//   frases_dos_palabras_meses?: number;
-//   oraciones_completas_meses?: number;
-//   sonrisa_social_meses?: number;
-//   ansiedad_separacion_meses?: number;
-//   juego_simbolico_meses?: number;
-//   control_esfinteres_meses?: number;
-//   desarrollo_normal?: boolean;
-//   areas_retraso?: string;
-//   recomendaciones?: string;
-//   observaciones?: string;
-//   id_personal_registro: number;
-// }
-
-// export interface CreateEstadoNutricionalPediatricoDto {
-//   id_expediente: number;
-//   id_paciente: number;
-//   peso_kg: number;
-//   talla_cm: number;
-//   perimetro_cefalico_cm?: number;
-//   perimetro_braquia_cm?: number;
-//   peso_para_edad_percentil?: number;
-//   talla_para_edad_percentil?: number;
-//   peso_para_talla_percentil?: number;
-//   imc?: number;
-//   imc_percentil?: number;
-//   clasificacion_nutricional: ClasificacionNutricional;
-//   riesgo_nutricional?: boolean;
-//   tipo_alimentacion?: TipoAlimentacion;
-//   numero_comidas_dia?: number;
-//   apetito?: 'BUENO' | 'REGULAR' | 'MALO';
-//   nauseas?: boolean;
-//   vomitos?: boolean;
-//   diarrea?: boolean;
-//   estrenimiento?: boolean;
-//   recomendaciones_nutricionales?: string;
-//   suplementos_vitaminicos?: string;
-//   observaciones?: string;
-//   fecha_evaluacion: string;
-//   id_personal_registro: number;
-// }
-
 
 
 // src/app/models/pediatria.model.ts
@@ -358,7 +15,7 @@ export interface AntecedentesHeredoFamiliares extends BaseEntity, AuditInfo {
 
   // Antecedentes paternos
   antecedentes_paternos?: AntecedentesFamiliares;
-  
+
   // Antecedentes maternos
   antecedentes_maternos?: AntecedentesFamiliares;
 
@@ -368,7 +25,7 @@ export interface AntecedentesHeredoFamiliares extends BaseEntity, AuditInfo {
 
   // Otros familiares
   otros_antecedentes_familiares?: string;
-  
+
   // Observaciones
   observaciones?: string;
   id_personal_registro: number;
@@ -400,7 +57,7 @@ export interface AntecedentesPerinatales extends BaseEntity, AuditInfo {
   control_prenatal?: boolean; // Añadido según BD
   numero_consultas_prenatales?: number; // Añadido según BD
   complicaciones_embarazo?: string;
-  
+
   // Datos del parto
   tipo_parto: 'Vaginal' | 'Cesarea'; // Ajustado al ENUM de la BD
   semanas_gestacion?: number; // Añadido según BD
@@ -415,12 +72,12 @@ export interface AntecedentesPerinatales extends BaseEntity, AuditInfo {
   dias_hospitalizacion_neonatal?: number; // Añadido según BD
   problemas_neonatales?: string; // Añadido según BD
   alimentacion_neonatal?: 'Seno materno' | 'Fórmula' | 'Mixta'; // Añadido según BD
-  
+
   // Desarrollo temprano
   peso_2_meses?: number; // Añadido según BD
   peso_4_meses?: number; // Añadido según BD
   peso_6_meses?: number; // Añadido según BD
-  
+
   observaciones?: string;
   id_personal_registro: number;
 }
@@ -461,7 +118,7 @@ export interface DesarrolloPsicomotriz extends BaseEntity, AuditInfo {
   tipo_estimulacion?: string; // Añadido según BD
   areas_retraso?: string; // Puede estar duplicado o relacionado con otras propiedades
   recomendaciones?: string; // Puede estar duplicado o relacionado con otras propiedades
-  
+
   id_personal_registro: number;
 }
 
@@ -479,7 +136,7 @@ export interface Inmunizaciones extends BaseEntity, AuditInfo {
   esquema_completo_edad?: boolean;
   esquema_incompleto_razon?: string; // Añadido según BD
   porcentaje_completado?: number; // Puede estar implícito o calculado
-  
+
   // Vacunas básicas (estructura simplificada, el control real puede ser más complejo según la BD)
   bcg_fecha?: string; // Añadido según BD
   bcg_observaciones?: string; // Añadido según BD
@@ -514,7 +171,7 @@ export interface VacunasAdicionales extends BaseEntity, AuditInfo {
 
   // Vacunas no incluidas en esquema básico
   vacunas_adicionales: VacunaAdicional[];
-  
+
   observaciones?: string;
   id_personal_registro: number;
 }
@@ -547,7 +204,7 @@ export interface EstadoNutricionalPediatrico extends BaseEntity, AuditInfo {
   talla_cm: number;
   perimetro_cefalico_cm?: number;
   perimetro_brazo_cm?: number; // Ajustado al nombre de la BD
-  
+
   // Índices nutricionales (Nombres ajustados según BD)
   percentil_peso?: number; // Ajustado
   percentil_talla?: number; // Ajustado
@@ -569,22 +226,22 @@ export interface EstadoNutricionalPediatrico extends BaseEntity, AuditInfo {
   // Clasificación nutricional
   diagnostico_nutricional?: string; // Ajustado al nombre de la BD
   riesgo_nutricional?: boolean;
-  
+
   // Alimentación
   tipo_alimentacion?: TipoAlimentacion;
   numero_comidas_dia?: number;
   apetito?: 'BUENO' | 'REGULAR' | 'MALO';
-  
+
   // Síntomas relacionados
   nauseas?: boolean;
   vomitos?: boolean;
   diarrea?: boolean;
   estrenimiento?: boolean;
-  
+
   // Plan nutricional
   recomendaciones_nutricionales?: string;
   suplementos_vitaminicos?: string;
-  
+
   observaciones?: string;
   fecha_evaluacion: string;
   id_personal_registro: number;

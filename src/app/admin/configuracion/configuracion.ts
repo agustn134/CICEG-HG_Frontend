@@ -92,10 +92,7 @@ import { heroExclamationTriangleMicro } from '@ng-icons/heroicons/micro';
           <ng-icon name="heroCheckCircle" class="h-4 w-4 text-hospital-success mt-0.5"></ng-icon>
           <span><strong>Logos:</strong> Suba imágenes en formato PNG, JPG o SVG (recomendado SVG para mejor calidad)</span>
         </li>
-        <!-- <li class="flex items-start gap-2">
-          <ng-icon name="heroCheckCircle" class="h-4 w-4 text-hospital-success mt-0.5"></ng-icon>
-          <span><strong>Favicon:</strong> Use formato .ico (ideal), PNG o SVG (32x32px)</span>
-        </li> -->
+
         <li class="flex items-start gap-2">
           <ng-icon name="heroCheckCircle" class="h-4 w-4 text-hospital-success mt-0.5"></ng-icon>
           <span><strong>Tamaño máximo:</strong> 2MB por imagen</span>
@@ -201,22 +198,6 @@ import { heroExclamationTriangleMicro } from '@ng-icons/heroicons/micro';
   </div>
 </div>
 
-<!-- Favicon -->
-<!-- <div>
-  <label class="block text-sm font-medium text-hospital-gray-700 mb-2">Favicon</label>
-  <div class="flex items-center gap-4">
-    <div class="relative w-16 h-16 bg-hospital-gray-100 rounded-form flex items-center justify-center overflow-hidden">
-      <img [src]="configuracion.favicon" alt="Favicon" class="max-h-full max-w-full object-contain">
-    </div>
-    <label class="relative inline-block w-full cursor-pointer group">
-      <input type="file" (change)="subirLogo($event, 'favicon')" accept=".ico,.png,.svg" class="sr-only">
-      <div class="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-hospital-primary-light text-white hover:bg-hospital-primary transition-all">
-        <ng-icon name="heroCloudArrowUp" class="h-4 w-4"></ng-icon>
-        <span class="text-sm font-medium">Subir</span>
-      </div>
-    </label>
-  </div>
-</div> -->
 
 <!-- Logo Gobierno -->
 <div>
@@ -541,38 +522,29 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   subirLogo(
-    event: Event,
-    tipo: 'principal' | 'sidebar' | 'favicon' | 'gobierno'
-  ): void {
-    const input = event.target as HTMLInputElement;
-    const archivo = input.files?.[0];
+  event: Event,
+  tipo: 'principal' | 'sidebar' | 'favicon' | 'gobierno'
+): void {
+  const input = event.target as HTMLInputElement;
+  const archivo = input.files?.[0];
 
-    if (archivo) {
-      this.procesando = true;
+  if (archivo) {
+    console.log('🔥 DEBUG: Subiendo logo tipo:', tipo); // Para verificar
+    this.procesando = true;
 
-      this.configuracionService.subirLogo(archivo, tipo).subscribe({
-        next: (response) => {
-          this.mostrarMensaje('Logo actualizado correctamente', 'success');
-          this.procesando = false;
-
-          // Actualizar preview inmediatamente
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const campo = `logo_${tipo}` as keyof ConfiguracionLogos;
-            this.configuracion = {
-              ...this.configuracion,
-              [campo]: e.target?.result as string,
-            };
-          };
-          reader.readAsDataURL(archivo);
-        },
-        error: (error) => {
-          this.mostrarMensaje('Error al subir el logo', 'error');
-          this.procesando = false;
-        },
-      });
-    }
+    this.configuracionService.subirLogo(archivo, tipo).subscribe({
+      next: (response) => {
+        this.mostrarMensaje('Logo actualizado correctamente', 'success');
+        this.procesando = false;
+      },
+      error: (error) => {
+        console.error('❌ Error completo:', error);
+        this.mostrarMensaje('Error al subir el logo', 'error');
+        this.procesando = false;
+      },
+    });
   }
+}
 
   guardarConfiguracion(): void {
     if (this.configForm.valid) {

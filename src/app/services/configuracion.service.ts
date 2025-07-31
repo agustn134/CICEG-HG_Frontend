@@ -117,6 +117,12 @@ export class ConfiguracionService {
     formData.append('archivo', archivo); // 🔥 DEBE COINCIDIR CON EL BACKEND
     formData.append('tipo', tipo);
 
+    console.log('🔥 DEBUG: FormData creado:', {
+    archivo: archivo.name,
+    tipo: tipo,
+    size: archivo.size
+  });
+
     return this.http.post(`${this.API_URL}/upload-logo`, formData).pipe(
       tap((response: any) => {
         // 🔥 ACTUALIZAR CONFIGURACIÓN INMEDIATAMENTE

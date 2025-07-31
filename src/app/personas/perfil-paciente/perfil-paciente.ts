@@ -80,42 +80,6 @@ interface TipoDocumentoConfig {
   orden: number;
 }
 
-// interface PacienteCompleto {
-//   persona: {
-//     nombre?: string;
-//     apellido_paterno?: string;
-//     apellido_materno?: string;
-//     fecha_nacimiento?: string;
-//     lugar_nacimiento?: string;
-//     ciudad_nacimiento?: string;
-//     municipio_nacimiento?: string;
-//     estado_nacimiento?: string;
-//     sexo?: string;
-//     telefono?: string;
-//     correo_electronico?: string;
-//     domicilio?: string;
-//     direccion?: string;
-//     calle?: string;
-//     numero_exterior?: string;
-//     numero_interior?: string;
-//     colonia?: string;
-//     ciudad?: string;
-//     estado?: string;
-//     codigo_postal?: string;
-//     curp?: string;
-//     tipo_sangre?: string;
-//     [key: string]: any;
-//   };
-//   paciente: Paciente & {
-//     persona?: any;
-//     fecha_nacimiento?: string;
-//     [key: string]: any;
-//   };
-//   expediente: Expediente;
-//   documentos: DocumentoClinico[] | null;
-//   ultimoInternamiento: any;
-//   signosVitales: SignosVitales[] | null;
-// }
 
 interface PacienteCompleto {
   persona: {
@@ -151,20 +115,20 @@ interface PacienteCompleto {
     tipo_sangre?: string;
     ocupacion?: string;
     escolaridad?: string;
-    familiar_responsable?: string; // 🔥 AGREGAR
-    telefono_familiar?: string; // 🔥 AGREGAR
-    religion?: string; // 🔥 AGREGAR
-    nombre_padre?: string; // 🔥 AGREGAR
-    nombre_madre?: string; // 🔥 AGREGAR
-    edad_padre?: number; // 🔥 AGREGAR
-    edad_madre?: number; // 🔥 AGREGAR
+    familiar_responsable?: string;
+    telefono_familiar?: string;
+    religion?: string;
+    nombre_padre?: string;
+    nombre_madre?: string;
+    edad_padre?: number;
+    edad_madre?: number;
     [key: string]: any;
   };
   expediente: Expediente;
   documentos: DocumentoClinico[] | null;
   ultimoInternamiento: any;
   signosVitales: SignosVitales[] | null;
-  tipo_sangre?: string; // 🔥 AGREGAR ESTA LÍNEA AQUÍ
+  tipo_sangre?: string;
 }
 
 
@@ -453,8 +417,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
   private documentosDisponibles: TipoDocumentoConfig[] = [
     {
-      id: 'signosVitales',
-      nombre: 'Signos Vitales',
+      id: 'signosVitales', nombre: 'Signos Vitales',
       descripcion: 'Registro de constantes vitales del paciente',
       icono: 'fas fa-heartbeat',
       color: 'red',
@@ -901,30 +864,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       requiereQuirurgico: false,
       orden: 58,
     },
-    // {
-    //   id: 'alimentacionPediatrica',
-    //   nombre: 'Alimentación Pediátrica',
-    //   descripcion: 'Evaluación nutricional y alimentaria',
-    //   icono: 'fas fa-utensils',
-    //   color: 'green',
-    //   requiereInternamiento: false,
-    //   soloAdultos: false,
-    //   soloPediatrico: true,
-    //   requiereQuirurgico: false,
-    //   orden: 59,
-    // },
-    // {
-    //   id: 'tamizajeNeonatal',
-    //   nombre: 'Tamizaje Neonatal',
-    //   descripcion: 'Pruebas de detección neonatal',
-    //   icono: 'fas fa-microscope',
-    //   color: 'yellow',
-    //   requiereInternamiento: false,
-    //   soloAdultos: false,
-    //   soloPediatrico: true,
-    //   requiereQuirurgico: false,
-    //   orden: 60,
-    // }
+
   ];
 
   // Métodos para manejar documentos existentes
@@ -5024,27 +4964,7 @@ private mostrarMensajeValidacion(formulario: string): void {
     : 'Sin dirección registrada';
 }
 
-  // private extraerLugarNacimiento(): string {
-  //   const objetos = [
-  //     this.pacienteCompleto?.persona,
-  //     this.personaInfo,
-  //     this.pacienteCompleto?.paciente as any,
-  //   ];
 
-  //   const propiedades = [
-  //     'lugar_nacimiento',
-  //     'ciudad_nacimiento',
-  //     'municipio_nacimiento',
-  //     'estado_nacimiento',
-  //   ];
-
-  //   for (const propiedad of propiedades) {
-  //     const valor = this.findPropertyInObjects(objetos, propiedad);
-  //     if (valor) return valor;
-  //   }
-
-  //   return 'No especificado';
-  // }
 
   private construirPacienteCompleto(data: any): void {
     console.log('  Datos recibidos para construir paciente completo:', data);
@@ -5887,50 +5807,6 @@ get esPediatrico(): boolean {
 get esMujer(): boolean {return this.pacienteCompleto?.paciente?.persona?.sexo === 'F';}
 
 
-// private extraerDatosPaciente(): any {
-//   if (!this.pacienteCompleto) return {};
-//   const paciente = this.pacienteCompleto.paciente as any;
-//   const persona = paciente?.persona || {};
-//   const edad = this.calcularEdad(persona.fecha_nacimiento || '');
-//   const esPediatrico = edad < 18;
-//   const datosBase = {
-//     id_paciente: paciente?.id_paciente,
-//     nombre: persona.nombre || '',
-//     apellido_paterno: persona.apellido_paterno || '',
-//     apellido_materno: persona.apellido_materno || '',
-//     nombre_completo: this.getNombreCompleto(),
-//     fecha_nacimiento: persona.fecha_nacimiento || '',
-//     edad: edad,
-//     sexo: this.formatearSexo(persona.sexo || ''),
-//     curp: persona.curp || '',
-//     tipo_sangre: persona.tipo_sangre || paciente?.tipo_sangre || 'No especificado',
-//     telefono: persona.telefono || '',
-//     correo_electronico: persona.correo_electronico || '',
-//     domicilio: this.extraerDireccionCompleta(),
-//     lugar_nacimiento: this.extraerLugarNacimiento(),
-//     numero_expediente: this.pacienteCompleto?.expediente?.numero_expediente || '',
-//   };
-
-//     if (esPediatrico) {
-//     return {
-//       ...datosBase,
-//       nombre_padre: paciente?.nombre_padre || 'No registrado',
-//       nombre_madre: paciente?.nombre_madre || 'No registrado',
-//       edad_padre: paciente?.edad_padre || null,
-//       edad_madre: paciente?.edad_madre || null,
-//       grado_escolar: this.determinarGradoEscolarPorEdad(edad),
-//       ocupacion: 'Estudiante',
-//       estado_civil: 'Soltero(a)',
-//     };
-//   }
-//   return {
-//     ...datosBase,
-//     ocupacion: paciente?.ocupacion || '',
-//     estado_civil: persona.estado_civil || '',
-//     escolaridad: paciente?.escolaridad || '',
-//   };
-// }
-
 private extraerDatosPaciente(): any {
   if (!this.pacienteCompleto) return {};
 
@@ -5939,6 +5815,20 @@ private extraerDatosPaciente(): any {
   const expediente = this.pacienteCompleto.expediente || {};
   const edad = this.calcularEdad(persona.fecha_nacimiento || '');
   const esPediatrico = edad < 18;
+
+  // 🔍 DEBUG ESPECÍFICO PARA TIPO DE SANGRE
+  console.log('🩸 DEBUG - Buscando tipo de sangre:');
+console.log('- persona.tipo_sangre:', persona.tipo_sangre);
+console.log('- persona.tipo_sangre_id:', persona.tipo_sangre_id);
+console.log('- paciente?.tipo_sangre:', paciente?.tipo_sangre);
+console.log('- paciente?.tipo_sangre_id:', paciente?.tipo_sangre_id);
+console.log('📋 Todas las propiedades de persona:', Object.keys(persona));
+console.log('📋 Todas las propiedades de paciente:', Object.keys(paciente || {}));
+console.log('🗺️ DEBUG - Buscando lugar de nacimiento:');
+console.log('- persona.lugar_nacimiento:', persona.lugar_nacimiento);
+console.log('- persona.ciudad:', persona.ciudad);
+console.log('- persona.estado:', persona.estado);
+console.log('- persona.municipio:', persona.municipio);
 
   const datosBase = {
     id_paciente: paciente?.id_paciente,
@@ -5951,11 +5841,14 @@ private extraerDatosPaciente(): any {
     sexo: this.formatearSexo(persona.sexo || ''),
     curp: persona.curp || '',
 
-    // 🔥 CORREGIR ACCESO AL TIPO DE SANGRE
-    tipo_sangre: persona.tipo_sangre ||
-                paciente?.tipo_sangre ||
-                (this.pacienteCompleto as any).tipo_sangre || // Cast para evitar error
-                'No especificado',
+    // 🔥 CORREGIR ACCESO AL TIPO DE SANGRE - MÁS OPCIONES
+   tipo_sangre: persona.tipo_sangre ||
+            paciente?.tipo_sangre ||
+            this.pacienteCompleto?.tipo_sangre ||
+            expediente?.tipo_sangre ||
+            'No especificado',
+
+
 
     telefono: persona.telefono || '',
     correo_electronico: persona.correo_electronico || '',
@@ -5966,14 +5859,20 @@ private extraerDatosPaciente(): any {
                persona.direccion ||
                'Sin dirección registrada',
 
-    lugar_nacimiento: this.extraerLugarNacimiento(),
+    lugar_nacimiento: this.extraerLugarNacimiento() ||
+                   persona.lugar_nacimiento ||
+                   persona.ciudad_nacimiento ||
+                   persona.municipio_nacimiento ||
+                   paciente?.lugar_nacimiento ||
+                   paciente?.ciudad_nacimiento ||
+                   `${persona.ciudad || ''}, ${persona.estado || ''}`.replace(', ', '') ||
+                   'No especificado',
 
     // 🔥 MEJORAR NÚMERO DE EXPEDIENTE
     numero_expediente: expediente?.numero_expediente_administrativo ||
                       expediente?.numero_expediente ||
                       'Sin número',
 
-    // 🔥 AGREGAR CAMPOS FALTANTES
     religion: persona.religion ||
               paciente?.religion ||
               'No registrada',
@@ -5986,9 +5885,15 @@ private extraerDatosPaciente(): any {
                       paciente?.telefono_emergencia ||
                       'No registrado',
 
-    // 🔥 AGREGAR EXPEDIENTE COMPLETO
     expediente: expediente
+
   };
+console.log('🩸 RESULTADO FINAL tipo_sangre:', datosBase.tipo_sangre);
+console.log('🔍 VALORES DISPONIBLES:');
+console.log('  - persona.tipo_sangre:', persona.tipo_sangre);
+console.log('  - paciente?.tipo_sangre:', paciente?.tipo_sangre);
+console.log('  - this.pacienteCompleto?.tipo_sangre:', this.pacienteCompleto?.tipo_sangre);
+console.log('  - expediente?.tipo_sangre:', expediente?.tipo_sangre);
 
   if (esPediatrico) {
     return {
@@ -6010,45 +5915,36 @@ private extraerDatosPaciente(): any {
     estado_civil: persona.estado_civil || 'No registrado',
     escolaridad: paciente?.escolaridad || 'No registrada',
   };
+
+
+
 }
 
-// private extraerDireccionCompleta(): string {
-//   if (!this.pacienteCompleto) return '';
 
-//   const persona = this.pacienteCompleto.paciente?.persona || this.pacienteCompleto.persona || {};
-
-//   // Intentar construir dirección completa
-//   const partes = [
-//     persona.calle,
-//     persona.numero_exterior ? `#${persona.numero_exterior}` : '',
-//     persona.numero_interior ? `Int. ${persona.numero_interior}` : '',
-//     persona.colonia,
-//     persona.municipio,
-//     persona.estado,
-//     persona.codigo_postal ? `C.P. ${persona.codigo_postal}` : ''
-//   ].filter(parte => parte && parte.trim() !== '');
-
-//   if (partes.length > 0) {
-//     return partes.join(', ');
-//   }
-
-//   // Si no se puede construir, buscar campo directo
-//   return persona.domicilio ||
-//          persona.direccion ||
-//          persona.direccion_completa ||
-//          '';
-// }
 
 private extraerLugarNacimiento(): string {
   if (!this.pacienteCompleto) return 'No especificado';
 
-  const persona = this.pacienteCompleto.paciente?.persona || this.pacienteCompleto.persona || {};
+  // 1. PRIMERO buscar en paciente (donde SÍ está el campo según tu BD)
+  const paciente = this.pacienteCompleto.paciente;
+  if (paciente?.lugar_nacimiento) {
+    return paciente.lugar_nacimiento;
+  }
 
-  return persona.lugar_nacimiento ||
-         persona.ciudad_nacimiento ||
-         persona.municipio_nacimiento ||
-         `${persona.municipio || ''}, ${persona.estado || ''}`.replace(', ', '') ||
-         'No especificado';
+  // 2. FALLBACK: buscar en persona por si acaso
+  const persona = this.pacienteCompleto.persona;
+  if (persona?.lugar_nacimiento) {
+    return persona.lugar_nacimiento;
+  }
+
+  // 3. CONSTRUIR desde otros campos si están disponibles
+  const lugarConstruido = [
+    persona?.ciudad_nacimiento,
+    persona?.municipio_nacimiento,
+    persona?.estado_nacimiento
+  ].filter(campo => campo && campo.trim() !== '').join(', ');
+
+  return lugarConstruido || 'No especificado';
 }
 
 
