@@ -108,50 +108,148 @@ export class PdfTemplatesService {
 }
 
 
-// En pdf-templates.service.ts
+// En src/app/services/pdf/pdf-templates.service.ts
 private async obtenerImagenBase64(rutaImagen: string): Promise<string> {
   try {
-    const fs = require('fs');
-    const path = require('path');
+    let urlCompleta: string;
 
-    // Construir ruta completa
-    const rutaCompleta = path.join(__dirname, '../../../public/uploads/logos', rutaImagen);
-
-    // Verificar si existe el archivo
-    if (!fs.existsSync(rutaCompleta)) {
-      console.warn(`Imagen no encontrada: ${rutaCompleta}`);
-      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2NjYyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxPR088L3RleHQ+PC9zdmc+';
+    if (rutaImagen.startsWith('http://') || rutaImagen.startsWith('https://')) {
+      urlCompleta = rutaImagen;
+    } else {
+      urlCompleta = `http://localhost:3000${rutaImagen}`;
     }
 
-    // Leer archivo y convertir a base64
-    const archivo = fs.readFileSync(rutaCompleta);
-    const extension = path.extname(rutaImagen).toLowerCase();
+    console.log('🖼️ Obteniendo imagen de:', urlCompleta);
 
-    let mimeType = 'image/png';
-    switch (extension) {
-      case '.svg':
-        mimeType = 'image/svg+xml';
-        break;
-      case '.jpg':
-      case '.jpeg':
-        mimeType = 'image/jpeg';
-        break;
-      case '.png':
-        mimeType = 'image/png';
-        break;
-      case '.ico':
-        mimeType = 'image/x-icon';
-        break;
+    const response = await this.http.get(urlCompleta, {
+      responseType: 'blob'
+    }).toPromise();
+
+    if (!response) {
+      throw new Error('No se pudo obtener la imagen');
     }
 
-    const base64 = archivo.toString('base64');
-    return `data:${mimeType};base64,${base64}`;
+    // 🔥 VERIFICAR TIPO DE IMAGEN
+    const tipoImagen = response.type;
+    console.log('📄 Tipo de imagen:', tipoImagen);
+
+    // 🔥 SI ES SVG, CONVERTIR A PNG USANDO CANVAS
+    if (tipoImagen === 'image/svg+xml' || rutaImagen.endsWith('.svg')) {
+      return await this.convertirSvgAPng(response);
+    }
+
+    // Para PNG, JPG, etc. - conversión normal
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        console.log('✅ Imagen convertida exitosamente');
+        resolve(result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(response);
+    });
 
   } catch (error) {
     console.error('Error al convertir imagen:', error);
-    // Imagen placeholder SVG
-    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2NjYyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxPR088L3RleHQ+PC9zdmc+';
+    return this.obtenerImagenPlaceholder();
   }
+}
+
+/// 🔥 MÉTODO MEJORADO PARA CONVERTIR SVG A PNG CON PROPORCIONES
+private async convertirSvgAPng(svgBlob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const svgText = e.target?.result as string;
+
+      // Crear imagen desde SVG
+      const img = new Image();
+      img.onload = () => {
+        // Crear canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          reject(new Error('No se pudo crear contexto de canvas'));
+          return;
+        }
+
+        // 🔥 CALCULAR PROPORCIONES CORRECTAS
+        const aspectRatio = img.width / img.height;
+        let canvasWidth, canvasHeight;
+
+        // Ajustar según la proporción
+        if (aspectRatio > 2) {
+          // Imagen muy ancha (como 600x200 = 3:1)
+          canvasWidth = 120;
+          canvasHeight = 40;
+        } else if (aspectRatio > 1.5) {
+          // Imagen moderadamente ancha (como 411x200 = 2:1)
+          canvasWidth = 100;
+          canvasHeight = 50;
+        } else {
+          // Imagen más cuadrada
+          canvasWidth = 80;
+          canvasHeight = 60;
+        }
+
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // Fondo transparente (mejor para logos)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dibujar SVG manteniendo proporciones
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/png', 0.9);
+        console.log(`✅ SVG convertido: ${img.width}x${img.height} → ${canvasWidth}x${canvasHeight}`);
+        resolve(dataUrl);
+      };
+
+      img.onerror = () => {
+        console.warn('❌ Error al cargar SVG, usando placeholder');
+        resolve(this.obtenerImagenPlaceholder());
+      };
+
+      const svgDataUrl = `data:image/svg+xml;base64,${btoa(svgText)}`;
+      img.src = svgDataUrl;
+    };
+
+    reader.onerror = () => {
+      console.warn('❌ Error al leer SVG blob, usando placeholder');
+      resolve(this.obtenerImagenPlaceholder());
+    };
+
+    reader.readAsText(svgBlob);
+  });
+}
+
+// 🔥 PLACEHOLDER MEJORADO
+// 🔥 PLACEHOLDER CON PROPORCIONES CORRECTAS
+private obtenerImagenPlaceholder(): string {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+
+  canvas.width = 120;  // 🔥 Tamaño más apropiado
+  canvas.height = 40;  // 🔥 Proporción 3:1
+
+  // Fondo gris claro
+  ctx.fillStyle = '#f3f4f6';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Borde
+  ctx.strokeStyle = '#d1d5db';
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+  // Texto
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('LOGO', canvas.width / 2, canvas.height / 2 + 4);
+
+  return canvas.toDataURL('image/png', 0.8);
 }
 
 
@@ -635,16 +733,15 @@ const tablaAntecedentes = {
       pageSize: 'LETTER',
       pageMargins: [20, 60, 20, 40],
       header: {
-        margin: [20, 10, 20, 10],
-        table: {
-          widths: ['15%', '70%', '15%'], // 3 columnas para los logos y texto
+  margin: [20, 10, 20, 10],
+  table: {
+    widths: ['20%', '60%', '20%'], // 🔥 Ajustar anchos para dar más espacio a logos
     body: [
       [
         {
           // Logo de gobierno (izquierda)
           image: await this.obtenerImagenBase64(datos.configuracion?.logo_gobierno || '/uploads/logos/logo-gobierno-default.svg'),
-          width: 35,
-          height: 30,
+          fit: [80, 40], // 🔥 USAR fit EN LUGAR DE width/height
           alignment: 'left',
           margin: [0, 5]
         },
@@ -662,16 +759,15 @@ const tablaAntecedentes = {
         {
           // Logo del hospital (derecha)
           image: await this.obtenerImagenBase64(datos.configuracion?.logo_principal || '/uploads/logos/logo-principal-default.svg'),
-          width: 35,
-          height: 30,
+          fit: [80, 40], // 🔥 USAR fit EN LUGAR DE width/height
           alignment: 'right',
           margin: [0, 5]
         }
       ]
     ]
-        },
-        layout: 'noBorders',
-      },
+  },
+  layout: 'noBorders',
+},
       content: [
         tablaIdentificacion,
         { text: '', margin: [0, 1] },
