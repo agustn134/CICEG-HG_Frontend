@@ -1806,6 +1806,14 @@ trackByGuiaId(index: number, guia: GuiaClinica): number {
   return guia.id_guia_diagnostico;
 }
 
+// En el componente TypeScript
+calcularGlasgowTotal(): number {
+  const ocular = this.notaUrgenciasForm?.get('glasgow_ocular')?.value || 0;
+  const verbal = this.notaUrgenciasForm?.get('glasgow_verbal')?.value || 0;
+  const motor = this.notaUrgenciasForm?.get('glasgow_motor')?.value || 0;
+  return parseInt(ocular) + parseInt(verbal) + parseInt(motor);
+}
+
 
   eliminarGuiaClinica(guia: GuiaClinica): void {
     this.guiasClinicasSeleccionadas = this.guiasClinicasSeleccionadas.filter(
@@ -2633,20 +2641,37 @@ filtrarGuiasClinicas(): void {
 
 
 
-  private initializeNotaUrgenciasForm(): FormGroup {
-    return this.fb.group({
-      motivo_atencion: ['', Validators.required],
-      estado_conciencia: ['', Validators.required],
-      resumen_interrogatorio: ['', Validators.required],
-      exploracion_fisica: ['', Validators.required],
-      resultados_estudios: [''],
-      estado_mental: [''],
-      diagnostico: ['', Validators.required],
-      plan_tratamiento: ['', Validators.required],
-      pronostico: ['', Validators.required],
-      id_guia_diagnostico: [null],
-    });
-  }
+  // private initializeNotaUrgenciasForm(): FormGroup {
+  //   return this.fb.group({
+  //     motivo_atencion: ['', Validators.required],
+  //     estado_conciencia: ['', Validators.required],
+  //     resumen_interrogatorio: ['', Validators.required],
+  //     exploracion_fisica: ['', Validators.required],
+  //     resultados_estudios: [''],
+  //     estado_mental: [''],
+  //     diagnostico: ['', Validators.required],
+  //     plan_tratamiento: ['', Validators.required],
+  //     pronostico: ['', Validators.required],
+  //     id_guia_diagnostico: [null],
+  //   });
+  // }
+private initializeNotaUrgenciasForm(): FormGroup {
+  return this.fb.group({
+    motivo_atencion: ['', Validators.required],
+    estado_conciencia: ['', Validators.required],
+    resumen_interrogatorio: ['', Validators.required],
+    exploracion_fisica: ['', Validators.required],
+    resultados_estudios: [''],
+    estado_mental: [''],
+    diagnostico: ['', Validators.required],
+    plan_tratamiento: ['', Validators.required],
+    pronostico: ['', Validators.required],
+    id_guia_diagnostico: [null],
+    numero_cama: [''],
+    hora_atencion: ['']
+  });
+}
+
   private initializeNotaEvolucionForm(): FormGroup {
     return this.fb.group({
       sintomas_signos: ['', [Validators.required, Validators.minLength(10)]],
@@ -4598,43 +4623,78 @@ private mostrarMensajeValidacion(formulario: string): void {
     }
   }
 
+  // private async guardarNotaUrgencias(): Promise<void> {
+  //   if (!this.notaUrgenciasForm.valid) {
+  //     throw new Error('Formulario de nota de urgencias inválido');
+  //   }
+
+  //   const tipoNotaUrgencias = this.tiposDocumentosDisponibles.find(
+  //     (t) => t.nombre === 'Nota de Urgencias'
+  //   );
+  //   if (!tipoNotaUrgencias) {
+  //     throw new Error('Tipo de documento de urgencias no encontrado');
+  //   }
+
+  //   const documentoUrgencias = await this.crearDocumentoEspecifico(
+  //     tipoNotaUrgencias.id_tipo_documento
+  //   );
+
+  //   const notaData = {
+  //     id_documento: documentoUrgencias.id_documento,
+  //     id_guia_diagnostico:
+  //       this.notaUrgenciasForm.value.id_guia_diagnostico || null,
+  //     motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
+  //     estado_conciencia: this.notaUrgenciasForm.value.estado_conciencia,
+  //     resumen_interrogatorio:
+  //       this.notaUrgenciasForm.value.resumen_interrogatorio,
+  //     exploracion_fisica: this.notaUrgenciasForm.value.exploracion_fisica,
+  //     resultados_estudios: this.notaUrgenciasForm.value.resultados_estudios,
+  //     estado_mental: this.notaUrgenciasForm.value.estado_mental,
+  //     diagnostico: this.notaUrgenciasForm.value.diagnostico,
+  //     plan_tratamiento: this.notaUrgenciasForm.value.plan_tratamiento,
+  //     pronostico: this.notaUrgenciasForm.value.pronostico,
+  //   };
+
+  //   const response = await firstValueFrom(
+  //     this.notasUrgenciasService.createNotaUrgencias(notaData)
+  //   );
+  //   console.log('- Nota de urgencias guardada:', response);
+  // }
+
   private async guardarNotaUrgencias(): Promise<void> {
-    if (!this.notaUrgenciasForm.valid) {
-      throw new Error('Formulario de nota de urgencias inválido');
-    }
-
-    const tipoNotaUrgencias = this.tiposDocumentosDisponibles.find(
-      (t) => t.nombre === 'Nota de Urgencias'
-    );
-    if (!tipoNotaUrgencias) {
-      throw new Error('Tipo de documento de urgencias no encontrado');
-    }
-
-    const documentoUrgencias = await this.crearDocumentoEspecifico(
-      tipoNotaUrgencias.id_tipo_documento
-    );
-
-    const notaData = {
-      id_documento: documentoUrgencias.id_documento,
-      id_guia_diagnostico:
-        this.notaUrgenciasForm.value.id_guia_diagnostico || null,
-      motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
-      estado_conciencia: this.notaUrgenciasForm.value.estado_conciencia,
-      resumen_interrogatorio:
-        this.notaUrgenciasForm.value.resumen_interrogatorio,
-      exploracion_fisica: this.notaUrgenciasForm.value.exploracion_fisica,
-      resultados_estudios: this.notaUrgenciasForm.value.resultados_estudios,
-      estado_mental: this.notaUrgenciasForm.value.estado_mental,
-      diagnostico: this.notaUrgenciasForm.value.diagnostico,
-      plan_tratamiento: this.notaUrgenciasForm.value.plan_tratamiento,
-      pronostico: this.notaUrgenciasForm.value.pronostico,
-    };
-
-    const response = await firstValueFrom(
-      this.notasUrgenciasService.createNotaUrgencias(notaData)
-    );
-    console.log('- Nota de urgencias guardada:', response);
+  if (!this.notaUrgenciasForm.valid) {
+    throw new Error('Formulario de nota de urgencias inválido');
   }
+  const tipoNotaUrgencias = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === 'Nota de Urgencias'
+  );
+  if (!tipoNotaUrgencias) {
+    throw new Error('Tipo de documento de urgencias no encontrado');
+  }
+  const documentoUrgencias = await this.crearDocumentoEspecifico(
+    tipoNotaUrgencias.id_tipo_documento
+  );
+  const notaData = {
+    id_documento: documentoUrgencias.id_documento,
+    id_guia_diagnostico: this.notaUrgenciasForm.value.id_guia_diagnostico || null,
+    motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
+    estado_conciencia: this.notaUrgenciasForm.value.estado_conciencia,
+    resumen_interrogatorio: this.notaUrgenciasForm.value.resumen_interrogatorio,
+    exploracion_fisica: this.notaUrgenciasForm.value.exploracion_fisica,
+    resultados_estudios: this.notaUrgenciasForm.value.resultados_estudios,
+    estado_mental: this.notaUrgenciasForm.value.estado_mental,
+    diagnostico: this.notaUrgenciasForm.value.diagnostico,
+    plan_tratamiento: this.notaUrgenciasForm.value.plan_tratamiento,
+    pronostico: this.notaUrgenciasForm.value.pronostico,
+    numero_cama: this.notaUrgenciasForm.value.numero_cama || 'NO ASIGNADO',
+    hora_atencion: this.notaUrgenciasForm.value.hora_atencion || new Date().toISOString()
+  };
+  const response = await firstValueFrom(
+    this.notasUrgenciasService.createNotaUrgencias(notaData)
+  );
+  console.log('- Nota de urgencias guardada:', response);
+}
+
 
   private async guardarNotaEvolucion(): Promise<void> {
     if (!this.notaEvolucionForm.valid) {

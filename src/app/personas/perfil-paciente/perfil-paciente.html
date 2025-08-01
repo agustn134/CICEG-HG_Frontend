@@ -811,696 +811,7 @@
         </form>
       </div>
 
-      <!-- <div *ngIf="formularioActivo === 'historiaClinica'" class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-file-medical-alt mr-2 text-blue-500"></i>
-            Historia Clínica <span *ngIf="esPacientePediatrico"
-              class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-md ml-2">Pediátrica</span>
-          </h3>
-          <p class="text-sm text-gray-600 mt-1">Complete la historia clínica del paciente</p>
-        </div>
-        <form [formGroup]="historiaClinicaForm" class="px-6 py-4">
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes</h4>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes Heredo-Familiares *</label>
-                <textarea formControlName="antecedentes_heredo_familiares" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enfermedades familiares relevantes (diabetes, hipertensión, cardiopatías, neoplasias...)"></textarea>
-                <div *ngIf="historiaClinicaForm.get('antecedentes_heredo_familiares')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio
-                </div>
-              </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Higiénicos</label>
-                <textarea formControlName="habitos_higienicos" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Baño diario, aseo dental, cambio de ropa..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hábitos Alimenticios</label>
-                <textarea formControlName="habitos_alimenticios" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo de dieta, frecuencia de comidas, preferencias..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Actividad Física</label>
-                <textarea formControlName="actividad_fisica" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo y frecuencia de ejercicio..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Vivienda</label>
-                <textarea formControlName="vivienda" rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo de vivienda, servicios básicos..."></textarea>
-              </div>
-              <div *ngIf="esPacienteAdulto()"><label
-                  class="block text-sm font-medium text-gray-700 mb-1">Toxicomanías</label>
-                <textarea formControlName="toxicomanias" rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tabaquismo, alcoholismo, drogas..."></textarea>
-              </div>
-
-            </div>
-          </div>
-
-          <div *ngIf="esPacientePediatrico" class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3"><i class="fas fa-baby mr-2 text-green-500"></i>
-              Antecedentes Perinatales
-            </h4>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Control Prenatal</label>
-                <select formControlName="control_prenatal"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Seleccionar</option>
-                  <option value="Sí">Sí</option>
-                  <option value="No">No</option>
-                  <option value="Irregular">Irregular</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Parto</label>
-                <select formControlName="tipo_parto"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Seleccionar</option>
-                  <option value="Vaginal">Vaginal</option>
-                  <option value="Cesárea">Cesárea</option>
-                  <option value="Fórceps">Fórceps</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Peso al Nacer (kg)</label>
-                <input type="number" formControlName="peso_nacer" step="0.1" min="0" max="10"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="3.5">
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Edad Gestacional (semanas)</label>
-                <input type="number" formControlName="edad_gestacional" min="20" max="45"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="40">
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">APGAR</label>
-                <input type="text" formControlName="apgar"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="9/10">
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Complicaciones Neonatales</label>
-                <textarea formControlName="complicaciones_neonatales" rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ictericia, dificultad respiratoria, etc."></textarea>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">Antecedentes Personales Patológicos</h4>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en la Infancia</label>
-                <textarea formControlName="enfermedades_infancia" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Sarampión, varicela, rubeola, parotiditis..."></textarea>
-              </div>
-
-              <div *ngIf="esPacienteAdulto()">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades en el Adulto</label>
-                <textarea formControlName="enfermedades_adulto" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Diabetes, hipertensión, cardiopatías..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cirugías Previas</label>
-                <textarea formControlName="cirugias_previas" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Tipo de cirugía, fecha, complicaciones..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Alergias *</label>
-                <textarea formControlName="alergias" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Medicamentos, alimentos, sustancias... (escribir 'Negadas' si no tiene)"></textarea>
-                <div *ngIf="historiaClinicaForm.get('alergias')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio para seguridad del paciente
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Traumatismos</label>
-                <textarea formControlName="traumatismos" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Fracturas, contusiones, accidentes..."></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Transfusiones Previas</label>
-                <textarea formControlName="transfusiones" rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Fecha, motivo, reacciones adversas..."></textarea>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">Padecimiento Actual</h4>
-            <div class="grid grid-cols-1 gap-6">
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Padecimiento Actual *</label>
-                <textarea formControlName="padecimiento_actual" rows="4"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Describa el motivo de consulta y evolución del padecimiento..."></textarea>
-                <div *ngIf="historiaClinicaForm.get('padecimiento_actual')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Síntomas Generales</label>
-                  <textarea formControlName="sintomas_generales" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Fiebre, escalofríos, sudoración..."></textarea>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Aparatos y Sistemas</label>
-                  <textarea formControlName="aparatos_sistemas" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Revisión por aparatos y sistemas..."></textarea>
-                </div>
-
-                <div class="relative">
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Número de Cama
-                    <span class="text-blue-500 ml-1 cursor-help" title="Seleccione la cama asignada al paciente">
-                      <i class="fas fa-bed"></i>
-                    </span>
-                  </label>
-
-                  <div class="relative">
-                    <div class="flex">
-                      <input type="text" [(ngModel)]="filtroCama" [ngModelOptions]="{standalone: true}"
-                        (input)="onCamaInputChangeEvent($event)" (focus)="toggleDropdownCamas()"
-                        (click)="toggleDropdownCamas()"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Buscar cama por número o área..." [readonly]="!!camaSeleccionada">
-                      <button type="button" (click)="toggleDropdownCamas()"
-                        class="px-3 py-2 bg-green-500 text-white border border-green-500 rounded-r-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <i class="fas fa-bed"></i>
-                      </button>
-                    </div>
-                    <div *ngIf="camaSeleccionada" class="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <div class="font-medium text-green-900">Cama {{ camaSeleccionada.numero }}</div>
-                          <div class="text-sm text-green-700">
-                            <span>Área: {{ camaSeleccionada.area }}</span>
-                            <span *ngIf="camaSeleccionada.subarea" class="ml-3">Subárea: {{ camaSeleccionada.subarea
-                              }}</span>
-                            <span class="ml-3 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                              {{ camaSeleccionada.estado }}
-                            </span>
-                          </div>
-                        </div>
-                        <button type="button" (click)="limpiarCama()" class="text-red-500 hover:text-red-700 ml-4">
-                          <i class="fas fa-times"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div *ngIf="mostrarDropdownCamas && camas && camas.length > 0"
-                      class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-
-                      <div *ngIf="camas.length === 0" class="p-4 text-gray-500 text-center">
-                        No se encontraron camas disponibles
-                      </div>
-
-                      <div *ngFor="let cama of camas; trackBy: trackByCamaId" (click)="seleccionarCama(cama)"
-                        class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                        <div class="font-medium text-gray-900">Cama {{ cama.numero }}</div>
-                        <div class="text-sm text-gray-600">
-                          <span>{{ cama.area }}</span>
-                          <span *ngIf="cama.subarea" class="ml-2">• {{ cama.subarea }}</span>
-                          <span class="ml-2 px-2 py-1 text-xs rounded-full" [ngClass]="{
-                                  'bg-green-100 text-green-800': cama.estado === 'Disponible',
-                                  'bg-yellow-100 text-yellow-800': cama.estado === 'Reservada'
-                                }">
-                            {{ cama.estado }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <h5 class="text-md font-semibold text-gray-800 mb-3">Interrogatorio Detallado por Aparatos y Sistemas
-                </h5>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Cardiovascular</label>
-                    <textarea formControlName="interrogatorio_cardiovascular" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Dolor precordial, palpitaciones, disnea, edema..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Respiratorio</label>
-                    <textarea formControlName="interrogatorio_respiratorio" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tos, expectoración, disnea, dolor torácico..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Digestivo</label>
-                    <textarea formControlName="interrogatorio_digestivo" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Náusea, vómito, dolor abdominal, cambios intestinales..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Genitourinario</label>
-                    <textarea formControlName="interrogatorio_genitourinario" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Disuria, urgencia urinaria, hematuria..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Neurológico</label>
-                    <textarea formControlName="interrogatorio_neurologico" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Cefalea, mareo, convulsiones, alteraciones visuales..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Musculoesquelético</label>
-                    <textarea formControlName="interrogatorio_musculoesqueletico" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Dolor articular, rigidez, limitación funcional..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Endocrino</label>
-                    <textarea formControlName="interrogatorio_endocrino" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Polidipsia, poliuria, cambios de peso, intolerancia al calor/frío..."></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Tegumentario</label>
-                    <textarea formControlName="interrogatorio_tegumentario" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Lesiones cutáneas, prurito, cambios de coloración..."></textarea>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-      </div>
-
-    </div>
-
-    <div *ngIf="esMujerAdolescente()" class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-venus mr-2 text-pink-500"></i>
-        Antecedentes Ginecobstétricos
-      </h4>
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Menarca (años)</label>
-          <input type="number" formControlName="menarca" min="8" max="18"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="12">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Ritmo Menstrual</label>
-          <input type="text" formControlName="ritmo_menstrual"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="28x4">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Gestas</label>
-          <input type="number" formControlName="gestas" min="0"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Partos</label>
-          <input type="number" formControlName="partos" min="0"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Cesáreas</label>
-          <input type="number" formControlName="cesareas" min="0"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Abortos</label>
-          <input type="number" formControlName="abortos" min="0"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Método Planificación Familiar</label>
-          <select formControlName="metodo_planificacion"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">Seleccionar</option>
-            <option value="Ninguno">Ninguno</option>
-            <option value="Preservativo">Preservativo</option>
-            <option value="Anticonceptivos orales">Anticonceptivos orales</option>
-            <option value="DIU">DIU</option>
-            <option value="Implante subdérmico">Implante subdérmico</option>
-            <option value="Inyección mensual">Inyección mensual</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Última Regla</label>
-          <input type="date" formControlName="fecha_ultima_regla"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">Exploración Física</h4>
-      <div class="grid grid-cols-1 gap-6">
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Exploración General *</label>
-          <textarea formControlName="exploracion_general" rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Estado general, constitución, facies, actitud..."></textarea>
-          <div *ngIf="historiaClinicaForm.get('exploracion_general')?.errors?.['required']"
-            class="text-red-500 text-xs mt-1">
-            Campo obligatorio
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cabeza</label>
-            <textarea formControlName="exploracion_cabeza" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Cráneo, ojos, nariz, boca, oídos..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cuello</label>
-            <textarea formControlName="exploracion_cuello" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ganglios, tiroides, venas yugulares..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tórax</label>
-            <textarea formControlName="exploracion_torax" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Inspección, palpación, percusión, auscultación..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Abdomen</label>
-            <textarea formControlName="exploracion_abdomen" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Forma, ruidos, palpación, masas..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Extremidades</label>
-            <textarea formControlName="exploracion_extremidades" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Edema, pulsos, movilidad, deformidades..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Columna Vertebral</label>
-            <textarea formControlName="exploracion_columna" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Deformidades, movilidad, dolor..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Genitales</label>
-            <textarea formControlName="exploracion_genitales" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Exploración genital (cuando aplique)..."></textarea>
-          </div>
-
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Habitus Exterior</label>
-            <textarea formControlName="habitus_exterior" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Constitución, actitud, facies, estado general..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Cardiovascular</label>
-            <textarea formControlName="exploracion_corazon" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ruidos cardíacos, soplos, ritmo, pulsos..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Sistema Neurológico</label>
-            <textarea formControlName="exploracion_neurologico" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Funciones mentales superiores, pares craneales, reflejos..."></textarea>
-          </div>
-
-          <div *ngIf="esPacientePediatrico">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              <i class="fas fa-baby mr-1 text-green-500"></i>
-              Desarrollo Psicomotor (Pediátrico)
-            </label>
-            <textarea formControlName="desarrollo_psicomotor_exploracion" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Desarrollo apropiado para la edad, hitos del desarrollo..."></textarea>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">Estudios Complementarios</h4>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Estudios de Laboratorio</label>
-          <textarea formControlName="estudios_laboratorio_previos" rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="BH, QS, electrolitos, gasometría, cultivos, etc."></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Estudios de Gabinete</label>
-          <textarea formControlName="estudios_gabinete_previos" rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Rx, TAC, RM, US, ECG, etc."></textarea>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">Tratamiento y Seguimiento</h4>
-      <div class="grid grid-cols-1 gap-6">
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Terapéutica Empleada y Resultados</label>
-          <textarea formControlName="terapeutica_empleada" rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Medicamentos utilizados y respuesta del paciente..."></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Indicaciones Terapéuticas</label>
-          <textarea formControlName="indicacion_terapeutica" rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Medicamentos, dosis, vía de administración, frecuencia..."></textarea>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">Impresión Diagnóstica y Plan</h4>
-      <div class="grid grid-cols-1 gap-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Impresión Diagnóstica *</label>
-          <textarea formControlName="impresion_diagnostica" rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Diagnóstico principal y diferenciales..."></textarea>
-          <div *ngIf="historiaClinicaForm.get('impresion_diagnostica')?.errors?.['required']"
-            class="text-red-500 text-xs mt-1">
-            Campo obligatorio
-          </div>
-        </div>
-        <div class="relative">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Guía Clínica de Diagnóstico
-            <span class="text-blue-500 ml-1 cursor-help"
-              title="Seleccione una guía clínica oficial para el diagnóstico">
-              <i class="fas fa-question-circle"></i>
-            </span>
-          </label>
-
-          <div class="relative">
-            <div class="flex">
-              <input type="text" [(ngModel)]="filtroGuiaClinica" [ngModelOptions]="{standalone: true}"
-                (input)="onGuiaClinicaInputChange($event)" (focus)="toggleDropdownGuias()"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Buscar y agregar guías clínicas...">
-              <button type="button" (click)="toggleDropdownGuias()"
-                class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600">
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-
-            <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
-                  <div class="text-sm text-blue-700">
-                    <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo
-                      }}</span>
-                    <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area
-                      }}</span>
-                    <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{
-                      guiaClinicaSeleccionada.fuente }}</span>
-                  </div>
-                </div>
-                <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-
-            <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
-              class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-
-              <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
-                No se encontraron guías clínicas
-              </div>
-
-              <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
-                (click)="agregarGuiaClinica(guia)" class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                [class.bg-blue-50]="isGuiaSeleccionada(guia)">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
-                    <div class="text-sm text-gray-600">
-                      <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
-                      <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
-                    </div>
-                  </div>
-                  <i *ngIf="isGuiaSeleccionada(guia)" class="fas fa-check text-blue-500"></i>
-                </div>
-              </div>
-            </div>
-
-
-
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Plan Diagnóstico</label>
-            <textarea formControlName="plan_diagnostico" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Estudios de laboratorio y gabinete..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Plan Terapéutico *</label>
-            <textarea formControlName="plan_terapeutico" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Medicamentos, procedimientos, cuidados..."></textarea>
-            <div *ngIf="historiaClinicaForm.get('plan_terapeutico')?.errors?.['required']"
-              class="text-red-500 text-xs mt-1">
-              Campo obligatorio
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Pronóstico *</label>
-          <textarea formControlName="pronostico" rows="2"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Pronóstico del paciente..."></textarea>
-          <div *ngIf="historiaClinicaForm.get('pronostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-            Campo obligatorio
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mt-6 flex justify-between">
-      <div class="flex space-x-3">
-        <button type="button" (click)="limpiarFormulario('historiaClinica')"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-          <i class="fas fa-eraser mr-2"></i>
-          Limpiar
-        </button>
-
-        <button type="button" (click)="guardarBorrador()"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-          <i class="fas fa-save mr-2"></i>
-          Guardar Borrador
-        </button>
-      </div>
-
-      <div class="flex space-x-3">
-        <button type="button" (click)="guardarFormularioActivo()"
-          [disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.signosVitales"
-          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-          <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-          <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-          {{ isCreatingDocument ? 'Guardando...' : 'Guardar Historia Clínica' }}
-        </button>
-
-        <button type="button" (click)="generarPDF('Historia Clínica')" [disabled]="!formularioEstado.historiaClinica"
-          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-          <i class="fas fa-file-pdf mr-2"></i>
-          {{ formularioEstado.historiaClinica ? 'Generar PDF' : 'Guardar primero' }}
-        </button>
-      </div>
-    </div>
-  </div> -->
 
 
   <!-- FORMULARIO DE HISTORIA CLÍNICA -->
@@ -2064,62 +1375,6 @@
           </div>
         </div>
 
-        <!-- SELECTOR DE GUÍAS CLÍNICAS -->
-        <!-- <div class="relative">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Guía Clínica de Diagnóstico
-            <span class="text-blue-500 ml-1 cursor-help" title="Seleccione una guía clínica oficial para el diagnóstico">
-              <i class="fas fa-question-circle"></i>
-            </span>
-          </label>
-
-          <div class="relative">
-            <div class="flex">
-              <input type="text" [(ngModel)]="filtroGuiaClinica" [ngModelOptions]="{standalone: true}"
-                (input)="onGuiaClinicaInputChange($event)" (focus)="toggleDropdownGuias()"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Buscar y agregar guías clínicas...">
-              <button type="button" (click)="toggleDropdownGuias()"
-                class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600">
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-
-            <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
-                  <div class="text-sm text-blue-700">
-                    <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
-                    <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area }}</span>
-                    <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{ guiaClinicaSeleccionada.fuente }}</span>
-                  </div>
-                </div>
-                <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-
-            <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
-              class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-              <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
-                (click)="agregarGuiaClinica(guia)" class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                [class.bg-blue-50]="isGuiaSeleccionada(guia)">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
-                    <div class="text-sm text-gray-600">
-                      <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
-                      <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
-                    </div>
-                  </div>
-                  <i *ngIf="isGuiaSeleccionada(guia)" class="fas fa-check text-blue-500"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
 
          <div class="mb-6">
   <h4 class="text-md font-semibold text-gray-800 mb-3">Guías Clínicas de Diagnóstico</h4>
@@ -2256,8 +1511,16 @@
 
 
 
-  <!-- FORMULARIO DE NOTA DE URGENCIAS -->
-  <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
+
+
+
+
+
+
+
+
+  <!-- FORMULARIO DE NOTA DE URGENCIAS
+   <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
     <div class="px-6 py-4 border-b border-gray-200">
       <h3 class="text-lg font-semibold text-gray-900">
         <i class="fas fa-ambulance mr-2 text-red-500"></i>
@@ -2349,7 +1612,6 @@
           </div>
         </div>
 
-        <!-- 🔥 COMPONENTE DE SELECTOR DE GUÍAS CLÍNICAS CORREGIDO -->
         <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Guía Clínica de Diagnóstico
@@ -2361,7 +1623,6 @@
 
           <div class="relative">
             <div class="flex">
-              <!-- 🔥 EN NOTA DE URGENCIAS (línea ~1500 aprox) -->
               <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
                 [ngModelOptions]="{standalone: true}" (input)="onGuiaClinicaInputChange($any($event.target).value)"
                 (focus)="toggleDropdownGuias()" (click)="toggleDropdownGuias()"
@@ -2374,7 +1635,6 @@
               </button>
             </div>
 
-            <!-- Información de la guía seleccionada -->
             <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
               <div class="flex items-center justify-between">
                 <div>
@@ -2393,7 +1653,6 @@
               </div>
             </div>
 
-            <!-- Dropdown de guías clínicas -->
             <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
               class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
 
@@ -2445,7 +1704,6 @@
 
       </div>
 
-      <!-- NOTA DE URGENCIAS - CORREGIR BOTONES -->
       <div class="mt-6 flex justify-end space-x-3">
         <button type="button" (click)="guardarFormularioActivo()"
           [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
@@ -2465,7 +1723,474 @@
 
 
     </form>
+  </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- FORMULARIO DE NOTA DE URGENCIAS  -->
+<!-- <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-ambulance mr-2 text-red-500"></i>
+      Nota de Urgencias (NOM-004 Sección 7)
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Documentar la atención inicial de urgencias según normativa oficial</p>
   </div>
+
+  <form [formGroup]="notaUrgenciasForm" class="px-6 py-4">
+    <div class="space-y-6">
+
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-blue-900 mb-3">
+          <i class="fas fa-clipboard-list mr-2"></i>
+          Datos Administrativos
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Atención *</label>
+            <input type="date" formControlName="fecha_atencion"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Atención *</label>
+            <input type="time" formControlName="hora_atencion"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Cama</label>
+            <input type="text" formControlName="numero_cama" placeholder="Ej: 001, 102, NO ASIGNADO"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-yellow-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-yellow-900 mb-3">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
+          Motivo de Atención (7.1.3)
+        </h4>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo Principal de la Consulta *</label>
+          <textarea formControlName="motivo_atencion" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Describa el motivo principal que llevó al paciente a solicitar atención de urgencias..."></textarea>
+          <div *ngIf="notaUrgenciasForm.get('motivo_atencion')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004 7.1.3
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-green-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-green-900 mb-3">
+          <i class="fas fa-user-md mr-2"></i>
+          Evaluación Inicial
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado de Conciencia *</label>
+            <select formControlName="estado_conciencia"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Seleccione...</option>
+              <option value="Consciente y orientado">Consciente y orientado</option>
+              <option value="Consciente desorientado">Consciente desorientado</option>
+              <option value="Somnoliento">Somnoliento</option>
+              <option value="Estuporoso">Estuporoso</option>
+              <option value="Coma superficial">Coma superficial</option>
+              <option value="Coma profundo">Coma profundo</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Escala de Glasgow</label>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="text-xs text-gray-600">Ocular (1-4)</label>
+                <input type="number" formControlName="glasgow_ocular" min="1" max="4" placeholder="4"
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+              </div>
+              <div>
+                <label class="text-xs text-gray-600">Verbal (1-5)</label>
+                <input type="number" formControlName="glasgow_verbal" min="1" max="5" placeholder="5"
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+              </div>
+              <div>
+                <label class="text-xs text-gray-600">Motor (1-6)</label>
+                <input type="number" formControlName="glasgow_motor" min="1" max="6" placeholder="6"
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+              </div>
+            </div>
+            <div class="mt-1 text-xs text-gray-500">
+              Total: {{ calcularGlasgowTotal() }}/15
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-purple-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-purple-900 mb-3">
+          <i class="fas fa-comments mr-2"></i>
+          Resumen del Interrogatorio (7.1.4)
+        </h4>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Resumen del Interrogatorio *</label>
+          <textarea formControlName="resumen_interrogatorio" rows="4"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Incluya: síntomas principales, tiempo de evolución, factores desencadenantes, síntomas asociados, tratamientos previos..."></textarea>
+          <div *ngIf="notaUrgenciasForm.get('resumen_interrogatorio')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004 7.1.4
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-red-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-red-900 mb-3">
+          <i class="fas fa-stethoscope mr-2"></i>
+          Exploración Física (7.1.4)
+        </h4>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Exploración Física Dirigida *</label>
+            <textarea formControlName="exploracion_fisica" rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Incluya: aspecto general, cabeza y cuello, tórax, cardiovascular, abdomen, extremidades, neurológico..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('exploracion_fisica')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004 7.1.4
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado Mental</label>
+            <textarea formControlName="estado_mental" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Evaluación del estado mental: cooperador, ansioso, agitado, deprimido..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-indigo-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-indigo-900 mb-3">
+          <i class="fas fa-flask mr-2"></i>
+          Estudios de Servicios Auxiliares (7.1.5)
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Resultados de Laboratorio</label>
+            <textarea formControlName="resultados_laboratorio" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="BH, QS, gasometría, electrolitos, etc."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estudios de Gabinete</label>
+            <textarea formControlName="resultados_gabinete" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Rx, ECG, TAC, ultrasonido, etc."></textarea>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Resumen de Estudios</label>
+          <textarea formControlName="resultados_estudios" rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Síntesis de todos los estudios realizados..."></textarea>
+        </div>
+      </div>
+
+      <div class="bg-orange-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-orange-900 mb-3">
+          <i class="fas fa-diagnoses mr-2"></i>
+          Diagnósticos (7.1.6)
+        </h4>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Principal *</label>
+            <textarea formControlName="diagnostico" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Diagnóstico principal de urgencias..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('diagnostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004 7.1.6
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Diagnósticos Secundarios</label>
+            <textarea formControlName="diagnosticos_secundarios" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Diagnósticos adicionales o diferenciales..."></textarea>
+          </div>
+
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Guía Clínica de Diagnóstico
+              <span class="text-blue-500 ml-1 cursor-help"
+                title="Seleccione una guía clínica oficial para el diagnóstico">
+                <i class="fas fa-question-circle"></i>
+              </span>
+            </label>
+
+            <div class="relative">
+              <div class="flex">
+                <input type="text" [ngModel]="filtroGuiaClinica" (ngModelChange)="onGuiaClinicaInputChange($event)"
+                  [ngModelOptions]="{standalone: true}" (input)="onGuiaClinicaInputChange($any($event.target).value)"
+                  (focus)="toggleDropdownGuias()" (click)="toggleDropdownGuias()"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Buscar guía clínica por nombre, código o área..." [readonly]="!!guiaClinicaSeleccionada">
+
+                <button type="button" (click)="toggleDropdownGuias()"
+                  class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+
+              <div *ngIf="guiaClinicaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-blue-900">{{ guiaClinicaSeleccionada.nombre }}</div>
+                    <div class="text-sm text-blue-700">
+                      <span *ngIf="guiaClinicaSeleccionada.codigo">Código: {{ guiaClinicaSeleccionada.codigo }}</span>
+                      <span *ngIf="guiaClinicaSeleccionada.area" class="ml-3">Área: {{ guiaClinicaSeleccionada.area }}</span>
+                      <span *ngIf="guiaClinicaSeleccionada.fuente" class="ml-3">Fuente: {{ guiaClinicaSeleccionada.fuente }}</span>
+                    </div>
+                  </div>
+                  <button type="button" (click)="limpiarGuiaClinica()" class="text-red-500 hover:text-red-700 ml-4">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
+                class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
+                  No se encontraron guías clínicas
+                </div>
+                <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId"
+                  (click)="seleccionarGuiaClinica(guia)"
+                  class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                  <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
+                  <div class="text-sm text-gray-600">
+                    <span *ngIf="guia.codigo">{{ guia.codigo }}</span>
+                    <span *ngIf="guia.area" class="ml-2">• {{ guia.area }}</span>
+                    <span *ngIf="guia.fuente" class="ml-2">• {{ guia.fuente }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-teal-50 p-4 rounded-lg">
+        <h4 class="text-md font-semibold text-teal-900 mb-3">
+          <i class="fas fa-pills mr-2"></i>
+          Tratamiento y Pronóstico (7.1.7)
+        </h4>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Plan de Tratamiento *</label>
+            <textarea formControlName="plan_tratamiento" rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Tratamiento inmediato, medicamentos administrados, procedimientos realizados, plan de manejo..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('plan_tratamiento')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004 7.1.7
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Pronóstico *</label>
+              <select formControlName="pronostico"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione...</option>
+                <option value="Bueno para la vida">Bueno para la vida</option>
+                <option value="Bueno para la función">Bueno para la función</option>
+                <option value="Reservado">Reservado</option>
+                <option value="Grave">Grave</option>
+                <option value="Malo">Malo</option>
+              </select>
+              <div *ngIf="notaUrgenciasForm.get('pronostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004 7.1.7
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Disposición del Paciente</label>
+              <select formControlName="disposicion_paciente"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione...</option>
+                <option value="Alta a domicilio">Alta a domicilio</option>
+                <option value="Hospitalización">Hospitalización</option>
+                <option value="Traslado a otra unidad">Traslado a otra unidad</option>
+                <option value="Interconsulta">Interconsulta</option>
+                <option value="Observación en urgencias">Observación en urgencias</option>
+                <option value="Defunción">Defunción</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Especificaciones de la Disposición</label>
+            <textarea formControlName="disposicion_especifica" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Detalles específicos sobre la disposición del paciente..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-8 flex justify-end space-x-3">
+      <button type="button" (click)="guardarFormularioActivo()"
+        [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
+        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded transition-colors">
+        <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+        <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+        {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Urgencias' }}
+      </button>
+
+      <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias"
+        class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+        <i class="fas fa-file-pdf mr-2"></i>
+        <span *ngIf="formularioEstado.notaUrgencias">📄 Descargar PDF</span>
+        <span *ngIf="!formularioEstado.notaUrgencias">Guardar primero</span>
+      </button>
+    </div>
+
+  </form>
+</div>
+ -->
+
+<!-- FORMULARIO DE NOTA DE URGENCIAS -->
+<div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-ambulance mr-2 text-red-500"></i>Nota de Urgencias (NOM-004 Sección 7)
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Documentar la atención inicial de urgencias según normativa oficial</p>
+  </div>
+  <form [formGroup]="notaUrgenciasForm" class="px-6 py-4">
+    <div class="space-y-6">
+      <!-- DATOS ADMINISTRATIVOS -->
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Atención *</label>
+            <textarea formControlName="motivo_atencion" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Motivo de atención..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('motivo_atencion')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.3</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado de Conciencia *</label>
+            <textarea formControlName="estado_conciencia" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Estado de conciencia..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('estado_conciencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.4</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Resumen del Interrogatorio *</label>
+            <textarea formControlName="resumen_interrogatorio" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Resumen del interrogatorio..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('resumen_interrogatorio')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.4</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Exploración Física *</label>
+            <textarea formControlName="exploracion_fisica" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Exploración física..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('exploracion_fisica')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.4</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Resultados de Estudios</label>
+            <textarea formControlName="resultados_estudios" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Resultados de estudios..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado Mental</label>
+            <textarea formControlName="estado_mental" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Estado mental..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Principal *</label>
+            <textarea formControlName="diagnostico" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Diagnóstico principal..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('diagnostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.6</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Plan de Tratamiento *</label>
+            <textarea formControlName="plan_tratamiento" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Plan de tratamiento..."></textarea>
+            <div *ngIf="notaUrgenciasForm.get('plan_tratamiento')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.7</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pronóstico *</label>
+            <select formControlName="pronostico" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Selecciona un pronóstico...</option>
+              <option value="Excelente">Excelente</option>
+              <option value="Bueno">Bueno</option>
+              <option value="Reservado">Reservado</option>
+              <option value="Malo">Malo</option>
+              <option value="Grave">Grave</option>
+            </select>
+            <div *ngIf="notaUrgenciasForm.get('pronostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 7.1.8</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Cama</label>
+            <input type="text" formControlName="numero_cama" placeholder="Ej: 001, 102, NO ASIGNADO" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Atención</label>
+            <input type="time" formControlName="hora_atencion" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="mt-8 flex justify-end space-x-3">
+      <button type="button" (click)="guardarFormularioActivo()" [disabled]="!notaUrgenciasForm.valid || isCreatingDocument" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded transition-colors">
+        <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+        <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+        {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota de Urgencias' }}
+      </button>
+      <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias" class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+        <i class="fas fa-file-pdf mr-2"></i>
+        {{ formularioEstado.notaUrgencias ? 'Generar PDF' : 'Guardar primero' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- FORMULARIO DE NOTA DE EVOLUCIÓN -->
   <div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">

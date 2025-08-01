@@ -10,45 +10,20 @@ import { map, catchError } from 'rxjs/operators';
 export class PdfTemplatesService {
   constructor(private http: HttpClient) {}
 
-  // ==========================================
-  // MÉTODOS AUXILIARES SIMPLES (solo cálculos)
-  // ==========================================
-
   private obtenerNumeroExpedientePreferido(expediente: any): string {
-    return (
-      expediente?.numero_expediente_administrativo ||
-      expediente?.numero_expediente ||
-      'Sin número'
-    );
+    return (expediente?.numero_expediente_administrativo ||expediente?.numero_expediente ||'Sin número');
   }
 
-  private calcularIMC(peso: number, talla: number): string {
-    if (!peso || !talla || peso <= 0 || talla <= 0) return '__';
-    const imc = peso / Math.pow(talla / 100, 2);
-    return imc.toFixed(1);
+  private calcularIMC(peso: number, talla: number): string {if (!peso || !talla || peso <= 0 || talla <= 0) return '__'; const imc = peso / Math.pow(talla / 100, 2);return imc.toFixed(1);
   }
 
   private formatearDireccionMejorada(paciente: any): string {
   if (!paciente) return 'Sin dirección registrada';
-
-  // Acceso directo al campo domicilio
-  const domicilio = paciente.persona?.domicilio ||
-                   paciente.domicilio ||
-                   paciente.paciente?.domicilio ||
-                   '';
-
+  const domicilio = paciente.persona?.domicilio ||paciente.domicilio ||paciente.paciente?.domicilio ||'';
   const domicilioLimpio = domicilio.toString().trim();
-
-  return domicilioLimpio !== '' &&
-         domicilioLimpio !== 'null' &&
-         domicilioLimpio !== 'undefined'
-    ? domicilioLimpio
-    : 'Sin dirección registrada';
+  return domicilioLimpio !== '' && domicilioLimpio !== 'null' && domicilioLimpio !== 'undefined'? domicilioLimpio : 'Sin dirección registrada';
 }
 
-  // ==========================================
-  // MÉTODOS DE UTILIDAD PARA EL GENERADOR GENÉRICO
-  // ==========================================
   private obtenerNombreCompletoPersona(persona: any): string {
     if (!persona) return 'N/A';
     const nombre = persona.nombre || '';
@@ -63,18 +38,15 @@ export class PdfTemplatesService {
     const nacimiento = new Date(fechaNacimiento);
     const edad = hoy.getFullYear() - nacimiento.getFullYear();
     const meses = hoy.getMonth() - nacimiento.getMonth();
-
     if (meses < 0 || (meses === 0 && hoy.getDate() < nacimiento.getDate())) { return `${edad - 1} años`; }
     return `${edad} años`;
   }
 
   private formatearFecha(fecha: string): string {
     if (!fecha) return 'N/A';
-    try { const fechaObj = new Date(fecha); return fechaObj.toLocaleDateString('es-Mx', {
-        day: '2-digit', month: '2-digit', year: 'numeric', });
-    } catch { return 'N/A'; }
+    try { const fechaObj = new Date(fecha); return fechaObj.toLocaleDateString('es-Mx', {day: '2-digit', month: '2-digit', year: 'numeric', });} catch { return 'N/A'; }
   }
-  // 🔧 MÉTODO AUXILIAR PARA CALCULAR TOTAL ALDRETE - MOVIDO DENTRO DE LA CLASE
+
   private calcularTotalAldrete(postanestesicaData: any): number {
     const actividad = parseInt(postanestesicaData.aldrete_actividad) || 2;
     const respiracion = parseInt(postanestesicaData.aldrete_respiracion) || 2;
@@ -83,172 +55,103 @@ export class PdfTemplatesService {
     const saturacion = parseInt(postanestesicaData.aldrete_saturacion) || 2;
     return actividad + respiracion + circulacion + conciencia + saturacion;
   }
-  //PARA DETERMINAR GRADO ESCOLAR POR EDAD
+
   private determinarGradoEscolarPorEdad(edad: number): string {
     if (edad < 3) return 'Lactante'; if (edad < 6) return 'Preescolar'; if (edad < 12) return `${edad - 5}° Primaria`;if (edad < 15) return `${edad - 11}° Secundaria`;if (edad < 18) return `${edad - 14}° Preparatoria`;
     return 'No aplica';
   }
 
   private construirTextoGuiasClinicas(guias: any[]): string {
-  if (!guias || guias.length === 0) {
-    return 'Guía clínica por definir según evolución clínica y estudios complementarios';
-  }
+  if (!guias || guias.length === 0) {return 'Guía clínica por definir según evolución clínica y estudios complementarios'}
 
-  if (guias.length === 1) {
-    const guia = guias[0];
-    return guia.nombre || guia.nombre_completo || `Guía Clínica ID: ${guia.id_guia_diagnostico}`;
-  }
+  if (guias.length === 1) {const guia = guias[0]; return guia.nombre || guia.nombre_completo || `Guía Clínica ID: ${guia.id_guia_diagnostico}`;}
 
-  // Múltiples guías
-  return guias.map((guia, index) => {
-    const nombre = guia.nombre || guia.nombre_completo || `Guía ID: ${guia.id_guia_diagnostico}`;
-    const codigo = guia.codigo ? ` (${guia.codigo})` : '';
-    return `${index + 1}. ${nombre}${codigo}`;
+  return guias.map((guia, index) => {const nombre = guia.nombre || guia.nombre_completo || `Guía ID: ${guia.id_guia_diagnostico}`;const codigo = guia.codigo ? ` (${guia.codigo})` : '';return `${index + 1}. ${nombre}${codigo}`;
   }).join('\n');
 }
 
-
-// En src/app/services/pdf/pdf-templates.service.ts
 private async obtenerImagenBase64(rutaImagen: string): Promise<string> {
   try {
     let urlCompleta: string;
-
-    if (rutaImagen.startsWith('http://') || rutaImagen.startsWith('https://')) {
-      urlCompleta = rutaImagen;
-    } else {
-      urlCompleta = `http://localhost:3000${rutaImagen}`;
-    }
-
-    console.log('🖼️ Obteniendo imagen de:', urlCompleta);
-
-    const response = await this.http.get(urlCompleta, {
-      responseType: 'blob'
-    }).toPromise();
-
-    if (!response) {
-      throw new Error('No se pudo obtener la imagen');
-    }
-
-    // 🔥 VERIFICAR TIPO DE IMAGEN
+    if (rutaImagen.startsWith('http://') || rutaImagen.startsWith('https://')) {urlCompleta = rutaImagen; } else {urlCompleta = `http://localhost:3000${rutaImagen}`;}
+    console.log('Obteniendo imagen de:', urlCompleta);
+    const response = await this.http.get(urlCompleta, {responseType: 'blob' }).toPromise();
+    if (!response) {throw new Error('No se pudo obtener la imagen');}
     const tipoImagen = response.type;
     console.log('📄 Tipo de imagen:', tipoImagen);
-
-    // 🔥 SI ES SVG, CONVERTIR A PNG USANDO CANVAS
     if (tipoImagen === 'image/svg+xml' || rutaImagen.endsWith('.svg')) {
       return await this.convertirSvgAPng(response);
     }
-
     // Para PNG, JPG, etc. - conversión normal
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        console.log('✅ Imagen convertida exitosamente');
-        resolve(result);
-      };
+    return new Promise((resolve, reject) => {const reader = new FileReader();
+      reader.onload = () => {const result = reader.result as string;console.log('✅ Imagen convertida exitosamente');resolve(result);};
       reader.onerror = reject;
       reader.readAsDataURL(response);
     });
-
-  } catch (error) {
-    console.error('Error al convertir imagen:', error);
-    return this.obtenerImagenPlaceholder();
-  }
+  } catch (error) {console.error('Error al convertir imagen:', error); return this.obtenerImagenPlaceholder();}
 }
 
-/// 🔥 MÉTODO MEJORADO PARA CONVERTIR SVG A PNG CON PROPORCIONES
 private async convertirSvgAPng(svgBlob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const svgText = e.target?.result as string;
-
-      // Crear imagen desde SVG
+    reader.onload = (e) => {const svgText = e.target?.result as string;
       const img = new Image();
       img.onload = () => {
-        // Crear canvas
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
-        if (!ctx) {
-          reject(new Error('No se pudo crear contexto de canvas'));
-          return;
-        }
-
-        // 🔥 CALCULAR PROPORCIONES CORRECTAS
+        if (!ctx) { reject(new Error('No se pudo crear contexto de canvas'));return;}
         const aspectRatio = img.width / img.height;
         let canvasWidth, canvasHeight;
-
-        // Ajustar según la proporción
         if (aspectRatio > 2) {
           // Imagen muy ancha (como 600x200 = 3:1)
-          canvasWidth = 120;
-          canvasHeight = 40;
+          canvasWidth = 120; canvasHeight = 40;
         } else if (aspectRatio > 1.5) {
           // Imagen moderadamente ancha (como 411x200 = 2:1)
-          canvasWidth = 100;
-          canvasHeight = 50;
+          canvasWidth = 100; canvasHeight = 50;
         } else {
           // Imagen más cuadrada
-          canvasWidth = 80;
-          canvasHeight = 60;
+          canvasWidth = 80; canvasHeight = 60;
         }
-
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
-
         // Fondo transparente (mejor para logos)
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         // Dibujar SVG manteniendo proporciones
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
         const dataUrl = canvas.toDataURL('image/png', 0.9);
         console.log(`✅ SVG convertido: ${img.width}x${img.height} → ${canvasWidth}x${canvasHeight}`);
         resolve(dataUrl);
       };
 
       img.onerror = () => {
-        console.warn('❌ Error al cargar SVG, usando placeholder');
-        resolve(this.obtenerImagenPlaceholder());
+        console.warn('❌ Error al cargar SVG, usando placeholder'); resolve(this.obtenerImagenPlaceholder());
       };
-
       const svgDataUrl = `data:image/svg+xml;base64,${btoa(svgText)}`;
       img.src = svgDataUrl;
     };
-
     reader.onerror = () => {
       console.warn('❌ Error al leer SVG blob, usando placeholder');
       resolve(this.obtenerImagenPlaceholder());
     };
-
     reader.readAsText(svgBlob);
   });
 }
 
-// 🔥 PLACEHOLDER MEJORADO
-// 🔥 PLACEHOLDER CON PROPORCIONES CORRECTAS
 private obtenerImagenPlaceholder(): string {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
-
   canvas.width = 120;  // 🔥 Tamaño más apropiado
   canvas.height = 40;  // 🔥 Proporción 3:1
-
-  // Fondo gris claro
   ctx.fillStyle = '#f3f4f6';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   // Borde
   ctx.strokeStyle = '#d1d5db';
   ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
   // Texto
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('LOGO', canvas.width / 2, canvas.height / 2 + 4);
-
   return canvas.toDataURL('image/png', 0.8);
 }
 
@@ -257,33 +160,16 @@ private obtenerImagenPlaceholder(): string {
 
 
   async generarHistoriaClinica(datos: any): Promise<any> {
-  console.log('🔍 DEBUG COMPLETO - Datos recibidos en template:');
-  console.log('- pacienteCompleto:', datos.pacienteCompleto);
-  console.log('- medicoCompleto:', datos.medicoCompleto);
-  console.log('- historiaClinica:', datos.historiaClinica);
-  console.log('- signosVitales:', datos.signosVitales);
-  console.log('- guiaClinica:', datos.guiaClinica);
-  console.log('- datosPadres:', datos.datosPadres);
-  console.log('🔍 CONTENIDO ESPECÍFICO:');
-  console.log('- antecedentes_heredo_familiares:', datos.historiaClinica?.antecedentes_heredo_familiares);
-  console.log('- padecimiento_actual:', datos.historiaClinica?.padecimiento_actual);
-  console.log('- motivo_consulta:', datos.historiaClinica?.motivo_consulta);
-  console.log('- impresion_diagnostica:', datos.historiaClinica?.impresion_diagnostica);
+
   const validarTodasLasTablas = (contenido: any[], nombre: string = 'Documento') => {
   contenido.forEach((elemento, index) => { if (elemento && elemento.table) { try {
   validarTabla(elemento, `${nombre}[${index}]`); } catch (error) {
-  console.error(`❌ Error en tabla ${nombre}[${index}]:`, error);
-  throw error; }}
-
-    if (elemento && elemento.table && elemento.table.body) {
+  console.error(`Error en tabla ${nombre}[${index}]:`, error);
+  throw error; }} if (elemento && elemento.table && elemento.table.body) {
       elemento.table.body.forEach((fila: any[], filaIndex: number) => {
         fila.forEach((celda: any, celdaIndex: number) => {
-          if (celda && celda.table) {
-            try {
-              validarTabla(celda, `${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]`);
-            } catch (error) {
-              console.error(`❌ Error en tabla anidada ${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]:`, error);
-              throw error;
+          if (celda && celda.table) { try { validarTabla(celda, `${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]`);
+            } catch (error) { console.error(`❌ Error en tabla anidada ${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]:`, error); throw error;
             }
           }
         });
@@ -292,8 +178,6 @@ private obtenerImagenPlaceholder(): string {
   });
 };
 
-
-    console.log('PdfTemplatesService: Creando definición Historia Clínica...');
     const pacienteCompleto = datos.pacienteCompleto;
     const medicoCompleto = datos.medicoCompleto;
     const historiaClinicaData = datos.historiaClinica || {};
@@ -302,19 +186,15 @@ private obtenerImagenPlaceholder(): string {
     const datosPadres = datos.datosPadres || {};
     const fechaActual = new Date();
     const esPediatrico = pacienteCompleto.edad < 18;
-    const domicilioPaciente =
-      pacienteCompleto.domicilio || 'Sin dirección registrada';
-    const lugarNacimiento =
-      pacienteCompleto.lugar_nacimiento || 'No especificado';
+    const domicilioPaciente = pacienteCompleto.domicilio || 'Sin dirección registrada';
+    const lugarNacimiento = pacienteCompleto.lugar_nacimiento || 'No especificado';
     const tipoSangre = pacienteCompleto.tipo_sangre || 'No especificado';
-    const contarFilasIdentificacion = () => {
-      let filas = 7;
-      if (esPediatrico) filas += 1;
-      return filas;
-    };
+    const contarFilasIdentificacion = () => { let filas = 7; if (esPediatrico) filas += 1; return filas;};
+    const contarFilasAntecedentes = () => {
 
-  const contarFilasAntecedentes = () => {
-  let filas = 6; // Base: heredo familiares, personales no patológicos, personales patológicos
+
+
+      let filas = 6; // Base: heredo familiares, personales no patológicos, personales patológicos
 
   // Sección ginecobstétrica (solo mujeres adultas)
   if (!esPediatrico && pacienteCompleto.sexo === 'F') {
@@ -474,7 +354,6 @@ private obtenerImagenPlaceholder(): string {
               { text: 'Religión', fontSize: 7, bold: true, alignment: 'center' }
             ],
             [
-              // ✅ USAR CAMPOS YA PROCESADOS
               { text: esPediatrico ? (pacienteCompleto.grado_escolar || this.determinarGradoEscolarPorEdad(pacienteCompleto.edad)) : (pacienteCompleto.ocupacion || 'No registrada'), fontSize: 7, alignment: 'center' },
               { text: pacienteCompleto.escolaridad || 'No registrada', fontSize: 7, alignment: 'center' },
               { text: pacienteCompleto.estado_civil || 'No registrado', fontSize: 7, alignment: 'center' },
@@ -593,8 +472,8 @@ private obtenerImagenPlaceholder(): string {
         text: historiaClinicaData.antecedentes_heredo_familiares ||
           'Sin información registrada',
         fontSize: 7,
-        margin: [5, 5],
-        lineHeight: 1.3,
+        margin: [3, 2],
+        lineHeight: 1.1,
       },
     ],
     [
@@ -617,8 +496,8 @@ private obtenerImagenPlaceholder(): string {
           `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''}` +
           `${!esPediatrico && historiaClinicaData.toxicomanias ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n` : ''}`,
         fontSize: 7,
-        margin: [5, 5],
-        lineHeight: 1.3,
+        margin: [3, 2],
+        lineHeight: 1.1,
       },
     ],
     [
@@ -641,8 +520,8 @@ private obtenerImagenPlaceholder(): string {
           `Alergias (medicamentos/alimentos): ${historiaClinicaData.alergias || 'Negadas'}\n` +
           `Transfusiones: ${historiaClinicaData.transfusiones || 'Ninguna'}`,
         fontSize: 7,
-        margin: [5, 5],
-        lineHeight: 1.3,
+        margin: [3, 2],
+        lineHeight: 1.1,
       },
     ]
   ];
@@ -667,8 +546,8 @@ private obtenerImagenPlaceholder(): string {
             `Gestas: ${historiaClinicaData.gestas || '0'} | Partos: ${historiaClinicaData.partos || '0'} | Cesáreas: ${historiaClinicaData.cesareas || '0'} | Abortos: ${historiaClinicaData.abortos || '0'}\n` +
             `Método de planificación familiar: ${historiaClinicaData.metodo_planificacion || 'Ninguno'}`,
           fontSize: 7,
-          margin: [5, 5],
-          lineHeight: 1.3,
+          margin: [3, 2],
+          lineHeight: 1.1,
         },
       ]
     );
@@ -696,8 +575,8 @@ private obtenerImagenPlaceholder(): string {
             `Apgar: ${historiaClinicaData.apgar || 'No registrado'}\n` +
             `Edad gestacional: ${historiaClinicaData.edad_gestacional || 'No registrada'} semanas`,
           fontSize: 7,
-          margin: [5, 5],
-          lineHeight: 1.3,
+          margin: [3, 2],
+          lineHeight: 1.1,
         },
       ]
     );
@@ -863,8 +742,8 @@ const tablaAntecedentes = {
                       'Sin información registrada'
                     }`,
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -955,7 +834,7 @@ const tablaAntecedentes = {
                     'Sin información registrada',
                   fontSize: 7,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1001,7 +880,7 @@ const tablaAntecedentes = {
                     }`,
                   fontSize: 7,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1021,7 +900,7 @@ const tablaAntecedentes = {
                     'Sin información registrada',
                   fontSize: 7,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -1063,8 +942,8 @@ const tablaAntecedentes = {
                     historiaClinicaData.estudios_laboratorio_previos ||
                     'Sin información registrada',
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1083,8 +962,8 @@ const tablaAntecedentes = {
                     historiaClinicaData.estudios_gabinete_previos ||
                     'Sin información registrada.',
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -1125,7 +1004,7 @@ const tablaAntecedentes = {
                       (datos.guiaClinica ? [datos.guiaClinica] : [])
                   ),
                   fontSize: 7,
-                  margin: [5, 5],
+                  margin: [3, 2],
                   italics:
                     !datos.guiasClinicas || datos.guiasClinicas.length === 0,
                 },
@@ -1147,9 +1026,9 @@ const tablaAntecedentes = {
                     historiaClinicaData.diagnosticos ||
                     'Sin información registrada',
                   fontSize: 7,
-                  margin: [5, 5],
+                  margin: [3, 2],
                   bold: true,
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1168,8 +1047,8 @@ const tablaAntecedentes = {
                     historiaClinicaData.terapeutica_empleada ||
                     'Sin información registrada',
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1188,8 +1067,8 @@ const tablaAntecedentes = {
                     historiaClinicaData.plan_diagnostico ||
                     'Sin información registrada.',
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -1209,8 +1088,8 @@ const tablaAntecedentes = {
                     historiaClinicaData.indicacion_terapeutica ||
                     'Sin información registrada.',
                   fontSize: 7,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -1238,7 +1117,7 @@ const tablaAntecedentes = {
                   fillColor: '#f8f8f8',
                   margin: [5, 8],
                   alignment: 'center',
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -1431,8 +1310,6 @@ const tablaAntecedentes = {
       },
     };
 
-
-console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, null, 2));
     // ✅ AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
   console.log('🔍 Validando todas las tablas del documento...');
   try {
@@ -1449,567 +1326,1214 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
 
 
 
-  // 📄 NOTA DE URGENCIA
-  async generarNotaUrgencias(datos: any): Promise<any> {
-    console.log('🚨 Generando Nota de Urgencias según NOM-004...');
-    const medicoCompleto = datos.medicoCompleto;
-    const pacienteCompleto = datos.pacienteCompleto;
-    const signosVitales = datos.signosVitales;
-    const numeroExpediente = this.obtenerNumeroExpedientePreferido( pacienteCompleto.expediente );
-    const fechaActual = new Date();
-    return {
-      pageSize: 'LETTER',
-      pageMargins: [20, 70, 20, 50],
-      header: {
-        margin: [20, 10, 20, 10],
+
+
+
+
+// // 📄 NOTA DE URGENCIAS
+// async generarNotaUrgencias(datos: any): Promise<any> {
+//     console.log('🚨 Generando Nota de Urgencias según NOM-004...');
+
+//     const medicoCompleto = datos.medicoCompleto;
+//     const pacienteCompleto = datos.pacienteCompleto;
+//     const signosVitales = datos.signosVitales || {};
+//     const notaUrgenciasData = datos.notaUrgencias || {};
+//     const fechaActual = new Date();
+//     const esPediatrico = pacienteCompleto.edad < 18;
+//     const domicilioPaciente = this.formatearDireccionMejorada(pacienteCompleto);
+//     const lugarNacimiento = pacienteCompleto.lugar_nacimiento || 'No especificado';
+//     const tipoSangre = pacienteCompleto.tipo_sangre || 'No especificado';
+
+//     const contarFilasIdentificacion = () => {
+//         let filas = 7; // Filas base
+//         if (esPediatrico) filas += 1; // Añadir fila de padres si es pediátrico
+//         return filas;
+//     };
+
+//     const crearFilasIdentificacion = () => {
+//         const filasBase = [
+//             [
+//                 {
+//                     text: 'IDENTIFICACIÓN',
+//                     fontSize: 8,
+//                     bold: true,
+//                     fillColor: '#f5f5f5',
+//                     alignment: 'center',
+//                     rowSpan: contarFilasIdentificacion(),
+//                 },
+//                 {
+//                     table: {
+//                         widths: ['20%', '20%', '20%', '20%', '20%'],
+//                         body: [
+//                             [
+//                                 { text: 'Fecha de atención', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Hora de atención', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'No. Expediente', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'No. de cama', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Folio nota', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: this.formatearFecha(notaUrgenciasData.fecha_atencion || fechaActual.toISOString()), fontSize: 7, alignment: 'center' },
+//                                 { text: notaUrgenciasData.hora_atencion || fechaActual.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'}), fontSize: 7, alignment: 'center' },
+//                                 { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
+//                                 { text: notaUrgenciasData.numero_cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
+//                                 { text: `NU-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${fechaActual.getFullYear()}`, fontSize: 6, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ],
+//             // FILA 2: Datos del paciente
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['55%', '15%', '15%', '15%'],
+//                         body: [
+//                             [
+//                                 { text: 'Nombre completo del paciente', fontSize: 7, bold: true },
+//                                 { text: 'Edad', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Sexo', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Tipo de sangre', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: pacienteCompleto.nombre_completo, fontSize: 8, bold: true, margin: [2, 3] },
+//                                 { text: `${pacienteCompleto.edad} años`, fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.sexo, fontSize: 7, alignment: 'center' },
+//                                 { text: tipoSangre, fontSize: 7, alignment: 'center', bold: true, color: '#dc2626' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ],
+//             // FILA 3: Domicilio
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['100%'],
+//                         body: [
+//                             [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
+//                             [{ text: domicilioPaciente, fontSize: 7, margin: [2, 3] }]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ],
+//             // FILA 4: Datos personales básicos
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['25%', '25%', '25%', '25%'],
+//                         body: [
+//                             [
+//                                 { text: 'Fecha nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'CURP', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Lugar de nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Teléfono', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.curp || 'No registrado', fontSize: 6, alignment: 'center' },
+//                                 { text: lugarNacimiento, fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.telefono || 'No registrado', fontSize: 7, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ],
+//             // FILA 5: Ocupación/Escolaridad
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['25%', '25%', '25%', '25%'],
+//                         body: [
+//                             [
+//                                 { text: esPediatrico ? 'Grado escolar' : 'Ocupación', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Escolaridad', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Estado civil', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Religión', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: esPediatrico ? (pacienteCompleto.grado_escolar || this.determinarGradoEscolarPorEdad(pacienteCompleto.edad)) : (pacienteCompleto.ocupacion || 'No registrada'), fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.escolaridad || 'No registrada', fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.estado_civil || 'No registrado', fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.religion || 'No registrada', fontSize: 7, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ]
+//         ];
+
+//         // FILA DE PADRES SOLO SI ES PEDIÁTRICO
+//         if (esPediatrico) {
+//             filasBase.push([
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['25%', '25%', '25%', '25%'],
+//                         body: [
+//                             [
+//                                 { text: 'Nombre del padre', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Edad padre', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Nombre de la madre', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Edad madre', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: datos.datosPadres?.nombre_padre || 'No registrado', fontSize: 7, alignment: 'center' },
+//                                 { text: datos.datosPadres?.edad_padre || 'N/A', fontSize: 7, alignment: 'center' },
+//                                 { text: datos.datosPadres?.nombre_madre || 'No registrado', fontSize: 7, alignment: 'center' },
+//                                 { text: datos.datosPadres?.edad_madre || 'N/A', fontSize: 7, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ]);
+//         }
+
+//         // FILAS FINALES
+//         filasBase.push(
+//             // Familiar responsable
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['60%', '40%'],
+//                         body: [
+//                             [
+//                                 { text: esPediatrico ? 'Familiar responsable/Tutor' : 'Contacto de emergencia', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Teléfono de contacto', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: pacienteCompleto.familiar_responsable || 'No registrado', fontSize: 7, alignment: 'center' },
+//                                 { text: pacienteCompleto.telefono_familiar || 'No registrado', fontSize: 7, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ],
+//             // Médico responsable
+//             [
+//                 {},
+//                 {
+//                     table: {
+//                         widths: ['70%', '30%'],
+//                         body: [
+//                             [
+//                                 { text: 'Médico responsable de la atención', fontSize: 7, bold: true, alignment: 'center' },
+//                                 { text: 'Cédula profesional', fontSize: 7, bold: true, alignment: 'center' }
+//                             ],
+//                             [
+//                                 { text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`, fontSize: 7, alignment: 'center' },
+//                                 { text: medicoCompleto.numero_cedula || 'No registrada', fontSize: 7, alignment: 'center' }
+//                             ]
+//                         ]
+//                     },
+//                     layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//                 }
+//             ]
+//         );
+//         return filasBase;
+//     };
+
+//     const tablaIdentificacion = {
+//         table: {
+//             widths: ['15%', '85%'],
+//             body: crearFilasIdentificacion()
+//         },
+//         layout: { hLineWidth: () => 0.5, vLineWidth: () => 0.5, hLineColor: () => '#000000', vLineColor: () => '#000000' }
+//     };
+
+//     // Contenido específico de urgencias
+//     const contenidoUrgencias = [
+//         { text: '', margin: [0, 3] },
+//         {
+//             table: {
+//                 widths: ['20%', '80%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'NOTA INICIAL DE URGENCIAS',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                             rowSpan: 8,
+//                         },
+//                         {
+//                             text: 'MOTIVO DE LA ATENCIÓN (7.1.3)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.motivo_atencion || 'Motivo de atención no especificado.',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: 'SIGNOS VITALES (7.1.2)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             table: {
+//                                 widths: ['25%', '25%', '25%', '25%'],
+//                                 body: [
+//                                     [
+//                                         { text: 'Presión arterial', fontSize: 6, bold: true, alignment: 'center' },
+//                                         { text: 'Frecuencia cardíaca', fontSize: 6, bold: true, alignment: 'center' },
+//                                         { text: 'Frecuencia respiratoria', fontSize: 6, bold: true, alignment: 'center' },
+//                                         { text: 'Temperatura', fontSize: 6, bold: true, alignment: 'center' },
+//                                     ],
+//                                     [
+//                                         {
+//                                             text: `${signosVitales.presion_arterial_sistolica || '___'}/${signosVitales.presion_arterial_diastolica || '___'} mmHg`,
+//                                             fontSize: 7,
+//                                             alignment: 'center',
+//                                             margin: [0, 1],
+//                                         },
+//                                         {
+//                                             text: `${signosVitales.frecuencia_cardiaca || '___'} lpm`,
+//                                             fontSize: 7,
+//                                             alignment: 'center',
+//                                             margin: [0, 1],
+//                                         },
+//                                         {
+//                                             text: `${signosVitales.frecuencia_respiratoria || '___'} rpm`,
+//                                             fontSize: 7,
+//                                             alignment: 'center',
+//                                             margin: [0, 1],
+//                                         },
+//                                         {
+//                                             text: `${signosVitales.temperatura || '___'} °C`,
+//                                             fontSize: 7,
+//                                             alignment: 'center',
+//                                             margin: [0, 1],
+//                                         },
+//                                     ],
+//                                 ],
+//                             },
+//                             layout: {
+//                                 hLineWidth: () => 0.3,
+//                                 vLineWidth: () => 0.3,
+//                                 hLineColor: () => '#000000',
+//                                 vLineColor: () => '#000000',
+//                             },
+//                             margin: [5, 2],
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: 'PESO Y TALLA',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: `Peso: ${signosVitales.peso || '___'} kg | Talla: ${signosVitales.talla || '___'} cm | Saturación O2: ${signosVitales.saturacion_oxigeno || '___'}% | IMC: ${this.calcularIMC(signosVitales.peso, signosVitales.talla)}`,
+//                             fontSize: 7,
+//                             margin: [5, 3],
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: 'RESUMEN DEL INTERROGATORIO, EXPLORACIÓN FÍSICA Y ESTADO MENTAL (7.1.4)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.resumen_interrogatorio || 'Paciente que se presenta por: [especificar motivo de consulta]. Interrogatorio: [síntomas principales]. Exploración física: [hallazgos relevantes]. Estado mental: [consciente, orientado, cooperador].',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 3] },
+//         // EXPLORACIÓN FÍSICA DETALLADA
+//         {
+//             table: {
+//                 widths: ['20%', '80%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'EXPLORACIÓN FÍSICA',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                             rowSpan: 2,
+//                         },
+//                         {
+//                             text: 'EXPLORACIÓN FÍSICA DIRIGIDA',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.exploracion_fisica || 'Paciente con habitus exterior [describir]. Cabeza y cuello: [hallazgos]. Tórax: [hallazgos]. Cardiovascular: [ruidos cardíacos, pulsos]. Abdomen: [palpación, auscultación]. Extremidades: [movilidad, pulsos]. Neurológico: [estado de conciencia, reflejos].',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 3] },
+//         // ESTUDIOS Y DIAGNÓSTICO
+//         {
+//             table: {
+//                 widths: ['20%', '80%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'ESTUDIOS Y DIAGNÓSTICO',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                             rowSpan: 4,
+//                         },
+//                         {
+//                             text: 'RESULTADOS DE ESTUDIOS DE SERVICIOS AUXILIARES DE DIAGNÓSTICO (7.1.5)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.resultados_estudios || 'Sin estudios solicitados al momento. Se valorará necesidad según evolución clínica.',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (7.1.6)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.diagnostico || 'Diagnóstico por definir. Se requiere evaluación complementaria.',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                             bold: true,
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 3] },
+//         // TRATAMIENTO Y PRONÓSTICO
+//         {
+//             table: {
+//                 widths: ['20%', '80%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'TRATAMIENTO Y PRONÓSTICO',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                             rowSpan: 4,
+//                         },
+//                         {
+//                             text: 'TRATAMIENTO ADMINISTRADO (7.1.7)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.plan_tratamiento || 'Medidas generales de sostén. Tratamiento sintomático según necesidad. Se definirá plan terapéutico específico.',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: 'PRONÓSTICO (7.1.7)',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f9f9f9',
+//                         },
+//                     ],
+//                     [
+//                         {},
+//                         {
+//                             text: notaUrgenciasData.pronostico || 'Pronóstico reservado a evolución clínica y respuesta al tratamiento establecido.',
+//                             fontSize: 8,
+//                             margin: [3, 2],
+//                             lineHeight: 1.1,
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 3] },
+//         // DISPOSICIÓN DEL PACIENTE
+//         {
+//             table: {
+//                 widths: ['100%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'DISPOSICIÓN DEL PACIENTE',
+//                             fontSize: 7,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                         },
+//                     ],
+//                     [
+//                         {
+//                             text: [
+//                                 { text: '_ Alta a domicilio    ', fontSize: 8 },
+//                                 { text: '_ Hospitalización    ', fontSize: 8 },
+//                                 { text: '_ Traslado a otra unidad    ', fontSize: 8 },
+//                                 { text: '_ Interconsulta    ', fontSize: 8 },
+//                                 { text: '_ Observación en urgencias', fontSize: 8 },
+//                             ],
+//                             margin: [10, 5],
+//                             alignment: 'center',
+//                         },
+//                     ],
+//                     [
+//                         {
+//                             text: `Especificar: ${notaUrgenciasData.disposicion_especifica || '_________________________________________________'}`,
+//                             fontSize: 8,
+//                             margin: [10, 3],
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 5] },
+//         // FIRMA MÉDICO RESPONSABLE
+//         {
+//             table: {
+//                 widths: ['50%', '50%'],
+//                 body: [
+//                     [
+//                         {
+//                             text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                         },
+//                         {
+//                             text: 'FIRMA AUTÓGRAFA',
+//                             fontSize: 8,
+//                             bold: true,
+//                             fillColor: '#f5f5f5',
+//                             alignment: 'center',
+//                         },
+//                     ],
+//                     [
+//                         {
+//                             text: [
+//                                 {
+//                                     text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+//                                     fontSize: 9,
+//                                     bold: true,
+//                                 },
+//                                 {
+//                                     text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+//                                     fontSize: 8,
+//                                 },
+//                                 {
+//                                     text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+//                                     fontSize: 8,
+//                                 },
+//                                 { text: `Servicio de Urgencias\n`, fontSize: 8 },
+//                                 {
+//                                     text: `Hospital General San Luis de la Paz\n`,
+//                                     fontSize: 7,
+//                                 },
+//                                 {
+//                                     text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+//                                     fontSize: 7,
+//                                 },
+//                                 {
+//                                     text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+//                                     fontSize: 7,
+//                                 },
+//                             ],
+//                             margin: [5, 15],
+//                             alignment: 'center',
+//                         },
+//                         {
+//                             text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO DE URGENCIAS\n(NOM-004-SSA3-2012)',
+//                             fontSize: 8,
+//                             margin: [5, 15],
+//                             alignment: 'center',
+//                         },
+//                     ],
+//                 ],
+//             },
+//             layout: {
+//                 hLineWidth: () => 0.5,
+//                 vLineWidth: () => 0.5,
+//                 hLineColor: () => '#000000',
+//                 vLineColor: () => '#000000',
+//             },
+//         },
+//         { text: '', margin: [0, 2] },
+//         // NOTA REFERENCIAL
+//         {
+//             text: [
+//                 {
+//                     text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 7 "De las notas médicas en urgencias"\n',
+//                     fontSize: 6,
+//                     italics: true,
+//                     color: '#666666',
+//                 },
+//                 {
+//                     text: '* Cumple con los requisitos establecidos en los numerales 7.1.1 al 7.1.7',
+//                     fontSize: 6,
+//                     italics: true,
+//                     color: '#666666',
+//                 },
+//             ],
+//             alignment: 'left',
+//         }
+//     ];
+
+//     const documentoFinal = {
+//         pageSize: 'LETTER',
+//         pageMargins: [20, 70, 20, 50],
+//         header: {
+//             margin: [20, 10, 20, 10],
+//             table: {
+//                 widths: ['20%', '60%', '20%'],
+//                 body: [
+//                     [
+//                         {
+//                             image: await this.obtenerImagenBase64(datos.configuracion?.logo_gobierno || '/uploads/logos/logo-gobierno-default.svg'),
+//                             fit: [80, 40],
+//                             alignment: 'left',
+//                             margin: [0, 5]
+//                         },
+//                         {
+//                             text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE URGENCIAS',
+//                             fontSize: 11,
+//                             bold: true,
+//                             alignment: 'center',
+//                         },
+//                         {
+//                             image: await this.obtenerImagenBase64(datos.configuracion?.logo_principal || '/uploads/logos/logo-principal-default.svg'),
+//                             fit: [80, 40],
+//                             alignment: 'right',
+//                             margin: [0, 5]
+//                         }
+//                     ]
+//                 ]
+//             },
+//             layout: 'noBorders',
+//         },
+//         content: [
+//             tablaIdentificacion,
+//             ...contenidoUrgencias
+//         ],
+//         footer: (currentPage: number, pageCount: number) => {
+//             return {
+//                 margin: [20, 5],
+//                 table: {
+//                     widths: ['25%', '50%', '25%'],
+//                     body: [
+//                         [
+//                             {
+//                                 text: `Página ${currentPage} de ${pageCount}`,
+//                                 fontSize: 7,
+//                                 color: '#666666',
+//                             },
+//                             {
+//                                 text: 'Nota de Urgencias - SICEG\nNOM-004-SSA3-2012',
+//                                 fontSize: 7,
+//                                 alignment: 'center',
+//                                 color: '#666666',
+//                             },
+//                             {
+//                                 text: [
+//                                     {
+//                                         text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+//                                         fontSize: 7,
+//                                     },
+//                                     {
+//                                         text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+//                                         fontSize: 6,
+//                                     },
+//                                 ],
+//                                 alignment: 'right',
+//                                 color: '#666666',
+//                             },
+//                         ],
+//                     ],
+//                 },
+//                 layout: 'noBorders',
+//             };
+//         },
+//     };
+
+//     return documentoFinal;
+// }
+
+async generarNotaUrgencias(datos: any): Promise<any> {
+  const pacienteCompleto = datos.pacienteCompleto;
+  const medicoCompleto = datos.medicoCompleto;
+  const notaUrgenciasData = datos.notaUrgencias || {};
+  const signosVitales = datos.signosVitales || {};
+  const fechaActual = new Date();
+
+  const documentoFinal = {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [
+          [
+            {
+              image: await this.obtenerImagenBase64('/uploads/logos/logo-gobierno-default.svg'),
+              fit: [80, 40],
+              alignment: 'left',
+              margin: [0, 5]
+            },
+            {
+              text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE URGENCIAS',
+              fontSize: 10,
+              bold: true,
+              alignment: 'center',
+              color: '#1a365d',
+              margin: [0, 8]
+            },
+            {
+              image: await this.obtenerImagenBase64('/uploads/logos/logo-principal-default.svg'),
+              fit: [80, 40],
+              alignment: 'right',
+              margin: [0, 5]
+            }
+          ]
+        ]
+      },
+      layout: 'noBorders',
+    },
+    content: [
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'IDENTIFICACIÓN',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 6,
+              },
+              {
+                table: {
+                  widths: ['20%', '20%', '20%', '20%', '20%'],
+                  body: [
+                    [
+                      { text: 'Fecha de elaboración', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Hora de elaboración', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'No. Expediente', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'No. de cama', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Servicio', fontSize: 7, bold: true, alignment: 'center' }
+                    ], [
+                      { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center' },
+                      { text: fechaActual.toLocaleTimeString('es-MX'), fontSize: 7, alignment: 'center' },
+                      { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
+                      { text: notaUrgenciasData.numero_cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
+                      { text: medicoCompleto.departamento || 'No especificado', fontSize: 7, alignment: 'center' }
+                    ]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['55%', '15%', '15%', '15%'],
+                  body: [
+                    [
+                      { text: 'Nombre completo del paciente', fontSize: 7, bold: true },
+                      { text: 'Edad', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Sexo', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Tipo de sangre', fontSize: 7, bold: true, alignment: 'center' }
+                    ],
+                    [
+                      { text: pacienteCompleto.nombre_completo, fontSize: 8, bold: true, margin: [2, 3] },
+                      { text: `${pacienteCompleto.edad} años`, fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.sexo, fontSize: 7, alignment: 'center' },
+                      { text: datos.pacienteCompleto.tipo_sangre || 'No especificado', fontSize: 7, alignment: 'center', bold: true, color: '#dc2626' }
+                    ]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['100%'],
+                  body: [
+                    [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
+                    [{ text: this.formatearDireccionMejorada(pacienteCompleto) || 'Sin dirección registrada', fontSize: 7, margin: [2, 3] }]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['25%', '25%', '25%', '25%'],
+                  body: [
+                    [
+                      { text: 'Fecha nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'CURP', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Lugar de nacimiento', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Teléfono', fontSize: 7, bold: true, alignment: 'center' }
+                    ],
+                    [
+                      { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.curp || 'No registrado', fontSize: 6, alignment: 'center' },
+                      { text: pacienteCompleto.lugar_nacimiento || 'No especificado', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.telefono || 'No registrado', fontSize: 7, alignment: 'center' }
+                    ]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['25%', '25%', '25%', '25%'],
+                  body: [
+                    [
+                      { text: 'Ocupación', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Escolaridad', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Estado civil', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Religión', fontSize: 7, bold: true, alignment: 'center' }
+                    ],
+                    [
+                      { text: pacienteCompleto.ocupacion || 'No registrada', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.escolaridad || 'No registrada', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.estado_civil || 'No registrado', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.religion || 'No registrada', fontSize: 7, alignment: 'center' }
+                    ]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['60%', '40%'],
+                  body: [
+                    [
+                      { text: 'Familiar responsable/Tutor', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Teléfono de contacto', fontSize: 7, bold: true, alignment: 'center' }
+                    ],
+                    [
+                      { text: pacienteCompleto.familiar_responsable || 'No registrado', fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.telefono_familiar || 'No registrado', fontSize: 7, alignment: 'center' }
+                    ]
+                  ]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                }
+              }
+            ],
+          ]
+        }
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 MOTIVO DE ATENCIÓN
+      {
         table: {
           widths: ['100%'],
-          body: [ [ { text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE URGENCIAS', fontSize: 11, bold: true, alignment: 'center', }, ],],
+          body: [
+            [
+              { text: 'MOTIVO DE ATENCIÓN', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Motivo de atención:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.motivo_atencion || 'No especificado', fontSize: 7 }
+            ]
+          ]
         },
-        layout: 'noBorders',
+        layout: 'noBorders'
       },
-
-      content: [
-         {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [ { text: 'IDENTIFICACIÓN', fontSize: 8, bold: true, fillColor: '#f5f5f5', alignment: 'center', rowSpan: 4, },
-                { table: { widths: ['20%', '20%', '20%', '20%', '20%'],
-                    body: [ [
-                        { text: 'Fecha de atención', fontSize: 7, bold: true, alignment: 'center', },
-                        { text: 'Hora de atención', fontSize: 7, bold: true, alignment: 'center', },
-                        { text: 'No. Expediente', fontSize: 7, bold: true, alignment: 'center', },
-                        { text: 'No. de cama', fontSize: 7, bold: true, alignment: 'center', },
-                        { text: 'Folio nota', fontSize: 7, bold: true, alignment: 'center', },
-                      ],
-                      [ { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center', margin: [0, 1],},
-                        { text: fechaActual.toLocaleTimeString('es-MX'), fontSize: 7, alignment: 'center', margin: [0, 1],},
-                        { text: this.obtenerNumeroExpedientePreferido( pacienteCompleto.expediente ) || 'N/A', fontSize: 7, alignment: 'center',margin: [0, 1], bold: true,},
-                        { text: datos.notaUrgencias?.numero_cama || 'Urgencias', fontSize: 7, alignment: 'center', margin: [0, 1],},
-                        { text: `NU-${this.obtenerNumeroExpedientePreferido( pacienteCompleto.expediente )}-${fechaActual.getFullYear()}`, fontSize: 6, alignment: 'center', margin: [0, 1],},
-                      ],
-                    ],
-                  },
-                  layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000', },
-                },
-              ],
-              [
-                {}, {
-                  table: { widths: ['60%', '20%', '20%'],
-                    body: [ [
-                        { text: 'Nombre completo del paciente', fontSize: 7, bold: true, },
-                        { text: 'Edad', fontSize: 7, bold: true, alignment: 'center', },
-                        { text: 'Sexo', fontSize: 7, bold: true, alignment: 'center', },
-                      ],
-                      [ { text: pacienteCompleto.nombre_completo, fontSize: 8, bold: true, margin: [2, 2], },
-                        { text: `${pacienteCompleto.edad} años`, fontSize: 7, alignment: 'center', margin: [0, 2],},
-                        { text: pacienteCompleto.sexo, fontSize: 7, alignment: 'center', margin: [0, 2],},
-                      ],
-                    ],
-                  },
-                  layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000',},
-                },
-              ],
-              [
-                {}, {
-                  table: { widths: ['60%', '40%'],
-                    body: [ [ { text: 'Domicilio', fontSize: 7, bold: true },
-                        { text: 'Teléfono', fontSize: 7, bold: true, alignment: 'center', },
-                      ],
-                      [ { text: this.formatearDireccionMejorada( pacienteCompleto ), fontSize: 6, margin: [2, 2],},
-                        { text: pacienteCompleto.telefono || 'No registrado', fontSize: 7, alignment: 'center', margin: [0, 2],},
-                      ],
-                    ],
-                  },
-                  layout: { hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000',},
-                },
-              ],
-              [
-                {},
-                {table: {
-                    widths: ['60%', '40%'],
-                    body: [
-                      [ { text: 'Familiar responsable', fontSize: 7, bold: true, },
-                        { text: 'Teléfono de contacto', fontSize: 7, bold: true, alignment: 'center', },
-                      ],
-                      [
-                        { text: pacienteCompleto.familiar_responsable || 'No registrado', fontSize: 7, margin: [2, 2],},
-                        { text: pacienteCompleto.telefono_familiar ||'No registrado',fontSize: 7,alignment: 'center',margin: [0, 2],},
-                      ],],
-                  },
-                  layout: {hLineWidth: () => 0.3, vLineWidth: () => 0.3, hLineColor: () => '#000000', vLineColor: () => '#000000',},
-                },
-              ],
+      { text: '', margin: [0, 15] },
+      // 🔹 ESTADO DE CONCIENCIA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'ESTADO DE CONCIENCIA', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
             ],
-          },
-          layout: { hLineWidth: () => 0.5, vLineWidth: () => 0.5, hLineColor: () => '#000000', vLineColor: () => '#000000',},
+            [
+              { text: 'Estado de conciencia:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.estado_conciencia || 'No especificado', fontSize: 7 }
+            ]
+          ]
         },
-        { text: '', margin: [0, 3] },
-        { table: { widths: ['20%', '80%'], body: [
-              [ { text: 'NOTA INICIAL DE URGENCIAS', fontSize: 8, bold: true, fillColor: '#f5f5f5', alignment: 'center',rowSpan: 8,  },
-                { text: 'MOTIVO DE LA ATENCIÓN (7.1.3)', fontSize: 7, bold: true, fillColor: '#f9f9f9',},
-              ],
-              [ {}, { text: datos.notaUrgencias?.motivo_atencion || 'Motivo de atención no especificado.', fontSize: 8,margin: [5, 5], lineHeight: 1.3,},],
-              [ {}, { text: 'SIGNOS VITALES (7.1.2)', fontSize: 7, bold: true, fillColor: '#f9f9f9',},],
-              [ {}, { table: { widths: ['25%', '25%', '25%', '25%'], body: [
-                      [ { text: 'Presión arterial', fontSize: 6, bold: true, alignment: 'center', },
-                        { text: 'Frecuencia cardíaca', fontSize: 6, bold: true, alignment: 'center', },
-                        { text: 'Frecuencia respiratoria', fontSize: 6, bold: true, alignment: 'center', },
-                        { text: 'Temperatura', fontSize: 6, bold: true, alignment: 'center', },
-                      ],
-                      [
-                        { text: `${ signosVitales.presion_arterial_sistolica || '___' }/${ signosVitales.presion_arterial_diastolica || '___'} mmHg`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${
-                            signosVitales.frecuencia_cardiaca || '___'
-                          } lpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${
-                            signosVitales.frecuencia_respiratoria || '___'
-                          } rpm`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                        {
-                          text: `${signosVitales.temperatura || '___'} °C`,
-                          fontSize: 7,
-                          alignment: 'center',
-                          margin: [0, 1],
-                        },
-                      ],
-                    ],
-                  },
-                  layout: {
-                    hLineWidth: () => 0.3,
-                    vLineWidth: () => 0.3,
-                    hLineColor: () => '#000000',
-                    vLineColor: () => '#000000',
-                  },
-                  margin: [5, 2],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'PESO Y TALLA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text: `Peso: ${signosVitales.peso || '___'} kg | Talla: ${
-                    signosVitales.talla || '___'
-                  } cm | Saturación O2: ${
-                    signosVitales.saturacion_oxigeno || '___'
-                  }%`,
-                  fontSize: 7,
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'RESUMEN DEL INTERROGATORIO, EXPLORACIÓN FÍSICA Y ESTADO MENTAL (7.1.4)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.resumen_interrogatorio ||
-                    'Paciente que se presenta por: [especificar motivo de consulta]. Interrogatorio: [síntomas principales]. Exploración física: [hallazgos relevantes]. Estado mental: [consciente, orientado, cooperador].',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 EXPLORACIÓN FÍSICA DETALLADA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'EXPLORACIÓN FÍSICA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 2, //   CORREGIDO: 2 filas exactas
-                },
-                {
-                  text: 'EXPLORACIÓN FÍSICA DIRIGIDA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.exploracion_fisica ||
-                    'Paciente con habitus exterior [describir]. Cabeza y cuello: [hallazgos]. Tórax: [hallazgos]. Cardiovascular: [ruidos cardíacos, pulsos]. Abdomen: [palpación, auscultación]. Extremidades: [movilidad, pulsos]. Neurológico: [estado de conciencia, reflejos].',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 ESTUDIOS Y DIAGNÓSTICO SEGÚN NOM-004 (7.1.5-7.1.6) - CORREGIDA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'ESTUDIOS Y DIAGNÓSTICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4, //   CORREGIDO: 4 filas exactas
-                },
-                {
-                  text: 'RESULTADOS DE ESTUDIOS DE SERVICIOS AUXILIARES DE DIAGNÓSTICO (7.1.5)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.resultados_estudios ||
-                    'Sin estudios solicitados al momento. Se valorará necesidad según evolución clínica.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'DIAGNÓSTICOS O PROBLEMAS CLÍNICOS (7.1.6)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.diagnostico ||
-                    'Diagnóstico por definir. Se requiere evaluación complementaria.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                  bold: true,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 TRATAMIENTO Y PRONÓSTICO SEGÚN NOM-004 (7.1.7) - CORREGIDA
-        {
-          table: {
-            widths: ['20%', '80%'],
-            body: [
-              [
-                {
-                  text: 'TRATAMIENTO Y PRONÓSTICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                  rowSpan: 4, //   CORREGIDO: 4 filas exactas
-                },
-                {
-                  text: 'TRATAMIENTO ADMINISTRADO (7.1.7)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.plan_tratamiento ||
-                    'Medidas generales de sostén. Tratamiento sintomático según necesidad. Se definirá plan terapéutico específico.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'PRONÓSTICO (7.1.7)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f9f9f9',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    datos.notaUrgencias?.pronostico ||
-                    'Pronóstico reservado a evolución clínica y respuesta al tratamiento establecido.',
-                  fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 3] },
-
-        // 🔹 DISPOSICIÓN DEL PACIENTE - CORREGIDA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: 'DISPOSICIÓN DEL PACIENTE',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: [
-                    { text: '_ Alta a domicilio    ', fontSize: 8 },
-                    { text: '_ Hospitalización    ', fontSize: 8 },
-                    { text: '_ Traslado a otra unidad    ', fontSize: 8 },
-                    { text: '_ Interconsulta    ', fontSize: 8 },
-                    { text: '_ Observación en urgencias', fontSize: 8 },
-                  ],
-                  margin: [10, 5],
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: `Especificar: ${
-                    datos.notaUrgencias?.disposicion_especifica ||
-                    '_________________________________________________'
-                  }`,
-                  fontSize: 8,
-                  margin: [10, 3],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 5] },
-
-        // 🔹 MÉDICO RESPONSABLE SEGÚN NOM-004 (5.10) - SIN CAMBIOS
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  text: 'NOMBRE COMPLETO Y CÉDULA PROFESIONAL DEL MÉDICO',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-                {
-                  text: 'FIRMA AUTÓGRAFA',
-                  fontSize: 8,
-                  bold: true,
-                  fillColor: '#f5f5f5',
-                  alignment: 'center',
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 8,
-                    },
-                    { text: `Servicio de Urgencias\n`, fontSize: 8 },
-                    {
-                      text: `Hospital General San Luis de la Paz\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Fecha: ${fechaActual.toLocaleDateString(
-                        'es-MX'
-                      )}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
-                      fontSize: 7,
-                    },
-                  ],
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-                {
-                  text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO DE URGENCIAS\n(NOM-004-SSA3-2012)',
-                  fontSize: 8,
-                  margin: [5, 15],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-
-        { text: '', margin: [0, 2] },
-
-        // 🔹 NOTA REFERENCIAL
-        {
-          text: [
-            {
-              text: '* Nota elaborada conforme a NOM-004-SSA3-2012, Sección 7 "De las notas médicas en urgencias"\n',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-            {
-              text: '* Cumple con los requisitos establecidos en los numerales 7.1.1 al 7.1.7',
-              fontSize: 6,
-              italics: true,
-              color: '#666666',
-            },
-          ],
-          alignment: 'left',
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [20, 5],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: 'Nota de Urgencias - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(
-                        pacienteCompleto.expediente
-                      )}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
+        layout: 'noBorders'
       },
-    };
-  }
+      { text: '', margin: [0, 15] },
+      // 🔹 RESUMEN DEL INTERROGATORIO
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'RESUMEN DEL INTERROGATORIO', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Resumen del interrogatorio:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.resumen_interrogatorio || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 EXPLORACIÓN FÍSICA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'EXPLORACIÓN FÍSICA', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Exploración física:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.exploracion_fisica || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 RESULTADOS DE ESTUDIOS
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'RESULTADOS DE ESTUDIOS', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Resultados de estudios:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.resultados_estudios || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 ESTADO MENTAL
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'ESTADO MENTAL', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Estado mental:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.estado_mental || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 DIAGNÓSTICO
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'DIAGNÓSTICO', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Diagnóstico:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.diagnostico || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 PLAN DE TRATAMIENTO
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'PLAN DE TRATAMIENTO', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Plan de tratamiento:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.plan_tratamiento || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 PRONÓSTICO
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: 'PRONÓSTICO', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 2 },
+              {}
+            ],
+            [
+              { text: 'Pronóstico:', fontSize: 7, bold: true },
+              { text: notaUrgenciasData.pronostico || 'No especificado', fontSize: 7 }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 SIGNOS VITALES
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: [
+            [
+              { text: 'SIGNOS VITALES', fontSize: 10, bold: true, fillColor: '#fef3c7', alignment: 'center', colSpan: 4 },
+              {},
+              {},
+              {}
+            ],
+            [
+              { text: 'Temperatura (°C)', fontSize: 7, bold: true, alignment: 'center' },
+              { text: 'Presión arterial sistólica (mmHg)', fontSize: 7, bold: true, alignment: 'center' },
+              { text: 'Presión arterial diastólica (mmHg)', fontSize: 7, bold: true, alignment: 'center' },
+              { text: 'Frecuencia cardíaca (lpm)', fontSize: 7, bold: true, alignment: 'center' }
+            ],
+            [
+              { text: signosVitales.temperatura || 'No especificado', fontSize: 7, alignment: 'center' },
+              { text: signosVitales.presion_arterial_sistolica || 'No especificado', fontSize: 7, alignment: 'center' },
+              { text: signosVitales.presion_arterial_diastolica || 'No especificado', fontSize: 7, alignment: 'center' },
+              { text: signosVitales.frecuencia_cardiaca || 'No especificado', fontSize: 7, alignment: 'center' }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      },
+      { text: '', margin: [0, 15] },
+      // 🔹 FIRMA DEL MEDICO
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { text: '__________________________________', fontSize: 7, alignment: 'center' },
+              { text: `Firma del médico: ${medicoCompleto.nombre_completo}`, fontSize: 7, alignment: 'center' }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      }
+    ],
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [20, 10],
+        table: {
+          widths: ['30%', '40%', '30%'],
+          body: [
+            [
+              { text: `Página ${currentPage} de ${pageCount}`, fontSize: 7, color: '#6b7280' },
+              { text: 'Nota de Urgencias - SICEG', fontSize: 7, alignment: 'center', color: '#6b7280' },
+              { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'right', color: '#6b7280' }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    }
+  };
+
+  return documentoFinal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // 📄 NOTA DE EVOLUCIÓN  NOM-004-SSA3-2012
   async generarNotaEvolucion(datos: any): Promise<any> {
@@ -2356,8 +2880,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     notaEvolucionData.sintomas_signos ||
                     'Paciente en evolución clínica favorable. Sin cambios significativos en el cuadro clínico inicial.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -2522,8 +3046,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     notaEvolucionData.estudios_laboratorio_gabinete ||
                     'Sin estudios nuevos solicitados. Resultados pendientes o no aplicables para la evolución actual.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -2567,7 +3091,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Paciente consciente, orientado, cooperador. Facies no características, marcha conservada, actitud adecuada.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -2601,7 +3125,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     }`,
                   fontSize: 7,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -2644,8 +3168,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     notaEvolucionData.diagnosticos ||
                     'Diagnósticos en seguimiento según nota de ingreso. Sin cambios en impresión diagnóstica.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -2680,8 +3204,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Favorable para la vida y función. Reservado a evolución clínica.'
                   }`,
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -2725,8 +3249,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     notaEvolucionData.plan_estudios_tratamiento ||
                     'Continuar manejo actual. Vigilar evolución clínica. Medidas generales de soporte.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -2745,8 +3269,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     notaEvolucionData.indicaciones_medicas ||
                     'Medicamentos según prescripción previa. Revisar esquema terapéutico en nota de ingreso.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -2782,7 +3306,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin interconsultas programadas para esta evolución. Sin procedimientos especiales indicados.',
                   fontSize: 8,
                   margin: [10, 5],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -3099,7 +3623,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
               fontSize: 11,
             },
           ],
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 10],
         },
 
@@ -3171,7 +3695,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Se da autorización bajo el entendimiento pleno de que cualquier operación o procedimiento médico-quirúrgico, implica algún(os) riesgo(s) y/o peligro(s). Los riesgos más comunes incluyen: Infección, Hemorragia, Lesión nerviosa, Coágulos sanguíneos, ataque cardiaco, Reacciones alérgicas y neumonía. Estos riesgos pueden ser graves e incluso mortales. Algunos riesgos importantes en especial de este tipo de intervención que se va a realizar son:',
           fontSize: 10,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
@@ -3219,7 +3743,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
               fontSize: 11,
             },
           ],
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
@@ -3249,21 +3773,21 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
               fontSize: 11,
             },
           ],
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
         {
           text: 'Estoy enterado(a), de que no existe garantía o seguridad sobre resultados del procedimiento y de que existe la posibilidad de que no pueda curarse la enfermedad o padecimiento que presento.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
         {
           text: 'Así también estoy enterado(a) de que nadie puede decir con seguridad cuáles serán las complicaciones que ocurran en mi caso, si es que las hay.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 20],
         },
 
@@ -3282,14 +3806,14 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Tengo que leer y entender esta forma de consentimiento, la que no debo firmar si alguno de los párrafos o de mis dudas no han sido explicadas a mi entera satisfacción o si no entiendo cualquier término o palabra contenida en ese documento.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
         {
           text: 'Si tiene cualquier duda acerca de los riesgos o peligros de la cirugía o tratamiento propuesto, pregunte a su Cirujano, ahora. ¡Antes de firmar el documento! ¡No firme a menos de que entienda por completo este documento!',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 25],
         },
 
@@ -3537,7 +4061,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'familiar o allegado designado por el paciente, y en caso de menores de edad e incapacitados para otorgar su consentimiento y/o autorización.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 20],
         },
 
@@ -3569,7 +4093,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'En atención a los artículos 80 al 83 de reglamento de la Ley General de Salud en materia de atención médica y a la NOM-168-SSA1-1998 relativa al expediente clínico numerales 4.2, 10.1 al 10.1.2, se otorga la presente autorización al personal Médico y Paramédico del Hospital.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
         },
 
@@ -3638,7 +4162,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que los Médicos del Hospital le han explicado de una manera detallada y con un lenguaje que pudo comprender, que los procedimientos médicos y/o quirúrgicos que se planean realizar, tienen como objetivo primordial dar solución a los problemas de salud del enfermo, utilizando las técnicas vigentes para tal efecto, en virtud de que el personal de salud que labora en dicha institución se declara ampliamente capacitado y que cuanta con autorización legal con efectos de patente y cédula profesional correspondiente para el libre ejercicio de su especialidad médica o quirúrgica en su caso, así como la certificación vigente del consejo nacional de dicha especialidad, además de comprometerse a cuidar de la salud y la integridad, del enfermo y actuar con ética y responsabilidad en beneficio del paciente y su entorno biológico, psicológico y social.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3646,7 +4170,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que cualquier procedimiento médico implica una serie de riesgo no siempre previsible debido a diversas circunstancias que entre otras se consideran se estado físico previo, enfermedades pre o coexistentes, tratamientos previos, etcétera y que existe la posibilidad de complicaciones debidas al tratamiento médico y/o quirúrgico, ya que cada paciente puede reaccionar en forma diversa a la aplicación de tal fármaco o bien a la realización de determinado procedimiento, dichas complicaciones pueden ser transitorias o permanentes y pueden ir desde leves hasta severas y pueden poner en peligro la vida del paciente e incluso provocar la muerte.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3654,7 +4178,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que, en circunstancias especiales, el personal de salud se verá obligado a utilizar técnicas invasivas de diagnóstico y tratamiento, conforme a los protocolos médicos actuales con el objeto de mantener una vigilancia estrecha de las constantes vitales o bien de proporcionar una terapéutica oportuna que puede salvar la vida del paciente, pero las cuales se requiere la aplicación de sondas, catéteres o marcapasos según sea al caso.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3662,7 +4186,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que algunas enfermedades pueden requerir de un procedimiento quirúrgico para su resolución y que esta necesidad puede presentarse en cualquier momento de su estancia hospitalaria, para lo cual se solicitará una autorización previa del paciente o su representante legal en su caso, sin embargo, en dado caso que dicha persona no autorice el procedimiento en cuestión, o bien solicite su alta voluntaria por cualquier motivo, el Hospital y el personal que en el labora quedará automáticamente exento de cualquier implicación médica y legal derivada de la decisión, así como de la evolución consecutiva del paciente.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3670,7 +4194,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que en ocasiones puede ser necesaria la aplicación de sangre o productos sanguíneos para la resolución de determinados problemas de salud, por lo que se autoriza a los médicos a emplear dicha terapéutica siempre que sea necesaria, con las reservas que marcan las normas vigentes.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3678,7 +4202,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Que el paciente será sometido a un protocolo terapéutico que se encuentra ampliamente documentado en el expediente clínico y que se apega estrechamente a las consideraciones éticas del tratado de Helsinki modificado en Viena y que el paciente debe seguir estrechamente las indicaciones para el diagnóstico y tratamiento de su enfermedad, ya que de no ser así o bien en el caso que el paciente siga instrucciones ajenas o bien actué de acuerdo a su propio entender o en su caso amita las indicaciones específicas del médico, así como el Hospital',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 15],
           alignment: 'justify',
         },
@@ -3711,7 +4235,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
         {
           text: 'Queda totalmente exentos de cualquier implicación médica y legal que se deriven de la evolución subsecuente del paciente.',
           fontSize: 11,
-          lineHeight: 1.3,
+          lineHeight: 1.1,
           margin: [0, 0, 0, 25],
           alignment: 'justify',
         },
@@ -4096,7 +4620,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   alignment: 'justify',
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                   margin: [10, 15, 10, 15],
                 },
               ],
@@ -4163,7 +4687,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -4694,7 +5218,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -5025,7 +5549,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -5117,7 +5641,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -5515,7 +6039,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -5595,7 +6119,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     },
                   ],
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                   alignment: 'justify',
                 },
               ],
@@ -5631,7 +6155,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Se recomienda:\n• Acudir inmediatamente a la unidad de salud más cercana si presenta deterioro de su estado general\n• Continuar con medicamentos prescritos según indicaciones\n• Seguimiento médico ambulatorio en las próximas 24-48 horas\n• Acudir a urgencias si presenta signos de alarma',
                   fontSize: 10,
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -5666,7 +6190,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     '• Dificultad para respirar o falta de aire\n• Dolor de pecho intenso\n• Pérdida de conocimiento o desmayo\n• Vómito persistente\n• Fiebre alta (mayor a 38.5°C)\n• Sangrado abundante\n• Convulsiones\n• Cambios en el estado de conciencia\n• Cualquier síntoma que considere grave o preocupante',
                   fontSize: 10,
                   margin: [10, 10, 10, 10],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -6123,7 +6647,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     '• Archivar en expediente clínico una vez completado',
                   fontSize: 8,
                   margin: [8, 8, 8, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -8603,7 +9127,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                             egresoData.estado_general_egreso ||
                             'Estable, sin signos de alarma.',
                           fontSize: 8,
-                          margin: [5, 5],
+                          margin: [3, 2],
                         },
                       ],
                     ],
@@ -8656,8 +9180,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.diagnosticos_ingreso ||
                     'No especificados en el momento del ingreso.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -8676,8 +9200,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.diagnosticos_finales ||
                     'Diagnósticos finales por definir.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -8721,8 +9245,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.resumen_evolucion ||
                     'Evolución clínica favorable durante la estancia hospitalaria.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -8741,8 +9265,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.manejo_hospitalario ||
                     'Manejo médico integral según protocolos institucionales.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -8785,8 +9309,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.procedimientos_realizados ||
                     'Sin procedimientos especiales durante la estancia.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -8884,8 +9408,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.problemas_pendientes ||
                     'Sin problemas clínicos pendientes al momento del egreso.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -8904,8 +9428,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.plan_manejo_tratamiento ||
                     'Continuar manejo ambulatorio según indicaciones médicas.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -8924,8 +9448,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     egresoData.recomendaciones_ambulatorias ||
                     'Control médico en consulta externa según programación. Acudir a urgencias en caso de signos de alarma.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -9390,8 +9914,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.motivo_consulta ||
                     'Motivo de interconsulta no especificado.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -9410,8 +9934,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.problema_clinico ||
                     'Se solicita valoración y manejo por especialidad correspondiente.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -9454,8 +9978,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.antecedentes_patologicos ||
                     'Sin antecedentes patológicos de importancia.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -9474,8 +9998,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.medicamentos_actuales ||
                     'Sin medicamentos de base reportados.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -9604,8 +10128,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.hallazgos_relevantes ||
                     'Exploración física dirigida según el motivo de interconsulta.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -9648,8 +10172,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.estudios_disponibles ||
                     'Se adjuntan estudios de laboratorio y gabinete disponibles en el expediente.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -9692,8 +10216,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.criterio_diagnostico ||
                     '________________________________________________________________________________________\n________________________________________________________________________________________',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -9712,8 +10236,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.sugerencias_diagnosticas ||
                     '________________________________________________________________________________________\n________________________________________________________________________________________',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -9732,8 +10256,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.sugerencias_tratamiento ||
                     '________________________________________________________________________________________\n________________________________________________________________________________________',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -9752,8 +10276,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     interconsultaData.estudios_sugeridos ||
                     '________________________________________________________________________________________',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -10256,7 +10780,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                       '• En caso de reacciones adversas, suspender y acudir al médico',
                   fontSize: 8,
                   margin: [5, 5, 5, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -11106,8 +11630,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     transfusionData.estado_general ||
                     'Paciente estable durante todo el procedimiento de transfusión. Sin signos de reacciones adversas.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -11187,8 +11711,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                       ? 'Describir tipo de reacción: _________________________________\nManejo aplicado: _________________________________'
                       : 'Sin reacciones adversas reportadas durante el procedimiento.'),
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -11298,8 +11822,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     transfusionData.observaciones_adicionales ||
                     'Transfusión realizada sin complicaciones. Paciente toleró bien el procedimiento.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -11819,8 +12343,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.diagnostico_preoperatorio ||
                     'Diagnóstico preoperatorio por especificar.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -11840,8 +12364,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.plan_quirurgico ||
                     'Plan quirúrgico por definir según evaluación.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -11860,8 +12384,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.tipo_intervencion ||
                     'Tipo de intervención por especificar.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -11963,8 +12487,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.justificacion_riesgo ||
                     'Paciente con riesgo quirúrgico apropiado para el procedimiento programado.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -12011,8 +12535,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                       '• Administrar premedicación según indicación anestésica\n' +
                       '• Verificar consentimiento informado firmado',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -12031,8 +12555,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.medicacion_preoperatoria ||
                     'Según indicación del anestesiólogo.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -12075,8 +12599,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.laboratorio_preoperatorio ||
                     'Biometría hemática, química sanguínea, tiempos de coagulación según protocolo.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -12095,8 +12619,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preoperatoriaData.gabinete_preoperatorio ||
                     'Radiografía de tórax, electrocardiograma según protocolo y edad del paciente.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -12131,7 +12655,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                   }`,
                   fontSize: 8,
                   margin: [5, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -12222,7 +12746,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     ],
                   },
                   layout: 'noBorders',
-                  margin: [5, 5],
+                  margin: [3, 2],
                 },
               ],
             ],
@@ -12685,7 +13209,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Diagnóstico preoperatorio.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -12705,7 +13229,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Operación programada.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -12725,7 +13249,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Operación efectivamente realizada.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -12746,7 +13270,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Diagnóstico postoperatorio.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -12790,8 +13314,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.descripcion_tecnica ||
                     'Descripción detallada de la técnica quirúrgica empleada.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -12810,8 +13334,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.hallazgos_transoperatorios ||
                     'Hallazgos encontrados durante el procedimiento quirúrgico.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -12928,7 +13452,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin incidentes ni accidentes transoperatorios.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13008,8 +13532,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.estudios_transoperatorios ||
                     'No se realizaron estudios transoperatorios.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -13108,7 +13632,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     ],
                   },
                   layout: 'noBorders',
-                  margin: [5, 5],
+                  margin: [3, 2],
                 },
               ],
             ],
@@ -13151,8 +13675,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.estado_postquirurgico ||
                     'Paciente estable al término del procedimiento quirúrgico.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13171,8 +13695,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.plan_postoperatorio ||
                     'Plan de manejo postoperatorio inmediato según protocolo.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -13215,8 +13739,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.pronostico ||
                     'Favorable para la vida y función.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -13236,8 +13760,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postoperatoriaData.envio_biopsias ||
                     'No se enviaron piezas quirúrgicas para estudio histopatológico.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -13273,7 +13797,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin otros hallazgos de importancia para reportar.',
                   fontSize: 8,
                   margin: [5, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -13760,7 +14284,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin antecedentes anestésicos previos conocidos.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13780,7 +14304,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin antecedentes patológicos de importancia para anestesia.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13800,7 +14324,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin medicamentos de importancia anestésica.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13820,7 +14344,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin alergias conocidas a medicamentos.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -13952,7 +14476,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Vía aérea permeable, cuello móvil, apertura oral adecuada, clasificación Mallampati I-II.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
               [
@@ -13972,7 +14496,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Ruidos cardíacos rítmicos, sin soplos. Murmullo vesicular presente bilateral.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -14074,8 +14598,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preanestesicaData.tecnica_especifica ||
                     'Técnica anestésica por definir según evaluación y tipo de cirugía.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -14186,8 +14710,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preanestesicaData.justificacion_riesgo ||
                     'Paciente con estado físico apropiado para anestesia y cirugía programada.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -14230,8 +14754,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     preanestesicaData.premedicacion ||
                     'Premedicación según protocolo anestésico y estado del paciente.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -14296,7 +14820,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Preparación estándar preoperatoria.',
                   fontSize: 8,
                   margin: [5, 3],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -15006,8 +15530,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                       '• Analgésicos\n' +
                       '• Otros medicamentos según protocolo',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -15156,7 +15680,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     'Sin incidentes ni accidentes atribuibles a la anestesia durante el procedimiento.',
                   fontSize: 8,
                   margin: [5, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -15271,8 +15795,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postanestesicaData.balance_hidrico ||
                     'Balance hídrico equilibrado durante el procedimiento anestésico.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -15419,8 +15943,8 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     postanestesicaData.estado_clinico_egreso ||
                     'Paciente estable, consciente, orientado, con signos vitales dentro de parámetros normales. Egresa de quirófano en condiciones satisfactorias.',
                   fontSize: 8,
-                  margin: [5, 5],
-                  lineHeight: 1.3,
+                  margin: [3, 2],
+                  lineHeight: 1.1,
                   bold: true,
                 },
               ],
@@ -15470,7 +15994,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                       '• Indicaciones específicas según evolución',
                   fontSize: 8,
                   margin: [5, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
@@ -15944,7 +16468,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     '• Mejoría de la condición médica\n• Alivio de síntomas\n• Mejor calidad de vida\n• Prevención de complicaciones',
                   fontSize: 8,
                   margin: [8, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
                 {
                   text:
@@ -15952,7 +16476,7 @@ console.log('🔥 DEBUG documentDefinition:', JSON.stringify(documentoFinal, nul
                     '• Sangrado\n• Infección\n• Reacciones alérgicas\n• Dolor temporal\n• Complicaciones específicas del procedimiento',
                   fontSize: 8,
                   margin: [8, 8],
-                  lineHeight: 1.3,
+                  lineHeight: 1.1,
                 },
               ],
             ],
