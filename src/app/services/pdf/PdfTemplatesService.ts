@@ -206,7 +206,7 @@ private obtenerImagenPlaceholder(): string {
     filas += 2; // +2 filas
   }
 
-  console.log(`🔍 Antecedentes: ${filas} filas calculadas (esPediatrico: ${esPediatrico}, sexo: ${pacienteCompleto.sexo})`);
+  console.log(`  Antecedentes: ${filas} filas calculadas (esPediatrico: ${esPediatrico}, sexo: ${pacienteCompleto.sexo})`);
   return filas;
 };
 
@@ -601,8 +601,8 @@ const tablaAntecedentes = {
 
 
 
-  console.log(`🔍 Debug: Tabla tiene ${tablaIdentificacion.table.body.length} filas, rowSpan configurado para ${contarFilasIdentificacion()}`);
-  console.log(`🔍 esPediatrico: ${esPediatrico}`);
+  console.log(`  Debug: Tabla tiene ${tablaIdentificacion.table.body.length} filas, rowSpan configurado para ${contarFilasIdentificacion()}`);
+  console.log(`  esPediatrico: ${esPediatrico}`);
 
 
   validarTabla(tablaIdentificacion, 'Identificación');
@@ -1311,7 +1311,7 @@ const tablaAntecedentes = {
     };
 
     // ✅ AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
-  console.log('🔍 Validando todas las tablas del documento...');
+  console.log('  Validando todas las tablas del documento...');
   try {
     validarTodasLasTablas(documentoFinal.content, 'HistoriaClinica');
     console.log('✅ Todas las tablas validadas correctamente');
@@ -4367,7 +4367,7 @@ async generarNotaUrgencias(datos: any): Promise<any> {
   // 📄 CARTA DE CONSENTIMIENTO INFORMADO PARA REFERENCIA DE PACIENTES SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoReferenciaPacientes(datos: any): Promise<any> {
     console.log(
-      '🔄 Generando Carta de Consentimiento Informado para Referencia de Pacientes según NOM-004...'
+      '  Generando Carta de Consentimiento Informado para Referencia de Pacientes según NOM-004...'
     );
 
     const medicoCompleto = datos.medicoCompleto;
@@ -6380,7 +6380,7 @@ async generarNotaUrgencias(datos: any): Promise<any> {
   }
   // 📄 HOJA DE INFORME DIARIO SEGÚN NOM-004-SSA3-2012
   async generarHojaInformeDiario(datos: any): Promise<any> {
-    console.log('📋 Generando Hoja de Informe Diario según NOM-004...');
+    console.log('  Generando Hoja de Informe Diario según NOM-004...');
 
     const medicoCompleto = datos.medicoCompleto;
     const pacienteCompleto = datos.pacienteCompleto;
@@ -6705,7 +6705,7 @@ async generarNotaUrgencias(datos: any): Promise<any> {
   }
   // 📄 HOJA FRONTAL DE EXPEDIENTE SEGÚN NOM-004-SSA3-2012
   async generarHojaFrontalExpediente(datos: any): Promise<any> {
-    console.log('📋 Generando Hoja Frontal de Expediente según NOM-004...');
+    console.log('  Generando Hoja Frontal de Expediente según NOM-004...');
 
     const medicoCompleto = datos.medicoCompleto;
     const pacienteCompleto = datos.pacienteCompleto;
@@ -9607,7 +9607,7 @@ async generarNotaUrgencias(datos: any): Promise<any> {
   // 📄 NOTA DE INTERCONSULTA SEGÚN NOM-004-SSA3-2012 SECCIÓN D7
   async generarNotaInterconsulta(datos: any): Promise<any> {
     console.log(
-      '🔄 Generando Nota de Interconsulta según NOM-004-SSA3-2012...'
+      '  Generando Nota de Interconsulta según NOM-004-SSA3-2012...'
     );
 
     const medicoCompleto = datos.medicoCompleto;

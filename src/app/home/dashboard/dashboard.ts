@@ -125,7 +125,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   private cargarDatosDashboard(): void {
     this.cargandoDatos = true;
-    console.log('📊 Cargando datos del dashboard...');
+    console.log('  Cargando datos del dashboard...');
 
     // Cargar datos en paralelo con manejo de errores individual
     forkJoin({
@@ -248,7 +248,7 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   private cargarDatosMock(): void {
-    console.log('📋 Cargando datos de respaldo...');
+    console.log('  Cargando datos de respaldo...');
 
     this.statistics = {
       pacientesActivos: 142,
@@ -288,7 +288,7 @@ export class Dashboard implements OnInit, OnDestroy {
     // Actualizar datos cada 5 minutos
     setInterval(() => {
       if (!this.cargandoDatos) {
-        console.log('🔄 Actualizando datos automáticamente...');
+        console.log('  Actualizando datos automáticamente...');
         this.cargarDatosDashboard();
       }
     }, 300000); // 5 minutos
@@ -300,11 +300,11 @@ export class Dashboard implements OnInit, OnDestroy {
 
   toggleEstadisticas(): void {
     this.mostrarEstadisticas = !this.mostrarEstadisticas;
-    console.log('📊 Estadísticas:', this.mostrarEstadisticas ? 'mostradas' : 'ocultas');
+    console.log('  Estadísticas:', this.mostrarEstadisticas ? 'mostradas' : 'ocultas');
   }
 
   refreshData(): void {
-    console.log('🔄 Actualizando datos manualmente...');
+    console.log('  Actualizando datos manualmente...');
     this.cargarDatosDashboard();
   }
 
@@ -403,7 +403,7 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   handleActivityAction(activity: ActividadReciente): void {
-    console.log(`📋 Ejecutando acción: ${activity.action} para ${activity.type}`);
+    console.log(`  Ejecutando acción: ${activity.action} para ${activity.type}`);
 
     switch(activity.action) {
       case 'Ver Expediente':
@@ -411,7 +411,7 @@ export class Dashboard implements OnInit, OnDestroy {
         // TODO: Implementar navegación al expediente específico
         break;
       case 'Ver Detalles':
-        console.log('📋 Mostrando detalles...');
+        console.log('  Mostrando detalles...');
         break;
       case 'Continuar':
         console.log('➡️ Continuando proceso...');

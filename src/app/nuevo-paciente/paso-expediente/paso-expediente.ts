@@ -231,7 +231,7 @@ private initializeForm(): void {
 
 
 crearExpediente(): void {
-  console.log('🔄 Form submitted. Valid:', this.expedienteForm.valid);
+  console.log('  Form submitted. Valid:', this.expedienteForm.valid);
 
   if (!this.expedienteForm.valid) {
     console.log('❌ Form invalid');
@@ -270,7 +270,7 @@ crearExpediente(): void {
       id_medico_creador: 9 // TODO: Obtener del contexto de usuario cuando tengas login
     };
 
-    console.log('🚀 Enviando al backend (ExpedientesService):', expedienteData);
+    console.log('  Enviando al backend (ExpedientesService):', expedienteData);
 
     // Llamada real al backend
     this.expedientesService.createExpediente(expedienteData).subscribe({
@@ -443,7 +443,7 @@ obtenerEjemplosFormato(): string[] {
 
   //   NUEVO MÉTODO: Redirigir al perfil del paciente
   private irAPerfilPaciente(idPaciente: number): void {
-    console.log('🔄 Redirigiendo al perfil del paciente ID:', idPaciente);
+    console.log('  Redirigiendo al perfil del paciente ID:', idPaciente);
 
     // Opcional: Limpiar el wizard state
     // this.wizardStateService.resetWizard();

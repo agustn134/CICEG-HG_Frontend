@@ -98,7 +98,7 @@ export class AuthService {
 
 
 logout(shouldRedirect: boolean = true): void {
-  console.log('🔄 AuthService.logout() iniciado, shouldRedirect:', shouldRedirect);
+  console.log('  AuthService.logout() iniciado, shouldRedirect:', shouldRedirect);
   try {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');

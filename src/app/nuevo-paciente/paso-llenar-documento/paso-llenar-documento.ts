@@ -336,7 +336,7 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
   // ==========================================
 
   onSubmit(): void {
-    console.log('🔄 Guardando documento...');
+    console.log('  Guardando documento...');
 
     if (this.documentoForm.valid && !this.isLoading) {
       this.guardarDocumento();
@@ -356,7 +356,7 @@ export class PasoLlenarDocumento implements OnInit, OnDestroy {
 
       // TODO: Aquí iría la lógica real para actualizar el documento con el contenido
       // Por ahora simulamos guardado exitoso
-      console.log('📋 Datos del formulario a guardar:', formData);
+      console.log('  Datos del formulario a guardar:', formData);
 
       // Simular llamada al backend
       setTimeout(() => {

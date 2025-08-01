@@ -97,7 +97,7 @@ export class PasoResumen implements OnInit, OnDestroy {
       this.resumen.ids.id_documento
     );
 
-    console.log('📋 Resumen completo:', this.resumen);
+    console.log('  Resumen completo:', this.resumen);
     console.log('  Expediente completo:', this.expedienteCompleto);
   }
 
@@ -227,7 +227,7 @@ export class PasoResumen implements OnInit, OnDestroy {
         this.autoGuardadoStatus = '🎉 ¡Expediente creado exitosamente!';
 
         console.log('🎉 Proceso completado exitosamente');
-        console.log('📋 Resumen final:', this.resumen);
+        console.log('  Resumen final:', this.resumen);
 
         // Navegar al dashboard después de un momento
         setTimeout(() => {
@@ -245,7 +245,7 @@ export class PasoResumen implements OnInit, OnDestroy {
   }
 
   crearNuevoExpediente(): void {
-    console.log('🔄 Iniciando nuevo expediente...');
+    console.log('  Iniciando nuevo expediente...');
 
     // Limpiar wizard state
     this.wizardStateService.resetWizard();

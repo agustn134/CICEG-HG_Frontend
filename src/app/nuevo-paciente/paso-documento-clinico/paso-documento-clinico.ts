@@ -499,7 +499,7 @@
 //   }
 
 //   onSubmit(): void {
-//     console.log('🔄 Form submitted. Valid:', this.documentoForm.valid);
+//     console.log('  Form submitted. Valid:', this.documentoForm.valid);
 
 //     if (this.documentoForm.valid && this.tipoSeleccionado && !this.isLoading) {
 //       if (this.documentoForm.get('crear_inmediatamente')?.value) {
@@ -559,7 +559,7 @@
 //         requiere_firma: false
 //       };
 
-//       console.log('🚀 Enviando al backend (DocumentosService):', documentoData);
+//       console.log('  Enviando al backend (DocumentosService):', documentoData);
 
 //       // Llamada real al backend
 //       this.documentosService.createDocumentoClinico(documentoData).subscribe({
@@ -945,7 +945,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
   }
 
   private loadTiposDocumento(): void {
-    console.log('🔄 Iniciando carga de tipos de documento...');
+    console.log('  Iniciando carga de tipos de documento...');
 
     // Cargar tipos de documento del backend
     this.catalogoService.getTiposDocumento()
@@ -960,7 +960,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
             .filter(tipo => tipo !== null) as TipoDocumento[];
 
           console.log('  Tipos de documento mapeados:', this.tiposDocumento.length);
-          console.log('📋 Lista final de tipos:', this.tiposDocumento);
+          console.log('  Lista final de tipos:', this.tiposDocumento);
         },
         error: (error) => {
           console.error('❌ Error al cargar tipos de documento:', error);
@@ -971,7 +971,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
   }
 
   private mapTipoDocumentoToLocal(tipoBackend: any): TipoDocumento | null {
-    console.log('🔄 Mapeando tipo de documento:', tipoBackend);
+    console.log('  Mapeando tipo de documento:', tipoBackend);
 
     // Validar que tenemos los datos mínimos necesarios
     if (!tipoBackend) {
@@ -1364,7 +1364,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    console.log('🔄 Form submitted. Valid:', this.documentoForm.valid);
+    console.log('  Form submitted. Valid:', this.documentoForm.valid);
 
     if (this.documentoForm.valid && this.tipoSeleccionado && !this.isLoading) {
       if (this.documentoForm.get('crear_inmediatamente')?.value) {
@@ -1424,7 +1424,7 @@ export class PasoDocumentoClinico implements OnInit, OnDestroy {
         requiere_firma: false
       };
 
-      console.log('🚀 Enviando al backend (DocumentosService):', documentoData);
+      console.log('  Enviando al backend (DocumentosService):', documentoData);
 
       // Llamada real al backend
       this.documentosService.createDocumentoClinico(documentoData).subscribe({

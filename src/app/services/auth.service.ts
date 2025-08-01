@@ -75,7 +75,7 @@ export class AuthService {
     this.currentUserSubject.next(user);
     this.saveUserToStorage(user);
     this.loggedIn = true;
-    console.log('🔄 Usuario establecido en AuthService:', user);
+    console.log('  Usuario establecido en AuthService:', user);
   }
 
   // 🆕 Método para actualizar la foto del usuario actual
@@ -85,7 +85,7 @@ export class AuthService {
       const updatedUser = { ...currentUser, foto: photoUrl || undefined };
       this.currentUserSubject.next(updatedUser);
       this.saveUserToStorage(updatedUser);
-      console.log('🔄 Foto sincronizada en AuthService:', photoUrl);
+      console.log('  Foto sincronizada en AuthService:', photoUrl);
     }
   }
 
@@ -96,7 +96,7 @@ export class AuthService {
       const updatedUser = { ...currentUser, ...userUpdates };
       this.currentUserSubject.next(updatedUser);
       this.saveUserToStorage(updatedUser);
-      console.log('🔄 Usuario actualizado en AuthService:', userUpdates);
+      console.log('  Usuario actualizado en AuthService:', userUpdates);
     }
   }
 }

@@ -335,7 +335,7 @@ private saveAndContinue(): void {
     // Preparar datos del formulario
     const formData = this.personaForm.value as DatosPersona;
 
-    console.log('🔄 Datos del wizard:', formData);
+    console.log('  Datos del wizard:', formData);
 
     // Convertir datos del wizard al formato del frontend service
     const personaFrontendDto: CreatePersonaFrontendDto = {
@@ -356,7 +356,7 @@ private saveAndContinue(): void {
       activo: true
     };
 
-    console.log('🚀 Enviando al backend:', personaFrontendDto);
+    console.log('  Enviando al backend:', personaFrontendDto);
 
     // Llamada real al backend a través del PersonasService
     this.personasService.createPersona(personaFrontendDto).subscribe({
@@ -444,12 +444,12 @@ private saveAndContinueAlternative(): void {
     // Preparar datos del formulario
     const formData = this.personaForm.value as DatosPersona;
 
-    console.log('🔄 Datos del wizard:', formData);
+    console.log('  Datos del wizard:', formData);
 
     // Usar el mapper del wizard para convertir al formato backend
     const backendData = WizardPersonaMapper.toBackendFormat(formData);
 
-    console.log('🚀 Datos convertidos para backend:', backendData);
+    console.log('  Datos convertidos para backend:', backendData);
 
     // Crear DTO frontend compatible
     const frontendDto: CreatePersonaFrontendDto = {

@@ -1215,7 +1215,7 @@ guardarBorrador(): void {
       }
 
       console.log(
-        '📋 Documentos existentes cargados:',
+        '  Documentos existentes cargados:',
         this.documentosExistentes
       );
     } catch (error) {
@@ -2467,7 +2467,7 @@ filtrarGuiasClinicas(): void {
           this.isLoading = false;
           console.log('- Componente inicializado correctamente');
           console.log('   Datos del paciente:', this.pacienteCompleto);
-          console.log('📋 Catálogos cargados:', data.catalogos);
+          console.log('  Catálogos cargados:', data.catalogos);
         },
         error: (error) => {
           console.error('❌ Error al inicializar componente:', error);
@@ -3788,10 +3788,10 @@ private async guardarTamizajeNeonatal(): Promise<void> {
 }
 
   private async guardarConsentimiento(): Promise<void> {
-    console.log('🔄 Guardando consentimiento informado...');
+    console.log('  Guardando consentimiento informado...');
     if (!this.consentimientoForm.valid) {
       console.error('❌ Formulario de consentimiento informado inválido');
-      console.log('🔍 Errores del formulario:', this.consentimientoForm.errors);
+      console.log('  Errores del formulario:', this.consentimientoForm.errors);
       throw new Error('Formulario de consentimiento informado inválido');
     }
     const tipoConsentimiento = this.tiposDocumentosDisponibles.find(
@@ -3803,7 +3803,7 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     if (!tipoConsentimiento) {
       console.error('❌ Tipo de documento de consentimiento no encontrado');
       console.log(
-        '🔍 Tipos disponibles:',
+        '  Tipos disponibles:',
         this.tiposDocumentosDisponibles.map((t) => t.nombre)
       );
       throw new Error(
@@ -3843,8 +3843,8 @@ private async guardarTamizajeNeonatal(): Promise<void> {
         new Date().toISOString(),
     };
 
-    console.log('🚀 Datos del consentimiento a enviar:', consentimientoData);
-    console.log('🔍 Campos verificados:');
+    console.log('  Datos del consentimiento a enviar:', consentimientoData);
+    console.log('  Campos verificados:');
     console.log('  - id_documento:', consentimientoData.id_documento);
     console.log(
       '  - tipo_consentimiento:',
@@ -3863,7 +3863,7 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       console.log('✅ Consentimiento informado guardado exitosamente:',response );
     } catch (error: any) {
       console.error('❌ Error al guardar consentimiento informado:', error);
-      console.error('📋 Detalles del error:', {
+      console.error('  Detalles del error:', {
         status: error?.status,
         message: error?.message,
         error: error?.error,
@@ -4105,12 +4105,12 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       documentosRecientes: documentosRecientes,
     };
 
-    console.log('📊 Resumen general cargado:', this.resumenGeneral);
+    console.log('  Resumen general cargado:', this.resumenGeneral);
   }
 
   // Método para refrescar la vista general
   refrescarVistaGeneral(): void {
-    console.log('🔄 Refrescando vista general...');
+    console.log('  Refrescando vista general...');
     this.cargarResumenGeneral();
   }
 
@@ -4164,9 +4164,9 @@ private async guardarTamizajeNeonatal(): Promise<void> {
     if (ultimosSignos) {
       if (ultimosSignos.temperatura) {
         if (ultimosSignos.temperatura > 38.5) {
-          alertas.push('🌡️ Fiebre alta (>38.5°C)');
+          alertas.push(' Fiebre alta (>38.5°C)');
         } else if (ultimosSignos.temperatura < 35) {
-          alertas.push('🌡️ Hipotermia (<35°C)');
+          alertas.push(' Hipotermia (<35°C)');
         }
       }
       if (
@@ -4198,18 +4198,18 @@ private async guardarTamizajeNeonatal(): Promise<void> {
       // Alertas de saturación de oxígeno
       if (ultimosSignos.saturacion_oxigeno) {
         if (ultimosSignos.saturacion_oxigeno < 90) {
-          alertas.push('🫁 Hipoxemia crítica (<90%)');
+          alertas.push('Hipoxemia crítica (<90%)');
         } else if (ultimosSignos.saturacion_oxigeno < 95) {
-          alertas.push('🫁 Saturación baja (<95%)');
+          alertas.push('Saturación baja (<95%)');
         }
       }
 
       // Alertas de frecuencia respiratoria
       if (ultimosSignos.frecuencia_respiratoria) {
         if (ultimosSignos.frecuencia_respiratoria > 24) {
-          alertas.push('🫁 Taquipnea (>24 rpm)');
+          alertas.push('Taquipnea (>24 rpm)');
         } else if (ultimosSignos.frecuencia_respiratoria < 12) {
-          alertas.push('🫁 Bradipnea (<12 rpm)');
+          alertas.push('Bradipnea (<12 rpm)');
         }
       }
     }
@@ -4499,7 +4499,7 @@ private mostrarMensajeValidacion(formulario: string): void {
       }
 
       if (!this.documentoClinicoActual) {
-        console.log('🔄 Creando nuevo documento clínico padre...');
+        console.log('  Creando nuevo documento clínico padre...');
         await this.crearDocumentoClinicoPadre();
       }
     }
@@ -4849,20 +4849,20 @@ private mostrarMensajeValidacion(formulario: string): void {
 
   async generarPDF(tipoDocumento: string): Promise<void> {
     try {
-    console.log('🔍 DEBUG - Datos del formulario antes de enviar:');
+    console.log('  DEBUG - Datos del formulario antes de enviar:');
     console.log('- historiaClinica form value:', this.historiaClinicaForm?.value);
     console.log('- signosVitales form value:', this.signosVitalesForm?.value);
     console.log(`- Generando PDF para: ${tipoDocumento}`);
     this.isCreatingDocument = true;
     const medicoCompleto = await this.obtenerDatosMedicoCompleto();
     const datosPacienteEstructurados = this.extraerDatosPaciente();
-    console.log( '📋 Datos del paciente estructurados:', datosPacienteEstructurados );
+    console.log( '  Datos del paciente estructurados:', datosPacienteEstructurados );
     console.log( '🩺 Signos vitales del formulario:', this.signosVitalesForm.value );
     console.log( '📖 Guía clínica seleccionada:', this.guiaClinicaSeleccionada );
     console.log('🩸 Tipo de sangre del paciente:', datosPacienteEstructurados.tipo_sangre);
-    console.log('📋 Datos completos del paciente:', datosPacienteEstructurados);
+    console.log('  Datos completos del paciente:', datosPacienteEstructurados);
     console.log('🏠 Domicilio del paciente:', datosPacienteEstructurados.domicilio);
-    console.log('📋 Estructura persona:', this.pacienteCompleto?.persona);
+    console.log('  Estructura persona:', this.pacienteCompleto?.persona);
       switch (tipoDocumento) {
         case 'Historia Clínica':
           await this.pdfGeneratorService.generarHistoriaClinica({
@@ -5869,14 +5869,14 @@ private extraerDatosPaciente(): any {
   const edad = this.calcularEdad(persona.fecha_nacimiento || '');
   const esPediatrico = edad < 18;
 
-  // 🔍 DEBUG ESPECÍFICO PARA TIPO DE SANGRE
+  //   DEBUG ESPECÍFICO PARA TIPO DE SANGRE
   console.log('🩸 DEBUG - Buscando tipo de sangre:');
 console.log('- persona.tipo_sangre:', persona.tipo_sangre);
 console.log('- persona.tipo_sangre_id:', persona.tipo_sangre_id);
 console.log('- paciente?.tipo_sangre:', paciente?.tipo_sangre);
 console.log('- paciente?.tipo_sangre_id:', paciente?.tipo_sangre_id);
-console.log('📋 Todas las propiedades de persona:', Object.keys(persona));
-console.log('📋 Todas las propiedades de paciente:', Object.keys(paciente || {}));
+console.log('  Todas las propiedades de persona:', Object.keys(persona));
+console.log('  Todas las propiedades de paciente:', Object.keys(paciente || {}));
 console.log('🗺️ DEBUG - Buscando lugar de nacimiento:');
 console.log('- persona.lugar_nacimiento:', persona.lugar_nacimiento);
 console.log('- persona.ciudad:', persona.ciudad);
@@ -5942,7 +5942,7 @@ console.log('- persona.municipio:', persona.municipio);
 
   };
 console.log('🩸 RESULTADO FINAL tipo_sangre:', datosBase.tipo_sangre);
-console.log('🔍 VALORES DISPONIBLES:');
+console.log('  VALORES DISPONIBLES:');
 console.log('  - persona.tipo_sangre:', persona.tipo_sangre);
 console.log('  - paciente?.tipo_sangre:', paciente?.tipo_sangre);
 console.log('  - this.pacienteCompleto?.tipo_sangre:', this.pacienteCompleto?.tipo_sangre);

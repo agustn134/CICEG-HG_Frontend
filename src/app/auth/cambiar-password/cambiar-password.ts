@@ -84,7 +84,7 @@ export class CambiarPassword implements OnInit, OnDestroy {
   this.passwordResetService.loading$
     .pipe(takeUntil(this.destroy$))
     .subscribe(loading => {
-      console.log('🔄 Loading state changed:', loading);
+      console.log('  Loading state changed:', loading);
       this.isLoading = loading;
     });
 
@@ -153,7 +153,7 @@ export class CambiarPassword implements OnInit, OnDestroy {
       newPassword: newPassword
     };
 
-    console.log('🔄 Cambiando contraseña...');
+    console.log('  Cambiando contraseña...');
 
     this.passwordResetService.resetPassword(resetData)
       .pipe(takeUntil(this.destroy$))

@@ -90,7 +90,7 @@ export class PasoPaciente implements OnInit, OnDestroy {
   }
 
 private loadCatalogos(): void {
-  console.log('🔄 Iniciando carga de catálogos...');
+  console.log('  Iniciando carga de catálogos...');
 
   //   CORRECCIÓN: Cargar tipos de sangre con mapeo correcto
   this.catalogoService.getTiposSangre()
@@ -121,7 +121,7 @@ private loadCatalogos(): void {
           { value: 'O-', label: 'O-' },
           { value: 'Desconocido', label: 'Desconocido' }
         ];
-        console.log('🔄 Usando tipos de sangre de fallback:', this.tiposSangre);
+        console.log('  Usando tipos de sangre de fallback:', this.tiposSangre);
       }
     });
 
@@ -269,7 +269,7 @@ private loadCatalogos(): void {
   // ==========================================
 
   onSubmit(): void {
-    console.log('🔄 Form submitted. Valid:', this.pacienteForm.valid);
+    console.log('  Form submitted. Valid:', this.pacienteForm.valid);
 
     if (this.pacienteForm.valid && !this.isLoading) {
       this.saveAndContinue();
@@ -303,7 +303,7 @@ private loadCatalogos(): void {
   //     // Preparar datos del formulario
   //     const formData = this.pacienteForm.value;
 
-  //     console.log('🔄 Datos del formulario paciente:', formData);
+  //     console.log('  Datos del formulario paciente:', formData);
 
   //     // Preparar DTO para el backend
   //     const createPacienteDto: CreatePacienteDto = {
@@ -323,7 +323,7 @@ private loadCatalogos(): void {
   //       activo: true
   //     };
 
-  //     console.log('🚀 Enviando al backend (PacientesService):', createPacienteDto);
+  //     console.log('  Enviando al backend (PacientesService):', createPacienteDto);
 
   //     // Llamada real al backend
   //     this.pacientesService.createPaciente(createPacienteDto).subscribe({
@@ -427,7 +427,7 @@ private loadCatalogos(): void {
 
     try {
       const formData = this.pacienteForm.value;
-      console.log('🔄 Datos del formulario paciente:', formData);
+      console.log('  Datos del formulario paciente:', formData);
 
       //   CORRECCIÓN: Buscar el nombre del tipo de sangre seleccionado
       const tipoSangreSeleccionado = this.tiposSangre.find(
@@ -459,7 +459,7 @@ private loadCatalogos(): void {
       };
 
       console.log(
-        '🚀 Enviando al backend (PacientesService):',
+        '  Enviando al backend (PacientesService):',
         createPacienteDto
       );
 

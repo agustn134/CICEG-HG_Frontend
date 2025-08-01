@@ -61,7 +61,7 @@ export class RecuperarPassword implements OnInit, OnDestroy {
 
     const formData = this.recuperarForm.value as PasswordResetRequest;
 
-    console.log('🔄 Enviando solicitud de recuperación:', formData);
+    console.log('  Enviando solicitud de recuperación:', formData);
 
     this.passwordResetService.requestPasswordReset(formData)
       .pipe(takeUntil(this.destroy$))

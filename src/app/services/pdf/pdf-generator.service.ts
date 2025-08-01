@@ -627,7 +627,7 @@ export class PdfGeneratorService {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -635,7 +635,7 @@ export class PdfGeneratorService {
       const faltantes = Object.entries(validaciones)
         .filter(([_, valor]) => !valor)
         .map(([campo, _]) => campo);
-      console.warn('📋 Campos faltantes:', faltantes);
+      console.warn('  Campos faltantes:', faltantes);
     } else {
       console.log('  CUMPLIMIENTO NORMATIVO SATISFACTORIO');
     }
@@ -807,7 +807,7 @@ private formatearDireccionMejorada(paciente: any): string {
     try {
       await this.ensurePdfMakeLoaded();
 
-      console.log('📊 Generando Signos Vitales con datos completos...');
+      console.log('  Generando Signos Vitales con datos completos...');
 
       const medicoCompleto = await this.obtenerDatosMedicoActual();
       const pacienteCompleto = this.validarYFormatearDatosPaciente(
@@ -827,7 +827,7 @@ private formatearDireccionMejorada(paciente: any): string {
             body: [
               [
                 {
-                  text: '📊',
+                  text: ' ',
                   fontSize: 20,
                   alignment: 'center',
                   color: '#7c3aed',
@@ -1550,7 +1550,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA URGENCIAS NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA URGENCIAS NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1610,7 +1610,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA EVOLUCIÓN NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA EVOLUCIÓN NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1666,7 +1666,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO CONSENTIMIENTO INFORMADO: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO CONSENTIMIENTO INFORMADO: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1723,7 +1723,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO CONSENTIMIENTO HOSPITALIZACIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO CONSENTIMIENTO HOSPITALIZACIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1787,7 +1787,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO CONSENTIMIENTO REFERENCIA: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO CONSENTIMIENTO REFERENCIA: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1870,7 +1870,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO CONSENTIMIENTO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO CONSENTIMIENTO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -1939,7 +1939,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO CONSENTIMIENTO TRATAMIENTO: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO CONSENTIMIENTO TRATAMIENTO: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2017,7 +2017,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO HOJA ALTA VOLUNTARIA: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO HOJA ALTA VOLUNTARIA: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2083,7 +2083,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO HOJA INFORME DIARIO: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO HOJA INFORME DIARIO: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2168,7 +2168,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA EGRESO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA EGRESO NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2226,7 +2226,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA INTERCONSULTA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA INTERCONSULTA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2287,7 +2287,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO PRESCRIPCIÓN MEDICAMENTOS: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO PRESCRIPCIÓN MEDICAMENTOS: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2362,7 +2362,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO REGISTRO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO REGISTRO TRANSFUSIÓN: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2463,7 +2463,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA POSTOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA POSTOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2535,7 +2535,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA PREOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA PREOPERATORIA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2609,7 +2609,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const porcentaje = Math.round((cumplimiento / total) * 100);
 
     console.log(
-      `📊 CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
+      `  CUMPLIMIENTO NOTA POSTANESTÉSICA NOM-004: ${cumplimiento}/${total} (${porcentaje}%)`
     );
 
     if (porcentaje < 90) {
@@ -2657,7 +2657,7 @@ async generarHistoriaClinica(datos: any): Promise<void> {
     };
 
     // ✅ DEBUG: Verificar que los datos llegan correctamente
-    console.log('🔍 Datos del paciente que van al template:', pacienteCompleto);
+    console.log('  Datos del paciente que van al template:', pacienteCompleto);
     console.log('🏠 Domicilio del paciente:', pacienteCompleto.domicilio);
     console.log('🩸 Tipo de sangre:', pacienteCompleto.tipo_sangre);
 
@@ -2668,7 +2668,7 @@ async generarHistoriaClinica(datos: any): Promise<void> {
       throw new Error('Definición del documento inválida');
     }
 
-    console.log('🔍 Contenido del documento:', documentDefinition.content.length, 'elementos');
+    console.log('  Contenido del documento:', documentDefinition.content.length, 'elementos');
 
     // 4. Generar nombre del archivo
     const fechaActual = new Date();
@@ -3061,7 +3061,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
 // ==========================================
 
  async generarNotaConsentimientoProcedimientos(datos: any): Promise<void> {
-  console.log('📋 Generando Consentimiento Informado de Procedimientos...');
+  console.log('  Generando Consentimiento Informado de Procedimientos...');
 
   try {
     await this.ensurePdfMakeLoaded();
@@ -3292,7 +3292,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
 }
 
 private async generarHojaInformeDiario(datos: any): Promise<void> {
-  console.log('📊 Generando Hoja de Informe Diario...');
+  console.log('  Generando Hoja de Informe Diario...');
 
   try {
     await this.ensurePdfMakeLoaded();

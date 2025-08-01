@@ -119,7 +119,7 @@ confirmLogout(): void {
 
 ---
 
-## 📋 ARCHIVOS MODIFICADOS/CREADOS
+##   ARCHIVOS MODIFICADOS/CREADOS
 
 ### 🆕 **Archivos Nuevos**:
 - `src/app/interceptors/error.interceptor.ts`
@@ -146,7 +146,7 @@ confirmLogout(): void {
 - ✅ **Agregado**: Sistema de notificaciones user-friendly
 - ✅ **Mejorado**: UX sin interrupciones en el flujo de trabajo
 
-### 🔍 **TESTING**:
+###   **TESTING**:
 ```bash
 # Para probar el fix:
 ng serve

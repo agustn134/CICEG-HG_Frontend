@@ -38,7 +38,7 @@ private async guardarConsentimiento(): Promise<void> {
 ### ✅ **DESPUÉS** - Método corregido:
 ```typescript
 private async guardarConsentimiento(): Promise<void> {
-  console.log('🔄 Guardando consentimiento informado...');
+  console.log('  Guardando consentimiento informado...');
   
   // ✅ PASO 1: Validar formulario
   if (!this.consentimientoForm.valid) {
@@ -67,7 +67,7 @@ private async guardarConsentimiento(): Promise<void> {
     // ... otros campos según el modelo CreateConsentimientoInformadoDto
   };
 
-  console.log('🚀 Datos del consentimiento a enviar:', consentimientoData);
+  console.log('  Datos del consentimiento a enviar:', consentimientoData);
   
   const response = await firstValueFrom(
     this.consentimientosService.createConsentimiento(consentimientoData)
@@ -77,17 +77,17 @@ private async guardarConsentimiento(): Promise<void> {
 
 ---
 
-## 🔍 SERVICIOS MEJORADOS
+##   SERVICIOS MEJORADOS
 
 ### **ConsentimientosService** (`src/app/services/documentos-clinicos/consentimientos-informados.ts`)
 
 **✅ Agregado debug detallado**:
 ```typescript
 createConsentimiento(data: any): Observable<ApiResponse<any>> {
-  console.log('🔄 ConsentimientosService.createConsentimiento()');
-  console.log('🚀 URL:', `${this.apiUrl}`);
-  console.log('🚀 Datos enviados:', data);
-  console.log('🔍 Campos requeridos verificados:');
+  console.log('  ConsentimientosService.createConsentimiento()');
+  console.log('  URL:', `${this.apiUrl}`);
+  console.log('  Datos enviados:', data);
+  console.log('  Campos requeridos verificados:');
   console.log('  - id_documento:', data.id_documento ? '✅' : '❌');
   console.log('  - tipo_consentimiento:', data.tipo_consentimiento ? '✅' : '❌');
   console.log('  - procedimiento_autorizado:', data.procedimiento_autorizado ? '✅' : '❌');
@@ -98,7 +98,7 @@ createConsentimiento(data: any): Observable<ApiResponse<any>> {
 
 ---
 
-## 📋 PATRÓN CORRECTO IDENTIFICADO
+##   PATRÓN CORRECTO IDENTIFICADO
 
 ### **Flujo de creación de documentos clínicos**:
 

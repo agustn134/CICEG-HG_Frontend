@@ -1,4 +1,4 @@
-# 🚀 IMPLEMENTACIÓN PASO PACIENTE - INSTRUCCIONES COMPLETAS
+#   IMPLEMENTACIÓN PASO PACIENTE - INSTRUCCIONES COMPLETAS
 
 ## ARCHIVOS A CREAR/ACTUALIZAR
 
@@ -146,7 +146,7 @@ npm install @angular/forms
 - Normal si no hay backend
 - Debería usar datos estáticos de fallback automáticamente
 
-## 📊 ESTADO ESPERADO DESPUÉS DE IMPLEMENTAR
+##   ESTADO ESPERADO DESPUÉS DE IMPLEMENTAR
 
 ###   **LO QUE DEBERÍA FUNCIONAR:**
 1. **Navegación completa:** Inicio → Persona → Paciente
@@ -173,4 +173,4 @@ Una vez implementado correctamente, tendrás:
 -   **Auto-guardado funcional**
 -   **Navegación inteligente entre pasos**
 
-**¡El sistema ya tiene una base sólida para el registro de pacientes!** 🚀
+**¡El sistema ya tiene una base sólida para el registro de pacientes!**  

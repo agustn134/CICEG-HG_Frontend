@@ -63,7 +63,7 @@ export class WizardLayout implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🔄 Inicializando WizardLayout...');
+    console.log('  Inicializando WizardLayout...');
 
     // Verificar y limpiar estado si es necesario
     this.checkAndResetStateIfNeeded();
@@ -137,7 +137,7 @@ export class WizardLayout implements OnInit, OnDestroy {
     this.wizardStateService.getState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
-        console.log('📊 Estado del wizard actualizado:', state);
+        console.log('  Estado del wizard actualizado:', state);
         this.wizardState = state;
 
         if (state) {
@@ -185,7 +185,7 @@ export class WizardLayout implements OnInit, OnDestroy {
       }
     }
 
-    console.log('🔄 Pasos actualizados desde ruta:', this.steps.map(s => ({
+    console.log('  Pasos actualizados desde ruta:', this.steps.map(s => ({
       title: s.title,
       active: s.isActive,
       completed: s.isCompleted
@@ -202,8 +202,8 @@ export class WizardLayout implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('🔄 Actualizando UI de pasos...');
-    console.log('📋 Pasos completados:', state.completedSteps);
+    console.log('  Actualizando UI de pasos...');
+    console.log('  Pasos completados:', state.completedSteps);
     console.log('🎯 Paso actual:', state.currentStep);
 
     this.steps.forEach((step, index) => {
@@ -269,7 +269,7 @@ export class WizardLayout implements OnInit, OnDestroy {
     const progress = ((completedCount + activeProgress) / totalSteps) * 100;
     const finalProgress = Math.min(Math.round(progress), 100);
 
-    console.log(`📊 Progreso calculado: ${finalProgress}% (completados: ${completedCount}, activo: ${activeStepIndex >= 0})`);
+    console.log(`  Progreso calculado: ${finalProgress}% (completados: ${completedCount}, activo: ${activeStepIndex >= 0})`);
 
     return finalProgress;
   }
@@ -320,7 +320,7 @@ export class WizardLayout implements OnInit, OnDestroy {
     }
 
     const targetStep = this.steps[stepIndex];
-    console.log(`🔄 Navegando al paso ${stepIndex + 1}: ${targetStep.title}`);
+    console.log(`  Navegando al paso ${stepIndex + 1}: ${targetStep.title}`);
 
     // Actualizar estado del wizard
     this.wizardStateService.goToStep(targetStep.stepEnum);

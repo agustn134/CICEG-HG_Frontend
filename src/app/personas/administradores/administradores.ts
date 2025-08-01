@@ -424,7 +424,7 @@ private crearAdministrador(formData: any): void {
     activo: true
   };
 
-  console.log('🔄 Creando persona:', createPersonaDto);
+  console.log('  Creando persona:', createPersonaDto);
 
   this.personasService.createPersona(createPersonaDto)
     .pipe(
@@ -441,7 +441,7 @@ private crearAdministrador(formData: any): void {
             activo: formData.activo
           };
 
-          console.log('🔄 Creando administrador:', createAdminDto);
+          console.log('  Creando administrador:', createAdminDto);
           return this.administradorService.createAdministrador(createAdminDto);
         } else {
           throw new Error(personaResponse.message || 'Error al crear la persona');
@@ -485,8 +485,8 @@ private actualizarAdministrador(formData: any): void {
       estado_civil: formData.estado_civil
     };
 
-    console.log('🔄 Actualizando persona con ID:', this.administradorEnEdicion.id_persona);
-    console.log('🔄 Datos a actualizar:', updatePersonaDto);
+    console.log('  Actualizando persona con ID:', this.administradorEnEdicion.id_persona);
+    console.log('  Datos a actualizar:', updatePersonaDto);
 
     // ← CAMBIO: usar this.administradorEnEdicion.id_persona en lugar de this.administradorEnEdicion.persona.id_persona
     this.personasService.updatePersona(this.administradorEnEdicion.id_persona, updatePersonaDto)
@@ -502,7 +502,7 @@ private actualizarAdministrador(formData: any): void {
               activo: formData.activo
             };
 
-            console.log('🔄 Actualizando administrador:', updateAdminDto);
+            console.log('  Actualizando administrador:', updateAdminDto);
             return this.administradorService.updateAdministrador(this.administradorEnEdicion!.id_administrador, updateAdminDto);
           } else {
             throw new Error(personaResponse.message || 'Error al actualizar la persona');

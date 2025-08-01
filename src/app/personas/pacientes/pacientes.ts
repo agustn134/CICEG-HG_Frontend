@@ -151,7 +151,7 @@ export class Pacientes implements OnInit, OnDestroy {
         next: (response: ApiResponse<EstadisticasPacientes>) => {
           if (response.success && response.data) {
             this.estadisticas = response.data;
-            console.log('📊 Estadísticas de pacientes cargadas');
+            console.log('  Estadísticas de pacientes cargadas');
           }
         },
         error: (error) => {
@@ -161,7 +161,7 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   recargarDatos(): void {
-    console.log('🔄 Recargando datos de pacientes...');
+    console.log('  Recargando datos de pacientes...');
     this.limpiarError();
     this.cargarPacientes();
     this.cargarEstadisticas();
@@ -201,7 +201,7 @@ export class Pacientes implements OnInit, OnDestroy {
 
   toggleEstadisticas(): void {
     this.mostrarEstadisticas = !this.mostrarEstadisticas;
-    console.log('📊 Estadísticas:', this.mostrarEstadisticas ? 'mostradas' : 'ocultas');
+    console.log('  Estadísticas:', this.mostrarEstadisticas ? 'mostradas' : 'ocultas');
   }
 
   cambiarVista(nuevaVista: 'tabla' | 'tarjetas'): void {
@@ -235,7 +235,7 @@ export class Pacientes implements OnInit, OnDestroy {
   }
 
   verExpedientes(paciente: Paciente): void {
-    console.log('📋 Ver expedientes de:', paciente.nombre_completo);
+    console.log('  Ver expedientes de:', paciente.nombre_completo);
     this.router.navigate(['/app/gestion-expedientes/expedientes'], {
       queryParams: { paciente: paciente.id_paciente }
     });

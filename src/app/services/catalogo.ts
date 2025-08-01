@@ -140,7 +140,7 @@ export class CatalogoService {
             }
           ];
 
-          console.log('🔄 Usando tipos de fallback:', fallbackTipos);
+          console.log('  Usando tipos de fallback:', fallbackTipos);
           return of(fallbackTipos);
         }),
         shareReplay(1) // Cache la respuesta
@@ -208,7 +208,7 @@ preloadEssentialCatalogos(): Observable<boolean> {
     // ❌ NO incluir: 'tipos_documentos_clinicos' porque da problemas
   ];
 
-  console.log('🔄 Precargando catálogos esenciales:', essentialTypes);
+  console.log('  Precargando catálogos esenciales:', essentialTypes);
 
   // Si no hay catálogos que cargar, retornar éxito inmediatamente
   if (essentialTypes.length === 0) {
@@ -446,7 +446,7 @@ preloadEssentialCatalogos(): Observable<boolean> {
         }
 
         const staticData = this.getStaticCatalogo(tipo);
-        console.log(`🔄 ${staticData.length} items estáticos para ${tipo}`);
+        console.log(`  ${staticData.length} items estáticos para ${tipo}`);
 
         return of(staticData);
       }),

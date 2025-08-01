@@ -620,7 +620,7 @@ export class ModernSidebarComponent implements OnInit {
      .pipe(takeUntil(this.destroy$))
      .subscribe((user) => {
        this.currentUser = user;
-       console.log('🔄 Usuario actualizado en Sidebar:', user?.foto);
+       console.log('  Usuario actualizado en Sidebar:', user?.foto);
      });
  }
 
@@ -661,7 +661,7 @@ export class ModernSidebarComponent implements OnInit {
 
   // Nuevo método para manejar el click en el perfil
   handleProfileClick(): void {
-    console.log('🔍 Abriendo perfil del usuario');
+    console.log('  Abriendo perfil del usuario');
 
     if (this.currentUser?.tipo_usuario === 'medico') {
       // Ir al perfil médico

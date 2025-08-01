@@ -246,7 +246,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
   // ==========================================
 
   private initializeComponent(): void {
-    console.log('🔄 Inicializando componente nuevo-paciente...');
+    console.log('  Inicializando componente nuevo-paciente...');
 
     //   INICIALIZACIÓN LIMPIA DEL WIZARD
     this.wizardStateService.initializeWizard();
@@ -262,7 +262,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.wizardState = state;
-        console.log('📊 Estado del wizard en nuevo-paciente:', state);
+        console.log('  Estado del wizard en nuevo-paciente:', state);
       });
   }
 
@@ -271,7 +271,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
     this.isLoadingCatalogos = true;
     this.catalogosError = false;
 
-    console.log('🔄 Precargando catálogos esenciales...');
+    console.log('  Precargando catálogos esenciales...');
 
     //   TIMEOUT DE SEGURIDAD - Si no carga en 3 segundos, continuar
     const timeout$ = timer(3000);
@@ -312,7 +312,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
         // NO incluir: estados_civiles, religiones, etc. porque dan 404
       ];
 
-      console.log('📋 Cargando catálogos existentes:', existingCatalogs);
+      console.log('  Cargando catálogos existentes:', existingCatalogs);
 
       // Cargar solo los que existen
       const loadPromises = existingCatalogs.map(async (catalog) => {
@@ -329,7 +329,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
       const results = await Promise.all(loadPromises);
       const successCount = results.filter(r => r).length;
 
-      console.log(`📊 Catálogos cargados: ${successCount}/${existingCatalogs.length}`);
+      console.log(`  Catálogos cargados: ${successCount}/${existingCatalogs.length}`);
 
       return 'success';
     } catch (error) {
@@ -344,7 +344,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
 
   comenzarRegistro(): void {
     //   PERMITIR INICIAR AUNQUE HAYA ERRORES EN CATÁLOGOS
-    console.log('🚀 Comenzando registro de nuevo paciente...');
+    console.log('  Comenzando registro de nuevo paciente...');
 
     // Actualizar estado del wizard a "en progreso"
     this.wizardStateService.setWizardEstado(EstadoWizard.EN_PROGRESO);
@@ -395,7 +395,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
 
   /** Forzar inicio (para bypass de catálogos) */
   forzarInicio(): void {
-    console.log('🚀 Forzando inicio del registro...');
+    console.log('  Forzando inicio del registro...');
 
     // Detener carga de catálogos
     this.isLoadingCatalogos = false;
@@ -414,7 +414,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
     const currentState = this.wizardStateService.getCurrentState();
 
     if (currentState.currentStep && currentState.currentStep !== WizardStep.INICIO) {
-      console.log('🔄 Continuando wizard existente desde:', currentState.currentStep);
+      console.log('  Continuando wizard existente desde:', currentState.currentStep);
       this.wizardStateService.goToStep(currentState.currentStep);
     } else {
       this.comenzarRegistro();
@@ -424,7 +424,7 @@ export class NuevoPaciente implements OnInit, OnDestroy {
   /** Resetear wizard completamente */
   resetearWizard(): void {
     if (confirm('¿Está seguro de que desea reiniciar el proceso de registro? Se perderán todos los datos ingresados.')) {
-      console.log('🔄 Reseteando wizard completamente...');
+      console.log('  Reseteando wizard completamente...');
       this.wizardStateService.resetWizard();
       this.initializeComponent(); // Re-inicializar
     }

@@ -478,7 +478,7 @@ export class WizardStateService {
 
 /** Inicializar wizard de forma segura */
 initializeWizard(): void {
-  console.log('🔄 Inicializando wizard...');
+  console.log('  Inicializando wizard...');
 
   // Limpiar cualquier estado previo
   this.clearStorageState();

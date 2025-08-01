@@ -30,7 +30,7 @@ export class NotasEvolucionService {
    */
   // CRUD básico (mantienes los métodos existentes)
   createNotaEvolucion(notaData: CreateNotaEvolucionDto): Observable<ApiResponse<NotaEvolucion>> {
-    console.log('🚀 Enviando datos al backend:', notaData);
+    console.log('  Enviando datos al backend:', notaData);
     return this.http.post<ApiResponse<NotaEvolucion>>(this.API_URL, notaData);
   }
 

@@ -137,7 +137,7 @@ export class EntretenimientoService {
     { id: 'neurologia', name: 'Neurología', description: 'Sistema nervioso', icon: '🧠', color: '#96CEB4' },
     { id: 'endocrinologia', name: 'Endocrinología', description: 'Sistema endocrino y hormonas', icon: '🔬', color: '#FECA57' },
     { id: 'farmacologia', name: 'Farmacología', description: 'Medicamentos y tratamientos', icon: '💊', color: '#FF9FF3' },
-    { id: 'epidemiologia', name: 'Epidemiología', description: 'Estudios poblacionales de salud', icon: '📊', color: '#54A0FF' },
+    { id: 'epidemiologia', name: 'Epidemiología', description: 'Estudios poblacionales de salud', icon: ' ', color: '#54A0FF' },
     { id: 'patologia', name: 'Patología', description: 'Estudio de enfermedades', icon: '🧫', color: '#A55EEA' },
   ];
 
@@ -192,7 +192,7 @@ export class EntretenimientoService {
   }
 
   // ==========================================
-  // 📊 ESTADÍSTICAS Y LOGROS
+  //   ESTADÍSTICAS Y LOGROS
   // ==========================================
 
   private loadStats(): TriviaStats {
@@ -298,7 +298,7 @@ getMedicalTrivia(difficulty: string = this.selectedDifficulty): Observable<Trivi
 
   if (lastApiCall && (now - parseInt(lastApiCall)) < 5000) {
     // Si la última llamada fue hace menos de 5 segundos, usar fallback
-    console.log('🔄 Usando preguntas locales para evitar rate limiting');
+    console.log('  Usando preguntas locales para evitar rate limiting');
     const fallback = this.getMedicalTriviaFallback();
     this.currentTrivia = fallback;
     this.isLoadingTrivia = false;

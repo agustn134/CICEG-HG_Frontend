@@ -525,7 +525,7 @@ onDropdownItemClick(action: string, event: Event): void {
   event.stopPropagation();
   this.closeUserDropdown();
 
-  console.log(`🔄 Ejecutando acción: ${action}`);
+  console.log(`  Ejecutando acción: ${action}`);
 
   switch (action) {
     case 'profile':

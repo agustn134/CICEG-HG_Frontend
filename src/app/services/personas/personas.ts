@@ -152,7 +152,7 @@ export class PersonasService {
 
     const personaDataBackend = PersonaMapper.frontendToBackend(personaDataFrontend);
 
-    console.log('🔄 Datos enviados al backend:', personaDataBackend);
+    console.log('  Datos enviados al backend:', personaDataBackend);
 
     return this.http.post<ApiResponse<Persona>>(this.API_URL, personaDataBackend)
       .pipe(

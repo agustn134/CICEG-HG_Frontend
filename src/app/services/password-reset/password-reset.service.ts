@@ -67,8 +67,8 @@ export class PasswordResetService {
       'Content-Type': 'application/json'
     });
 
-    console.log('🔄 Enviando request a:', `${this.API_URL}/request`);
-    console.log('🔄 Datos:', data);
+    console.log('  Enviando request a:', `${this.API_URL}/request`);
+    console.log('  Datos:', data);
 
     return this.http.post<PasswordResetResponse>(`${this.API_URL}/request`, data, { headers })
       .pipe(
@@ -95,7 +95,7 @@ export class PasswordResetService {
     this.setLoading(true);
     this.clearMessages();
 
-    console.log('🔄 Validando token:', `${this.API_URL}/validate/${token}`);
+    console.log('  Validando token:', `${this.API_URL}/validate/${token}`);
 
     return this.http.get<ValidateTokenResponse>(`${this.API_URL}/validate/${token}`)
       .pipe(
@@ -124,8 +124,8 @@ export class PasswordResetService {
       'Content-Type': 'application/json'
     });
 
-    console.log('🔄 Reseteando password:', `${this.API_URL}/reset`);
-    console.log('🔄 Datos:', { token: data.token, passwordLength: data.newPassword.length });
+    console.log('  Reseteando password:', `${this.API_URL}/reset`);
+    console.log('  Datos:', { token: data.token, passwordLength: data.newPassword.length });
 
     return this.http.post<PasswordResetResponse>(`${this.API_URL}/reset`, data, { headers })
       .pipe(
