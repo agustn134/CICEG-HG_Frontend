@@ -4471,6 +4471,7 @@ private mostrarMensajeValidacion(formulario: string): void {
       console.warn(' No se pudo obtener id_documento de la respuesta');
     }
   }
+
   private async guardarHistoriaClinica(): Promise<void> {
     if (!this.historiaClinicaForm.valid) {
       throw new Error('Formulario de historia clínica inválido');
@@ -4540,9 +4541,6 @@ private mostrarMensajeValidacion(formulario: string): void {
       plan_diagnostico: this.historiaClinicaForm.value.plan_diagnostico || null,
       plan_terapeutico: this.historiaClinicaForm.value.plan_terapeutico || null,
       pronostico: this.historiaClinicaForm.value.pronostico || null,
-
-
-
       numero_cama: this.historiaClinicaForm.value.numero_cama || null,
       interrogatorio_cardiovascular: this.historiaClinicaForm.value.interrogatorio_cardiovascular || null,
       interrogatorio_respiratorio: this.historiaClinicaForm.value.interrogatorio_respiratorio || null,
@@ -4570,11 +4568,6 @@ private mostrarMensajeValidacion(formulario: string): void {
 
       // IDs de las guías clínicas seleccionadas
       guias_clinicas_ids: this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico),
-
-
-
-
-
 
 
     };
