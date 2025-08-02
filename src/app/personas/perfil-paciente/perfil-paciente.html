@@ -258,7 +258,7 @@
         </nav>
       </div>
     </div>
-    
+
     <div *ngIf="tabActiva === 'crear'" class="bg-white shadow rounded-lg mb-6">
       <div class="p-4 border-b border-gray-200">
         <div class="flex flex-col sm:flex-row gap-4">
@@ -1502,9 +1502,9 @@
           </h3>
           <p class="text-sm text-gray-600 mt-1">Seleccione el tipo de estudio y los exámenes requeridos</p>
         </div>
-      
+
         <form [formGroup]="solicitudEstudioForm" class="px-6 py-4">
-      
+
           <!-- SELECTOR DE TIPO DE ESTUDIO -->
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Estudio *</label>
@@ -1515,13 +1515,13 @@
               <option value="otros">🔬 Otros Estudios</option>
             </select>
           </div>
-      
+
           <!-- ===================================
                     SECCIÓN LABORATORIO
                     =================================== -->
           <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-4">📊 Estudios de Laboratorio Solicitados</h4>
-      
+
             <!-- Química Sanguínea -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-blue-700 mb-3">🩸 Química Sanguínea</h5>
@@ -1548,7 +1548,7 @@
                 </label>
               </div>
             </div>
-      
+
             <!-- Perfil Lipídico -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-red-700 mb-3">❤️ Perfil Lipídico</h5>
@@ -1571,7 +1571,7 @@
                 </label>
               </div>
             </div>
-      
+
             <!-- Biometría Hemática -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-purple-700 mb-3">🔬 Hematología</h5>
@@ -1582,7 +1582,7 @@
                 </label>
               </div>
             </div>
-      
+
             <!-- Estudios de Orina -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-cyan-700 mb-3">💧 Estudios de Orina</h5>
@@ -1598,13 +1598,13 @@
               </div>
             </div>
           </div>
-      
+
           <!-- ===================================
                     SECCIÓN IMAGENOLOGÍA
                     =================================== -->
           <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-4">📷 Estudios de Imagenología Solicitados</h4>
-      
+
             <!-- Radiografías -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-green-700 mb-3">📸 Radiografías</h5>
@@ -1627,7 +1627,7 @@
                 </label>
               </div>
             </div>
-      
+
             <!-- Ultrasonidos -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-indigo-700 mb-3">🔊 Ultrasonidos</h5>
@@ -1650,7 +1650,7 @@
                 </label>
               </div>
             </div>
-      
+
             <!-- Tomografías -->
             <div class="mb-6">
               <h5 class="text-sm font-semibold text-orange-700 mb-3">🖥️ Tomografías</h5>
@@ -1674,7 +1674,7 @@
               </div>
             </div>
           </div>
-      
+
           <!-- ===================================
                       SECCIÓN OTROS ESTUDIOS
                       =================================== -->
@@ -1687,7 +1687,7 @@
                 placeholder="Especifique detalladamente el estudio requerido..."></textarea>
             </div>
           </div>
-      
+
           <!-- INFORMACIÓN CLÍNICA -->
           <div class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-4">📋 Información Clínica</h4>
@@ -1702,7 +1702,7 @@
                   Campo obligatorio
                 </div>
               </div>
-      
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Presuntivo *</label>
                 <textarea formControlName="diagnostico_presuntivo" rows="4"
@@ -1715,7 +1715,7 @@
               </div>
             </div>
           </div>
-      
+
           <!-- CONFIGURACIÓN DEL ESTUDIO -->
           <div class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-4">⚙️ Configuración del Estudio</h4>
@@ -1729,13 +1729,13 @@
                   <option value="stat">STAT (Inmediato)</option>
                 </select>
               </div>
-      
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada</label>
                 <input type="date" formControlName="fecha_programada"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               </div>
-      
+
               <div class="space-y-2">
                 <label class="flex items-center cursor-pointer">
                   <input type="checkbox" formControlName="ayuno_requerido" class="text-blue-600 mr-2">
@@ -1754,7 +1754,7 @@
               </div>
             </div>
           </div>
-      
+
           <!-- OBSERVACIONES -->
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
@@ -1762,7 +1762,7 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Observaciones adicionales para el estudio..."></textarea>
           </div>
-      
+
           <!-- BOTONES -->
           <div class="flex justify-end space-x-3 pt-4 border-t">
             <button type="button" (click)="resetearFormularioActual()"
@@ -1777,9 +1777,356 @@
               {{ isCreatingDocument ? 'Guardando...' : 'Guardar y Generar PDF' }}
             </button>
           </div>
-      
+
         </form>
       </div>
+
+      <!-- FORMULARIO DE PRESCRIPCIÓN DE MEDICAMENTOS -->
+      <div *ngIf="formularioActivo === 'prescripcionMedicamento'" class="space-y-6">
+
+        <!-- ENCABEZADO -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+          <div class="flex items-center space-x-3">
+            <i class="fas fa-prescription-bottle-alt text-2xl"></i>
+            <div>
+              <h3 class="text-xl font-bold">💊 Prescripción de Medicamentos</h3>
+              <p class="text-purple-100 text-sm">NOM-004-SSA3-2012 | Receta médica digital</p>
+            </div>
+          </div>
+
+          <!-- INDICADOR DE VALIDEZ -->
+          <div class="mt-4 flex items-center space-x-2 text-sm">
+            <div class="flex items-center space-x-1">
+              <i class="fas fa-check-circle" [class]="prescripcionForm.valid ? 'text-green-300' : 'text-gray-400'"></i>
+              <span>Formulario {{ prescripcionForm.valid ? 'válido' : 'pendiente' }}</span>
+            </div>
+            <div class="flex items-center space-x-1">
+              <i class="fas fa-pills" [class]="medicamentosFormArray.length > 0 ? 'text-green-300' : 'text-gray-400'"></i>
+              <span>{{ medicamentosFormArray.length }} medicamento(s)</span>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="prescripcionForm" class="space-y-6">
+
+          <!-- INFORMACIÓN GENERAL -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center space-x-2 mb-4">
+              <i class="fas fa-info-circle text-blue-500"></i>
+              <h4 class="text-lg font-semibold text-gray-800">Información General</h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Fecha de Prescripción -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Fecha de Prescripción *
+                </label>
+                <input type="date" formControlName="fecha_prescripcion"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  [class.border-red-500]="prescripcionForm.get('fecha_prescripcion')?.invalid && prescripcionForm.get('fecha_prescripcion')?.touched">
+              </div>
+
+              <!-- Duración del Tratamiento -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Duración del Tratamiento (días)
+                </label>
+                <input type="number" formControlName="duracion_tratamiento_dias" placeholder="Ej: 7, 14, 30..." min="1"
+                  max="365"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+              </div>
+
+              <!-- Diagnóstico -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Diagnóstico para Prescripción *
+                </label>
+                <textarea formControlName="diagnostico_prescripcion" rows="2"
+                  placeholder="Diagnóstico que justifica la prescripción..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  [class.border-red-500]="prescripcionForm.get('diagnostico_prescripcion')?.invalid && prescripcionForm.get('diagnostico_prescripcion')?.touched"></textarea>
+              </div>
+
+              <!-- Indicaciones Generales -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Indicaciones Generales
+                </label>
+                <textarea formControlName="indicaciones_generales" rows="2"
+                  placeholder="Indicaciones generales para el paciente..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- MEDICAMENTOS PRESCRITOS -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <i class="fas fa-pills text-purple-500"></i>
+                <h4 class="text-lg font-semibold text-gray-800">Medicamentos Prescritos</h4>
+                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  {{ medicamentosFormArray.length }}
+                </span>
+              </div>
+
+              <button type="button" (click)="agregarMedicamento()"
+                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
+                <i class="fas fa-plus mr-1"></i>
+                Agregar Medicamento
+              </button>
+            </div>
+
+            <!-- LISTA DE MEDICAMENTOS -->
+            <div formArrayName="medicamentos" class="space-y-4">
+              <div *ngFor="let medicamento of medicamentosFormArray.controls; let i = index; trackBy: trackByIndex"
+                [formGroupName]="i" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+
+                <!-- ENCABEZADO DEL MEDICAMENTO -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span class="text-purple-600 font-medium text-sm">{{ i + 1 }}</span>
+                    </div>
+                    <span class="font-medium text-gray-800">Medicamento {{ i + 1 }}</span>
+                    <span *ngIf="medicamento.get('medicamento_controlado')?.value"
+                      class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>
+                      Controlado
+                    </span>
+                  </div>
+
+                  <button *ngIf="medicamentosFormArray.length > 1" type="button" (click)="eliminarMedicamento(i)"
+                    class="text-red-600 hover:text-red-800 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                  <!-- BÚSQUEDA DE MEDICAMENTO -->
+                  <div class="lg:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Buscar Medicamento *
+                    </label>
+                    <div class="relative">
+                     <input
+                      type="text"
+                      formControlName="busqueda_medicamento"
+                      (input)="onBusquedaMedicamentoChange($event, i)"
+                      placeholder="Escriba el nombre del medicamento..."
+                      class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      [class.border-red-500]="medicamento.get('id_medicamento')?.invalid && medicamento.get('id_medicamento')?.touched">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+
+                    <!-- DROPDOWN DE MEDICAMENTOS -->
+                    <div
+                      *ngIf="medicamentosFiltrados.length > 0 && medicamento.get('busqueda_medicamento')?.value?.length >= 2"
+                      class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
+                      <div *ngFor="let med of medicamentosFiltrados.slice(0, 10)" (click)="seleccionarMedicamento(med, i)"
+                        class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-purple-50 hover:text-purple-900">
+                        <div class="flex items-center">
+                          <span class="font-medium block truncate">{{ med.nombre }}</span>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          {{ med.presentacion }} {{ med.concentracion }} - {{ med.grupo_terapeutico }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- DOSIS -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Dosis *
+                    </label>
+                    <input type="text" formControlName="dosis" placeholder="Ej: 500 mg, 1 tableta"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      [class.border-red-500]="medicamento.get('dosis')?.invalid && medicamento.get('dosis')?.touched">
+                  </div>
+
+                  <!-- FRECUENCIA -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Frecuencia *
+                    </label>
+                    <select formControlName="frecuencia"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      [class.border-red-500]="medicamento.get('frecuencia')?.invalid && medicamento.get('frecuencia')?.touched">
+                      <option value="">Seleccionar frecuencia</option>
+                      <option value="Cada 24 horas">Cada 24 horas (1 vez al día)</option>
+                      <option value="Cada 12 horas">Cada 12 horas (2 veces al día)</option>
+                      <option value="Cada 8 horas">Cada 8 horas (3 veces al día)</option>
+                      <option value="Cada 6 horas">Cada 6 horas (4 veces al día)</option>
+                      <option value="Cada 4 horas">Cada 4 horas (6 veces al día)</option>
+                      <option value="1 vez al día">1 vez al día</option>
+                      <option value="2 veces al día">2 veces al día</option>
+                      <option value="3 veces al día">3 veces al día</option>
+                      <option value="Según sea necesario">Según sea necesario (PRN)</option>
+                    </select>
+                  </div>
+
+                  <!-- VÍA DE ADMINISTRACIÓN -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Vía de Administración *
+                    </label>
+                    <select formControlName="via_administracion"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <option value="Oral">Oral (PO)</option>
+                      <option value="Intravenosa">Intravenosa (IV)</option>
+                      <option value="Intramuscular">Intramuscular (IM)</option>
+                      <option value="Subcutánea">Subcutánea (SC)</option>
+                      <option value="Tópica">Tópica</option>
+                      <option value="Inhalatoria">Inhalatoria</option>
+                      <option value="Rectal">Rectal</option>
+                      <option value="Oftálmica">Oftálmica</option>
+                      <option value="Ótica">Ótica</option>
+                      <option value="Nasal">Nasal</option>
+                      <option value="Sublingual">Sublingual</option>
+                      <option value="Transdérmica">Transdérmica</option>
+                    </select>
+                  </div>
+
+                  <!-- DURACIÓN EN DÍAS -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Duración (días) *
+                    </label>
+                    <input type="number" formControlName="duracion_dias" (change)="calcularCantidadTotal(i)"
+                      placeholder="Ej: 7, 14" min="1" max="365"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      [class.border-red-500]="medicamento.get('duracion_dias')?.invalid && medicamento.get('duracion_dias')?.touched">
+                  </div>
+
+                  <!-- CANTIDAD TOTAL -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Cantidad Total
+                    </label>
+                    <input type="number" formControlName="cantidad_total" placeholder="Se calcula automáticamente" readonly
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600">
+                  </div>
+
+                  <!-- INSTRUCCIONES DE TOMA -->
+                  <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Instrucciones de Toma
+                    </label>
+                    <input type="text" formControlName="instrucciones_toma"
+                      placeholder="Ej: Con alimentos, En ayunas, Antes de dormir"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  </div>
+
+                  <!-- INDICACIONES ESPECIALES -->
+                  <div class="lg:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Indicaciones Especiales
+                    </label>
+                    <textarea formControlName="indicaciones_especiales" rows="2"
+                      placeholder="Instrucciones especiales para este medicamento..."
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MENSAJE SI NO HAY MEDICAMENTOS -->
+            <div *ngIf="medicamentosFormArray.length === 0" class="text-center py-8 text-gray-500">
+              <i class="fas fa-pills text-4xl mb-2"></i>
+              <p>No hay medicamentos prescritos</p>
+              <button type="button" (click)="agregarMedicamento()"
+                class="mt-2 text-purple-600 hover:text-purple-800 font-medium">
+                Agregar el primer medicamento
+              </button>
+            </div>
+          </div>
+
+          <!-- INFORMACIÓN ADICIONAL -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center space-x-2 mb-4">
+              <i class="fas fa-clipboard-list text-green-500"></i>
+              <h4 class="text-lg font-semibold text-gray-800">Información Adicional</h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Alergias Consideradas -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Alergias Consideradas
+                </label>
+                <textarea formControlName="alergias_consideradas" rows="2"
+                  placeholder="Alergias del paciente consideradas en esta prescripción..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+              </div>
+
+              <!-- Interacciones Importantes -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Interacciones Importantes
+                </label>
+                <textarea formControlName="interacciones_importantes" rows="2"
+                  placeholder="Interacciones medicamentosas a considerar..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+              </div>
+
+              <!-- Seguimiento -->
+              <div>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" formControlName="requiere_seguimiento"
+                    class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                  <span class="text-sm font-medium text-gray-700">Requiere seguimiento médico</span>
+                </label>
+
+                <div *ngIf="prescripcionForm.get('requiere_seguimiento')?.value" class="mt-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha Próxima Revisión
+                  </label>
+                  <input type="date" formControlName="fecha_proxima_revision"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+              </div>
+
+              <!-- Observaciones Generales -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Observaciones Generales
+                </label>
+                <textarea formControlName="observaciones" rows="3"
+                  placeholder="Observaciones adicionales sobre la prescripción..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN -->
+          <div class="flex justify-end space-x-3 pt-4 border-t">
+            <button type="button" (click)="resetearFormularioActual()"
+              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!prescripcionForm.valid || medicamentosFormArray.length === 0 || isCreatingDocument"
+              class="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-prescription-bottle-alt mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar y Generar Receta' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+
+
+
+
+
+
+
 
 
     <!-- Modal para editar número administrativo -->

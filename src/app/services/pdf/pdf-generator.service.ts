@@ -120,7 +120,7 @@ export class PdfGeneratorService {
 
   // Using inject() to avoid circular dependency issues
   private personalMedicoService = inject(PersonalMedicoService);
-  private configuracionService = inject(ConfiguracionService); 
+  private configuracionService = inject(ConfiguracionService);
   private authService = inject(AuthService);
   private guiasClinicasService = inject(GuiasClinicasService);
   private pacientesService = inject(PacientesService);
@@ -160,21 +160,21 @@ export class PdfGeneratorService {
 
   async generarDocumento(tipoDocumento: string, datos: any): Promise<void> {
   console.log(`📄 Generando ${tipoDocumento}...`);
-  
+
   try {
     await this.ensurePdfMakeLoaded();
-    
+
     // 1. Procesar datos común para todos
     const medicoCompleto = await this.obtenerDatosMedicoActual();
     const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-    
+
     // 2. Preparar datos para template
     const datosParaTemplate = {
       ...datos,
       medicoCompleto,
       pacienteCompleto
     };
-    
+
     // 3. Llamar al template correspondiente
     let documentDefinition;
     switch (tipoDocumento) {
@@ -190,20 +190,24 @@ export class PdfGeneratorService {
       case 'Solicitud de Imagenología':
        documentDefinition = await this.pdfTemplatesService.generarSolicitudEstudio(datosParaTemplate);
       break;
+      case 'Prescripción de Medicamentos':
+      case 'Prescripción':
+        documentDefinition = await this.pdfTemplatesService.generarPrescripcionMedicamentos(datosParaTemplate);
+      break;
       // Aquí iremos agregando cada nuevo documento
       default:
         throw new Error(`Documento ${tipoDocumento} no implementado aún`);
     }
-    
+
     // 4. Generar y descargar PDF
     const fechaActual = new Date();
     const nombreArchivo = `${tipoDocumento.toLowerCase().replace(/\s+/g, '-')}-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
-    
+
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
-    
+
     console.log(`✅ ${tipoDocumento} generado exitosamente`);
-    
+
   } catch (error) {
     console.error(`❌ Error generando ${tipoDocumento}:`, error);
     throw error;
@@ -1549,6 +1553,42 @@ async generarHojaFrontalExpediente(datos: any): Promise<void> {
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
+    throw error;
+  }
+}
+
+
+async generarPrescripcionMedicamentos(datos: any): Promise<void> {
+  console.log('💊 Generando PDF de Prescripción de Medicamentos...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarPrescripcionMedicamentos(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `prescripcion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Prescripción:', error);
     throw error;
   }
 }

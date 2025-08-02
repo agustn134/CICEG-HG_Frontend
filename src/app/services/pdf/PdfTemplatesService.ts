@@ -250,6 +250,13 @@ private generarFolioSolicitud(): string {
   return `SOL-${fecha.getFullYear()}-${timestamp}`;
 }
 
+// MÉTODOS AUXILIARES PARA PRESCRIPCIONES
+private generarFolioReceta(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `RX-${fecha.getFullYear()}-${timestamp}`;
+}
+
 /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 
 
@@ -1431,7 +1438,7 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
   return {
     pageSize: 'LETTER',
     pageMargins: [30, 40, 30, 60],
-    
+
     header: {
       margin: [30, 20, 30, 0],
       table: {
@@ -1585,9 +1592,9 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
         table: {
           widths: ['100%'],
           body: [
-            [{ 
-              text: this.formatearDireccionCompleta(pacienteCompleto) || 'No especificado', 
-              fontSize: 9 
+            [{
+              text: this.formatearDireccionCompleta(pacienteCompleto) || 'No especificado',
+              fontSize: 9
             }]
           ]
         },
@@ -1717,8 +1724,8 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
         table: {
           widths: ['100%'],
           body: [
-            [{ 
-              text: hojaFrontalData.observaciones || '_'.repeat(100), 
+            [{
+              text: hojaFrontalData.observaciones || '_'.repeat(100),
               fontSize: 9,
               margin: [5, 10, 5, 10]
             }]
@@ -1769,25 +1776,21 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
 }
 
 
-
-
-
-
 async generarSolicitudEstudio(datos: any): Promise<any> {
   console.log('📄 Generando Solicitud de Estudio...');
-  
+
   const { pacienteCompleto, medicoCompleto, solicitudEstudio } = datos;
   const fechaActual = new Date();
   const tipoEstudio = solicitudEstudio.tipo_estudio || 'laboratorio';
-  
+
   // Obtener título dinámico
   const tituloDocumento = this.obtenerTituloSolicitud(tipoEstudio);
   const iconoDocumento = this.obtenerIconoSolicitud(tipoEstudio);
-  
+
   return {
     pageSize: 'LETTER',
     pageMargins: [40, 80, 40, 60],
-    
+
     header: (currentPage: number, pageCount: number) => {
       return {
         margin: [40, 20, 40, 20],
@@ -1821,7 +1824,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: 'noBorders'
       };
     },
-    
+
     content: [
       // SECCIÓN DATOS DEL PACIENTE
       {
@@ -1846,7 +1849,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         },
         margin: [0, 0, 0, 10]
       },
-      
+
       {
         table: {
           widths: ['25%', '25%', '25%', '25%'],
@@ -1874,10 +1877,10 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: this.getTableLayout(),
         margin: [0, 0, 0, 15]
       },
-      
+
       // SECCIÓN ESTUDIOS SOLICITADOS (DINÁMICO)
       this.generarSeccionEstudios(solicitudEstudio, tipoEstudio),
-      
+
       // SECCIÓN INFORMACIÓN CLÍNICA
       {
         table: {
@@ -1896,7 +1899,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: this.getTableLayout(),
         margin: [0, 15, 0, 10]
       },
-      
+
       {
         table: {
           widths: ['50%', '50%'],
@@ -1905,7 +1908,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
               {
                 stack: [
                   { text: 'INDICACIÓN CLÍNICA:', style: 'fieldLabel' },
-                  { 
+                  {
                     text: solicitudEstudio.indicacion_clinica || 'No especificada',
                     style: 'fieldValue',
                     margin: [0, 5, 0, 10]
@@ -1915,7 +1918,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
               {
                 stack: [
                   { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'fieldLabel' },
-                  { 
+                  {
                     text: solicitudEstudio.diagnostico_presuntivo || 'No especificado',
                     style: 'fieldValue',
                     margin: [0, 5, 0, 10]
@@ -1928,7 +1931,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: this.getTableLayout(),
         margin: [0, 0, 0, 15]
       },
-      
+
       // SECCIÓN CONFIGURACIÓN
       {
         table: {
@@ -1951,7 +1954,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: this.getTableLayout(),
         margin: [0, 0, 0, 15]
       },
-      
+
       // OBSERVACIONES
       ...(solicitudEstudio.observaciones ? [
         {
@@ -1962,7 +1965,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
                 {
                   stack: [
                     { text: 'OBSERVACIONES:', style: 'fieldLabel' },
-                    { 
+                    {
                       text: solicitudEstudio.observaciones,
                       style: 'fieldValue',
                       margin: [0, 5]
@@ -1977,10 +1980,10 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
           margin: [0, 0, 0, 20]
         }
       ] : []),
-      
+
       // ESPACIADOR PARA FIRMAS
       { text: '', pageBreak: 'before' },
-      
+
       // SECCIÓN FIRMAS
       {
         margin: [0, 40, 0, 0],
@@ -2012,7 +2015,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: 'noBorders'
       }
     ],
-    
+
     footer: (currentPage: number, pageCount: number) => {
       return {
         margin: [40, 10],
@@ -2043,7 +2046,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
         layout: 'noBorders'
       };
     },
-    
+
     styles: {
       sectionHeader: {
         fontSize: 12,
@@ -2090,15 +2093,14 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
 }
 
 // MÉTODOS AUXILIARES PARA LA SOLICITUD
-
 private generarSeccionEstudios(solicitudEstudio: any, tipoEstudio: string): any {
-  const estudiosArray = solicitudEstudio.estudios_solicitados 
+  const estudiosArray = solicitudEstudio.estudios_solicitados
     ? solicitudEstudio.estudios_solicitados.split('\n').filter((e: string) => e.trim())
     : [];
-    
+
   const tituloSeccion = this.obtenerTituloSeccionEstudios(tipoEstudio);
   const iconoSeccion = this.obtenerIconoSeccionEstudios(tipoEstudio);
-  
+
   return {
     stack: [
       // Header de la sección
@@ -2119,7 +2121,7 @@ private generarSeccionEstudios(solicitudEstudio: any, tipoEstudio: string): any 
         layout: this.getTableLayout(),
         margin: [0, 15, 0, 10]
       },
-      
+
       // Lista de estudios
       {
         table: {
@@ -2129,7 +2131,7 @@ private generarSeccionEstudios(solicitudEstudio: any, tipoEstudio: string): any 
               {
                 stack: [
                   { text: 'ESTUDIOS SOLICITADOS:', style: 'estudiosTitle' },
-                  ...(estudiosArray.length > 0 
+                  ...(estudiosArray.length > 0
                     ? estudiosArray.map((estudio: string) => ({
                         text: `• ${estudio}`,
                         style: 'estudioItem'
@@ -2149,14 +2151,466 @@ private generarSeccionEstudios(solicitudEstudio: any, tipoEstudio: string): any 
   };
 }
 
+async generarPrescripcionMedicamentos(datos: any): Promise<any> {
+  console.log('💊 Generando Prescripción de Medicamentos...');
 
+  const { pacienteCompleto, medicoCompleto, prescripcion } = datos;
+  const fechaActual = new Date();
+  const medicamentos = prescripcion.medicamentos || [];
 
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [40, 80, 40, 60],
 
+    header: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [40, 20, 40, 20],
+        table: {
+          widths: ['30%', '40%', '30%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
+                  { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
+                  { text: 'GUANAJUATO, MÉXICO', fontSize: 8 },
+                  { text: 'RFC: HGS-123456-ABC', fontSize: 7, color: '#666666', margin: [0, 2, 0, 0] }
+                ]
+              },
+              {
+                stack: [
+                  { text: '💊 PRESCRIPCIÓN MÉDICA', fontSize: 16, bold: true, alignment: 'center', color: '#7c3aed' },
+                  { text: 'RECETA MÉDICA ELECTRÓNICA', fontSize: 10, alignment: 'center', italics: true },
+                  { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'FECHA:', fontSize: 8, bold: true, alignment: 'right' },
+                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 10, alignment: 'right' },
+                  { text: `Folio: ${prescripcion.numero_receta || this.generarFolioReceta()}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
+                  { text: `Válida hasta: ${this.formatearFecha(prescripcion.valida_hasta)}`, fontSize: 7, alignment: 'right', color: '#dc2626' }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    },
 
+    content: [
+      // INFORMACIÓN DEL PACIENTE
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '👤 DATOS DEL PACIENTE',
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
 
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: [
+            [
+              { text: 'Nombre:', style: 'fieldLabel' },
+              { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
+              { text: 'Expediente:', style: 'fieldLabel' },
+              { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Edad:', style: 'fieldLabel' },
+              { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
+              { text: 'Sexo:', style: 'fieldLabel' },
+              { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Tipo de Sangre:', style: 'fieldLabel' },
+              { text: pacienteCompleto.tipo_sangre || 'No especificado', style: 'fieldValue' },
+              { text: 'Alergias:', style: 'fieldLabel' },
+              { text: prescripcion.alergias_consideradas || 'No especificadas', style: 'fieldValue' }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
 
+      // INFORMACIÓN MÉDICA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '🏥 INFORMACIÓN MÉDICA',
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
 
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'DIAGNÓSTICO:', style: 'fieldLabel' },
+                  {
+                    text: prescripcion.diagnostico_prescripcion || 'No especificado',
+                    style: 'fieldValue',
+                    margin: [0, 5, 0, 10]
+                  }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'DURACIÓN TRATAMIENTO:', style: 'fieldLabel' },
+                  {
+                    text: prescripcion.duracion_tratamiento_dias ? `${prescripcion.duracion_tratamiento_dias} días` : 'Según indicación médica',
+                    style: 'fieldValue',
+                    margin: [0, 5, 0, 10]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
 
+      // MEDICAMENTOS PRESCRITOS
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '💊 MEDICAMENTOS PRESCRITOS',
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      // TABLA DE MEDICAMENTOS
+      ...(medicamentos.length > 0 ? [
+        {
+          table: {
+            widths: ['5%', '25%', '15%', '15%', '10%', '10%', '20%'],
+            headerRows: 1,
+            body: [
+              // ENCABEZADO
+              [
+                { text: '#', style: 'tableHeader' },
+                { text: 'MEDICAMENTO', style: 'tableHeader' },
+                { text: 'DOSIS', style: 'tableHeader' },
+                { text: 'FRECUENCIA', style: 'tableHeader' },
+                { text: 'VÍA', style: 'tableHeader' },
+                { text: 'DURACIÓN', style: 'tableHeader' },
+                { text: 'INSTRUCCIONES', style: 'tableHeader' }
+              ],
+              // MEDICAMENTOS
+              ...medicamentos.map((med: any, index: number) => [
+                { text: (index + 1).toString(), style: 'tableCell', alignment: 'center' },
+                {
+                  stack: [
+                    { text: med.medicamento_seleccionado?.nombre || 'Medicamento', style: 'medicamentoNombre' },
+                    { text: med.medicamento_seleccionado?.presentacion ? `${med.medicamento_seleccionado.presentacion} ${med.medicamento_seleccionado.concentracion || ''}` : '', style: 'medicamentoPresentacion' },
+                    ...(med.medicamento_controlado ? [{ text: '⚠️ CONTROLADO', style: 'medicamentoControlado' }] : [])
+                  ]
+                },
+                { text: med.dosis || 'N/A', style: 'tableCell' },
+                { text: med.frecuencia || 'N/A', style: 'tableCell' },
+                { text: med.via_administracion || 'Oral', style: 'tableCell' },
+                { text: med.duracion_dias ? `${med.duracion_dias} días` : 'N/A', style: 'tableCell' },
+                {
+                  stack: [
+                    { text: med.instrucciones_toma || '', style: 'instruccionesTexto' },
+                    { text: med.indicaciones_especiales || '', style: 'indicacionesTexto' }
+                  ]
+                }
+              ])
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 20]
+        }
+      ] : [
+        {
+          text: 'No se prescribieron medicamentos',
+          style: 'noMedicamentos',
+          alignment: 'center',
+          margin: [0, 20, 0, 20]
+        }
+      ]),
+
+      // INDICACIONES GENERALES
+      ...(prescripcion.indicaciones_generales ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'INDICACIONES GENERALES:', style: 'fieldLabel' },
+                    {
+                      text: prescripcion.indicaciones_generales,
+                      style: 'fieldValue',
+                      margin: [0, 5]
+                    }
+                  ],
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // OBSERVACIONES
+      ...(prescripcion.observaciones ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'OBSERVACIONES:', style: 'fieldLabel' },
+                    {
+                      text: prescripcion.observaciones,
+                      style: 'fieldValue',
+                      margin: [0, 5]
+                    }
+                  ],
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // INTERACCIONES Y SEGUIMIENTO
+      ...(prescripcion.interacciones_importantes || prescripcion.requiere_seguimiento ? [
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'INTERACCIONES IMPORTANTES:', style: 'fieldLabel' },
+                    {
+                      text: prescripcion.interacciones_importantes || 'No se identificaron interacciones relevantes',
+                      style: 'fieldValue',
+                      margin: [0, 5]
+                    }
+                  ]
+                },
+                {
+                  stack: [
+                    { text: 'SEGUIMIENTO:', style: 'fieldLabel' },
+                    {
+                      text: prescripcion.requiere_seguimiento
+                        ? `Próxima cita: ${this.formatearFecha(prescripcion.fecha_proxima_revision) || 'A programar'}`
+                        : 'No requiere seguimiento especial',
+                      style: 'fieldValue',
+                      margin: [0, 5]
+                    }
+                  ]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 20]
+        }
+      ] : []),
+
+      // ESPACIADOR PARA FIRMA
+      { text: '', pageBreak: 'before' },
+
+      // SECCIÓN DE FIRMA
+      {
+        margin: [0, 40, 0, 0],
+        table: {
+          widths: ['60%', '40%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: '_'.repeat(50), alignment: 'center', margin: [0, 30, 0, 5] },
+                  { text: 'MÉDICO PRESCRIPTOR', style: 'signatureLabel' },
+                  { text: medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
+                  { text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' },
+                  { text: `Especialidad: ${medicoCompleto.especialidad || 'Medicina General'}`, style: 'signatureDetails' }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'SELLO', alignment: 'center', margin: [0, 30, 0, 30], border: [1, 1, 1, 1], fontSize: 12 },
+                  { text: 'Validez:', style: 'validezLabel' },
+                  { text: `${this.formatearFecha(prescripcion.valida_hasta)}`, style: 'validezFecha' },
+                  { text: 'Esta receta tiene validez de 30 días', style: 'validezNota' }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      }
+    ],
+
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [40, 10],
+        table: {
+          widths: ['33%', '34%', '33%'],
+          body: [
+            [
+              {
+                text: `Receta Médica - Hospital General San Luis de la Paz`,
+                fontSize: 8,
+                color: '#666666'
+              },
+              {
+                text: `Página ${currentPage} de ${pageCount}`,
+                fontSize: 8,
+                alignment: 'center',
+                color: '#666666'
+              },
+              {
+                text: fechaActual.toLocaleString('es-MX'),
+                fontSize: 8,
+                alignment: 'right',
+                color: '#666666'
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    },
+
+    styles: {
+      sectionHeader: {
+        fontSize: 12,
+        bold: true,
+        color: '#374151'
+      },
+      fieldLabel: {
+        fontSize: 9,
+        bold: true,
+        color: '#4b5563'
+      },
+      fieldValue: {
+        fontSize: 9,
+        color: '#111827'
+      },
+      tableHeader: {
+        fontSize: 8,
+        bold: true,
+        color: '#ffffff',
+        fillColor: '#7c3aed',
+        margin: [3, 3, 3, 3]
+      },
+      tableCell: {
+        fontSize: 8,
+        margin: [3, 3, 3, 3]
+      },
+      medicamentoNombre: {
+        fontSize: 9,
+        bold: true,
+        color: '#1f2937'
+      },
+      medicamentoPresentacion: {
+        fontSize: 7,
+        color: '#6b7280',
+        italics: true
+      },
+      medicamentoControlado: {
+        fontSize: 6,
+        color: '#dc2626',
+        bold: true
+      },
+      instruccionesTexto: {
+        fontSize: 7,
+        color: '#374151'
+      },
+      indicacionesTexto: {
+        fontSize: 7,
+        color: '#6b7280',
+        italics: true
+      },
+      signatureLabel: {
+        fontSize: 10,
+        bold: true,
+        alignment: 'center',
+        color: '#374151'
+      },
+      signatureName: {
+        fontSize: 9,
+        alignment: 'center',
+        color: '#111827'
+      },
+      signatureDetails: {
+        fontSize: 8,
+        alignment: 'center',
+        color: '#6b7280'
+      },
+      validezLabel: {
+        fontSize: 8,
+        bold: true,
+        color: '#dc2626'
+      },
+      validezFecha: {
+        fontSize: 8,
+        color: '#dc2626'
+      },
+      validezNota: {
+        fontSize: 7,
+        color: '#6b7280',
+        italics: true
+      },
+      noMedicamentos: {
+        fontSize: 10,
+        color: '#6b7280',
+        italics: true
+      }
+    }
+  };
+}
 
 
 

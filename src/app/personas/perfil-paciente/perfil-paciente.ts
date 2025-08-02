@@ -1,6 +1,6 @@
 import {Component,OnInit,OnDestroy,HostListener,ViewChild,ElementRef,} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule,} from '@angular/forms';
+import {ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, FormArray,} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {  Subject,  takeUntil,  forkJoin,  Observable,  firstValueFrom,  switchMap,  catchError,  of,} from 'rxjs';
 import { ExpedientesService } from '../../services/gestion-expedientes/expedientes';
@@ -67,6 +67,8 @@ import { VacunasAdicionalesService } from '../../services/documentos-clinicos/va
 import { CamasService } from '../../services/gestion-expedientes/camas';
 import { Cama } from '../../models/cama.model';
 import { ValidacionesComunesService } from '../../services/validaciones/validaciones-comunes.service';
+import { MedicamentosService } from '../../services/catalogos/medicamentos';
+import { Medicamento } from '../../models/medicamento.model';
 
 interface TipoDocumentoConfig {
   id: string;
@@ -132,51 +134,51 @@ interface PacienteCompleto {
 }
 
 interface TipoDocumentoDisponible {
-  id_tipo_documento: number; 
+  id_tipo_documento: number;
   nombre: string;
-  descripcion: string; 
-  icono: string; 
+  descripcion: string;
+  icono: string;
   color: string;
-  requiereInternamiento: boolean; 
-  orden: number; 
+  requiereInternamiento: boolean;
+  orden: number;
   activo: boolean;
 }
 
 interface FormularioEstado {
-  signosVitales: boolean;  
-  historiaClinica: boolean;  
-  historiaClinicaPediatrica: boolean;  
-  notaUrgencias: boolean;  
-  notaEvolucion: boolean;  
+  signosVitales: boolean;
+  historiaClinica: boolean;
+  historiaClinicaPediatrica: boolean;
+  notaUrgencias: boolean;
+  notaEvolucion: boolean;
   consentimiento: boolean;
-  notaPreoperatoria: boolean;  
-  notaPostoperatoria: boolean;  
-  notaPreanestesica: boolean;  
-  notaPostanestesica: boolean;  
-  notaInterconsulta: boolean;  
+  notaPreoperatoria: boolean;
+  notaPostoperatoria: boolean;
+  notaPreanestesica: boolean;
+  notaPostanestesica: boolean;
+  notaInterconsulta: boolean;
   controlCrecimiento: boolean;
-  esquemaVacunacion: boolean;  
-  solicitudEstudio: boolean;  
-  referenciaTraslado: boolean;  
-  prescripcionMedicamento: boolean;  
-  registroTransfusion: boolean;  
+  esquemaVacunacion: boolean;
+  solicitudEstudio: boolean;
+  referenciaTraslado: boolean;
+  prescripcionMedicamento: boolean;
+  registroTransfusion: boolean;
   notaEgreso: boolean;
-  desarrolloPsicomotriz: boolean;  
-  alimentacionPediatrica: boolean;  
-  tamizajeNeonatal: boolean;  
-  antecedentesHeredoFamiliares: boolean;  
-  antecedentesPerinatales: boolean;  
+  desarrolloPsicomotriz: boolean;
+  alimentacionPediatrica: boolean;
+  tamizajeNeonatal: boolean;
+  antecedentesHeredoFamiliares: boolean;
+  antecedentesPerinatales: boolean;
   estadoNutricionalPediatrico: boolean;
-  inmunizaciones: boolean;  
-  vacunasAdicionales: boolean;  
-  solicitudCultivo: boolean;  
-  solicitudGasometria: boolean;  
-  hojaFrontal: boolean;  
+  inmunizaciones: boolean;
+  vacunasAdicionales: boolean;
+  solicitudCultivo: boolean;
+  solicitudGasometria: boolean;
+  hojaFrontal: boolean;
   altaVoluntaria: boolean;
 }
 
 type TabActiva = 'general' | 'crear' | 'historial' | 'datos';
-type FormularioActivo = 
+type FormularioActivo =
   | 'signosVitales' | 'historiaClinica' | 'hojaFrontal' | 'notaUrgencias' | 'notaEvolucion'
   | 'consentimiento' | 'notaPreoperatoria' | 'notaPostoperatoria' | 'notaPreanestesica'
   | 'notaPostanestesica' | 'notaInterconsulta' | 'controlCrecimiento' | 'esquemaVacunacion'
@@ -224,7 +226,13 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   mostrarDropdownCamas = false;
   filtroCama = '';
   guiasClinicasSeleccionadas: GuiaClinica[] = [];
-  
+
+  medicamentosDisponibles: Medicamento[] = [];
+medicamentosFiltrados: Medicamento[] = [];
+medicamentosMasPrescitos: Medicamento[] = [];
+gruposTerapeuticos: string[] = [];
+presentacionesDisponibles: string[] = [];
+
   // 🔥 FORMULARIOS CORREGIDOS - TODOS DECLARADOS
   signosVitalesForm: FormGroup;
   historiaClinicaForm: FormGroup;
@@ -255,7 +263,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   inmunizacionesForm!: FormGroup;
   vacunasAdicionalesForm!: FormGroup;
   hojaFrontalForm!: FormGroup; // ✅ AGREGADO
-  
+
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
   grupoExpandido: string | null = 'basicos';
@@ -263,41 +271,41 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   busquedaFormulario = '';
   filtroActivo: FiltroCategoria = 'todos';
   formulariosVisibles: string[] = [];
-  
-  
+
+
   gruposFormularios = {
-    basicos: { 
+    basicos: {
       nombre: 'Documentos Básicos',
-      icono: 'fas fa-file-medical', 
-      color: 'blue', 
-      formularios: [ 'signosVitales','historiaClinica','notaUrgencias', 'notaEvolucion' ], 
+      icono: 'fas fa-file-medical',
+      color: 'blue',
+      formularios: [ 'signosVitales','historiaClinica','notaUrgencias', 'notaEvolucion' ],
     },
     quirurgicos: {
-      nombre: 'Documentos Quirúrgicos', 
-      icono: 'fas fa-procedures', 
+      nombre: 'Documentos Quirúrgicos',
+      icono: 'fas fa-procedures',
       color: 'orange',
       formularios: ['notaPreoperatoria','notaPreanestesica','notaPostoperatoria', 'notaPostanestesica'],
     },
     solicitudes: {
       nombre: 'Solicitudes de Estudios',
-      icono: 'fas fa-vial', 
-      color: 'green', 
-      formularios: ['solicitudEstudio', 'solicitudCultivo','solicitudGasometria'], 
-    }, 
+      icono: 'fas fa-vial',
+      color: 'green',
+      formularios: ['solicitudEstudio', 'solicitudCultivo','solicitudGasometria'],
+    },
     pediatricos: {
       nombre: 'Documentos Pediátricos',
-      icono: 'fas fa-baby', 
+      icono: 'fas fa-baby',
       color: 'pink',
-      formularios: [ 
-        'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz', 
-        'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico', 
+      formularios: [
+        'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
+        'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
         'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-      ], 
+      ],
       condition: () => this.esPacientePediatrico,
     },
     prescripciones: {
-      nombre: 'Prescripciones', 
-      icono: 'fas fa-pills', 
+      nombre: 'Prescripciones',
+      icono: 'fas fa-pills',
       color: 'purple',
       formularios: ['prescripcionMedicamento', 'registroTransfusion'],
     },
@@ -345,7 +353,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     notaPostanestesica: false,notaInterconsulta: false,controlCrecimiento: false,esquemaVacunacion: false,solicitudEstudio: false,referenciaTraslado: false,prescripcionMedicamento: false,
     registroTransfusion: false,notaEgreso: false,historiaClinicaPediatrica: false,desarrolloPsicomotriz: false,alimentacionPediatrica: false,tamizajeNeonatal: false,antecedentesHeredoFamiliares: false,
     antecedentesPerinatales: false,estadoNutricionalPediatrico: false,inmunizaciones: false,vacunasAdicionales: false,solicitudCultivo: false,solicitudGasometria: false,hojaFrontal: false,
-    altaVoluntaria: false,  
+    altaVoluntaria: false,
   };
 
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
@@ -393,7 +401,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private estadoNutricionalPediatricoService: EstadoNutricionalPediatricoService,
     private inmunizacionesService: InmunizacionesService,
     private vacunasAdicionalesService: VacunasAdicionalesService,
-    private camasService: CamasService
+    private camasService: CamasService,
+    private medicamentosService: MedicamentosService,
   ) {
     // ✅ INICIALIZACIÓN CORREGIDA
     this.signosVitalesForm = this.initializeSignosVitalesForm();
@@ -476,7 +485,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
      edad_gestacional: [''],
      apgar: [''],
      complicaciones_neonatales: [''],
-     
+
      // 🔥 CAMPOS PEDIÁTRICOS ESPECÍFICOS
      ...(this.esPacientePediatrico && {
        // Datos de los padres
@@ -761,11 +770,11 @@ private initializeSolicitudEstudioForm(): FormGroup {
   return this.fb.group({
     // Tipo de estudio
     tipo_estudio: ['laboratorio', [Validators.required]], // laboratorio, imagen, otros
-    
+
     // ===================================
     // ESTUDIOS DE LABORATORIO
     // ===================================
-    
+
     // Química Sanguínea
     biometria_hematica: [false],
     quimica_sanguinea: [false],
@@ -782,45 +791,45 @@ private initializeSolicitudEstudioForm(): FormGroup {
     proteinas_totales: [false],
     albumina: [false],
     fosfatasa_alcalina: [false],
-    
+
     // Electrolitos
     sodio: [false],
     potasio: [false],
     cloro: [false],
-    
+
     // Estudios hormonales
     tsh: [false],
     t3: [false],
     t4: [false],
-    
+
     // Estudios de orina
     examen_general_orina: [false],
     urocultivo: [false],
-    
+
     // Estudios de heces
     coproparasitoscopico: [false],
     coprocultivo: [false],
     sangre_oculta_heces: [false],
-    
+
     // Marcadores cardiacos
     troponinas: [false],
     ck_mb: [false],
-    
+
     // Coagulación
     tiempo_protrombina: [false],
     tiempo_tromboplastina: [false],
     inr: [false],
-    
+
     // ===================================
     // ESTUDIOS DE IMAGENOLOGÍA
     // ===================================
-    
+
     // Radiografías
     radiografia_torax: [false],
     radiografia_abdomen: [false],
     radiografia_columna: [false],
     radiografia_extremidades: [false],
-    
+
     // Ultrasonidos
     ultrasonido_abdominal: [false],
     ultrasonido_pelvico: [false],
@@ -828,48 +837,48 @@ private initializeSolicitudEstudioForm(): FormGroup {
     ultrasonido_carotideo: [false],
     ultrasonido_renal: [false],
     ecocardiograma: [false],
-    
+
     // Tomografías
     tomografia_cerebral: [false],
     tomografia_torax: [false],
     tomografia_abdomen: [false],
     tomografia_contrastada: [false],
-    
+
     // Resonancias
     resonancia_cerebral: [false],
     resonancia_columna: [false],
     resonancia_articular: [false],
-    
+
     // Estudios especiales
     mamografia: [false],
     densitometria_osea: [false],
-    
+
     // ===================================
     // CAMPOS COMUNES PARA TODOS
     // ===================================
-    
+
     // Otros estudios específicos
     otros_estudios: [''],
-    
+
     // Información clínica (OBLIGATORIO)
     indicacion_clinica: ['', [Validators.required]],
     diagnostico_presuntivo: ['', [Validators.required]],
-    
+
     // Configuración del estudio
     urgencia: ['normal'], // normal, urgente, stat
     ayuno_requerido: [false],
     contraste_requerido: [false], // Para imagenología
     sedacion_requerida: [false], // Para ciertos estudios
-    
+
     // Fechas y observaciones
     fecha_solicitud: [new Date().toISOString().split('T')[0], [Validators.required]],
     fecha_programada: [''],
     observaciones: [''],
-    
+
     // Médico solicitante
     medico_solicitante: [''],
     especialidad_solicitante: [''],
-    
+
     // Guía clínica
     id_guia_clinica: [''],
   });
@@ -893,63 +902,431 @@ private initializeSolicitudEstudioForm(): FormGroup {
     proteinas_totales: [false],
     albumina: [false],
     fosfatasa_alcalina: [false],
-    
+
     // Electrolitos
     sodio: [false],
     potasio: [false],
     cloro: [false],
-    
+
     // Estudios hormonales
     tsh: [false],
     t3: [false],
     t4: [false],
-    
+
     // Estudios de orina
     examen_general_orina: [false],
     urocultivo: [false],
-    
+
     // Estudios de heces
     coproparasitoscopico: [false],
     coprocultivo: [false],
     sangre_oculta_heces: [false],
-    
+
     // Marcadores cardiacos
     troponinas: [false],
     ck_mb: [false],
-    
+
     // Coagulación
     tiempo_protrombina: [false],
     tiempo_tromboplastina: [false],
     inr: [false],
-    
+
     // Otros estudios
     otros_estudios: [''],
-    
+
     // Información clínica
     indicacion_clinica: ['', Validators.required],
     diagnostico_presuntivo: ['', Validators.required],
     urgencia: ['normal'], // normal, urgente, stat
     ayuno_requerido: [false],
-    
+
     // Observaciones
     observaciones: [''],
-    
+
     // Fecha programada
     fecha_programada: ['']
   });
 }
 
- private initializePrescripcionForm(): FormGroup {
-   return this.fb.group({
-     medicamentos: this.fb.array([]),
-     indicaciones_generales: [''],
-     duracion_tratamiento_dias: [null, [Validators.min(1)]],
-     frecuencia: [''],
-     via_administracion: [''],
-     fecha_inicio: [new Date().toISOString().split('T')[0]],
-     medico_prescriptor: [''],
-   });
- }
+private initializePrescripcionForm(): FormGroup {
+  return this.fb.group({
+    // Información general de la prescripción
+    fecha_prescripcion: [new Date().toISOString().split('T')[0], [Validators.required]],
+    duracion_tratamiento_dias: [null, [Validators.min(1), Validators.max(365)]],
+    indicaciones_generales: [''],
+    diagnostico_prescripcion: ['', [Validators.required]],
+
+    // Array de medicamentos
+    medicamentos: this.fb.array([
+      this.crearMedicamentoFormGroup() // Crear al menos uno por defecto
+    ]),
+
+    // Información del médico
+    medico_prescriptor: [''],
+    cedula_medico: [''],
+    especialidad_medico: [''],
+
+    // Observaciones y advertencias
+    observaciones: [''],
+    alergias_consideradas: [''],
+    interacciones_importantes: [''],
+
+    // Control de seguimiento
+    requiere_seguimiento: [false],
+    fecha_proxima_revision: [''],
+
+    // Datos administrativos
+    numero_receta: [''], // Se generará automáticamente
+    valida_hasta: [''], // Se calculará automáticamente
+  });
+}
+
+private crearMedicamentoFormGroup(): FormGroup {
+  return this.fb.group({
+    // Selección del medicamento
+    id_medicamento: [null, [Validators.required]],
+    medicamento_seleccionado: [null], // Objeto completo del medicamento
+    busqueda_medicamento: [''], // Para el campo de búsqueda
+
+    // Prescripción específica
+    dosis: ['', [Validators.required]], // "500 mg", "1 tableta", etc.
+    frecuencia: ['', [Validators.required]], // "Cada 8 horas", "3 veces al día"
+    via_administracion: ['Oral', [Validators.required]], // Oral, IV, IM, etc.
+    duracion_dias: [null, [Validators.required, Validators.min(1)]],
+
+    // Instrucciones específicas
+    instrucciones_toma: [''], // "Con alimentos", "En ayunas", etc.
+    indicaciones_especiales: [''],
+
+    // Cálculos automáticos
+    cantidad_total: [null], // Se calculará automáticamente
+    dosis_diaria_total: [''], // Se calculará si es posible
+
+    // Control
+    medicamento_controlado: [false],
+    requiere_receta_especial: [false],
+  });
+}
+
+// Método auxiliar para crear un medicamento individual
+private crearGrupoMedicamento(): FormGroup {
+  return this.fb.group({
+    // Información del medicamento
+    nombre_medicamento: ['', [Validators.required]],
+    nombre_generico: [''],
+    nombre_comercial: [''],
+    concentracion: [''],
+    presentacion: [''], // tableta, cápsula, jarabe, etc.
+
+    // Dosis y administración
+    dosis: ['', [Validators.required]],
+    unidad_dosis: ['mg'], // mg, ml, g, etc.
+    frecuencia: ['', [Validators.required]], // cada 8 horas, 3 veces al día, etc.
+    via_administracion: ['oral', [Validators.required]], // oral, iv, im, etc.
+
+    // Duración específica del medicamento
+    duracion_dias: [null, [Validators.min(1), Validators.max(365)]],
+    cantidad_total: [null, [Validators.min(1)]],
+
+    // Instrucciones específicas
+    instrucciones_especificas: [''],
+    momento_administracion: [''], // antes de comer, después de comer, etc.
+
+    // Información adicional
+    indicacion: [''], // para qué sirve este medicamento específico
+    contraindicaciones: [''],
+    efectos_adversos: [''],
+
+    // Control
+    medicamento_controlado: [false],
+    requiere_receta_especial: [false],
+
+    // Estado
+    activo: [true]
+  });
+}
+
+// Métodos para manejar el array de medicamentos
+get medicamentosFormArray(): FormArray {
+  return this.prescripcionForm.get('medicamentos') as FormArray;
+}
+
+agregarMedicamento(): void {
+  this.medicamentosFormArray.push(this.crearMedicamentoFormGroup());
+}
+
+// Agregar este método en perfil-paciente.ts
+onBusquedaMedicamentoChange(event: Event, index: number): void {
+  const target = event.target as HTMLInputElement;
+  if (target) {
+    this.buscarMedicamentos(target.value, index);
+  }
+}
+
+// Eliminar un medicamento
+eliminarMedicamento(index: number): void {
+  if (this.medicamentosFormArray.length > 1) {
+    this.medicamentosFormArray.removeAt(index);
+  } else {
+    this.error = 'Debe prescribir al menos un medicamento';
+    setTimeout(() => this.error = null, 3000);
+  }
+}
+async buscarMedicamentos(termino: string, medicamentoIndex: number): Promise<void> {
+  if (!termino || termino.length < 2) {
+    this.medicamentosFiltrados = [...this.medicamentosMasPrescitos];
+    return;
+  }
+
+  try {
+    const response = await this.medicamentosService.buscarPorNombre(termino);
+    if (response.success) {
+      this.medicamentosFiltrados = response.data || [];
+    }
+  } catch (error) {
+    console.error('Error al buscar medicamentos:', error);
+    this.medicamentosFiltrados = [];
+  }
+}
+
+duplicarMedicamento(index: number): void {
+  const medicamentoActual = this.medicamentosFormArray.at(index).value;
+  const nuevoMedicamento = this.crearGrupoMedicamento();
+  nuevoMedicamento.patchValue({
+    ...medicamentoActual,
+    nombre_medicamento: `${medicamentoActual.nombre_medicamento} (copia)`
+  });
+  this.medicamentosFormArray.push(nuevoMedicamento);
+}
+
+
+trackByIndex(index: number): number {
+  return index;
+}
+
+
+private async guardarPrescripcionMedicamento(): Promise<void> {
+  if (!this.prescripcionForm.valid) {
+    this.marcarCamposInvalidos(this.prescripcionForm);
+    throw new Error('Formulario de prescripción inválido');
+  }
+
+  if (!this.pacienteCompleto?.expediente.id_expediente) {
+    throw new Error('No hay expediente disponible');
+  }
+
+  // Crear documento padre si no existe
+  if (!this.documentoClinicoActual) {
+    await this.crearDocumentoClinicoPadre('Prescripción de Medicamentos');
+  }
+
+  const prescripcionData = {
+    id_documento: this.documentoClinicoActual!,
+    fecha_prescripcion: this.prescripcionForm.value.fecha_prescripcion,
+    duracion_tratamiento_dias: this.prescripcionForm.value.duracion_tratamiento_dias,
+    indicaciones_generales: this.prescripcionForm.value.indicaciones_generales,
+    diagnostico_prescripcion: this.prescripcionForm.value.diagnostico_prescripcion,
+    medicamentos: this.medicamentosFormArray.value.map((med: any) => ({
+      id_medicamento: med.id_medicamento,
+      dosis: med.dosis,
+      frecuencia: med.frecuencia,
+      via_administracion: med.via_administracion,
+      duracion_dias: med.duracion_dias,
+      instrucciones_toma: med.instrucciones_toma,
+      indicaciones_especiales: med.indicaciones_especiales,
+      cantidad_total: med.cantidad_total
+    })),
+    observaciones: this.prescripcionForm.value.observaciones,
+    numero_receta: this.generarNumeroReceta(),
+    valida_hasta: this.calcularFechaValidez()
+  };
+
+  try {
+    console.log('📄 Datos de prescripción preparados:', prescripcionData);
+    // Aquí integraremos con el backend más tarde
+  } catch (error: any) {
+    console.error('❌ Error al guardar prescripción:', error);
+    throw error;
+  }
+}
+
+private generarNumeroReceta(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `RX-${fecha.getFullYear()}-${timestamp}`;
+}
+
+private calcularFechaValidez(): string {
+  const fechaValidez = new Date();
+  fechaValidez.setDate(fechaValidez.getDate() + 30); // Válida por 30 días
+  return fechaValidez.toISOString().split('T')[0];
+}
+
+private marcarCamposInvalidos(formGroup: FormGroup): void {
+  Object.keys(formGroup.controls).forEach(key => {
+    const control = formGroup.get(key);
+    if (control instanceof FormGroup) {
+      this.marcarCamposInvalidos(control);
+    } else if (control instanceof FormArray) {
+      control.controls.forEach((arrayControl, index) => {
+        if (arrayControl instanceof FormGroup) {
+          this.marcarCamposInvalidos(arrayControl);
+        }
+      });
+    } else {
+      control?.markAsTouched();
+    }
+  });
+}
+
+private construirListaMedicamentos(): any[] {
+  const medicamentos = this.medicamentosFormArray.value;
+  return medicamentos.filter((med: any) => med.activo && med.nombre_medicamento.trim())
+    .map((med: any, index: number) => ({
+      numero_orden: index + 1,
+      nombre_medicamento: med.nombre_medicamento,
+      nombre_generico: med.nombre_generico || med.nombre_medicamento,
+      nombre_comercial: med.nombre_comercial,
+      concentracion: med.concentracion,
+      presentacion: med.presentacion,
+      dosis: med.dosis,
+      unidad_dosis: med.unidad_dosis,
+      frecuencia: med.frecuencia,
+      via_administracion: med.via_administracion,
+      duracion_dias: med.duracion_dias,
+      cantidad_total: med.cantidad_total,
+      instrucciones_especificas: med.instrucciones_especificas,
+      momento_administracion: med.momento_administracion,
+      indicacion: med.indicacion,
+      medicamento_controlado: med.medicamento_controlado
+    }));
+}
+
+private generarFolioReceta(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `RX-${fecha.getFullYear()}-${timestamp}`;
+}
+
+private async generarPDFPrescripcion(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Prescripción de Medicamentos', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      prescripcion: {
+        ...this.prescripcionForm.value,
+        medicamentos: this.medicamentosFormArray.value,
+        numero_receta: this.generarNumeroReceta(),
+        valida_hasta: this.calcularFechaValidez()
+      }
+    });
+
+    console.log('✅ PDF de Prescripción generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF de prescripción:', error);
+    this.error = 'Error al generar el PDF de la prescripción';
+  }
+}
+
+// Seleccionar un medicamento específico
+seleccionarMedicamento(medicamento: Medicamento, medicamentoIndex: number): void {
+  const medicamentoFormGroup = this.medicamentosFormArray.at(medicamentoIndex) as FormGroup;
+
+  medicamentoFormGroup.patchValue({
+    id_medicamento: medicamento.id_medicamento,
+    medicamento_seleccionado: medicamento,
+    busqueda_medicamento: `${medicamento.nombre} - ${medicamento.presentacion} ${medicamento.concentracion}`,
+    via_administracion: medicamento.via_administracion || 'Oral',
+    medicamento_controlado: this.esMedicamentoControlado(medicamento),
+  });
+
+  // Auto-llenar dosis si está disponible
+  if (medicamento.dosis_adulto && !this.esPacientePediatrico) {
+    medicamentoFormGroup.patchValue({
+      dosis: medicamento.dosis_adulto
+    });
+  } else if (medicamento.dosis_pediatrica && this.esPacientePediatrico) {
+    medicamentoFormGroup.patchValue({
+      dosis: medicamento.dosis_pediatrica
+    });
+  }
+
+  // Calcular cantidad total automáticamente
+  this.calcularCantidadTotal(medicamentoIndex);
+}
+
+// Calcular cantidad total necesaria
+calcularCantidadTotal(medicamentoIndex: number): void {
+  const medicamentoFormGroup = this.medicamentosFormArray.at(medicamentoIndex) as FormGroup;
+  const frecuencia = medicamentoFormGroup.get('frecuencia')?.value;
+  const duracionDias = medicamentoFormGroup.get('duracion_dias')?.value;
+
+  if (frecuencia && duracionDias) {
+    let tomasPorDia = this.extraerTomasPorDia(frecuencia);
+    if (tomasPorDia > 0) {
+      const cantidadTotal = Math.ceil(tomasPorDia * duracionDias);
+      medicamentoFormGroup.patchValue({
+        cantidad_total: cantidadTotal
+      });
+    }
+  }
+}
+
+// Extraer número de tomas por día de la frecuencia
+private extraerTomasPorDia(frecuencia: string): number {
+  const frecuenciaLower = frecuencia.toLowerCase();
+
+  // Patrones comunes
+  if (frecuenciaLower.includes('cada 24 horas') || frecuenciaLower.includes('1 vez')) return 1;
+  if (frecuenciaLower.includes('cada 12 horas') || frecuenciaLower.includes('2 veces')) return 2;
+  if (frecuenciaLower.includes('cada 8 horas') || frecuenciaLower.includes('3 veces')) return 3;
+  if (frecuenciaLower.includes('cada 6 horas') || frecuenciaLower.includes('4 veces')) return 4;
+  if (frecuenciaLower.includes('cada 4 horas') || frecuenciaLower.includes('6 veces')) return 6;
+
+  // Buscar números explícitos
+  const matches = frecuencia.match(/(\d+)\s*veces/i);
+  if (matches) {
+    return parseInt(matches[1]);
+  }
+
+  return 0; // No se pudo determinar
+}
+
+// Verificar si es medicamento controlado
+private esMedicamentoControlado(medicamento: Medicamento): boolean {
+  const medicamentosControlados = [
+    'tramadol', 'morfina', 'fentanilo', 'oxicodona', 'diazepam', 'alprazolam',
+    'clonazepam', 'zolpidem', 'methylphenidate', 'anfetamina'
+  ];
+
+  const nombreLower = medicamento.nombre.toLowerCase();
+  return medicamentosControlados.some(controlado => nombreLower.includes(controlado));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  private initializeReferenciaForm(): FormGroup {
    return this.fb.group({
@@ -1353,7 +1730,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
 
  private documentosDisponibles: TipoDocumentoConfig[] = [
    {
-     id: 'signosVitales', 
+     id: 'signosVitales',
      nombre: 'Signos Vitales',
      descripcion: 'Registro de constantes vitales del paciente',
      icono: 'fas fa-heartbeat',
@@ -1420,7 +1797,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
  ngOnInit(): void {
    this.inicializarFormulariosVisibles();
    this.cargarCamasDisponibles();
-   
+    this.cargarCatalogosMedicamentos();
    this.route.paramMap.subscribe((params) => {
      const id = params.get('id');
      if (id) {
@@ -1457,14 +1834,12 @@ private initializeSolicitudEstudioForm(): FormGroup {
    this.destroy$.next();
    this.destroy$.complete();
  }
-//home/agustin/CICEG-HG_Frontend/src/app/personas/perfil-paciente/perfil-paciente.ts
- // ✅ MÉTODO CORREGIDO guardarFormularioActivo
  async guardarFormularioActivo(): Promise<void> {
    if (this.isCreatingDocument) return;
    this.isCreatingDocument = true;
    this.error = null;
    this.success = null;
-   
+
    try {
      switch (this.formularioActivo) {
        case 'signosVitales':
@@ -1472,15 +1847,15 @@ private initializeSolicitudEstudioForm(): FormGroup {
          this.formularioEstado['signosVitales'] = true;
          this.success = 'Signos Vitales guardados correctamente';
          break;
-         
+
        case 'historiaClinica':
          await this.guardarHistoriaClinica();
          this.formularioEstado['historiaClinica'] = true;
-         this.success = this.esPacientePediatrico 
+         this.success = this.esPacientePediatrico
            ? 'Historia Clínica Pediátrica guardada correctamente'
            : 'Historia Clínica guardada correctamente';
          break;
-         
+
        case 'hojaFrontal': // ✅ CASO CORREGIDO
          const medicoCompleto = await this.obtenerDatosMedicoCompleto();
          const datosPacienteEstructurados = this.extraerDatosPaciente();
@@ -1494,11 +1869,16 @@ private initializeSolicitudEstudioForm(): FormGroup {
         this.formularioEstado['solicitudEstudio'] = true;
         const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
         this.success = `Solicitud de ${this.getTipoEstudioNombre(tipoEstudio)} guardada correctamente`;
-        
+
         // Generar PDF automáticamente
         await this.generarPDFSolicitudEstudio(tipoEstudio);
         break;
-         
+      case 'prescripcionMedicamento':
+        await this.guardarPrescripcionMedicamento();
+        this.formularioEstado['prescripcionMedicamento'] = true;
+        this.success = 'Prescripción de Medicamentos guardada correctamente';
+        break;
+
        default:
          throw new Error('Tipo de formulario no válido');
      }
@@ -1506,10 +1886,10 @@ private initializeSolicitudEstudioForm(): FormGroup {
      if (this.formularioActivo !== 'signosVitales' && this.formularioActivo !== null) {
        this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
      }
-     
+
      localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
      console.log('- Formulario completado:', this.formularioActivo);
-     
+
      this.cargarDatosPaciente().subscribe((data) => {
        this.construirPacienteCompleto(data);
      });
@@ -1556,7 +1936,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
             }
           });
           break;
-          
+
         case 'Signos Vitales':
           await this.pdfGeneratorService.generarSignosVitales({
             paciente: datosPacienteEstructurados,
@@ -1568,7 +1948,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
             },
           });
           break;
-          
+
         case 'Hoja Frontal Expediente':
         case 'Hoja Frontal': // ✅ MÉTODO CORREGIDO
           await this.pdfGeneratorService.generarDocumento('Hoja Frontal', {
@@ -1578,7 +1958,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
             hojaFrontal: this.hojaFrontalForm?.value || {}
           });
           break;
-          
+
         default:
           console.warn('Tipo de documento no soportado:', tipoDocumento);
           throw new Error(`Tipo de documento "${tipoDocumento}" no es válido`);
@@ -1614,7 +1994,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
         estudios_solicitados: this.construirEstudiosSeleccionados(tipoEstudio)
       }
     });
-    
+
     console.log(`✅ PDF de Solicitud de ${tipoEstudio} generado correctamente`);
   } catch (error) {
     console.error('❌ Error al generar PDF:', error);
@@ -1655,7 +2035,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
    this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
    this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
    this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
-   this.hojaFrontalForm = this.initializeHojaFrontalForm(); 
+   this.hojaFrontalForm = this.initializeHojaFrontalForm();
    console.log('Todos los formularios han sido inicializados correctamente.');
  }
 
@@ -1667,7 +2047,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
    this.determinarTipoPaciente();
    this.configurarDocumentosDisponibles();
    this.iniciarAutoguardado();
-   
+
    setTimeout(() => {
      this.debugPacienteCompleto();
    }, 2000);
@@ -1680,9 +2060,9 @@ private initializeSolicitudEstudioForm(): FormGroup {
      this.mostrarMensajeValidacion(tipoFormulario);
      return;
    }
-   
+
    console.log(`Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`);
-   
+
    const formulariosValidos: FormularioActivo[] = [
      'signosVitales', 'historiaClinica', 'hojaFrontal', 'notaUrgencias', 'notaEvolucion',
      'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica',
@@ -1704,7 +2084,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
    const titulos: { [key: string]: string } = {
      signosVitales: 'Signos Vitales',
      historiaClinica: this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
-     hojaFrontal: 'Hoja Frontal', 
+     hojaFrontal: 'Hoja Frontal',
      notaUrgencias: 'Nota de Urgencias',
      notaEvolucion: 'Nota de Evolución',
      consentimiento: 'Consentimiento Informado',
@@ -1718,7 +2098,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
      solicitudEstudio: 'Solicitud de Estudio',
      referenciaTraslado: 'Referencia Traslado',
      solicitudCultivo: 'Solicitud Cultivo',
-     prescripcionMedicamentos: 'Prescripción Medicamentos',
+      prescripcionMedicamento: 'Prescripción de Medicamentos',
      solicitudGasometria: 'Solicitud Gasometría',
      altaVoluntaria: 'Alta Voluntaria',
    };
@@ -1733,7 +2113,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
    this.formulariosVisibles = Object.keys(this.configFormularios);
  }
 
- toggleGrupo(nombreGrupo: string): void { 
+ toggleGrupo(nombreGrupo: string): void {
    this.grupoExpandido = this.grupoExpandido === nombreGrupo ? null : nombreGrupo;
  }
 
@@ -1751,9 +2131,9 @@ private initializeSolicitudEstudioForm(): FormGroup {
  getFormulariosVisibles(): any[] {
   return this.formulariosVisibles
     .filter((key) => this.configFormularios[key])
-    .map((key) => ({ 
+    .map((key) => ({
       key: key,  // ✅ ASEGURAR QUE EXISTE LA PROPIEDAD KEY
-      ...this.configFormularios[key] 
+      ...this.configFormularios[key]
     }));
 }
 
@@ -1761,14 +2141,14 @@ private initializeSolicitudEstudioForm(): FormGroup {
    const isActive = this.formularioActivo === formulario;
    const config = this.configFormularios[formulario];
    const puedeAcceder = this.puedeAccederFormulario(formulario);
-   
+
    if (isActive) {
      return 'bg-blue-500 text-white shadow-lg transform scale-105';
    }
    if (!puedeAcceder) {
      return 'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed opacity-60';
    }
-   
+
    let clases = 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-300';
    if (config?.completado) {
      clases += ' ring-2 ring-green-200';
@@ -1799,6 +2179,8 @@ private initializeSolicitudEstudioForm(): FormGroup {
      case 'controlCrecimiento': return true;
      case 'esquemaVacunacion': return true;
      case 'solicitudEstudio': return this.solicitudEstudioForm.valid;
+     case 'prescripcionMedicamento':
+      return this.prescripcionForm.valid && this.medicamentosFormArray.length > 0;
      default: return false;
    }
  }
@@ -2005,6 +2387,43 @@ private initializeSolicitudEstudioForm(): FormGroup {
  // MÉTODOS AUXILIARES RESTANTES
  // ===================================
 
+ private async cargarCatalogosMedicamentos(): Promise<void> {
+  try {
+    // Cargar medicamentos más prescritos para mostrar primero
+    const masPrescritosResponse = await this.medicamentosService.getMasPrescitos(20);
+    if (masPrescritosResponse.success) {
+      this.medicamentosMasPrescitos = masPrescritosResponse.data || [];
+    }
+
+    // Cargar todos los medicamentos activos
+    const medicamentosResponse = await this.medicamentosService.getAll({ activo: true });
+    if (medicamentosResponse.success) {
+      this.medicamentosDisponibles = medicamentosResponse.data || [];
+      this.medicamentosFiltrados = [...this.medicamentosDisponibles];
+    }
+
+    // Cargar grupos terapéuticos
+    const gruposResponse = await this.medicamentosService.getGruposTerapeuticos();
+    if (gruposResponse.success) {
+      this.gruposTerapeuticos = gruposResponse.data || [];
+    }
+
+    // Cargar presentaciones
+    const presentacionesResponse = await this.medicamentosService.getPresentaciones();
+    if (presentacionesResponse.success) {
+      this.presentacionesDisponibles = presentacionesResponse.data || [];
+    }
+
+    console.log('✅ Catálogos de medicamentos cargados:', {
+      medicamentos: this.medicamentosDisponibles.length,
+      masPrescitos: this.medicamentosMasPrescitos.length,
+      grupos: this.gruposTerapeuticos.length
+    });
+  } catch (error) {
+    console.error('❌ Error al cargar catálogos de medicamentos:', error);
+  }
+}
+
  async cargarCamasDisponibles(): Promise<void> {
    try {
      const response = await this.camasService.getCamasDisponibles();
@@ -2197,10 +2616,10 @@ private initializeSolicitudEstudioForm(): FormGroup {
 private construirEstudiosSeleccionados(tipoEstudio: string): string {
   const form = this.solicitudEstudioForm.value;
   const estudios: string[] = [];
-  
+
   // Mapeos según el tipo de estudio
   let mapeoEstudios: { [key: string]: string } = {};
-  
+
   if (tipoEstudio === 'laboratorio') {
     mapeoEstudios = {
       biometria_hematica: 'Biometría hemática completa',
@@ -2306,7 +2725,7 @@ private construirEstudiosSeleccionados(tipoEstudio: string): string {
 
    const response = await firstValueFrom(this.signosVitalesService.createSignosVitales(signosData));
    console.log(' Signos vitales guardados exitosamente:', response);
-   
+
    if (response?.data?.id_documento) {
      this.documentoClinicoActual = response.data.id_documento;
    }
@@ -2377,36 +2796,50 @@ private construirEstudiosSeleccionados(tipoEstudio: string): string {
  // MÉTODOS DE DOCUMENTOS
  // ===================================
 
- private async crearDocumentoClinicoPadre(): Promise<void> {
-   if (!this.pacienteCompleto?.expediente.id_expediente) {
-     throw new Error('No hay expediente disponible');
-   }
-   
-   const tipoHistoriaClinica = this.tiposDocumentosDisponibles.find(
-     (t) => t.nombre === 'Historia Clínica' || t.nombre.toLowerCase().includes('historia')
-   );
+ private async crearDocumentoClinicoPadre(tipoDocumento?: string): Promise<void> {
+  if (!this.pacienteCompleto?.expediente.id_expediente) {
+    throw new Error('No hay expediente disponible');
+  }
 
-   if (!tipoHistoriaClinica) {
-     throw new Error('Tipo de documento Historia Clínica no encontrado');
-   }
+  let nombreBusqueda = 'Historia Clínica';
+  if (tipoDocumento) {
+    nombreBusqueda = tipoDocumento;
+  }
 
-   const documentoData = {
-     id_expediente: this.pacienteCompleto.expediente.id_expediente,
-     id_internamiento: this.pacienteCompleto.ultimoInternamiento?.id_internamiento || null,
-     id_tipo_documento: tipoHistoriaClinica.id_tipo_documento,
-     id_personal_creador: this.medicoActual!,
-     fecha_elaboracion: new Date().toISOString(),
-     estado: EstadoDocumento.ACTIVO,
-   };
+  const tipoDocumentoEncontrado = this.tiposDocumentosDisponibles.find(
+    (t) => t.nombre === nombreBusqueda || t.nombre.toLowerCase().includes(nombreBusqueda.toLowerCase())
+  );
 
-   const response = await firstValueFrom(this.documentosService.createDocumentoClinico(documentoData));
+  if (!tipoDocumentoEncontrado) {
+    // Si no encuentra el tipo específico, usar Historia Clínica como fallback
+    const tipoHistoriaClinica = this.tiposDocumentosDisponibles.find(
+      (t) => t.nombre === 'Historia Clínica' || t.nombre.toLowerCase().includes('historia')
+    );
 
-   if (response?.data?.id_documento) {
-     this.documentoClinicoActual = response.data.id_documento;
-   } else {
-     throw new Error('Error al crear documento clínico');
-   }
- }
+    if (!tipoHistoriaClinica) {
+      throw new Error('Tipo de documento Historia Clínica no encontrado');
+    }
+  }
+
+  const tipoFinal = tipoDocumentoEncontrado || this.tiposDocumentosDisponibles.find(t => t.nombre.includes('Historia'));
+
+  const documentoData = {
+    id_expediente: this.pacienteCompleto.expediente.id_expediente,
+    id_internamiento: this.pacienteCompleto.ultimoInternamiento?.id_internamiento || null,
+    id_tipo_documento: tipoFinal!.id_tipo_documento,
+    id_personal_creador: this.medicoActual!,
+    fecha_elaboracion: new Date().toISOString(),
+    estado: EstadoDocumento.ACTIVO,
+  };
+
+  const response = await firstValueFrom(this.documentosService.createDocumentoClinico(documentoData));
+
+  if (response?.data?.id_documento) {
+    this.documentoClinicoActual = response.data.id_documento;
+  } else {
+    throw new Error('Error al crear documento clínico');
+  }
+}
 
  private getTipoEstudioNombre(tipo: string): string {
   const nombres: { [key: string]: string } = {
@@ -2480,7 +2913,7 @@ await this.crearDocumentoClinicoPadre();
          departamento: medico.departamento,
        };
      }
-     
+
      const usuarioActual = this.authService.getCurrentUser();
      return {
        id_personal_medico: this.medicoActual,
@@ -2553,7 +2986,7 @@ await this.crearDocumentoClinicoPadre();
      const esPediatricoAnterior = this.esPacientePediatrico;
      this.esPacientePediatrico = edad < 18;
      console.log(`Paciente ${this.esPacientePediatrico ? 'PEDIÁTRICO' : 'ADULTO'} (${edad} años)`);
-     
+
      this.evaluarDocumentosQuirurgicos();
      if (esPediatricoAnterior !== this.esPacientePediatrico) {
        this.ajustarFormulariosPorEdad();
@@ -2634,12 +3067,12 @@ await this.crearDocumentoClinicoPadre();
     'notaUrgencias',
     'notaEvolucion',
   ];
-  
+
   const indiceDestino = secuenciaFormularios.indexOf(formulario);
 
   // ✅ Si no está en secuencia, permitir acceso
-  if (indiceDestino === -1) return true; 
-  
+  if (indiceDestino === -1) return true;
+
   switch (formulario) {
     case 'signosVitales':
       return true;
@@ -2700,7 +3133,7 @@ await this.crearDocumentoClinicoPadre();
      console.warn(`Tab no válida: ${tab}`);
      this.tabActiva = 'general';
    }
-   
+
    if (this.tabActiva === 'historial') {
      this.cargarHistorialClinico();
    } else if (this.tabActiva === 'datos') {
@@ -2993,13 +3426,13 @@ await this.crearDocumentoClinicoPadre();
 
   private esFormularioValido(formulario: string | null): formulario is FormularioActivo {
     if (formulario === null) return false;
-    
+
     const formulariosValidos: FormularioActivo[] = [
       'signosVitales', 'historiaClinica', 'hojaFrontal', 'notaUrgencias', 'notaEvolucion',
       'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica',
       'notaPostanestesica', 'notaInterconsulta', 'controlCrecimiento', 'esquemaVacunacion'
     ];
-    
+
     return formulariosValidos.includes(formulario as FormularioActivo);
   }
 
@@ -3019,14 +3452,14 @@ await this.crearDocumentoClinicoPadre();
     if (confirm('¿Está seguro de que desea eliminar el borrador guardado?')) {
       localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
       this.success = 'Borrador eliminado correctamente';
-      
+
       // Resetear todos los formularios
       this.signosVitalesForm.reset();
       this.historiaClinicaForm.reset();
       this.hojaFrontalForm?.reset(); // ✅ AGREGADO
       this.notaUrgenciasForm.reset();
       this.notaEvolucionForm.reset();
-      
+
       // Resetear estado
       this.formularioEstado = {
         signosVitales: false, historiaClinica: false, hojaFrontal: false, notaUrgencias: false,
@@ -3073,7 +3506,7 @@ await this.crearDocumentoClinicoPadre();
           console.warn(`Formulario no reconocido: ${this.formularioActivo}`);
           return;
       }
-      
+
       this.formularioEstado[this.formularioActivo] = false;
       this.success = `Formulario ${this.getTituloFormulario(this.formularioActivo)} reseteado`;
     }
@@ -3129,7 +3562,7 @@ await this.crearDocumentoClinicoPadre();
       this.guiasClinicasFiltradas = [...this.guiasClinicas];
       return;
     }
-    
+
     this.guiasClinicasFiltradas = this.guiasClinicas.filter(
       (guia) =>
         guia.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
@@ -3222,7 +3655,7 @@ await this.crearDocumentoClinicoPadre();
       this.error = 'Debe completar al menos Signos Vitales e Historia Clínica para finalizar';
       return;
     }
-    
+
     const progreso = this.progresoFormularios;
     const mensaje = progreso.completados === progreso.total
       ? '¡Proceso completado exitosamente! Todos los documentos han sido creados.'
@@ -3255,7 +3688,7 @@ await this.crearDocumentoClinicoPadre();
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
     if (this.tabActiva !== 'crear') return;
-    
+
     if ((event.ctrlKey || event.metaKey) && event.key >= '1' && event.key <= '9') {
       event.preventDefault();
       const index = parseInt(event.key) - 1;
@@ -3264,7 +3697,7 @@ await this.crearDocumentoClinicoPadre();
         this.cambiarFormulario(formularios[index].key);
       }
     }
-    
+
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       this.navegarFormulario(event.key === 'ArrowRight' ? 'siguiente' : 'anterior');
@@ -3275,28 +3708,24 @@ await this.crearDocumentoClinicoPadre();
     const formularios = this.getFormulariosVisibles();
     const actual = formularios.findIndex((f) => f.key === this.formularioActivo);
     if (actual === -1) return;
-    
+
     let nuevo = direccion === 'siguiente' ? actual + 1 : actual - 1;
     if (nuevo >= formularios.length) nuevo = 0;
     if (nuevo < 0) nuevo = formularios.length - 1;
-    
+
     this.cambiarFormulario(formularios[nuevo].key);
   }
 
 
 
-  // ===================================
+  // ===================================/////////////////////////////////////////////////////////////////////////////////////////
 // MÉTODOS AUXILIARES PARA EL HTML
-// ===================================
+// ===================================////////////////////////////////////////////////////////////////////////////////////
 
-    // filtrarPorCategoria(categoria: string): void {
-    //   this.filtroActivo = categoria;
-    //   // Lógica básica de filtrado
-    // }
     filtrarPorCategoria(categoria: FiltroCategoria): void {
     this.filtroActivo = categoria;
     switch (categoria) {
-      case 'frecuentes': 
+      case 'frecuentes':
         this.formulariosVisibles = Object.keys(this.configFormularios).filter(
           (key) => this.configFormularios[key].frecuente
         );
@@ -3306,7 +3735,7 @@ await this.crearDocumentoClinicoPadre();
           (key) => this.configFormularios[key].obligatorio
         );
         break;
-      case 'pediatricos': 
+      case 'pediatricos':
         this.formulariosVisibles = Object.keys(this.configFormularios).filter(
           (key) => this.esFormularioPediatrico(key)
         );
@@ -3326,8 +3755,10 @@ await this.crearDocumentoClinicoPadre();
       return [
         { key: 'principales', data: { nombre: 'Documentos Principales', icono: 'fas fa-star', color: 'blue', formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal'] } },
         { key: 'clinicos', data: { nombre: 'Documentos Clínicos', icono: 'fas fa-file-medical', color: 'green', formularios: ['notaUrgencias', 'notaEvolucion'] } },
-        { key: 'solicitudes',data: {nombre: 'Solicitudes de Estudios',icono: 'fas fa-microscope',color: 'green',formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']}}
-      
+        { key: 'solicitudes',data: {nombre: 'Solicitudes de Estudios',icono: 'fas fa-microscope',color: 'green',formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']}},
+        { key: 'prescripciones', data: {nombre: 'Prescripciones y Medicamentos',icono: 'fas fa-pills', color: 'purple',formularios: ['prescripcionMedicamento', 'registroTransfusion']}}
+
+
       ];
     }
 
@@ -3335,12 +3766,12 @@ await this.crearDocumentoClinicoPadre();
   if (!formularios || !Array.isArray(formularios)) {
     return [];
   }
-  
+
   return formularios
     .filter(key => this.configFormularios[key]) // Solo formularios que existen
-    .map(key => ({ 
+    .map(key => ({
       key: key,  // ✅ ASEGURAR QUE EXISTE LA PROPIEDAD KEY
-      ...this.configFormularios[key] 
+      ...this.configFormularios[key]
     }));
 }
 
@@ -3358,8 +3789,8 @@ await this.crearDocumentoClinicoPadre();
     }
 
     obtenerNumeroExpedientePreferido(): string {
-      return this.pacienteCompleto?.expediente?.numero_expediente_administrativo || 
-            this.pacienteCompleto?.expediente?.numero_expediente || 
+      return this.pacienteCompleto?.expediente?.numero_expediente_administrativo ||
+            this.pacienteCompleto?.expediente?.numero_expediente ||
             'Sin número';
     }
 
