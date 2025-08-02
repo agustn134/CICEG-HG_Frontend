@@ -150,8 +150,107 @@ private obtenerImagenPlaceholder(): string {
   return canvas.toDataURL('image/png', 0.8);
 }
 
+/////////////////////////METODOS AUXILIARES/////////////////////////////////
+// ==========================================
+// MÉTODOS AUXILIARES PARA TABLAS Y LAYOUTS
+// ==========================================
 
-  /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
+private getTableLayout(): any {
+  return {
+    hLineWidth: (i: number, node: any) => {
+      return (i === 0 || i === node.table.body.length) ? 1 : 0.5;
+    },
+    vLineWidth: (i: number, node: any) => {
+      return (i === 0 || i === node.table.widths.length) ? 1 : 0.5;
+    },
+    hLineColor: (i: number, node: any) => {
+      return '#d1d5db';
+    },
+    vLineColor: (i: number, node: any) => {
+      return '#d1d5db';
+    },
+    paddingLeft: (i: number, node: any) => 4,
+    paddingRight: (i: number, node: any) => 4,
+    paddingTop: (i: number, node: any) => 4,
+    paddingBottom: (i: number, node: any) => 4,
+    fillColor: (rowIndex: number, node: any, columnIndex: number) => {
+      return (rowIndex % 2 === 0) ? '#f9fafb' : null;
+    }
+  };
+}
+
+
+
+// Método auxiliar para formatear dirección completa
+private formatearDireccionCompleta(paciente: any): string {
+  const domicilio = paciente.domicilio || {};
+  const partes = [
+    domicilio.calle,
+    domicilio.numero_exterior ? `#${domicilio.numero_exterior}` : null,
+    domicilio.numero_interior ? `Int. ${domicilio.numero_interior}` : null,
+    domicilio.colonia,
+    domicilio.codigo_postal ? `C.P. ${domicilio.codigo_postal}` : null,
+    domicilio.municipio,
+    domicilio.estado
+  ].filter(Boolean);
+
+  return partes.length > 0 ? partes.join(', ') : 'Domicilio no especificado';
+
+
+}
+
+private obtenerTituloSolicitud(tipo: string): string {
+  const titulos: { [key: string]: string } = {
+    laboratorio: 'SOLICITUD DE LABORATORIO',
+    imagen: 'SOLICITUD DE IMAGENOLOGÍA',
+    otros: 'SOLICITUD DE ESTUDIO ESPECIAL'
+  };
+  return titulos[tipo] || 'SOLICITUD DE ESTUDIO';
+}
+
+private obtenerIconoSolicitud(tipo: string): string {
+  const iconos: { [key: string]: string } = {
+    laboratorio: '🧪',
+    imagen: '📷',
+    otros: '🔬'
+  };
+  return iconos[tipo] || '📄';
+}
+
+private obtenerTituloSeccionEstudios(tipo: string): string {
+  const titulos: { [key: string]: string } = {
+    laboratorio: 'ESTUDIOS DE LABORATORIO SOLICITADOS',
+    imagen: 'ESTUDIOS DE IMAGENOLOGÍA SOLICITADOS',
+    otros: 'ESTUDIOS ESPECIALES SOLICITADOS'
+  };
+  return titulos[tipo] || 'ESTUDIOS SOLICITADOS';
+}
+
+private obtenerIconoSeccionEstudios(tipo: string): string {
+  const iconos: { [key: string]: string } = {
+    laboratorio: '📊',
+    imagen: '🖼️',
+    otros: '⚗️'
+  };
+  return iconos[tipo] || '📋';
+}
+
+private formatearUrgencia(urgencia: string): string {
+  const urgencias: { [key: string]: string } = {
+    normal: 'Normal',
+    urgente: 'URGENTE',
+    stat: 'STAT (Inmediato)'
+  };
+  return urgencias[urgencia] || urgencia;
+}
+
+private generarFolioSolicitud(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `SOL-${fecha.getFullYear()}-${timestamp}`;
+}
+
+/////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 
 
   async generarHistoriaClinica(datos: any): Promise<any> {
@@ -1669,21 +1768,398 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
   };
 }
 
-// Método auxiliar para formatear dirección completa
-private formatearDireccionCompleta(paciente: any): string {
-  const domicilio = paciente.domicilio || {};
-  const partes = [
-    domicilio.calle,
-    domicilio.numero_exterior ? `#${domicilio.numero_exterior}` : null,
-    domicilio.numero_interior ? `Int. ${domicilio.numero_interior}` : null,
-    domicilio.colonia,
-    domicilio.codigo_postal ? `C.P. ${domicilio.codigo_postal}` : null,
-    domicilio.municipio,
-    domicilio.estado
-  ].filter(Boolean);
 
-  return partes.length > 0 ? partes.join(', ') : 'Domicilio no especificado';
+
+
+
+
+async generarSolicitudEstudio(datos: any): Promise<any> {
+  console.log('📄 Generando Solicitud de Estudio...');
+  
+  const { pacienteCompleto, medicoCompleto, solicitudEstudio } = datos;
+  const fechaActual = new Date();
+  const tipoEstudio = solicitudEstudio.tipo_estudio || 'laboratorio';
+  
+  // Obtener título dinámico
+  const tituloDocumento = this.obtenerTituloSolicitud(tipoEstudio);
+  const iconoDocumento = this.obtenerIconoSolicitud(tipoEstudio);
+  
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [40, 80, 40, 60],
+    
+    header: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [40, 20, 40, 20],
+        table: {
+          widths: ['33%', '34%', '33%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
+                  { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
+                  { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
+                ]
+              },
+              {
+                stack: [
+                  { text: `${iconoDocumento} ${tituloDocumento}`, fontSize: 14, bold: true, alignment: 'center', color: '#2563eb' },
+                  { text: 'Cumplimiento NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', italics: true, color: '#666666', margin: [0, 5] }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'FECHA:', fontSize: 8, bold: true, alignment: 'right' },
+                  { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 10, alignment: 'right' },
+                  { text: `Folio: ${this.generarFolioSolicitud()}`, fontSize: 8, alignment: 'right', margin: [0, 2] }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    },
+    
+    content: [
+      // SECCIÓN DATOS DEL PACIENTE
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '👤 DATOS DEL PACIENTE',
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: {
+          hLineWidth: () => 1,
+          vLineWidth: () => 1,
+          hLineColor: () => '#d1d5db',
+          vLineColor: () => '#d1d5db'
+        },
+        margin: [0, 0, 0, 10]
+      },
+      
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: [
+            [
+              { text: 'Nombre Completo:', style: 'fieldLabel' },
+              { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
+              { text: 'Expediente:', style: 'fieldLabel' },
+              { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Edad:', style: 'fieldLabel' },
+              { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
+              { text: 'Sexo:', style: 'fieldLabel' },
+              { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Fecha Nacimiento:', style: 'fieldLabel' },
+              { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento), style: 'fieldValue' },
+              { text: 'Tipo de Sangre:', style: 'fieldLabel' },
+              { text: pacienteCompleto.tipo_sangre || 'No especificado', style: 'fieldValue' }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+      
+      // SECCIÓN ESTUDIOS SOLICITADOS (DINÁMICO)
+      this.generarSeccionEstudios(solicitudEstudio, tipoEstudio),
+      
+      // SECCIÓN INFORMACIÓN CLÍNICA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '🏥 INFORMACIÓN CLÍNICA',
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 15, 0, 10]
+      },
+      
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'INDICACIÓN CLÍNICA:', style: 'fieldLabel' },
+                  { 
+                    text: solicitudEstudio.indicacion_clinica || 'No especificada',
+                    style: 'fieldValue',
+                    margin: [0, 5, 0, 10]
+                  }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'fieldLabel' },
+                  { 
+                    text: solicitudEstudio.diagnostico_presuntivo || 'No especificado',
+                    style: 'fieldValue',
+                    margin: [0, 5, 0, 10]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+      
+      // SECCIÓN CONFIGURACIÓN
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: [
+            [
+              { text: 'Urgencia:', style: 'fieldLabel' },
+              { text: this.formatearUrgencia(solicitudEstudio.urgencia), style: 'fieldValue' },
+              { text: 'Fecha Programada:', style: 'fieldLabel' },
+              { text: this.formatearFecha(solicitudEstudio.fecha_programada) || 'No programada', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Ayuno Requerido:', style: 'fieldLabel' },
+              { text: solicitudEstudio.ayuno_requerido ? 'SÍ' : 'NO', style: 'fieldValue' },
+              { text: 'Contraste:', style: 'fieldLabel' },
+              { text: solicitudEstudio.contraste_requerido ? 'SÍ' : 'NO', style: 'fieldValue' }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+      
+      // OBSERVACIONES
+      ...(solicitudEstudio.observaciones ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'OBSERVACIONES:', style: 'fieldLabel' },
+                    { 
+                      text: solicitudEstudio.observaciones,
+                      style: 'fieldValue',
+                      margin: [0, 5]
+                    }
+                  ],
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 20]
+        }
+      ] : []),
+      
+      // ESPACIADOR PARA FIRMAS
+      { text: '', pageBreak: 'before' },
+      
+      // SECCIÓN FIRMAS
+      {
+        margin: [0, 40, 0, 0],
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+                  { text: 'MÉDICO SOLICITANTE', style: 'signatureLabel' },
+                  { text: medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
+                  { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' },
+                  { text: `Especialidad: ${medicoCompleto.especialidad || 'N/A'}`, style: 'signatureDetails' }
+                ]
+              },
+              {
+                stack: [
+                  { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+                  { text: 'RECIBIDO POR', style: 'signatureLabel' },
+                  { text: 'LABORATORIO/IMAGENOLOGÍA', style: 'signatureName' },
+                  { text: 'Fecha: ________________', style: 'signatureDetails', margin: [0, 10, 0, 0] },
+                  { text: 'Hora: ________________', style: 'signatureDetails' }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      }
+    ],
+    
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [40, 10],
+        table: {
+          widths: ['33%', '34%', '33%'],
+          body: [
+            [
+              {
+                text: `${tituloDocumento} - Hospital General San Luis de la Paz`,
+                fontSize: 8,
+                color: '#666666'
+              },
+              {
+                text: `Página ${currentPage} de ${pageCount}`,
+                fontSize: 8,
+                alignment: 'center',
+                color: '#666666'
+              },
+              {
+                text: fechaActual.toLocaleString('es-MX'),
+                fontSize: 8,
+                alignment: 'right',
+                color: '#666666'
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    },
+    
+    styles: {
+      sectionHeader: {
+        fontSize: 12,
+        bold: true,
+        color: '#374151'
+      },
+      fieldLabel: {
+        fontSize: 9,
+        bold: true,
+        color: '#4b5563'
+      },
+      fieldValue: {
+        fontSize: 9,
+        color: '#111827'
+      },
+      signatureLabel: {
+        fontSize: 10,
+        bold: true,
+        alignment: 'center',
+        color: '#374151'
+      },
+      signatureName: {
+        fontSize: 9,
+        alignment: 'center',
+        color: '#111827'
+      },
+      signatureDetails: {
+        fontSize: 8,
+        alignment: 'center',
+        color: '#6b7280'
+      },
+      estudiosTitle: {
+        fontSize: 10,
+        bold: true,
+        color: '#1f2937',
+        margin: [0, 0, 0, 5]
+      },
+      estudioItem: {
+        fontSize: 9,
+        margin: [0, 2, 0, 2]
+      }
+    }
+  };
 }
+
+// MÉTODOS AUXILIARES PARA LA SOLICITUD
+
+private generarSeccionEstudios(solicitudEstudio: any, tipoEstudio: string): any {
+  const estudiosArray = solicitudEstudio.estudios_solicitados 
+    ? solicitudEstudio.estudios_solicitados.split('\n').filter((e: string) => e.trim())
+    : [];
+    
+  const tituloSeccion = this.obtenerTituloSeccionEstudios(tipoEstudio);
+  const iconoSeccion = this.obtenerIconoSeccionEstudios(tipoEstudio);
+  
+  return {
+    stack: [
+      // Header de la sección
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: `${iconoSeccion} ${tituloSeccion}`,
+                style: 'sectionHeader',
+                fillColor: '#f3f4f6',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 15, 0, 10]
+      },
+      
+      // Lista de estudios
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'ESTUDIOS SOLICITADOS:', style: 'estudiosTitle' },
+                  ...(estudiosArray.length > 0 
+                    ? estudiosArray.map((estudio: string) => ({
+                        text: `• ${estudio}`,
+                        style: 'estudioItem'
+                      }))
+                    : [{ text: '• No se especificaron estudios', style: 'estudioItem', italics: true, color: '#9ca3af' }]
+                  )
+                ],
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      }
+    ]
+  };
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

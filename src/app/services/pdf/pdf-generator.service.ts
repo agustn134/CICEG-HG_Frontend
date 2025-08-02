@@ -185,6 +185,11 @@ export class PdfGeneratorService {
       case 'Hoja Frontal Expediente': // ✅ AGREGADO
         documentDefinition = await this.pdfTemplatesService.generarHojaFrontalExpediente(datosParaTemplate);
         break;
+      case 'Solicitud de Estudio':
+      case 'Solicitud de Laboratorio':
+      case 'Solicitud de Imagenología':
+       documentDefinition = await this.pdfTemplatesService.generarSolicitudEstudio(datosParaTemplate);
+      break;
       // Aquí iremos agregando cada nuevo documento
       default:
         throw new Error(`Documento ${tipoDocumento} no implementado aún`);

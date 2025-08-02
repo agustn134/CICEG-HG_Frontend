@@ -337,7 +337,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     inmunizaciones: {nombre: 'Inmunizaciones',icono: 'fas fa-syringe', obligatorio: true,frecuente: true,completado: false},
     vacunasAdicionales: {nombre: 'Vacunas Adicionales',icono: 'fas fa-plus-square',obligatorio: false,frecuente: false,completado: false},
     alimentacionPediatrica: {nombre: 'Alimentación Pediátrica',icono: 'fas fa-utensils',obligatorio: false,frecuente: true,completado: false },
-    tamizajeNeonatal: {nombre: 'Tamizaje Neonatal',icono: 'fas fa-microscope',obligatorio: false,frecuente: false,completado: false}
+    tamizajeNeonatal: {nombre: 'Tamizaje Neonatal',icono: 'fas fa-microscope',obligatorio: false,frecuente: false,completado: false},
   };
 
   formularioEstado: FormularioEstado = {
@@ -345,7 +345,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     notaPostanestesica: false,notaInterconsulta: false,controlCrecimiento: false,esquemaVacunacion: false,solicitudEstudio: false,referenciaTraslado: false,prescripcionMedicamento: false,
     registroTransfusion: false,notaEgreso: false,historiaClinicaPediatrica: false,desarrolloPsicomotriz: false,alimentacionPediatrica: false,tamizajeNeonatal: false,antecedentesHeredoFamiliares: false,
     antecedentesPerinatales: false,estadoNutricionalPediatrico: false,inmunizaciones: false,vacunasAdicionales: false,solicitudCultivo: false,solicitudGasometria: false,hojaFrontal: false,
-    altaVoluntaria: false,
+    altaVoluntaria: false,  
   };
 
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
@@ -757,18 +757,187 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    });
  }
 
- private initializeSolicitudEstudioForm(): FormGroup {
-   return this.fb.group({
-     tipo_estudio: ['', [Validators.required]],
-     descripcion: ['', [Validators.required, Validators.minLength(10)]],
-     indicaciones: [''],
-     fecha_solicitud: [new Date().toISOString().split('T')[0], [Validators.required]],
-     prioridad: ['normal', [Validators.required]],
-     medico_solicitante: [''],
-     diagnostico_presuntivo: [''],
-     id_guia_clinica: [''],
-   });
- }
+private initializeSolicitudEstudioForm(): FormGroup {
+  return this.fb.group({
+    // Tipo de estudio
+    tipo_estudio: ['laboratorio', [Validators.required]], // laboratorio, imagen, otros
+    
+    // ===================================
+    // ESTUDIOS DE LABORATORIO
+    // ===================================
+    
+    // Química Sanguínea
+    biometria_hematica: [false],
+    quimica_sanguinea: [false],
+    glucosa: [false],
+    urea: [false],
+    creatinina: [false],
+    acido_urico: [false],
+    colesterol_total: [false],
+    trigliceridos: [false],
+    hdl: [false],
+    ldl: [false],
+    transaminasas: [false],
+    bilirrubinas: [false],
+    proteinas_totales: [false],
+    albumina: [false],
+    fosfatasa_alcalina: [false],
+    
+    // Electrolitos
+    sodio: [false],
+    potasio: [false],
+    cloro: [false],
+    
+    // Estudios hormonales
+    tsh: [false],
+    t3: [false],
+    t4: [false],
+    
+    // Estudios de orina
+    examen_general_orina: [false],
+    urocultivo: [false],
+    
+    // Estudios de heces
+    coproparasitoscopico: [false],
+    coprocultivo: [false],
+    sangre_oculta_heces: [false],
+    
+    // Marcadores cardiacos
+    troponinas: [false],
+    ck_mb: [false],
+    
+    // Coagulación
+    tiempo_protrombina: [false],
+    tiempo_tromboplastina: [false],
+    inr: [false],
+    
+    // ===================================
+    // ESTUDIOS DE IMAGENOLOGÍA
+    // ===================================
+    
+    // Radiografías
+    radiografia_torax: [false],
+    radiografia_abdomen: [false],
+    radiografia_columna: [false],
+    radiografia_extremidades: [false],
+    
+    // Ultrasonidos
+    ultrasonido_abdominal: [false],
+    ultrasonido_pelvico: [false],
+    ultrasonido_tiroideo: [false],
+    ultrasonido_carotideo: [false],
+    ultrasonido_renal: [false],
+    ecocardiograma: [false],
+    
+    // Tomografías
+    tomografia_cerebral: [false],
+    tomografia_torax: [false],
+    tomografia_abdomen: [false],
+    tomografia_contrastada: [false],
+    
+    // Resonancias
+    resonancia_cerebral: [false],
+    resonancia_columna: [false],
+    resonancia_articular: [false],
+    
+    // Estudios especiales
+    mamografia: [false],
+    densitometria_osea: [false],
+    
+    // ===================================
+    // CAMPOS COMUNES PARA TODOS
+    // ===================================
+    
+    // Otros estudios específicos
+    otros_estudios: [''],
+    
+    // Información clínica (OBLIGATORIO)
+    indicacion_clinica: ['', [Validators.required]],
+    diagnostico_presuntivo: ['', [Validators.required]],
+    
+    // Configuración del estudio
+    urgencia: ['normal'], // normal, urgente, stat
+    ayuno_requerido: [false],
+    contraste_requerido: [false], // Para imagenología
+    sedacion_requerida: [false], // Para ciertos estudios
+    
+    // Fechas y observaciones
+    fecha_solicitud: [new Date().toISOString().split('T')[0], [Validators.required]],
+    fecha_programada: [''],
+    observaciones: [''],
+    
+    // Médico solicitante
+    medico_solicitante: [''],
+    especialidad_solicitante: [''],
+    
+    // Guía clínica
+    id_guia_clinica: [''],
+  });
+}
+
+ private initializeSolicitudLaboratorioForm(): FormGroup {
+  return this.fb.group({
+    // Estudios de laboratorio más comunes
+    biometria_hematica: [false],
+    quimica_sanguinea: [false],
+    glucosa: [false],
+    urea: [false],
+    creatinina: [false],
+    acido_urico: [false],
+    colesterol_total: [false],
+    trigliceridos: [false],
+    hdl: [false],
+    ldl: [false],
+    transaminasas: [false],
+    bilirrubinas: [false],
+    proteinas_totales: [false],
+    albumina: [false],
+    fosfatasa_alcalina: [false],
+    
+    // Electrolitos
+    sodio: [false],
+    potasio: [false],
+    cloro: [false],
+    
+    // Estudios hormonales
+    tsh: [false],
+    t3: [false],
+    t4: [false],
+    
+    // Estudios de orina
+    examen_general_orina: [false],
+    urocultivo: [false],
+    
+    // Estudios de heces
+    coproparasitoscopico: [false],
+    coprocultivo: [false],
+    sangre_oculta_heces: [false],
+    
+    // Marcadores cardiacos
+    troponinas: [false],
+    ck_mb: [false],
+    
+    // Coagulación
+    tiempo_protrombina: [false],
+    tiempo_tromboplastina: [false],
+    inr: [false],
+    
+    // Otros estudios
+    otros_estudios: [''],
+    
+    // Información clínica
+    indicacion_clinica: ['', Validators.required],
+    diagnostico_presuntivo: ['', Validators.required],
+    urgencia: ['normal'], // normal, urgente, stat
+    ayuno_requerido: [false],
+    
+    // Observaciones
+    observaciones: [''],
+    
+    // Fecha programada
+    fecha_programada: ['']
+  });
+}
 
  private initializePrescripcionForm(): FormGroup {
    return this.fb.group({
@@ -1288,7 +1457,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    this.destroy$.next();
    this.destroy$.complete();
  }
-
+//home/agustin/CICEG-HG_Frontend/src/app/personas/perfil-paciente/perfil-paciente.ts
  // ✅ MÉTODO CORREGIDO guardarFormularioActivo
  async guardarFormularioActivo(): Promise<void> {
    if (this.isCreatingDocument) return;
@@ -1319,6 +1488,16 @@ export class PerfilPaciente implements OnInit, OnDestroy {
          this.formularioEstado['hojaFrontal'] = true;
          this.success = 'Hoja Frontal generada correctamente';
          break;
+
+      case 'solicitudEstudio':
+        await this.guardarSolicitudEstudio();
+        this.formularioEstado['solicitudEstudio'] = true;
+        const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
+        this.success = `Solicitud de ${this.getTipoEstudioNombre(tipoEstudio)} guardada correctamente`;
+        
+        // Generar PDF automáticamente
+        await this.generarPDFSolicitudEstudio(tipoEstudio);
+        break;
          
        default:
          throw new Error('Tipo de formulario no válido');
@@ -1421,6 +1600,28 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     }
   }
 
+  private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Solicitud de Estudio', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      solicitudEstudio: {
+        ...this.solicitudEstudioForm.value,
+        estudios_solicitados: this.construirEstudiosSeleccionados(tipoEstudio)
+      }
+    });
+    
+    console.log(`✅ PDF de Solicitud de ${tipoEstudio} generado correctamente`);
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la solicitud';
+  }
+}
+
  // ===================================
  // MÉTODOS AUXILIARES PRINCIPALES
  // ===================================
@@ -1454,9 +1655,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
    this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
    this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
-   this.hojaFrontalForm = this.initializeHojaFrontalForm(); // ✅ AGREGADO
-   
-   console.log('✅ Todos los formularios han sido inicializados correctamente.');
+   this.hojaFrontalForm = this.initializeHojaFrontalForm(); 
+   console.log('Todos los formularios han sido inicializados correctamente.');
  }
 
  private inicializarFlujoPaciente(): void {
@@ -1504,7 +1704,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    const titulos: { [key: string]: string } = {
      signosVitales: 'Signos Vitales',
      historiaClinica: this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
-     hojaFrontal: 'Hoja Frontal', // ✅ AGREGADO
+     hojaFrontal: 'Hoja Frontal', 
      notaUrgencias: 'Nota de Urgencias',
      notaEvolucion: 'Nota de Evolución',
      consentimiento: 'Consentimiento Informado',
@@ -1520,7 +1720,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
      solicitudCultivo: 'Solicitud Cultivo',
      prescripcionMedicamentos: 'Prescripción Medicamentos',
      solicitudGasometria: 'Solicitud Gasometría',
-     altaVoluntaria: 'Alta Voluntaria'
+     altaVoluntaria: 'Alta Voluntaria',
    };
    return titulos[formulario] || formulario;
  }
@@ -1598,6 +1798,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
      case 'notaInterconsulta': return this.notaInterconsultaForm.valid;
      case 'controlCrecimiento': return true;
      case 'esquemaVacunacion': return true;
+     case 'solicitudEstudio': return this.solicitudEstudioForm.valid;
      default: return false;
    }
  }
@@ -1993,6 +2194,87 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    }
  }
 
+private construirEstudiosSeleccionados(tipoEstudio: string): string {
+  const form = this.solicitudEstudioForm.value;
+  const estudios: string[] = [];
+  
+  // Mapeos según el tipo de estudio
+  let mapeoEstudios: { [key: string]: string } = {};
+  
+  if (tipoEstudio === 'laboratorio') {
+    mapeoEstudios = {
+      biometria_hematica: 'Biometría hemática completa',
+      quimica_sanguinea: 'Química sanguínea',
+      glucosa: 'Glucosa sérica',
+      urea: 'Urea',
+      creatinina: 'Creatinina',
+      acido_urico: 'Ácido úrico',
+      colesterol_total: 'Colesterol total',
+      trigliceridos: 'Triglicéridos',
+      hdl: 'HDL colesterol',
+      ldl: 'LDL colesterol',
+      transaminasas: 'Transaminasas (ALT/AST)',
+      bilirrubinas: 'Bilirrubinas',
+      proteinas_totales: 'Proteínas totales',
+      albumina: 'Albúmina',
+      fosfatasa_alcalina: 'Fosfatasa alcalina',
+      sodio: 'Sodio sérico',
+      potasio: 'Potasio sérico',
+      cloro: 'Cloro sérico',
+      tsh: 'TSH',
+      t3: 'T3',
+      t4: 'T4',
+      examen_general_orina: 'Examen general de orina',
+      urocultivo: 'Urocultivo',
+      coproparasitoscopico: 'Coproparasitoscópico',
+      coprocultivo: 'Coprocultivo',
+      sangre_oculta_heces: 'Sangre oculta en heces',
+      troponinas: 'Troponinas',
+      ck_mb: 'CK-MB',
+      tiempo_protrombina: 'Tiempo de protrombina',
+      tiempo_tromboplastina: 'Tiempo de tromboplastina parcial',
+      inr: 'INR'
+    };
+  } else if (tipoEstudio === 'imagen') {
+    mapeoEstudios = {
+      radiografia_torax: 'Radiografía de tórax',
+      radiografia_abdomen: 'Radiografía de abdomen',
+      radiografia_columna: 'Radiografía de columna',
+      radiografia_extremidades: 'Radiografía de extremidades',
+      ultrasonido_abdominal: 'Ultrasonido abdominal',
+      ultrasonido_pelvico: 'Ultrasonido pélvico',
+      ultrasonido_tiroideo: 'Ultrasonido tiroideo',
+      ultrasonido_carotideo: 'Ultrasonido carotídeo',
+      ultrasonido_renal: 'Ultrasonido renal',
+      ecocardiograma: 'Ecocardiograma',
+      tomografia_cerebral: 'Tomografía cerebral',
+      tomografia_torax: 'Tomografía de tórax',
+      tomografia_abdomen: 'Tomografía abdominal',
+      tomografia_contrastada: 'Tomografía con contraste',
+      resonancia_cerebral: 'Resonancia magnética cerebral',
+      resonancia_columna: 'Resonancia magnética de columna',
+      resonancia_articular: 'Resonancia magnética articular',
+      mamografia: 'Mamografía',
+      densitometria_osea: 'Densitometría ósea'
+    };
+  }
+
+  // Agregar estudios seleccionados
+  Object.keys(mapeoEstudios).forEach(campo => {
+    if (form[campo]) {
+      estudios.push(mapeoEstudios[campo]);
+    }
+  });
+
+  // Agregar otros estudios si los hay
+  if (form.otros_estudios && form.otros_estudios.trim()) {
+    estudios.push(form.otros_estudios.trim());
+  }
+
+  return estudios.join('\n');
+}
+
+
  // ===================================
  // MÉTODOS DE GUARDADO
  // ===================================
@@ -2089,6 +2371,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
    }
  }
 
+
+
  // ===================================
  // MÉTODOS DE DOCUMENTOS
  // ===================================
@@ -2123,6 +2407,54 @@ export class PerfilPaciente implements OnInit, OnDestroy {
      throw new Error('Error al crear documento clínico');
    }
  }
+
+ private getTipoEstudioNombre(tipo: string): string {
+  const nombres: { [key: string]: string } = {
+    laboratorio: 'Laboratorio',
+    imagen: 'Imagenología',
+    otros: 'Estudio Especial'
+  };
+  return nombres[tipo] || 'Estudio';
+}
+private async guardarSolicitudEstudio(): Promise<void> {
+  if (!this.solicitudEstudioForm.valid) {
+    throw new Error('Formulario de solicitud de estudio inválido');
+  }
+
+  if (!this.pacienteCompleto?.expediente.id_expediente) {
+    throw new Error('No hay expediente disponible');
+  }
+
+  // Crear documento padre si no existe
+  if (!this.documentoClinicoActual) {
+await this.crearDocumentoClinicoPadre();
+  }
+
+  const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
+  const estudiosSeleccionados = this.construirEstudiosSeleccionados(tipoEstudio);
+
+  const solicitudData = {
+    id_documento: this.documentoClinicoActual!,
+    tipo_estudio: tipoEstudio,
+    estudios_solicitados: estudiosSeleccionados,
+    indicacion_clinica: this.solicitudEstudioForm.value.indicacion_clinica,
+    diagnostico_presuntivo: this.solicitudEstudioForm.value.diagnostico_presuntivo,
+    urgencia: this.solicitudEstudioForm.value.urgencia,
+    ayuno_requerido: this.solicitudEstudioForm.value.ayuno_requerido,
+    contraste_requerido: this.solicitudEstudioForm.value.contraste_requerido,
+    sedacion_requerida: this.solicitudEstudioForm.value.sedacion_requerida,
+    observaciones: this.solicitudEstudioForm.value.observaciones,
+    fecha_programada: this.solicitudEstudioForm.value.fecha_programada || null
+  };
+
+  try {
+    console.log(`📄 Datos de solicitud de ${tipoEstudio} preparados:`, solicitudData);
+    // Aquí integraremos con el backend más tarde
+  } catch (error: any) {
+    console.error(`❌ Error al guardar solicitud de ${tipoEstudio}:`, error);
+    throw error;
+  }
+}
 
  private async obtenerDatosMedicoCompleto(): Promise<any> {
    try {
@@ -2170,6 +2502,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
      };
    }
  }
+
+
 
  // ===================================
  // MÉTODOS DE UTILIDAD Y AUXILIARES
@@ -2991,7 +3325,9 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       // Retornar grupos básicos
       return [
         { key: 'principales', data: { nombre: 'Documentos Principales', icono: 'fas fa-star', color: 'blue', formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal'] } },
-        { key: 'clinicos', data: { nombre: 'Documentos Clínicos', icono: 'fas fa-file-medical', color: 'green', formularios: ['notaUrgencias', 'notaEvolucion'] } }
+        { key: 'clinicos', data: { nombre: 'Documentos Clínicos', icono: 'fas fa-file-medical', color: 'green', formularios: ['notaUrgencias', 'notaEvolucion'] } },
+        { key: 'solicitudes',data: {nombre: 'Solicitudes de Estudios',icono: 'fas fa-microscope',color: 'green',formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']}}
+      
       ];
     }
 
