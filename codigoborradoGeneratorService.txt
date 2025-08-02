@@ -1,0 +1,1067 @@
+  
+async generarNotaUrgencias(datos: any): Promise<void> {
+  console.log('🚨 Generando Nota de Urgencias...');
+  try {
+    await this.ensurePdfMakeLoaded();
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales,
+      numeroExpediente: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
+      direccionCompleta: this.formatearDireccionMejorada(pacienteCompleto),
+      folioNota: `NU-${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}-${new Date().getFullYear()}`,
+    };
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaUrgencias(datosParaTemplate);
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-urgencias-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+    console.log('✅ PDF de Nota de Urgencias generado exitosamente');
+    // 5. Validación específica
+    this.validarCumplimientoNotaUrgencias(datos, medicoCompleto, pacienteCompleto);
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Urgencias:', error);
+    throw error;
+  }
+}
+
+
+
+// ==========================================
+// MÉTODOS REFACTORIZADOS COMPLETOS
+// ==========================================
+
+ async generarNotaEvolucion(datos: any): Promise<void> {
+  console.log('📈 Generando Nota de Evolución...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaEvolucion(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Evolución generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaEvolucion(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Evolución:', error);
+    throw error;
+  }
+}
+
+ async generarNotaEgreso(datos: any): Promise<void> {
+  console.log('🚪 Generando Nota de Egreso...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales,
+      diasHospitalizacion: this.calcularDiaHospitalizacion()
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaEgreso(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-egreso-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Egreso generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaEgreso(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Egreso:', error);
+    throw error;
+  }
+}
+
+ async generarNotaInterconsulta(datos: any): Promise<void> {
+  console.log('🩺 Generando Nota de Interconsulta...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaInterconsulta(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-interconsulta-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Interconsulta generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaInterconsulta(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Interconsulta:', error);
+    throw error;
+  }
+}
+
+ async generarNotaPreoperatoria(datos: any): Promise<void> {
+  console.log('🔧 Generando Nota Preoperatoria...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-preoperatoria-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota Preoperatoria generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaPreoperatoria(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota Preoperatoria:', error);
+    throw error;
+  }
+}
+
+ async generarNotaPostoperatoria(datos: any): Promise<void> {
+  console.log('⚕️ Generando Nota Postoperatoria...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaPostoperatoria(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-postoperatoria-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota Postoperatoria generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaPostoperatoria(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota Postoperatoria:', error);
+    throw error;
+  }
+}
+
+ async generarNotaPreanestesica(datos: any): Promise<void> {
+  console.log('💉 Generando Nota Preanestésica...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaPreanestesica(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-preanestesica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota Preanestésica generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota Preanestésica:', error);
+    throw error;
+  }
+}
+
+ async generarNotaPostanestesica(datos: any): Promise<void> {
+  console.log('🏥 Generando Nota Postanestésica...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+    const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto,
+      signosVitales,
+      totalAldrete: this.calcularTotalAldrete(datos.notaPostanestesica || {})
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaPostanestesica(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-postanestesica-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota Postanestésica generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoNotaPostanestesica(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota Postanestésica:', error);
+    throw error;
+  }
+}
+
+// ==========================================
+// CONSENTIMIENTOS INFORMADOS
+// ==========================================
+
+ async generarNotaConsentimientoProcedimientos(datos: any): Promise<void> {
+  console.log('  Generando Consentimiento Informado de Procedimientos...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+const documentDefinition = await this.pdfTemplatesService.generarConsentimientoProcedimientos(datosParaTemplate);
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `consentimiento-procedimientos-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Consentimiento Informado de Procedimientos generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoConsentimientoProcedimientos(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Consentimiento Informado de Procedimientos:', error);
+    throw error;
+  }
+}
+
+ async generarConsentimientoHospitalizacion(datos: any): Promise<void> {
+  console.log('🏥 Generando Consentimiento de Hospitalización...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarConsentimientoHospitalizacion(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `consentimiento-hospitalizacion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Consentimiento de Hospitalización generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoConsentimientoHospitalizacion(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Consentimiento de Hospitalización:', error);
+    throw error;
+  }
+}
+
+ async generarConsentimientoReferenciaPacientes(datos: any): Promise<void> {
+  console.log('↗️ Generando Consentimiento de Referencia de Pacientes...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarConsentimientoReferenciaPacientes(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `consentimiento-referencia-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Consentimiento de Referencia generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoConsentimientoReferencia(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Consentimiento de Referencia:', error);
+    throw error;
+  }
+}
+
+ async generarConsentimientoTransfusionSanguinea(datos: any): Promise<void> {
+  console.log('🩸 Generando Consentimiento de Transfusión Sanguínea...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarConsentimientoTransfusionSanguinea(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `consentimiento-transfusion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Consentimiento de Transfusión Sanguínea generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoConsentimientoTransfusion(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Consentimiento de Transfusión Sanguínea:', error);
+    throw error;
+  }
+}
+
+ async generarConsentimientoTratamientoMedico(datos: any): Promise<void> {
+  console.log('💊 Generando Consentimiento de Tratamiento Médico...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarConsentimientoTratamientoMedico(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `consentimiento-tratamiento-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Consentimiento de Tratamiento Médico generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoConsentimientoTratamiento(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Consentimiento de Tratamiento Médico:', error);
+    throw error;
+  }
+}
+
+// ==========================================
+// HOJAS Y FORMATOS ADMINISTRATIVOS
+// ==========================================
+
+ async generarHojaAltaVoluntaria(datos: any): Promise<void> {
+  console.log('🚪 Generando Hoja de Alta Voluntaria...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarHojaAltaVoluntaria(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `hoja-alta-voluntaria-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Hoja de Alta Voluntaria generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoAltaVoluntaria(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Hoja de Alta Voluntaria:', error);
+    throw error;
+  }
+}
+
+private async generarHojaInformeDiario(datos: any): Promise<void> {
+  console.log('  Generando Hoja de Informe Diario...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarHojaInformeDiario(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `hoja-informe-diario-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Hoja de Informe Diario generado exitosamente');
+
+    // 5. Validación específica
+    this.validarCumplimientoInformeDiario(datos, medicoCompleto, pacienteCompleto);
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Hoja de Informe Diario:', error);
+    throw error;
+  }
+}
+
+ async generarHojaFrontalExpediente(datos: any): Promise<void> {
+  console.log('📂 Generando Hoja Frontal de Expediente...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarHojaFrontalExpediente(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `hoja-frontal-expediente-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
+    throw error;
+  }
+}
+
+// ==========================================
+// SOLICITUDES Y PRESCRIPCIONES
+// ==========================================
+
+ async generarSolicitudLaboratorio(datos: any): Promise<void> {
+  console.log('🧪 Generando Solicitud de Laboratorio...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarSolicitudLaboratorio(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `solicitud-laboratorio-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Solicitud de Laboratorio generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Solicitud de Laboratorio:', error);
+    throw error;
+  }
+}
+
+ async generarSolicitudImagenologia(datos: any): Promise<void> {
+  console.log('📸 Generando Solicitud de Imagenología...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarSolicitudImagenologia(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `solicitud-imagenologia-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Solicitud de Imagenología generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
+    throw error;
+  }
+}
+
+ async generarSolicitudCultivo(datos: any): Promise<void> {
+  console.log('🦠 Generando Solicitud de Cultivo...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarSolicitudCultivo(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `solicitud-cultivo-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
+    throw error;
+  }
+}// ==========================================
+// SOLICITUDES Y PRESCRIPCIONES (CONTINUACIÓN)
+// ==========================================
+
+ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
+ console.log('💊 Generando Prescripción de Medicamentos...');
+
+ try {
+   await this.ensurePdfMakeLoaded();
+
+   // 1. Procesar datos
+   const medicoCompleto = await this.obtenerDatosMedicoActual();
+   const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+   // 2. Preparar datos para template
+   const datosParaTemplate = {
+     ...datos,
+     medicoCompleto,
+     pacienteCompleto
+   };
+
+   // 3. Obtener definición del template
+   const documentDefinition = await this.pdfTemplatesService.generarPrescripcionMedicamentos(datosParaTemplate);
+
+   // 4. Generar y descargar
+   const fechaActual = new Date();
+   const nombreArchivo = `prescripcion-medicamentos-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+   pdfDocGenerator.download(nombreArchivo);
+
+   console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+
+   // 5. Validación específica
+   this.validarCumplimientoPrescripcionMedicamentos(datos, medicoCompleto, pacienteCompleto);
+
+ } catch (error) {
+   console.error('❌ Error al generar PDF de Prescripción de Medicamentos:', error);
+   throw error;
+ }
+}
+
+private async generarRegistroTransfusion(datos: any): Promise<void> {
+ console.log('🩸 Generando Registro de Transfusión...');
+
+ try {
+   await this.ensurePdfMakeLoaded();
+
+   // 1. Procesar datos
+   const medicoCompleto = await this.obtenerDatosMedicoActual();
+   const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+   const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+   // 2. Preparar datos para template
+   const datosParaTemplate = {
+     ...datos,
+     medicoCompleto,
+     pacienteCompleto,
+     signosVitales
+   };
+
+   // 3. Obtener definición del template
+   const documentDefinition = await this.pdfTemplatesService.generarRegistroTransfusion(datosParaTemplate);
+
+   // 4. Generar y descargar
+   const fechaActual = new Date();
+   const nombreArchivo = `registro-transfusion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+   pdfDocGenerator.download(nombreArchivo);
+
+   console.log('✅ PDF de Registro de Transfusión generado exitosamente');
+
+   // 5. Validación específica
+   this.validarCumplimientoRegistroTransfusion(datos, medicoCompleto, pacienteCompleto);
+
+ } catch (error) {
+   console.error('❌ Error al generar PDF de Registro de Transfusión:', error);
+   throw error;
+ }
+}
+
+private async generarHojaQuirofano(datos: any): Promise<void> {
+ console.log('🏥 Generando Hoja de Quirófano...');
+
+ try {
+   await this.ensurePdfMakeLoaded();
+
+   // 1. Procesar datos
+   const medicoCompleto = await this.obtenerDatosMedicoActual();
+   const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+   const signosVitales = this.obtenerSignosVitalesReales(datos);
+
+   // 2. Preparar datos para template
+   const datosParaTemplate = {
+     ...datos,
+     medicoCompleto,
+     pacienteCompleto,
+     signosVitales
+   };
+
+   // 3. Obtener definición del template
+   const documentDefinition = await this.pdfTemplatesService.generarHojaQuirofano(datosParaTemplate);
+
+   // 4. Generar y descargar
+   const fechaActual = new Date();
+   const nombreArchivo = `hoja-quirofano-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+   pdfDocGenerator.download(nombreArchivo);
+
+   console.log('✅ PDF de Hoja de Quirófano generado exitosamente');
+
+ } catch (error) {
+   console.error('❌ Error al generar PDF de Hoja de Quirófano:', error);
+   throw error;
+ }
+}
+
+// ==========================================
+// DOCUMENTOS GENÉRICOS Y ESPECIALES
+// ==========================================
+
+private async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promise<void> {
+ console.log(`📄 Generando documento genérico: ${tipoDocumento}...`);
+
+ try {
+   await this.ensurePdfMakeLoaded();
+
+   // 1. Procesar datos básicos
+   const medicoCompleto = await this.obtenerDatosMedicoActual();
+   const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+   const fechaActual = new Date();
+
+   // 2. Crear documento genérico básico
+   const documentDefinition = {
+     pageSize: 'LETTER',
+     pageMargins: [40, 60, 40, 60],
+
+     header: {
+       margin: [40, 20, 40, 20],
+       table: {
+         widths: ['100%'],
+         body: [
+           [
+             {
+               text: `HOSPITAL GENERAL SAN LUIS DE LA PAZ\n${tipoDocumento.toUpperCase()}`,
+               fontSize: 14,
+               bold: true,
+               alignment: 'center',
+               color: '#1a365d',
+             },
+           ],
+         ],
+       },
+       layout: 'noBorders',
+     },
+
+     content: [
+       { text: '', margin: [0, 20] },
+
+       // Datos del paciente
+       {
+         table: {
+           widths: ['100%'],
+           body: [
+             [
+               {
+                 text: 'DATOS DEL PACIENTE',
+                 fontSize: 10,
+                 bold: true,
+                 fillColor: '#f0f0f0',
+                 alignment: 'center',
+                 margin: [0, 5],
+               },
+             ],
+             [
+               {
+                 text: [
+                   { text: 'Nombre: ', bold: true },
+                   { text: `${pacienteCompleto.nombre_completo}\n`, fontSize: 10 },
+                   { text: 'Expediente: ', bold: true },
+                   { text: `${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente || {})}\n`, fontSize: 10 },
+                   { text: 'Edad: ', bold: true },
+                   { text: `${pacienteCompleto.edad} años\n`, fontSize: 10 },
+                   { text: 'Sexo: ', bold: true },
+                   { text: `${pacienteCompleto.sexo}\n`, fontSize: 10 },
+                   { text: 'Fecha: ', bold: true },
+                   { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 10 },
+                 ],
+                 margin: [10, 10],
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 1,
+           vLineWidth: () => 1,
+           hLineColor: () => '#cccccc',
+           vLineColor: () => '#cccccc',
+         },
+       },
+
+       { text: '', margin: [0, 20] },
+
+       // Contenido específico del documento
+       {
+         table: {
+           widths: ['100%'],
+           body: [
+             [
+               {
+                 text: `CONTENIDO DE ${tipoDocumento.toUpperCase()}`,
+                 fontSize: 10,
+                 bold: true,
+                 fillColor: '#f0f0f0',
+                 alignment: 'center',
+                 margin: [0, 5],
+               },
+             ],
+             [
+               {
+                 text: [
+                   { text: 'Este documento será completado por el personal médico correspondiente.\n\n', fontSize: 10 },
+                   { text: 'Observaciones: ', bold: true },
+                   { text: datos.observaciones || 'Sin observaciones especiales.', fontSize: 10 },
+                 ],
+                 margin: [10, 20],
+                 minHeight: 200,
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 1,
+           vLineWidth: () => 1,
+           hLineColor: () => '#cccccc',
+           vLineColor: () => '#cccccc',
+         },
+       },
+
+       { text: '', margin: [0, 30] },
+
+       // Datos del médico
+       {
+         table: {
+           widths: ['50%', '50%'],
+           body: [
+             [
+               {
+                 text: 'MÉDICO RESPONSABLE',
+                 fontSize: 9,
+                 bold: true,
+                 fillColor: '#f0f0f0',
+                 alignment: 'center',
+                 margin: [0, 5],
+               },
+               {
+                 text: 'FIRMA',
+                 fontSize: 9,
+                 bold: true,
+                 fillColor: '#f0f0f0',
+                 alignment: 'center',
+                 margin: [0, 5],
+               },
+             ],
+             [
+               {
+                 text: [
+                   { text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`, fontSize: 9, bold: true },
+                   { text: `Cédula: ${medicoCompleto.numero_cedula}\n`, fontSize: 8 },
+                   { text: `${medicoCompleto.especialidad}\n`, fontSize: 8 },
+                   { text: `${medicoCompleto.departamento}`, fontSize: 8 },
+                 ],
+                 margin: [10, 15],
+                 alignment: 'center',
+               },
+               {
+                 text: '\n\n_________________________\nFirma del Médico',
+                 fontSize: 8,
+                 margin: [10, 15],
+                 alignment: 'center',
+               },
+             ],
+           ],
+         },
+         layout: {
+           hLineWidth: () => 1,
+           vLineWidth: () => 1,
+           hLineColor: () => '#cccccc',
+           vLineColor: () => '#cccccc',
+         },
+       },
+     ],
+
+     footer: (currentPage: number, pageCount: number) => {
+       return {
+         margin: [40, 10],
+         table: {
+           widths: ['50%', '50%'],
+           body: [
+             [
+               {
+                 text: `${tipoDocumento} - SICEG`,
+                 fontSize: 7,
+                 color: '#666666',
+               },
+               {
+                 text: fechaActual.toLocaleDateString('es-MX'),
+                 fontSize: 7,
+                 alignment: 'right',
+                 color: '#666666',
+               },
+             ],
+           ],
+         },
+         layout: 'noBorders',
+       };
+     },
+   };
+
+   // 3. Generar y descargar
+   const nombreArchivo = `${tipoDocumento.toLowerCase().replace(/\s+/g, '-')}-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+   const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+   pdfDocGenerator.download(nombreArchivo);
+
+   console.log(`✅ PDF de ${tipoDocumento} generado exitosamente`);
+
+ } catch (error) {
+   console.error(`❌ Error al generar PDF de ${tipoDocumento}:`, error);
+   throw error;
+ }
+}
