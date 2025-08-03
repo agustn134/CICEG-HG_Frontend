@@ -3419,7 +3419,6 @@ private getTituloFormulario(formulario: string): string {
      case 'prescripcionMedicamento':return this.prescripcionForm.valid && this.medicamentosFormArray.length > 0;
      case 'referenciaTraslado':return this.referenciaForm.valid;
      case 'altaVoluntaria': return this.altaVoluntariaForm.valid;
-     case 'notaPostoperatoria': return this.notaPostoperatoriaForm.valid;
      default: return false;
    }
  }
