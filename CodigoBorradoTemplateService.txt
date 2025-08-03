@@ -15503,6 +15503,8 @@ async generarNotaUrgencias(datos: any): Promise<any> {
           </div>
         </form>
       </div>
+
+
       <!-- FORMULARIO DE SOLICITUD DE ESTUDIO -->
       <div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">

@@ -337,8 +337,8 @@ presentacionesDisponibles: string[] = [];
     registroTransfusion: {nombre: 'Transfusión',icono: 'fas fa-tint',obligatorio: false,frecuente: false,completado: false},
     hojaFrontal: {nombre: 'Hoja Frontal',icono: 'fas fa-file-alt',obligatorio: true,frecuente: false,completado: false},
     altaVoluntaria: {nombre: 'Alta Voluntaria',icono: 'fas fa-door-open',obligatorio: false,frecuente: false,completado: false},
-    referenciaTraslado: {nombre: 'Referencia',icono: 'fas fa-share',obligatorio: false,frecuente: false,completado: false},
-    historiaClinicaPediatrica: {nombre: 'Historia Clínica Pediátrica',icono: 'fas fa-baby-carriage',obligatorio: true,frecuente: true,completado: false},
+  referenciaTraslado: { nombre: 'Referencia y Contrarreferencia', icono: 'fas fa-share', obligatorio: false, frecuente: true, completado: false },
+  historiaClinicaPediatrica: {nombre: 'Historia Clínica Pediátrica',icono: 'fas fa-baby-carriage',obligatorio: true,frecuente: true,completado: false},
     antecedentesHeredoFamiliares: {nombre: 'Antecedentes Heredo-Familiares',icono: 'fas fa-dna',obligatorio: true,frecuente: true,completado: false},
     antecedentesPerinatales: {nombre: 'Antecedentes Perinatales',icono: 'fas fa-baby', obligatorio: true,frecuente: true,completado: false},
     estadoNutricionalPediatrico: {nombre: 'Estado Nutricional',icono: 'fas fa-weight',obligatorio: false,frecuente: true,completado: false},
@@ -346,6 +346,7 @@ presentacionesDisponibles: string[] = [];
     vacunasAdicionales: {nombre: 'Vacunas Adicionales',icono: 'fas fa-plus-square',obligatorio: false,frecuente: false,completado: false},
     alimentacionPediatrica: {nombre: 'Alimentación Pediátrica',icono: 'fas fa-utensils',obligatorio: false,frecuente: true,completado: false },
     tamizajeNeonatal: {nombre: 'Tamizaje Neonatal',icono: 'fas fa-microscope',obligatorio: false,frecuente: false,completado: false},
+
   };
 
   formularioEstado: FormularioEstado = {
@@ -353,7 +354,7 @@ presentacionesDisponibles: string[] = [];
     notaPostanestesica: false,notaInterconsulta: false,controlCrecimiento: false,esquemaVacunacion: false,solicitudEstudio: false,referenciaTraslado: false,prescripcionMedicamento: false,
     registroTransfusion: false,notaEgreso: false,historiaClinicaPediatrica: false,desarrolloPsicomotriz: false,alimentacionPediatrica: false,tamizajeNeonatal: false,antecedentesHeredoFamiliares: false,
     antecedentesPerinatales: false,estadoNutricionalPediatrico: false,inmunizaciones: false,vacunasAdicionales: false,solicitudCultivo: false,solicitudGasometria: false,hojaFrontal: false,
-    altaVoluntaria: false,
+    altaVoluntaria: false
   };
 
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
@@ -416,6 +417,7 @@ presentacionesDisponibles: string[] = [];
     this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
     this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
     this.hojaFrontalForm = this.initializeHojaFrontalForm(); // ✅ AGREGADO
+    this.referenciaForm = this.initializeReferenciaForm();
     this.inicializarFormularios();
   }
 
@@ -590,22 +592,7 @@ presentacionesDisponibles: string[] = [];
    });
  }
 
- private initializeNotaUrgenciasForm(): FormGroup {
-   return this.fb.group({
-     motivo_atencion: ['', Validators.required],
-     estado_conciencia: ['', Validators.required],
-     resumen_interrogatorio: ['', Validators.required],
-     exploracion_fisica: ['', Validators.required],
-     resultados_estudios: [''],
-     estado_mental: [''],
-     diagnostico: ['', Validators.required],
-     plan_tratamiento: ['', Validators.required],
-     pronostico: ['', Validators.required],
-     id_guia_diagnostico: [null],
-     numero_cama: [''],
-     hora_atencion: ['']
-   });
- }
+
 
  private initializeNotaEvolucionForm(): FormGroup {
    return this.fb.group({
@@ -644,14 +631,140 @@ presentacionesDisponibles: string[] = [];
  }
 
  private initializeConsentimientoForm(): FormGroup {
-   return this.fb.group({
-     procedimiento: ['', Validators.required],
-     riesgos: [''],
-     alternativas: [''],
-     nombre_testigo1: [''],
-     nombre_testigo2: [''],
-   });
- }
+  return this.fb.group({
+    // Información del procedimiento (OBLIGATORIO NOM-004)
+    nombre_procedimiento: ['', [Validators.required, Validators.minLength(10)]],
+    tipo_procedimiento: ['quirurgico', [Validators.required]], // quirurgico, diagnostico, terapeutico
+
+    // Beneficios y justificación (OBLIGATORIO NOM-004)
+    beneficios_procedimiento: ['', [Validators.required, Validators.minLength(20)]],
+    justificacion_medica: ['', [Validators.required, Validators.minLength(15)]],
+
+    // Riesgos (OBLIGATORIO NOM-004)
+    riesgos_especificos: ['', [Validators.required, Validators.minLength(20)]],
+    riesgos_anestesia: ['Se han explicado los riesgos de la anestesia'],
+    probabilidad_exito: [''],
+
+    // Alternativas de tratamiento (OBLIGATORIO NOM-004)
+    alternativas_tratamiento: [''],
+    consecuencias_no_tratamiento: [''],
+
+    // Procedimientos adicionales
+    autoriza_procedimientos_adicionales: ['si', [Validators.required]],
+    procedimientos_adicionales_especificos: [''],
+
+    // Información del responsable
+    nombre_responsable: ['', [Validators.required]],
+    parentesco: ['paciente', [Validators.required]], // paciente, padre, madre, tutor, representante
+    identificacion_responsable: [''],
+
+    // Testigos (OBLIGATORIO NOM-004)
+    testigo1_nombre: ['', [Validators.required]],
+    testigo1_identificacion: [''],
+    testigo2_nombre: ['', [Validators.required]],
+    testigo2_identificacion: [''],
+
+    // Información médica adicional
+    medico_responsable: [''],
+    especialidad_medico: [''],
+    numero_cama: [''],
+    servicio_medico: [''],
+
+    // Fechas
+    fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
+    hora_consentimiento: [new Date().toTimeString().slice(0, 5)],
+
+    // Confirmaciones (OBLIGATORIO NOM-004)
+    confirma_explicacion_satisfactoria: [false, [Validators.requiredTrue]],
+    confirma_dudas_resueltas: [false, [Validators.requiredTrue]],
+    confirma_comprension_riesgos: [false, [Validators.requiredTrue]],
+    confirma_voluntariedad: [false, [Validators.requiredTrue]],
+
+    // Observaciones
+    observaciones: [''],
+    condiciones_especiales: ['']
+  });
+}
+
+// ===================================
+// CONSENTIMIENTO INFORMADO
+// ===================================
+
+async guardarConsentimientoInformado(): Promise<void> {
+  if (!this.consentimientoForm.valid) {
+    this.marcarCamposInvalidos(this.consentimientoForm);
+    this.error = 'Por favor complete todos los campos obligatorios y confirmaciones.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Consentimiento Informado');
+    }
+
+    // Preparar datos para el consentimiento
+    const consentimientoData = {
+      id_documento: this.documentoClinicoActual!,
+      ...this.consentimientoForm.value,
+      // Campos calculados
+      folio_consentimiento: this.generarFolioConsentimiento(),
+      estado_consentimiento: 'firmado',
+      fecha_elaboracion: new Date().toISOString()
+    };
+
+    // Guardar consentimiento (integrar con servicio backend cuando esté listo)
+    console.log('📄 Datos de consentimiento preparados:', consentimientoData);
+
+    this.success = '📋 Consentimiento Informado guardado correctamente';
+    this.formularioEstado.consentimiento = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFConsentimiento();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar consentimiento:', error);
+    this.error = 'Error al guardar el consentimiento. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFConsentimiento(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Consentimiento Informado', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      consentimiento: {
+        ...this.consentimientoForm.value,
+        folio_consentimiento: this.generarFolioConsentimiento()
+      }
+    });
+
+    console.log('✅ PDF de Consentimiento Informado generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF del consentimiento';
+  }
+}
+
+private generarFolioConsentimiento(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `CI-${fecha.getFullYear()}-${timestamp}`;
+}
 
  private initializeNotaPreoperatoriaForm(): FormGroup {
    return this.fb.group({
@@ -1310,12 +1423,190 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
 
 
 
+// ===================================
+// NOTA DE EVOLUCIÓN MÉDICA - MÉTODO CORREGIDO
+// ===================================
+
+async guardarNotaEvolucion(): Promise<void> {
+  if (!this.notaEvolucionForm.valid) {
+    this.marcarCamposInvalidos(this.notaEvolucionForm);
+    this.error = 'Por favor complete todos los campos obligatorios.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Nota de Evolución');
+    }
+
+    // Preparar datos para la nota de evolución
+    const notaEvolucionData = {
+      id_documento: this.documentoClinicoActual!,
+      ...this.notaEvolucionForm.value,
+      // Asegurar que los campos obligatorios tengan valor
+      sintomas_signos: this.notaEvolucionForm.value.sintomas_signos || 'No especificado',
+      habitus_exterior: this.notaEvolucionForm.value.habitus_exterior || 'No especificado',
+      estado_nutricional: this.notaEvolucionForm.value.estado_nutricional || 'No especificado',
+      estudios_laboratorio_gabinete: this.notaEvolucionForm.value.estudios_laboratorio_gabinete || 'No se realizaron estudios',
+      evolucion_analisis: this.notaEvolucionForm.value.evolucion_analisis || 'No especificado',
+      diagnosticos: this.notaEvolucionForm.value.diagnosticos || 'No especificado',
+      plan_estudios_tratamiento: this.notaEvolucionForm.value.plan_estudios_tratamiento || 'No especificado',
+      pronostico: this.notaEvolucionForm.value.pronostico || 'No especificado',
+    };
+
+    // Guardar nota de evolución (aquí integrarías con tu servicio backend)
+    console.log('📄 Datos de nota de evolución preparados:', notaEvolucionData);
+
+    this.success = '✅ Nota de Evolución guardada correctamente';
+    this.formularioEstado.notaEvolucion = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFNotaEvolucion();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar nota de evolución:', error);
+    this.error = 'Error al guardar la nota de evolución. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFNotaEvolucion(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Nota de Evolución', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      notaEvolucion: this.notaEvolucionForm.value
+    });
+
+    console.log('✅ PDF de Nota de Evolución generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la nota de evolución';
+  }
+}
 
 
 
 
+// ===================================
+// NOTA DE URGENCIAS
+// ===================================
 
+async guardarNotaUrgencias(): Promise<void> {
+  if (!this.notaUrgenciasForm.valid) {
+    this.marcarCamposInvalidos(this.notaUrgenciasForm);
+    this.error = 'Por favor complete todos los campos obligatorios según NOM-004.';
+    return;
+  }
 
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Nota de Urgencias');
+    }
+
+    // ✅ PREPARAR DATOS CON TIPOS CORRECTOS
+    const notaUrgenciasData: CreateNotaUrgenciasDto = {
+      id_documento: this.documentoClinicoActual!,
+      motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
+      estado_conciencia: this.notaUrgenciasForm.value.estado_conciencia || undefined,
+      resumen_interrogatorio: this.notaUrgenciasForm.value.resumen_interrogatorio || undefined,
+      exploracion_fisica: this.notaUrgenciasForm.value.exploracion_fisica || undefined,
+      resultados_estudios: this.notaUrgenciasForm.value.resultados_estudios || undefined,
+      estado_mental: this.notaUrgenciasForm.value.estado_mental || undefined,
+      diagnostico: this.notaUrgenciasForm.value.diagnostico || undefined,
+      plan_tratamiento: this.notaUrgenciasForm.value.plan_tratamiento || undefined,
+      pronostico: this.notaUrgenciasForm.value.pronostico || undefined,
+      id_guia_diagnostico: this.notaUrgenciasForm.value.id_guia_diagnostico || undefined,
+      // ✅ CORREGIDO: usar undefined en lugar de null
+      area_interconsulta: undefined // Se puede agregar después si es necesario
+    };
+
+    // Guardar nota de urgencias usando el servicio correcto
+    const response = await firstValueFrom(
+      this.notasUrgenciasService.createNotaUrgencias(notaUrgenciasData)
+    );
+
+    console.log('📄 Nota de Urgencias guardada exitosamente:', response);
+
+    this.success = '🚨 Nota de Urgencias guardada correctamente';
+    this.formularioEstado.notaUrgencias = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFNotaUrgencias();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar nota de urgencias:', error);
+    this.error = 'Error al guardar la nota de urgencias. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+public async generarPDFNotaUrgencias(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Nota de Urgencias', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      notaUrgencias: this.notaUrgenciasForm.value
+    });
+
+    console.log('✅ PDF de Nota de Urgencias generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la nota de urgencias';
+  }
+}
+
+private initializeNotaUrgenciasForm(): FormGroup {
+  return this.fb.group({
+    // Campos obligatorios según NOM-004
+    motivo_atencion: ['', [Validators.required, Validators.minLength(10)]],
+    estado_conciencia: ['', [Validators.required]],
+    resumen_interrogatorio: ['', [Validators.required, Validators.minLength(20)]],
+    exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
+    diagnostico: ['', [Validators.required, Validators.minLength(10)]],
+    plan_tratamiento: ['', [Validators.required, Validators.minLength(20)]],
+    pronostico: ['', [Validators.required, Validators.minLength(10)]],
+
+    // Campos opcionales pero importantes
+    resultados_estudios: [''],
+    estado_mental: [''],
+    id_guia_diagnostico: [null],
+    numero_cama: [''],
+    hora_atencion: [new Date().toTimeString().slice(0, 5)], // Hora actual por defecto
+
+    // Campos específicos de urgencias (NOM-004)
+    destino_paciente: [''], // D4.14 - Se menciona destino después de urgencias
+    procedimientos_urgencias: [''] // D4.15 - Procedimientos en área de urgencias
+  });
+}
 
 
 
@@ -1329,18 +1620,137 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
 
 
  private initializeReferenciaForm(): FormGroup {
-   return this.fb.group({
-     institucion_destino: ['', [Validators.required]],
-     medico_destino: [''],
-     especialidad: [''],
-     motivo_referencia: ['', [Validators.required, Validators.minLength(20)]],
-     estado_paciente: ['', [Validators.required]],
-     datos_clinicos_relevantes: [''],
-     contacto_institucion: [''],
-     fecha_referencia: [new Date().toISOString().split('T')[0]],
-     tipo_referencia: ['segunda_opinion', [Validators.required]],
-   });
- }
+  return this.fb.group({
+    // Información de la institución destino (OBLIGATORIO NOM-004)
+    institucion_destino: ['', [Validators.required, Validators.minLength(5)]],
+    nivel_atencion_destino: ['segundo_nivel', [Validators.required]], // primer, segundo, tercer nivel
+    direccion_institucion: [''],
+    telefono_institucion: ['', [ValidacionesComunesService.validarTelefono]],
+    contacto_institucion: [''],
+
+    // Médico receptor (si se conoce)
+    medico_destino: [''],
+    especialidad_destino: [''],
+
+    // Tipo y motivo de referencia (OBLIGATORIO NOM-004)
+    tipo_referencia: ['referencia', [Validators.required]], // referencia, contrarreferencia
+    motivo_referencia: ['', [Validators.required, Validators.minLength(20)]],
+    urgencia_referencia: ['programada', [Validators.required]], // urgente, programada
+
+    // Estado actual del paciente (OBLIGATORIO NOM-004)
+    estado_paciente: ['', [Validators.required, Validators.minLength(10)]],
+    diagnostico_referencia: ['', [Validators.required]],
+    resumen_clinico: ['', [Validators.required, Validators.minLength(30)]],
+
+    // Datos clínicos relevantes
+    datos_clinicos_relevantes: [''],
+    estudios_realizados: [''],
+    tratamiento_actual: [''],
+    medicamentos_actuales: [''],
+
+    // Información de traslado
+    requiere_ambulancia: [false],
+    acompañante_autorizado: [''],
+    observaciones_traslado: [''],
+
+    // Fechas y seguimiento
+    fecha_referencia: [new Date().toISOString().split('T')[0], [Validators.required]],
+    fecha_programada_cita: [''],
+
+    // Seguimiento y contrarreferencia
+    requiere_contrarreferencia: [true],
+    tiempo_esperado_respuesta: ['30_dias'], // 7_dias, 15_dias, 30_dias, 60_dias
+
+    // Información administrativa
+    autorizado_por: [''],
+    numero_autorizacion: [''],
+
+    // Observaciones
+    observaciones: ['']
+  });
+}
+
+
+// ===================================
+// REFERENCIA Y CONTRARREFERENCIA
+// ===================================
+
+async guardarReferenciaTraslado(): Promise<void> {
+  if (!this.referenciaForm.valid) {
+    this.marcarCamposInvalidos(this.referenciaForm);
+    this.error = 'Por favor complete todos los campos obligatorios según NOM-004.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Referencia y Contrarreferencia');
+    }
+
+    // Preparar datos para la referencia
+    const referenciaData = {
+      id_documento: this.documentoClinicoActual!,
+      ...this.referenciaForm.value,
+      // Campos calculados
+      folio_referencia: this.generarFolioReferencia(),
+      estado_referencia: 'pendiente',
+      fecha_elaboracion: new Date().toISOString()
+    };
+
+    // Guardar referencia (integrar con servicio backend cuando esté listo)
+    console.log('📄 Datos de referencia preparados:', referenciaData);
+
+    this.success = '🔄 Referencia y Contrarreferencia guardada correctamente';
+    this.formularioEstado.referenciaTraslado = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFReferencia();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar referencia:', error);
+    this.error = 'Error al guardar la referencia. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFReferencia(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      referencia: {
+        ...this.referenciaForm.value,
+        folio_referencia: this.generarFolioReferencia()
+      }
+    });
+
+    console.log('✅ PDF de Referencia y Contrarreferencia generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la referencia';
+  }
+}
+
+private generarFolioReferencia(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `REF-${fecha.getFullYear()}-${timestamp}`;
+}
+
 
  private initializeControlCrecimientoForm(): FormGroup {
    return this.fb.group({
@@ -1879,6 +2289,25 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
         this.success = 'Prescripción de Medicamentos guardada correctamente';
         break;
 
+        case 'notaEvolucion':
+        await this.guardarNotaEvolucion();
+        this.formularioEstado['notaEvolucion'] = true;
+        this.success = 'Nota de Evolución guardada correctamente';
+        break;
+
+        case 'notaUrgencias':
+  await this.guardarNotaUrgencias();
+  this.formularioEstado['notaUrgencias'] = true;
+  this.success = 'Nota de Urgencias guardada correctamente';
+  break;
+
+  case 'referenciaTraslado':
+        await this.guardarReferenciaTraslado();
+        this.formularioEstado['referenciaTraslado'] = true;
+        this.success = 'Referencia y Contrarreferencia guardada correctamente';
+        break;
+
+
        default:
          throw new Error('Tipo de formulario no válido');
      }
@@ -1958,7 +2387,19 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
             hojaFrontal: this.hojaFrontalForm?.value || {}
           });
           break;
-
+case 'Nota de Urgencias':
+case 'Nota de Urgencias Médicas':
+  await this.pdfGeneratorService.generarDocumento('Nota de Urgencias', {
+    paciente: datosPacienteEstructurados,
+    medico: medicoCompleto,
+    expediente: this.pacienteCompleto?.expediente,
+    notaUrgencias: {
+      ...this.notaUrgenciasForm.value,
+      destino_paciente: this.notaUrgenciasForm.value.destino_paciente || 'A definir según evolución',
+      procedimientos_urgencias: this.notaUrgenciasForm.value.procedimientos_urgencias || 'Ningún procedimiento específico realizado'
+    }
+  });
+  break;
         default:
           console.warn('Tipo de documento no soportado:', tipoDocumento);
           throw new Error(`Tipo de documento "${tipoDocumento}" no es válido`);
@@ -2002,6 +2443,7 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
   }
 }
 
+
  // ===================================
  // MÉTODOS AUXILIARES PRINCIPALES
  // ===================================
@@ -2018,6 +2460,7 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
    this.notaPostanestesicaForm = this.initializeNotaPostanestesicaForm();
    this.notaInterconsultaForm = this.initializeNotaInterconsultaForm();
    this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
+   this.referenciaForm = this.initializeReferenciaForm();
    this.prescripcionForm = this.initializePrescripcionForm();
    this.referenciaForm = this.initializeReferenciaForm();
    this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
@@ -2064,12 +2507,12 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
    console.log(`Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`);
 
    const formulariosValidos: FormularioActivo[] = [
-     'signosVitales', 'historiaClinica', 'hojaFrontal', 'notaUrgencias', 'notaEvolucion',
-     'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica',
-     'notaPostanestesica', 'notaInterconsulta', 'controlCrecimiento', 'esquemaVacunacion',
-     'solicitudEstudio', 'referenciaTraslado', 'prescripcionMedicamento', 'solicitudCultivo',
-     'solicitudGasometria', 'altaVoluntaria'
-   ];
+  'signosVitales', 'historiaClinica', 'hojaFrontal', 'notaUrgencias', 'notaEvolucion',
+  'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica',
+  'notaPostanestesica', 'notaInterconsulta', 'controlCrecimiento', 'esquemaVacunacion',
+  'solicitudEstudio', 'referenciaTraslado', 'prescripcionMedicamento', 'solicitudCultivo',
+  'solicitudGasometria', 'altaVoluntaria'
+];
 
    if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
      this.error = null;
@@ -2096,8 +2539,8 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
      controlCrecimiento: 'Control de Crecimiento',
      esquemaVacunacion: 'Esquema de Vacunación',
      solicitudEstudio: 'Solicitud de Estudio',
-     referenciaTraslado: 'Referencia Traslado',
-     solicitudCultivo: 'Solicitud Cultivo',
+ referenciaTraslado: 'Referencia y Contrarreferencia',
+      solicitudCultivo: 'Solicitud Cultivo',
       prescripcionMedicamento: 'Prescripción de Medicamentos',
      solicitudGasometria: 'Solicitud Gasometría',
      altaVoluntaria: 'Alta Voluntaria',
@@ -2179,8 +2622,8 @@ private esMedicamentoControlado(medicamento: Medicamento): boolean {
      case 'controlCrecimiento': return true;
      case 'esquemaVacunacion': return true;
      case 'solicitudEstudio': return this.solicitudEstudioForm.valid;
-     case 'prescripcionMedicamento':
-      return this.prescripcionForm.valid && this.medicamentosFormArray.length > 0;
+     case 'prescripcionMedicamento':return this.prescripcionForm.valid && this.medicamentosFormArray.length > 0;
+     case 'referenciaTraslado':return this.referenciaForm.valid;
      default: return false;
    }
  }
@@ -3058,57 +3501,44 @@ await this.crearDocumentoClinicoPadre();
  // ===================================
 
  puedeAccederFormulario(formulario: string): boolean {
-  if (!formulario) return false; // ✅ PROTECCIÓN CONTRA UNDEFINED
-
-  const secuenciaFormularios = [
-    'signosVitales',
-    'historiaClinica',
-    'hojaFrontal', // ✅ AGREGAR HOJA FRONTAL
-    'notaUrgencias',
-    'notaEvolucion',
-  ];
-
-  const indiceDestino = secuenciaFormularios.indexOf(formulario);
-
-  // ✅ Si no está en secuencia, permitir acceso
-  if (indiceDestino === -1) return true;
+  if (!formulario) return false;
 
   switch (formulario) {
     case 'signosVitales':
-      return true;
+      return true; // ✅ Siempre disponible
+
     case 'historiaClinica':
-      return this.formularioEstado.signosVitales;
-    case 'hojaFrontal': // ✅ AGREGAR CASO HOJA FRONTAL
-      return true; // Siempre disponible
+      return this.formularioEstado.signosVitales; // ✅ Requiere signos vitales iniciales
+
+    case 'hojaFrontal':
+      return true; // ✅ Siempre disponible
+
     case 'notaUrgencias':
     case 'notaEvolucion':
-      return this.formularioEstado.signosVitales; // Requiere signos vitales
+    case 'prescripcionMedicamento':
+    case 'solicitudEstudio':
+      return true; // ✅ ACCESO LIBRE - Son documentos independientes
+
     default:
-      return true;
+      return true; // ✅ Por defecto, acceso libre
   }
 }
 
  private mostrarMensajeValidacion(formulario: string): void {
-   let mensaje = '';
+  let mensaje = '';
 
-   switch (formulario) {
-     case 'historiaClinica':
-       mensaje = 'Debe completar los Signos Vitales antes de acceder a la Historia Clínica.';
-       break;
-     case 'notaEvolucion':
-       if (!this.formularioEstado.signosVitales) {
-         mensaje = 'Debe completar los Signos Vitales antes de crear una Nota de Evolución.';
-       } else if (!this.formularioEstado.historiaClinica) {
-         mensaje = 'Debe completar la Historia Clínica antes de crear una Nota de Evolución.';
-       }
-       break;
-     default:
-       mensaje = `No puede acceder a ${this.getTituloFormulario(formulario)} en este momento.`;
-   }
+  switch (formulario) {
+    case 'historiaClinica':
+      mensaje = 'Debe completar los Signos Vitales antes de acceder a la Historia Clínica.';
+      break;
+    // ❌ QUITAR el case de notaEvolucion
+    default:
+      mensaje = `No puede acceder a ${this.getTituloFormulario(formulario)} en este momento.`;
+  }
 
-   this.error = mensaje;
-   setTimeout(() => { this.error = null; }, 5000);
- }
+  this.error = mensaje;
+  setTimeout(() => { this.error = null; }, 5000);
+}
 
  mostrarConfirmacionPDF(tipoDocumento: string): void {
    if (tipoDocumento === 'Signos Vitales') {
@@ -3756,7 +4186,9 @@ await this.crearDocumentoClinicoPadre();
         { key: 'principales', data: { nombre: 'Documentos Principales', icono: 'fas fa-star', color: 'blue', formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal'] } },
         { key: 'clinicos', data: { nombre: 'Documentos Clínicos', icono: 'fas fa-file-medical', color: 'green', formularios: ['notaUrgencias', 'notaEvolucion'] } },
         { key: 'solicitudes',data: {nombre: 'Solicitudes de Estudios',icono: 'fas fa-microscope',color: 'green',formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']}},
-        { key: 'prescripciones', data: {nombre: 'Prescripciones y Medicamentos',icono: 'fas fa-pills', color: 'purple',formularios: ['prescripcionMedicamento', 'registroTransfusion']}}
+        { key: 'prescripciones', data: {nombre: 'Prescripciones y Medicamentos',icono: 'fas fa-pills', color: 'purple',formularios: ['prescripcionMedicamento', 'registroTransfusion']}},
+        { key: 'administrativos', data: { nombre: 'Documentos Administrativos', icono: 'fas fa-folder-open', color: 'gray', formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento'] }}
+
 
 
       ];

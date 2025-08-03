@@ -174,26 +174,56 @@ export class PdfGeneratorService {
       medicoCompleto,
       pacienteCompleto
     };
-
-    // 3. Llamar al template correspondiente
     let documentDefinition;
     switch (tipoDocumento) {
       case 'Historia Clínica':
-        documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica(datosParaTemplate);
+        documentDefinition =
+          await this.pdfTemplatesService.generarHistoriaClinica(
+            datosParaTemplate
+          );
         break;
       case 'Hoja Frontal':
       case 'Hoja Frontal Expediente': // ✅ AGREGADO
-        documentDefinition = await this.pdfTemplatesService.generarHojaFrontalExpediente(datosParaTemplate);
+        documentDefinition =
+          await this.pdfTemplatesService.generarHojaFrontalExpediente(
+            datosParaTemplate
+          );
         break;
       case 'Solicitud de Estudio':
       case 'Solicitud de Laboratorio':
       case 'Solicitud de Imagenología':
-       documentDefinition = await this.pdfTemplatesService.generarSolicitudEstudio(datosParaTemplate);
-      break;
+        documentDefinition =
+          await this.pdfTemplatesService.generarSolicitudEstudio(
+            datosParaTemplate
+          );
+        break;
       case 'Prescripción de Medicamentos':
       case 'Prescripción':
-        documentDefinition = await this.pdfTemplatesService.generarPrescripcionMedicamentos(datosParaTemplate);
-      break;
+        documentDefinition =
+          await this.pdfTemplatesService.generarPrescripcionMedicamentos(
+            datosParaTemplate
+          );
+        break;
+      case 'Nota de Evolución':
+      case 'Nota de Evolución Médica':
+        documentDefinition =
+          await this.pdfTemplatesService.generarNotaEvolucion(
+            datosParaTemplate
+          );
+        break;
+      case 'Nota de Urgencias':
+case 'Nota de Urgencias Médicas':
+  documentDefinition = await this.pdfTemplatesService.generarNotaUrgencias(datosParaTemplate);
+  break;
+  case 'Referencia y Contrarreferencia':
+case 'Referencia':
+case 'Contrarreferencia':
+  documentDefinition = await this.pdfTemplatesService.generarReferenciaContrarreferencia(datosParaTemplate);
+  break;
+  case 'Consentimiento Informado':
+case 'Consentimiento':
+  documentDefinition = await this.pdfTemplatesService.generarNotaConsentimientoProcedimientos(datosParaTemplate);
+  break;
       // Aquí iremos agregando cada nuevo documento
       default:
         throw new Error(`Documento ${tipoDocumento} no implementado aún`);
@@ -1592,5 +1622,42 @@ async generarPrescripcionMedicamentos(datos: any): Promise<void> {
     throw error;
   }
 }
+
+
+async generarNotaUrgenciasMedicas(datos: any): Promise<void> {
+  console.log('🚨 Generando PDF de Nota de Urgencias...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaUrgencias(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-urgencias-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Urgencias generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Urgencias:', error);
+    throw error;
+  }
+}
+
 
 }
