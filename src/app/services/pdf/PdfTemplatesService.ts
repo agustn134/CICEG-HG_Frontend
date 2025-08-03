@@ -7829,4 +7829,925 @@ private generarFolioPostoperatorio(): string {
 }
 
 
+async generarNotaInterconsulta(datos: any): Promise<any> {
+  console.log('💫 Generando Nota de Interconsulta - ¡EL GRAN FINAL!');
+
+  const { pacienteCompleto, medicoCompleto, interconsulta } = datos;
+  const fechaActual = new Date();
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [40, 80, 40, 60],
+
+    header: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [40, 20, 40, 20],
+        table: {
+          widths: ['30%', '40%', '30%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
+                  { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
+                  { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
+                ]
+              },
+              {
+                stack: [
+                  { text: '💫 NOTA DE INTERCONSULTA', fontSize: 16, bold: true, alignment: 'center', color: '#7c3aed' },
+                  { text: 'COMUNICACIÓN ENTRE ESPECIALIDADES', fontSize: 10, alignment: 'center', italics: true },
+                  { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
+                  { text: interconsulta.numero_interconsulta || this.generarNumeroInterconsulta(), fontSize: 10, alignment: 'right' },
+                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
+                  { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 8, alignment: 'right' }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: 'noBorders'
+      };
+    },
+
+    content: [
+      // DATOS DEL PACIENTE
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '👤 DATOS DEL PACIENTE',
+                style: 'sectionHeader',
+                fillColor: '#faf5ff',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['25%', '25%', '25%', '25%'],
+          body: [
+            [
+              { text: 'Nombre:', style: 'fieldLabel' },
+              { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
+              { text: 'Expediente:', style: 'fieldLabel' },
+              { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Edad:', style: 'fieldLabel' },
+              { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
+              { text: 'Sexo:', style: 'fieldLabel' },
+              { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+            ],
+            [
+              { text: 'Fecha Solicitud:', style: 'fieldLabel' },
+              { text: this.formatearFecha(interconsulta.fecha_solicitud), style: 'fieldValue' },
+              { text: 'Urgencia:', style: 'fieldLabel' },
+              { text: this.formatearUrgencia(interconsulta.urgencia_interconsulta), style: 'urgenciaValue', color: this.getColorUrgencia(interconsulta.urgencia_interconsulta) }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN DE LA SOLICITUD
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '📋 INFORMACIÓN DE LA SOLICITUD',
+                style: 'sectionHeader',
+                fillColor: '#eff6ff',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'ESPECIALIDAD SOLICITADA:', style: 'fieldLabel' },
+                  { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'MÉDICO SOLICITANTE:', style: 'fieldLabel' },
+                  { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'SERVICIO SOLICITANTE:', style: 'fieldLabel' },
+                  { text: interconsulta.servicio_solicitante || medicoCompleto.departamento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'CONTACTO:', style: 'fieldLabel' },
+                  { text: interconsulta.telefono_contacto ? `Tel: ${interconsulta.telefono_contacto}` : 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'TIEMPO ESPERADO:', style: 'fieldLabel' },
+                  { text: interconsulta.tiempo_respuesta_esperado || '48 horas', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'ESTADO:', style: 'fieldLabel' },
+                  { text: interconsulta.estado_interconsulta || 'Pendiente', style: 'estadoValue', color: this.getColorEstado(interconsulta.estado_interconsulta), margin: [0, 5, 0, 0] }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+
+      // MOTIVO DE LA INTERCONSULTA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '❓ MOTIVO DE LA INTERCONSULTA',
+                style: 'sectionHeader',
+                fillColor: '#fef3c7',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'MOTIVO DE INTERCONSULTA:', style: 'fieldLabel' },
+                  { text: interconsulta.motivo_interconsulta || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'PREGUNTA ESPECÍFICA AL ESPECIALISTA:', style: 'fieldLabel' },
+                  { text: interconsulta.pregunta_especifica || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'JUSTIFICACIÓN DE LA INTERCONSULTA:', style: 'fieldLabel' },
+                  { text: interconsulta.justificacion_interconsulta || 'Evaluación especializada requerida', style: 'fieldValue', margin: [0, 5, 0, 0] }
+                ],
+                margin: [10, 10]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN CLÍNICA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '🩺 INFORMACIÓN CLÍNICA DEL PACIENTE',
+                style: 'sectionHeader',
+                fillColor: '#f0fdf4',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'RESUMEN DEL CASO:', style: 'fieldLabel' },
+                  { text: interconsulta.resumen_caso || 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'fieldLabel' },
+                  { text: interconsulta.diagnostico_presuntivo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'SÍNTOMAS PRINCIPALES:', style: 'fieldLabel' },
+                  { text: interconsulta.sintomas_principales || 'No especificados', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'TIEMPO DE EVOLUCIÓN:', style: 'fieldLabel' },
+                  { text: interconsulta.tiempo_evolucion || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+                ],
+                margin: [10, 10]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+
+      // SIGNOS VITALES ACTUALES
+      ...(this.tieneSignosVitales(interconsulta) ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '💓 SIGNOS VITALES ACTUALES',
+                  style: 'sectionHeader',
+                  fillColor: '#ffebee',
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['20%', '20%', '20%', '20%', '20%'],
+            body: [
+              [
+                { text: 'TA', style: 'vitalHeader' },
+                { text: 'FC', style: 'vitalHeader' },
+                { text: 'FR', style: 'vitalHeader' },
+                { text: 'Temp.', style: 'vitalHeader' },
+                { text: 'SatO₂', style: 'vitalHeader' }
+              ],
+              [
+                { text: interconsulta.presion_arterial_actual || '--', style: 'vitalValue' },
+                { text: interconsulta.frecuencia_cardiaca_actual ? `${interconsulta.frecuencia_cardiaca_actual} lpm` : '--', style: 'vitalValue' },
+                { text: interconsulta.frecuencia_respiratoria_actual ? `${interconsulta.frecuencia_respiratoria_actual} rpm` : '--', style: 'vitalValue' },
+                { text: interconsulta.temperatura_actual ? `${interconsulta.temperatura_actual}°C` : '--', style: 'vitalValue' },
+                { text: interconsulta.saturacion_oxigeno_actual ? `${interconsulta.saturacion_oxigeno_actual}%` : '--', style: 'vitalValue' }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // EXPLORACIÓN FÍSICA
+      ...(interconsulta.exploracion_fisica_relevante ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'EXPLORACIÓN FÍSICA RELEVANTE:', style: 'fieldLabel' },
+                    { text: interconsulta.exploracion_fisica_relevante, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                    ...(interconsulta.hallazgos_importantes ? [
+                      { text: 'HALLAZGOS IMPORTANTES:', style: 'fieldLabel' },
+                      { text: interconsulta.hallazgos_importantes, style: 'fieldValue', margin: [0, 5, 0, 0] }
+                    ] : [])
+                  ],
+                  margin: [10, 10]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // ESTUDIOS REALIZADOS
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '🔬 ESTUDIOS REALIZADOS',
+                style: 'sectionHeader',
+                fillColor: '#f3e8ff',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['25%', '25%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'LABORATORIO:', style: 'fieldLabel' },
+                  { text: interconsulta.examenes_laboratorio ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_laboratorio ? '#059669' : '#dc2626' }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'GABINETE:', style: 'fieldLabel' },
+                  { text: interconsulta.examenes_gabinete ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_gabinete ? '#059669' : '#dc2626' }
+                ]
+              },
+              {
+                stack: [
+                  { text: 'ESTUDIOS REALIZADOS:', style: 'fieldLabel' },
+                  { text: interconsulta.estudios_realizados || 'No se han realizado estudios', style: 'fieldValue' }
+                ]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      ...(interconsulta.resultados_relevantes ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'RESULTADOS RELEVANTES:', style: 'fieldLabel' },
+                    { text: interconsulta.resultados_relevantes, style: 'fieldValue' }
+                  ],
+                  margin: [10, 5]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // TRATAMIENTO ACTUAL
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '💊 TRATAMIENTO ACTUAL',
+                style: 'sectionHeader',
+                fillColor: '#fef2f2',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: 'TRATAMIENTO ACTUAL:', style: 'fieldLabel' },
+                  { text: interconsulta.tratamiento_actual || 'Sin tratamiento específico', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'MEDICAMENTOS ACTUALES:', style: 'fieldLabel' },
+                  { text: interconsulta.medicamentos_actuales || 'Sin medicamentos', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                  { text: 'ALERGIAS MEDICAMENTOSAS:', style: 'fieldLabel' },
+                  { text: interconsulta.alergias_medicamentosas || 'Sin alergias conocidas', style: 'fieldValue', margin: [0, 5, 0, 0] }
+                ],
+                margin: [10, 10]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 15]
+      },
+
+      // NUEVA PÁGINA PARA RESPUESTA
+      { text: '', pageBreak: 'before' },
+
+      // RESPUESTA DEL ESPECIALISTA
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: '👨‍⚕️ RESPUESTA DEL ESPECIALISTA',
+                style: 'sectionHeader',
+                fillColor: '#e0f2fe',
+                margin: [10, 8]
+              }
+            ]
+          ]
+        },
+        layout: this.getTableLayout(),
+        margin: [0, 0, 0, 10]
+      },
+
+      ...(interconsulta.medico_consultor ? [
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'MÉDICO CONSULTOR:', style: 'fieldLabel' },
+                    { text: interconsulta.medico_consultor, style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+                    { text: 'FECHA DE RESPUESTA:', style: 'fieldLabel' },
+                    { text: this.formatearFecha(interconsulta.fecha_respuesta), style: 'fieldValue' }
+                  ]
+                },
+                {
+                  stack: [
+                    { text: 'HORA DE EVALUACIÓN:', style: 'fieldLabel' },
+                    { text: interconsulta.hora_evaluacion || 'No registrada', style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+                    { text: 'ESPECIALIDAD:', style: 'fieldLabel' },
+                    { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue' }
+                  ]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '⏳ PENDIENTE DE RESPUESTA DEL ESPECIALISTA',
+                  style: 'pendienteText',
+                  alignment: 'center',
+                  margin: [10, 20]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ]),
+
+      // EVALUACIÓN DEL ESPECIALISTA
+      ...(interconsulta.impresion_diagnostica ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'IMPRESIÓN DIAGNÓSTICA DEL ESPECIALISTA:', style: 'fieldLabel' },
+                    { text: interconsulta.impresion_diagnostica, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                    ...(interconsulta.diagnostico_especialista ? [
+                      { text: 'DIAGNÓSTICO DEL ESPECIALISTA:', style: 'fieldLabel' },
+                      { text: interconsulta.diagnostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
+                    ] : []),
+
+                    ...(interconsulta.comentarios_especialista ? [
+                      { text: 'COMENTARIOS DEL ESPECIALISTA:', style: 'fieldLabel' },
+                      { text: interconsulta.comentarios_especialista, style: 'fieldValue', margin: [0, 5, 0, 0] }
+                    ] : [])
+                  ],
+                  margin: [10, 10]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // RECOMENDACIONES
+      ...(interconsulta.recomendaciones ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '💡 RECOMENDACIONES DEL ESPECIALISTA',
+                  style: 'sectionHeader',
+                  fillColor: '#f0fdf4',
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'RECOMENDACIONES PRINCIPALES:', style: 'fieldLabel' },
+                    { text: interconsulta.recomendaciones, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                    ...(interconsulta.plan_manejo ? [
+                      { text: 'PLAN DE MANEJO:', style: 'fieldLabel' },
+                      { text: interconsulta.plan_manejo, style: 'fieldValue', margin: [0, 5, 0, 15] }
+                    ] : []),
+
+                    ...(interconsulta.medicamentos_sugeridos ? [
+                      { text: 'MEDICAMENTOS SUGERIDOS:', style: 'fieldLabel' },
+                      { text: interconsulta.medicamentos_sugeridos, style: 'fieldValue', margin: [0, 5, 0, 15] }
+                    ] : []),
+
+                    ...(interconsulta.estudios_adicionales ? [
+                      { text: 'ESTUDIOS ADICIONALES:', style: 'fieldLabel' },
+                      { text: interconsulta.estudios_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
+                    ] : [])
+                  ],
+                  margin: [10, 10]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // SEGUIMIENTO
+      ...(interconsulta.requiere_seguimiento ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '📅 PLAN DE SEGUIMIENTO',
+                  style: 'sectionHeader',
+                  fillColor: '#fef3c7',
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'REQUIERE SEGUIMIENTO:', style: 'fieldLabel' },
+                    { text: '✅ SÍ', style: 'fieldValue', color: '#059669', margin: [0, 5, 0, 10] },
+
+                    { text: 'TIPO DE SEGUIMIENTO:', style: 'fieldLabel' },
+                    { text: interconsulta.tipo_seguimiento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+                    { text: 'FRECUENCIA:', style: 'fieldLabel' },
+                    { text: interconsulta.frecuencia_seguimiento || 'No especificada', style: 'fieldValue' }
+                  ]
+                },
+                {
+                  stack: [
+                    { text: 'HOSPITALIZACÓN:', style: 'fieldLabel' },
+                    { text: interconsulta.requiere_hospitalizacion ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_hospitalizacion ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
+
+                    { text: 'CIRUGÍA:', style: 'fieldLabel' },
+                    { text: interconsulta.requiere_cirugia ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_cirugia ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
+
+                    { text: 'OTRAS ESPECIALIDADES:', style: 'fieldLabel' },
+                    { text: interconsulta.otras_especialidades || 'No requiere', style: 'fieldValue' }
+                  ]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PRONÓSTICO
+      ...(interconsulta.pronostico_especialista ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: 'PRONÓSTICO:', style: 'fieldLabel' },
+                    { text: interconsulta.pronostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+                    ...(interconsulta.signos_alarma ? [
+                      { text: 'SIGNOS DE ALARMA:', style: 'fieldLabel' },
+                      { text: interconsulta.signos_alarma, style: 'fieldValue', margin: [0, 5, 0, 0] }
+                    ] : [])
+                  ],
+                  margin: [10, 10]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // OBSERVACIONES FINALES
+      ...(interconsulta.observaciones_especialista || interconsulta.observaciones_adicionales ? [
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  text: '💬 OBSERVACIONES ADICIONALES',
+                  style: 'sectionHeader',
+                  fillColor: '#f8fafc',
+                  margin: [10, 8]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                {
+                  stack: [
+                    ...(interconsulta.observaciones_especialista ? [
+                      { text: 'OBSERVACIONES DEL ESPECIALISTA:', style: 'fieldLabel' },
+                      { text: interconsulta.observaciones_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
+                    ] : []),
+
+                    ...(interconsulta.observaciones_adicionales ? [
+                      { text: 'OBSERVACIONES ADICIONALES:', style: 'fieldLabel' },
+                      { text: interconsulta.observaciones_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
+                    ] : [])
+                  ],
+                  margin: [10, 10]
+                }
+              ]
+            ]
+          },
+          layout: this.getTableLayout(),
+          margin: [0, 0, 0, 20]
+        }
+      ] : []),
+
+      // FIRMAS
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                stack: [
+                  { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+                  { text: 'MÉDICO SOLICITANTE', style: 'signatureLabel' },
+                  { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
+                  { text: `Servicio: ${interconsulta.servicio_solicitante || medicoCompleto.departamento || 'N/A'}`, style: 'signatureDetails' },
+                  { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' }
+                ]
+              },
+              {
+                stack: [
+                  { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+                  { text: 'MÉDICO CONSULTOR', style: 'signatureLabel' },
+                  { text: interconsulta.medico_consultor || 'Pendiente de asignar', style: 'signatureName' },
+                  { text: `Especialidad: ${interconsulta.especialidad_solicitada || 'N/A'}`, style: 'signatureDetails' },
+{ text: `Fecha: ${this.formatearFecha(interconsulta.fecha_respuesta) || '________________'}`, style: 'signatureDetails' }
+               ]
+             }
+           ]
+         ]
+       },
+       layout: 'noBorders'
+     },
+
+     // MENSAJE DE COMPLETADO AL 100%
+     {
+       margin: [0, 30, 0, 0],
+       table: {
+         widths: ['100%'],
+         body: [
+           [
+             {
+               stack: [
+                 { text: '🎉 SISTEMA SICEG-HG COMPLETADO AL 100% 🎉', style: 'completedTitle', alignment: 'center', margin: [0, 10, 0, 5] },
+                 { text: '12/12 DOCUMENTOS CLÍNICOS FUNCIONALES', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 5] },
+                 { text: 'CUMPLIMIENTO TOTAL NOM-004-SSA3-2012', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 10] },
+                 { text: 'Hospital General San Luis de la Paz, Guanajuato', style: 'completedFooter', alignment: 'center' }
+               ],
+               fillColor: '#f0fdf4',
+               margin: [10, 15]
+             }
+           ]
+         ]
+       },
+       layout: this.getTableLayout()
+     }
+   ],
+
+   footer: (currentPage: number, pageCount: number) => {
+     return {
+       margin: [40, 10],
+       table: {
+         widths: ['33%', '34%', '33%'],
+         body: [
+           [
+             {
+               text: `Interconsulta - Hospital General San Luis de la Paz`,
+               fontSize: 8,
+               color: '#666666'
+             },
+             {
+               text: `Página ${currentPage} de ${pageCount}`,
+               fontSize: 8,
+               alignment: 'center',
+               color: '#666666'
+             },
+             {
+               text: fechaActual.toLocaleString('es-MX'),
+               fontSize: 8,
+               alignment: 'right',
+               color: '#666666'
+             }
+           ]
+         ]
+       },
+       layout: 'noBorders'
+     };
+   },
+
+   styles: {
+     sectionHeader: {
+       fontSize: 12,
+       bold: true,
+       color: '#374151'
+     },
+     fieldLabel: {
+       fontSize: 9,
+       bold: true,
+       color: '#4b5563'
+     },
+     fieldValue: {
+       fontSize: 9,
+       color: '#111827'
+     },
+     urgenciaValue: {
+       fontSize: 10,
+       bold: true
+     },
+     estadoValue: {
+       fontSize: 10,
+       bold: true
+     },
+     estudioValue: {
+       fontSize: 9,
+       bold: true
+     },
+     vitalHeader: {
+       fontSize: 8,
+       bold: true,
+       color: '#ffffff',
+       fillColor: '#7c3aed',
+       alignment: 'center',
+       margin: [2, 2, 2, 2]
+     },
+     vitalValue: {
+       fontSize: 8,
+       alignment: 'center',
+       margin: [2, 2, 2, 2]
+     },
+     pendienteText: {
+       fontSize: 12,
+       bold: true,
+       color: '#d97706',
+       italics: true
+     },
+     signatureLabel: {
+       fontSize: 10,
+       bold: true,
+       alignment: 'center',
+       color: '#374151'
+     },
+     signatureName: {
+       fontSize: 9,
+       alignment: 'center',
+       color: '#111827'
+     },
+     signatureDetails: {
+       fontSize: 8,
+       alignment: 'center',
+       color: '#6b7280'
+     },
+     completedTitle: {
+       fontSize: 14,
+       bold: true,
+       color: '#059669'
+     },
+     completedSubtitle: {
+       fontSize: 10,
+       bold: true,
+       color: '#059669'
+     },
+     completedFooter: {
+       fontSize: 8,
+       color: '#6b7280'
+     }
+   }
+ };
+}
+
+// // MÉTODOS AUXILIARES PARA INTERCONSULTA
+// private tieneSignosVitales(interconsulta: any): boolean {
+//  return !!(interconsulta.presion_arterial_actual ||
+//           interconsulta.frecuencia_cardiaca_actual ||
+//           interconsulta.frecuencia_respiratoria_actual ||
+//           interconsulta.temperatura_actual ||
+//           interconsulta.saturacion_oxigeno_actual);
+// }
+
+// private formatearUrgencia(urgencia: string): string {
+//  const urgencias: { [key: string]: string } = {
+//    'Urgente': 'URGENTE',
+//    'Alta': 'ALTA PRIORIDAD',
+//    'Normal': 'NORMAL',
+//    'Baja': 'BAJA PRIORIDAD'
+//  };
+//  return urgencias[urgencia] || urgencia;
+// }
+
+private getColorUrgencia(urgencia: string): string {
+ const colores: { [key: string]: string } = {
+   'Urgente': '#dc2626',
+   'Alta': '#ea580c',
+   'Normal': '#059669',
+   'Baja': '#6b7280'
+ };
+ return colores[urgencia] || '#6b7280';
+}
+
+private getColorEstado(estado: string): string {
+ const colores: { [key: string]: string } = {
+   'Pendiente': '#d97706',
+   'En Proceso': '#2563eb',
+   'Respondida': '#059669'
+ };
+ return colores[estado] || '#6b7280';
+}
+
+private generarNumeroInterconsulta(): string {
+ const fecha = new Date();
+ const timestamp = fecha.getTime().toString().slice(-6);
+ return `IC-${fecha.getFullYear()}-${timestamp}`;
+}
+
 }

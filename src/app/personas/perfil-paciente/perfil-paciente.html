@@ -6435,8 +6435,1023 @@ class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none foc
 </div>
 
 
+<!-- FORMULARIO DE NOTA DE INTERCONSULTA -->
+<div *ngIf="formularioActivo === 'notaInterconsulta'" class="space-y-6">
 
+  <!-- ENCABEZADO ÉPICO - ¡EL GRAN FINAL! -->
+  <div class="bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-600 rounded-lg p-6 text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/20"></div>
+    <div class="relative z-10">
+      <div class="flex items-center space-x-3">
+        <i class="fas fa-user-friends text-2xl"></i>
+        <div>
+          <h3 class="text-xl font-bold">💫 Nota de Interconsulta</h3>
+          <p class="text-purple-100 text-sm">NOM-004-SSA3-2012 | Comunicación entre especialidades</p>
+        </div>
+        <div class="ml-auto">
+          <div class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2">
+            <span class="text-sm font-bold">¡ÚLTIMO DOCUMENTO!</span>
+            <div class="text-xs">100% AL ALCANCE</div>
+          </div>
+        </div>
+      </div>
 
+      <!-- INDICADOR DE PROGRESO ÉPICO -->
+      <div class="mt-4 flex items-center space-x-2 text-sm">
+        <div class="flex items-center space-x-1">
+          <i class="fas fa-check-circle"
+             [class]="notaInterconsultaForm.valid ? 'text-green-300' : 'text-gray-400'"></i>
+          <span>Solicitud {{ notaInterconsultaForm.valid ? 'completa' : 'pendiente' }}</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <i class="fas fa-trophy text-yellow-300"></i>
+          <span>Documento 12/12 - ¡FINAL ÉPICO!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="notaInterconsultaForm" class="space-y-6">
+
+    <!-- INFORMACIÓN DE LA SOLICITUD -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-clipboard-list text-purple-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Información de la Solicitud</h4>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Fecha de Solicitud -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Fecha de Solicitud *
+          </label>
+          <input
+            type="date"
+            formControlName="fecha_solicitud"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="notaInterconsultaForm.get('fecha_solicitud')?.invalid && notaInterconsultaForm.get('fecha_solicitud')?.touched">
+        </div>
+
+        <!-- Especialidad Solicitada -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Especialidad Solicitada *
+          </label>
+          <select
+            formControlName="especialidad_solicitada"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="notaInterconsultaForm.get('especialidad_solicitada')?.invalid && notaInterconsultaForm.get('especialidad_solicitada')?.touched">
+            <option value="">Seleccionar especialidad</option>
+            <option value="Cardiología">Cardiología</option>
+            <option value="Neurología">Neurología</option>
+            <option value="Gastroenterología">Gastroenterología</option>
+            <option value="Endocrinología">Endocrinología</option>
+            <option value="Oncología">Oncología</option>
+            <option value="Psiquiatría">Psiquiatría</option>
+            <option value="Dermatología">Dermatología</option>
+            <option value="Oftalmología">Oftalmología</option>
+            <option value="Otorrinolaringología">Otorrinolaringología</option>
+            <option value="Traumatología">Traumatología</option>
+            <option value="Ginecología">Ginecología</option>
+            <option value="Urología">Urología</option>
+            <option value="Neumología">Neumología</option>
+            <option value="Medicina Interna">Medicina Interna</option>
+            <option value="Pediatría">Pediatría</option>
+            <option value="Cirugía General">Cirugía General</option>
+          </select>
+        </div>
+
+        <!-- Urgencia -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Urgencia de la Interconsulta *
+          </label>
+          <select
+            formControlName="urgencia_interconsulta"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="Normal">Normal (48-72 horas)</option>
+            <option value="Alta">Alta prioridad (24 horas)</option>
+            <option value="Urgente">Urgente (inmediato)</option>
+            <option value="Baja">Baja prioridad (1 semana)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <!-- Médico Solicitante -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Médico Solicitante *
+          </label>
+          <input
+            type="text"
+            formControlName="medico_solicitante"
+            placeholder="Nombre del médico que solicita"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="notaInterconsultaForm.get('medico_solicitante')?.invalid && notaInterconsultaForm.get('medico_solicitante')?.touched">
+        </div>
+
+        <!-- Servicio Solicitante -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Servicio Solicitante
+          </label>
+          <input
+            type="text"
+            formControlName="servicio_solicitante"
+            placeholder="Ej: Medicina Interna, Urgencias..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Teléfono de Contacto -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Teléfono de Contacto
+          </label>
+          <input
+            type="tel"
+            formControlName="telefono_contacto"
+            placeholder="Extensión o teléfono"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Tiempo de Respuesta Esperado -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Tiempo de Respuesta Esperado
+          </label>
+          <select
+            formControlName="tiempo_respuesta_esperado"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="24 horas">24 horas</option>
+            <option value="48 horas">48 horas</option>
+            <option value="72 horas">72 horas</option>
+            <option value="1 semana">1 semana</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOTIVO DE LA INTERCONSULTA -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-question-circle text-orange-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Motivo de la Interconsulta</h4>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Motivo Principal -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Motivo de la Interconsulta *
+          </label>
+          <textarea
+            formControlName="motivo_interconsulta"
+            rows="3"
+            placeholder="Describa claramente por qué solicita la interconsulta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            [class.border-red-500]="notaInterconsultaForm.get('motivo_interconsulta')?.invalid && notaInterconsultaForm.get('motivo_interconsulta')?.touched"></textarea>
+          <div *ngIf="notaInterconsultaForm.get('motivo_interconsulta')?.errors?.['required']"
+               class="text-red-500 text-xs mt-1">Campo obligatorio</div>
+          <div *ngIf="notaInterconsultaForm.get('motivo_interconsulta')?.errors?.['minlength']"
+               class="text-red-500 text-xs mt-1">Mínimo 20 caracteres</div>
+        </div>
+
+        <!-- Pregunta Específica -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Pregunta Específica al Especialista *
+          </label>
+          <textarea
+            formControlName="pregunta_especifica"
+            rows="2"
+            placeholder="¿Qué pregunta específica tiene para el especialista?"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            [class.border-red-500]="notaInterconsultaForm.get('pregunta_especifica')?.invalid && notaInterconsultaForm.get('pregunta_especifica')?.touched"></textarea>
+          <div *ngIf="notaInterconsultaForm.get('pregunta_especifica')?.errors?.['required']"
+               class="text-red-500 text-xs mt-1">Campo obligatorio</div>
+        </div>
+
+        <!-- Justificación -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Justificación de la Interconsulta
+          </label>
+          <textarea
+            formControlName="justificacion_interconsulta"
+            rows="2"
+            placeholder="Justifique por qué es necesaria esta interconsulta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMACIÓN CLÍNICA DEL PACIENTE -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-stethoscope text-blue-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Información Clínica del Paciente</h4>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Resumen del Caso -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Resumen del Caso *
+          </label>
+          <textarea
+            formControlName="resumen_caso"
+            rows="4"
+            placeholder="Resumen clínico completo del caso del paciente..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            [class.border-red-500]="notaInterconsultaForm.get('resumen_caso')?.invalid && notaInterconsultaForm.get('resumen_caso')?.touched"></textarea>
+          <div *ngIf="notaInterconsultaForm.get('resumen_caso')?.errors?.['required']"
+               class="text-red-500 text-xs mt-1">Campo obligatorio</div>
+        </div>
+
+        <!-- Diagnóstico Presuntivo -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Diagnóstico Presuntivo *
+          </label>
+          <textarea
+            formControlName="diagnostico_presuntivo"
+            rows="2"
+            placeholder="Diagnóstico probable o diagnósticos diferenciales..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            [class.border-red-500]="notaInterconsultaForm.get('diagnostico_presuntivo')?.invalid && notaInterconsultaForm.get('diagnostico_presuntivo')?.touched"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Síntomas Principales -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Síntomas Principales
+            </label>
+            <textarea
+              formControlName="sintomas_principales"
+              rows="3"
+              placeholder="Síntomas más relevantes del paciente..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+          </div>
+
+          <!-- Tiempo de Evolución -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Tiempo de Evolución
+            </label>
+            <textarea
+              formControlName="tiempo_evolucion"
+              rows="3"
+              placeholder="Tiempo de evolución de los síntomas..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANTECEDENTES RELEVANTES -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-history text-green-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Antecedentes Relevantes</h4>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Antecedentes Relevantes -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Antecedentes Patológicos Relevantes
+          </label>
+          <textarea
+            formControlName="antecedentes_relevantes"
+            rows="3"
+            placeholder="Antecedentes médicos relevantes para la interconsulta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Medicamentos Actuales -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Medicamentos Actuales
+            </label>
+            <textarea
+              formControlName="medicamentos_actuales"
+              rows="3"
+              placeholder="Medicamentos que está tomando actualmente..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+          </div>
+
+          <!-- Alergias -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Alergias Medicamentosas
+            </label>
+            <textarea
+              formControlName="alergias_medicamentosas"
+              rows="3"
+              placeholder="Alergias conocidas a medicamentos..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNOS VITALES ACTUALES -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-heartbeat text-red-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Signos Vitales Actuales</h4>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <!-- Presión Arterial -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">TA</label>
+          <input
+            type="text"
+            formControlName="presion_arterial_actual"
+            placeholder="120/80"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- FC -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">FC (lpm)</label>
+          <input
+            type="number"
+            formControlName="frecuencia_cardiaca_actual"
+            min="40"
+            max="200"
+            placeholder="80"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- FR -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">FR (rpm)</label>
+          <input
+            type="number"
+            formControlName="frecuencia_respiratoria_actual"
+            min="10"
+            max="40"
+            placeholder="20"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Temperatura -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Temp. (°C)</label>
+          <input
+            type="number"
+            formControlName="temperatura_actual"
+            step="0.1"
+            min="35"
+            max="42"
+            placeholder="36.5"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- SatO2 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">SatO₂ (%)</label>
+          <input
+            type="number"
+            formControlName="saturacion_oxigeno_actual"
+            min="70"
+            max="100"
+            placeholder="98"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPLORACIÓN FÍSICA -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-user-check text-indigo-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Exploración Física</h4>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Exploración Física Relevante -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Exploración Física Relevante
+          </label>
+          <textarea
+            formControlName="exploracion_fisica_relevante"
+            rows="4"
+            placeholder="Hallazgos relevantes en la exploración física..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+        </div>
+
+        <!-- Hallazgos Importantes -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Hallazgos Importantes
+          </label>
+          <textarea
+            formControlName="hallazgos_importantes"
+            rows="3"
+            placeholder="Hallazgos más relevantes para la interconsulta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTUDIOS REALIZADOS -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <i class="fas fa-vial text-teal-500"></i>
+        <h4 class="text-lg font-semibold text-gray-800">Estudios Realizados</h4>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Checkboxes de Estudios -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                formControlName="examenes_laboratorio"
+                class="rounded border-gray-300 text-teal-600 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50">
+              <span class="text-sm font-medium text-gray-700">Se realizaron exámenes de laboratorio</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                formControlName="examenes_gabinete"
+class="rounded border-gray-300 text-teal-600 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50">
+             <span class="text-sm font-medium text-gray-700">Se realizaron estudios de gabinete</span>
+           </label>
+         </div>
+       </div>
+
+       <!-- Estudios Realizados -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Estudios Realizados
+         </label>
+         <textarea
+           formControlName="estudios_realizados"
+           rows="3"
+           placeholder="Detallar estudios de laboratorio y gabinete realizados..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Resultados Relevantes -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Resultados Relevantes
+         </label>
+         <textarea
+           formControlName="resultados_relevantes"
+           rows="3"
+           placeholder="Resultados más importantes de los estudios..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <!-- Estudios Pendientes -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Estudios Pendientes
+           </label>
+           <textarea
+             formControlName="estudios_pendientes"
+             rows="2"
+             placeholder="Estudios solicitados pero pendientes..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+
+         <!-- Estudios Recomendados -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Estudios Recomendados
+           </label>
+           <textarea
+             formControlName="estudios_recomendados"
+             rows="2"
+             placeholder="Estudios que recomienda realizar..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- TRATAMIENTO ACTUAL -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-pills text-pink-500"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Tratamiento Actual</h4>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Tratamiento Actual -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Tratamiento Actual
+         </label>
+         <textarea
+           formControlName="tratamiento_actual"
+           rows="3"
+           placeholder="Tratamiento que está recibiendo actualmente..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <!-- Medicamentos Administrados -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Medicamentos Administrados
+           </label>
+           <textarea
+             formControlName="medicamentos_administrados"
+             rows="3"
+             placeholder="Medicamentos administrados recientemente..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+
+         <!-- Medidas Tomadas -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Medidas Terapéuticas Tomadas
+           </label>
+           <textarea
+             formControlName="medidas_tomadas"
+             rows="3"
+             placeholder="Otras medidas terapéuticas implementadas..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- RESPUESTA DEL ESPECIALISTA -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-user-md text-blue-600"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Respuesta del Especialista</h4>
+       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Completar cuando se reciba la respuesta</span>
+     </div>
+
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+       <!-- Médico Consultor -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Médico Consultor
+         </label>
+         <input
+           type="text"
+           formControlName="medico_consultor"
+           placeholder="Nombre del especialista que responde"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+       </div>
+
+       <!-- Fecha de Respuesta -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Fecha de Respuesta
+         </label>
+         <input
+           type="date"
+           formControlName="fecha_respuesta"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+       </div>
+
+       <!-- Hora de Evaluación -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Hora de Evaluación
+         </label>
+         <input
+           type="time"
+           formControlName="hora_evaluacion"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+       </div>
+
+       <!-- Estado -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Estado de la Interconsulta
+         </label>
+         <select
+           formControlName="estado_interconsulta"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+           <option value="Pendiente">Pendiente</option>
+           <option value="En Proceso">En Proceso</option>
+           <option value="Respondida">Respondida</option>
+         </select>
+       </div>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Impresión Diagnóstica -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Impresión Diagnóstica del Especialista
+         </label>
+         <textarea
+           formControlName="impresion_diagnostica"
+           rows="3"
+           placeholder="Impresión diagnóstica del especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Diagnóstico del Especialista -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Diagnóstico del Especialista
+         </label>
+         <textarea
+           formControlName="diagnostico_especialista"
+           rows="2"
+           placeholder="Diagnóstico establecido por el especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Comentarios del Especialista -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Comentarios del Especialista
+         </label>
+         <textarea
+           formControlName="comentarios_especialista"
+           rows="3"
+           placeholder="Comentarios adicionales del especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+     </div>
+   </div>
+
+   <!-- RECOMENDACIONES -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-lightbulb text-yellow-500"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Recomendaciones del Especialista</h4>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Recomendaciones Principales -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Recomendaciones Principales
+         </label>
+         <textarea
+           formControlName="recomendaciones"
+           rows="4"
+           placeholder="Recomendaciones del especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Plan de Manejo -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Plan de Manejo
+         </label>
+         <textarea
+           formControlName="plan_manejo"
+           rows="3"
+           placeholder="Plan de manejo sugerido..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <!-- Medicamentos Sugeridos -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Medicamentos Sugeridos
+           </label>
+           <textarea
+             formControlName="medicamentos_sugeridos"
+             rows="3"
+             placeholder="Medicamentos recomendados..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+
+         <!-- Estudios Adicionales -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Estudios Adicionales
+           </label>
+           <textarea
+             formControlName="estudios_adicionales"
+             rows="3"
+             placeholder="Estudios adicionales recomendados..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- SEGUIMIENTO -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-calendar-check text-green-600"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Seguimiento</h4>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Requiere Seguimiento -->
+       <div>
+         <label class="flex items-center space-x-2">
+           <input
+             type="checkbox"
+             formControlName="requiere_seguimiento"
+             class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+           <span class="text-sm font-medium text-gray-700">Requiere seguimiento por especialista</span>
+         </label>
+       </div>
+
+       <div *ngIf="notaInterconsultaForm.get('requiere_seguimiento')?.value" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <!-- Tipo de Seguimiento -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Tipo de Seguimiento
+           </label>
+           <select
+             formControlName="tipo_seguimiento"
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+             <option value="">Seleccionar tipo</option>
+             <option value="Consulta externa">Consulta externa</option>
+             <option value="Hospitalización">Hospitalización</option>
+             <option value="Urgencias">Urgencias si es necesario</option>
+             <option value="Telemedicina">Telemedicina</option>
+           </select>
+         </div>
+
+         <!-- Frecuencia -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Frecuencia de Seguimiento
+           </label>
+           <select
+             formControlName="frecuencia_seguimiento"
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+             <option value="">Seleccionar frecuencia</option>
+             <option value="1 semana">1 semana</option>
+             <option value="2 semanas">2 semanas</option>
+             <option value="1 mes">1 mes</option>
+             <option value="3 meses">3 meses</option>
+             <option value="6 meses">6 meses</option>
+             <option value="Según evolución">Según evolución</option>
+           </select>
+         </div>
+       </div>
+
+       <!-- Opciones de Manejo -->
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="requiere_hospitalizacion"
+               class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+             <span class="text-sm font-medium text-gray-700">Requiere hospitalización</span>
+           </label>
+         </div>
+
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="requiere_cirugia"
+               class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+             <span class="text-sm font-medium text-gray-700">Requiere cirugía</span>
+           </label>
+         </div>
+
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="manejo_conjunto"
+               class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+             <span class="text-sm font-medium text-gray-700">Manejo conjunto</span>
+           </label>
+         </div>
+       </div>
+
+       <!-- Otras Especialidades -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Otras Especialidades Requeridas
+         </label>
+         <input
+           type="text"
+           formControlName="otras_especialidades"
+           placeholder="Otras especialidades que deben evaluar al paciente"
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+       </div>
+     </div>
+   </div>
+
+   <!-- PRONÓSTICO -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-chart-line text-indigo-600"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Pronóstico y Signos de Alarma</h4>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Pronóstico -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Pronóstico del Especialista
+         </label>
+         <textarea
+           formControlName="pronostico_especialista"
+           rows="2"
+           placeholder="Pronóstico según el especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <!-- Complicaciones Posibles -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Complicaciones Posibles
+           </label>
+           <textarea
+             formControlName="complicaciones_posibles"
+             rows="3"
+             placeholder="Posibles complicaciones a vigilar..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+
+         <!-- Signos de Alarma -->
+         <div>
+           <label class="block text-sm font-medium text-gray-700 mb-1">
+             Signos de Alarma
+           </label>
+           <textarea
+             formControlName="signos_alarma"
+             rows="3"
+             placeholder="Signos de alarma que requieren atención inmediata..."
+             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- OBSERVACIONES ADICIONALES -->
+   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-comment-alt text-gray-500"></i>
+       <h4 class="text-lg font-semibold text-gray-800">Observaciones Adicionales</h4>
+     </div>
+
+     <div class="grid grid-cols-1 gap-4">
+       <!-- Observaciones del Solicitante -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Observaciones del Médico Solicitante
+         </label>
+         <textarea
+           formControlName="observaciones_solicitante"
+           rows="3"
+           placeholder="Observaciones adicionales del médico que solicita..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Observaciones del Especialista -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Observaciones del Especialista
+         </label>
+         <textarea
+           formControlName="observaciones_especialista"
+           rows="3"
+           placeholder="Observaciones adicionales del especialista..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+
+       <!-- Observaciones Adicionales -->
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">
+           Otras Observaciones
+         </label>
+         <textarea
+           formControlName="observaciones_adicionales"
+           rows="2"
+           placeholder="Otras observaciones relevantes..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+       </div>
+     </div>
+   </div>
+
+   <!-- VALIDACIONES FINALES -->
+   <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+     <div class="flex items-center space-x-2 mb-4">
+       <i class="fas fa-clipboard-check text-purple-600"></i>
+       <h4 class="text-lg font-semibold text-purple-800">Validaciones Finales</h4>
+     </div>
+
+     <div class="space-y-4">
+       <label class="flex items-start space-x-3">
+         <input
+           type="checkbox"
+           formControlName="solicitud_completa"
+           class="rounded border-purple-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 mt-1"
+           [class.border-red-500]="notaInterconsultaForm.get('solicitud_completa')?.invalid && notaInterconsultaForm.get('solicitud_completa')?.touched">
+         <span class="text-sm text-purple-800">
+           <strong>La solicitud de interconsulta está completa</strong> y contiene toda la información clínica relevante.
+         </span>
+       </label>
+
+       <label class="flex items-start space-x-3">
+         <input
+           type="checkbox"
+           formControlName="informacion_verificada"
+           class="rounded border-purple-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 mt-1"
+           [class.border-red-500]="notaInterconsultaForm.get('informacion_verificada')?.invalid && notaInterconsultaForm.get('informacion_verificada')?.touched">
+         <span class="text-sm text-purple-800">
+           <strong>He verificado toda la información</strong> y confirmo que es precisa y actualizada.
+         </span>
+       </label>
+
+       <!-- Control de Calidad -->
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="interconsulta_necesaria"
+               class="rounded border-purple-300 text-purple-600 shadow-sm">
+             <span class="text-sm text-purple-800">Interconsulta necesaria</span>
+           </label>
+         </div>
+
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="informacion_suficiente"
+               class="rounded border-purple-300 text-purple-600 shadow-sm">
+             <span class="text-sm text-purple-800">Información suficiente</span>
+           </label>
+         </div>
+
+         <div>
+           <label class="flex items-center space-x-2">
+             <input
+               type="checkbox"
+               formControlName="pregunta_clara"
+               class="rounded border-purple-300 text-purple-600 shadow-sm">
+             <span class="text-sm text-purple-800">Pregunta clara</span>
+           </label>
+         </div>
+       </div>
+
+       <!-- Mensaje de error si faltan validaciones -->
+       <div *ngIf="(notaInterconsultaForm.get('solicitud_completa')?.invalid ||
+                    notaInterconsultaForm.get('informacion_verificada')?.invalid) &&
+                   (notaInterconsultaForm.get('solicitud_completa')?.touched ||
+                    notaInterconsultaForm.get('informacion_verificada')?.touched)"
+            class="text-red-600 text-sm font-medium bg-red-100 p-3 rounded-md">
+         <i class="fas fa-exclamation-circle mr-2"></i>
+         Las validaciones finales son obligatorias para enviar la interconsulta.
+       </div>
+     </div>
+   </div>
+
+   <!-- BOTONES DE ACCIÓN ÉPICOS -->
+   <div class="flex justify-end space-x-3 pt-4 border-t">
+     <button
+       type="button"
+       (click)="resetearFormularioActual()"
+       class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+       <i class="fas fa-eraser mr-2"></i>
+       Limpiar
+     </button>
+
+     <button
+       type="button"
+       (click)="guardarFormularioActivo()"
+       [disabled]="!notaInterconsultaForm.valid || isCreatingDocument"
+       class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg">
+       <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+       <i *ngIf="!isCreatingDocument" class="fas fa-trophy mr-2"></i>
+       {{ isCreatingDocument ? 'Procesando...' : '¡COMPLETAR AL 100%!' }}
+     </button>
+   </div>
+
+   <!-- MENSAJE ÉPICO FINAL -->
+   <div class="text-center pt-4">
+     <div class="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg p-4">
+       <p class="text-lg font-bold text-purple-800">🎉 ¡ÚLTIMO DOCUMENTO DEL PROYECTO SICEG-HG! 🎉</p>
+       <p class="text-sm text-purple-600">Campos marcados con * son obligatorios según NOM-004-SSA3-2012</p>
+       <p class="text-xs text-purple-500 mt-2">Al completar este formulario alcanzarás el 100% del sistema hospitalario</p>
+     </div>
+   </div>
+ </form>
+</div>
 
 
     <!-- Modal para editar número administrativo -->

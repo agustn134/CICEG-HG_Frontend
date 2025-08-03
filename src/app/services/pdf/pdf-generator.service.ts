@@ -235,6 +235,10 @@ export class PdfGeneratorService {
       case 'Postoperatoria':
         documentDefinition = await this.pdfTemplatesService.generarNotaPostoperatoria(datosParaTemplate);
         break;
+      case 'Nota de Interconsulta':
+case 'Interconsulta':
+  documentDefinition = await this.pdfTemplatesService.generarNotaInterconsulta(datosParaTemplate);
+  break;
       default:
         throw new Error(`Documento ${tipoDocumento} no implementado aún`);
     }
