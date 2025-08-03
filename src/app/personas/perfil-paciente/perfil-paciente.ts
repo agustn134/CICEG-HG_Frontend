@@ -322,9 +322,9 @@ presentacionesDisponibles: string[] = [];
     historiaClinica: { nombre: 'Historia Clínica', icono: 'fas fa-file-medical-alt', obligatorio: true, frecuente: true, completado: false },
     notaUrgencias: {nombre: 'Nota Urgencias',icono: 'fas fa-ambulance',obligatorio: true,frecuente: true,completado: false},
     notaEvolucion: {nombre: 'Evolución', icono:'fas fa-chart-line', obligatorio: false,frecuente: true,completado: false},
-    notaPreoperatoria: {nombre: 'Preoperatoria',icono: 'fas fa-user-md',obligatorio: false,frecuente: false,completado: false},
+    notaPreoperatoria: {nombre: 'Preoperatoria',icono: 'fas fa-user-md',obligatorio: true,frecuente: false,completado: false},
     notaPreanestesica: {nombre: 'Preanestésica',icono: 'fas fa-syringe',obligatorio: false,frecuente: false,completado: false },
-    notaPostoperatoria: {nombre: 'Postoperatoria',icono: 'fas fa-bed',obligatorio: false,frecuente: false,completado: false},
+    notaPostoperatoria: {nombre: 'Postoperatoria',icono: 'fas fa-bed',obligatorio: true,frecuente: false,completado: false},
     notaPostanestesica: {nombre: 'Postanestésica',icono: 'fas fa-clock',obligatorio: false,frecuente: false,completado: false},
     consentimiento: {nombre: 'Consentimiento',icono: 'fas fa-signature',obligatorio: true,frecuente: false,completado: false},
     solicitudEstudio: {nombre: 'Solicitud Estudio',icono: 'fas fa-microscope',obligatorio: false,frecuente: true,completado: false},
@@ -336,9 +336,9 @@ presentacionesDisponibles: string[] = [];
     prescripcionMedicamento: { nombre: 'Prescripción',icono: 'fas fa-prescription-bottle-alt',obligatorio: false,frecuente: true,completado: false},
     registroTransfusion: {nombre: 'Transfusión',icono: 'fas fa-tint',obligatorio: false,frecuente: false,completado: false},
     hojaFrontal: {nombre: 'Hoja Frontal',icono: 'fas fa-file-alt',obligatorio: true,frecuente: false,completado: false},
-    altaVoluntaria: {nombre: 'Alta Voluntaria',icono: 'fas fa-door-open',obligatorio: false,frecuente: false,completado: false},
-  referenciaTraslado: { nombre: 'Referencia y Contrarreferencia', icono: 'fas fa-share', obligatorio: false, frecuente: true, completado: false },
-  historiaClinicaPediatrica: {nombre: 'Historia Clínica Pediátrica',icono: 'fas fa-baby-carriage',obligatorio: true,frecuente: true,completado: false},
+    altaVoluntaria: {nombre: 'Alta Voluntaria',icono: 'fas fa-door-open',obligatorio: false,frecuente: true,completado: false},
+    referenciaTraslado: { nombre: 'Referencia y Contrarreferencia', icono: 'fas fa-share', obligatorio: false, frecuente: true, completado: false },
+    historiaClinicaPediatrica: {nombre: 'Historia Clínica Pediátrica',icono: 'fas fa-baby-carriage',obligatorio: true,frecuente: true,completado: false},
     antecedentesHeredoFamiliares: {nombre: 'Antecedentes Heredo-Familiares',icono: 'fas fa-dna',obligatorio: true,frecuente: true,completado: false},
     antecedentesPerinatales: {nombre: 'Antecedentes Perinatales',icono: 'fas fa-baby', obligatorio: true,frecuente: true,completado: false},
     estadoNutricionalPediatrico: {nombre: 'Estado Nutricional',icono: 'fas fa-weight',obligatorio: false,frecuente: true,completado: false},
@@ -766,82 +766,452 @@ private generarFolioConsentimiento(): string {
   return `CI-${fecha.getFullYear()}-${timestamp}`;
 }
 
- private initializeNotaPreoperatoriaForm(): FormGroup {
-   return this.fb.group({
-     motivo_cirugia: ['', Validators.required],
-     tecnica_propuesta: [''],
-     riesgo_quirurgico: [''],
-   });
- }
+private initializeNotaPreoperatoriaForm(): FormGroup {
+  return this.fb.group({
+    // Información del procedimiento programado (OBLIGATORIO NOM-004)
+    procedimiento_programado: ['', [Validators.required, Validators.minLength(10)]],
+    fecha_cirugia_programada: [new Date().toISOString().split('T')[0], [Validators.required]],
+    hora_programada: ['', [Validators.required]],
+    duracion_estimada_minutos: [null, [Validators.min(15), Validators.max(720)]], // 15 min a 12 horas
+
+    // Diagnósticos (OBLIGATORIO NOM-004)
+    diagnostico_preoperatorio: ['', [Validators.required, Validators.minLength(10)]],
+    id_guia_diagnostico: [null],
+    indicacion_quirurgica: ['', [Validators.required, Validators.minLength(15)]],
+
+    // Clasificación de riesgo (OBLIGATORIO NOM-004)
+    riesgo_quirurgico: ['Moderado', [Validators.required]],
+    clasificacion_asa: ['II', [Validators.required]], // ASA I-VI
+
+    // Antecedentes relevantes para cirugía
+    antecedentes_quirurgicos: [''],
+    antecedentes_anestesicos: [''],
+    alergias_conocidas: ['', [Validators.required]], // Obligatorio por seguridad
+    medicamentos_habituales: [''],
+    comorbilidades: [''],
+
+    // Examen físico preoperatorio (OBLIGATORIO NOM-004)
+    estado_general: ['', [Validators.required]],
+    exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
+    via_aerea: [''], // Importante para anestesia
+
+    // Signos vitales preoperatorios
+    temperatura_preop: [null, [Validators.min(35), Validators.max(42)]],
+    presion_arterial_sistolica: [null, [Validators.min(70), Validators.max(220)]],
+    presion_arterial_diastolica: [null, [Validators.min(40), Validators.max(120)]],
+    frecuencia_cardiaca: [null, [Validators.min(50), Validators.max(150)]],
+    frecuencia_respiratoria: [null, [Validators.min(12), Validators.max(30)]],
+    saturacion_oxigeno: [null, [Validators.min(90), Validators.max(100)]],
+    peso_actual: [null, [Validators.min(1), Validators.max(300)]],
+    talla_actual: [null, [Validators.min(50), Validators.max(250)]],
+
+    // Estudios preoperatorios (OBLIGATORIO NOM-004)
+    laboratorios_preoperatorios: ['', [Validators.required]],
+    estudios_imagen: [''],
+    electrocardiograma: [''],
+    estudios_adicionales: [''],
+
+    // Interconsultas
+    interconsultas_realizadas: [''],
+    valoracion_cardiologica: [''],
+    valoracion_anestesiologica: [''],
+    otras_valoraciones: [''],
+
+    // Preparación preoperatoria (OBLIGATORIO NOM-004)
+    ayuno_indicado: ['8 horas para sólidos, 2 horas para líquidos claros', [Validators.required]],
+    preparacion_intestinal: [false],
+    profilaxis_antibiotica: [''],
+    medicacion_preanestesica: [''],
+    suspender_medicamentos: [''],
+
+    // Planificación quirúrgica
+    tipo_anestesia_propuesta: ['', [Validators.required]],
+    tecnica_quirurgica_planeada: ['', [Validators.required]],
+    equipo_quirurgico: [''],
+    material_especial: [''],
+
+    // Consentimiento y autorizaciones (OBLIGATORIO NOM-004)
+    consentimiento_informado: [false, [Validators.requiredTrue]],
+    autorizacion_familiar: [false],
+    riesgos_explicados: ['', [Validators.required, Validators.minLength(30)]],
+    alternativas_explicadas: [''],
+
+    // Personal médico asignado
+    cirujano_principal: ['', [Validators.required]],
+    ayudante_cirugia: [''],
+    anestesiologo_asignado: [''],
+    instrumentista_asignada: [''],
+
+    // Indicaciones preoperatorias específicas
+    indicaciones_preoperatorias: ['', [Validators.required]],
+    cuidados_especiales: [''],
+    restricciones_preoperatorias: [''],
+
+    // Información para quirófano
+    quirofano_asignado: [''],
+    posicion_quirurgica: [''],
+    tipo_monitorizacion: [''],
+    accesos_vasculares: [''],
+
+    // Condiciones especiales
+    requiere_cuidados_intensivos: [false],
+    transfusion_programada: [false],
+    banco_sangre_reservado: [false],
+    unidades_sangre_reservadas: [null],
+
+    // Observaciones y notas
+    observaciones: [''],
+    consideraciones_especiales: [''],
+    fecha_ultima_evaluacion: [new Date().toISOString().split('T')[0]],
+
+    // Control de calidad
+    evaluacion_completa: [false, [Validators.requiredTrue]],
+    paciente_apto_cirugia: [false, [Validators.requiredTrue]]
+  });
+}
+// ===================================
+// NOTA PREOPERATORIA
+// ===================================
+
+async guardarNotaPreoperatoria(): Promise<void> {
+  if (!this.notaPreoperatoriaForm.valid) {
+    this.marcarCamposInvalidos(this.notaPreoperatoriaForm);
+    this.error = 'Por favor complete todos los campos obligatorios para la evaluación preoperatoria.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Nota Preoperatoria');
+    }
+
+    // Preparar datos para la nota preoperatoria
+    const notaPreoperatoriaData = {
+      id_documento: this.documentoClinicoActual!,
+      ...this.notaPreoperatoriaForm.value,
+      // Campos calculados
+      folio_preoperatorio: this.generarFolioPreoperatorio(),
+      fecha_evaluacion: new Date().toISOString(),
+      medico_evaluador: this.medicoActual
+    };
+
+    // Guardar nota preoperatoria (integrar con servicio backend cuando esté listo)
+    console.log('📄 Datos de nota preoperatoria preparados:', notaPreoperatoriaData);
+
+    this.success = '⚕️ Nota Preoperatoria guardada correctamente';
+    this.formularioEstado.notaPreoperatoria = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFNotaPreoperatoria();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar nota preoperatoria:', error);
+    this.error = 'Error al guardar la nota preoperatoria. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFNotaPreoperatoria(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      notaPreoperatoria: {
+        ...this.notaPreoperatoriaForm.value,
+        folio_preoperatorio: this.generarFolioPreoperatorio()
+      }
+    });
+
+    console.log('✅ PDF de Nota Preoperatoria generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la nota preoperatoria';
+  }
+}
+
+private generarFolioPreoperatorio(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `PREOP-${fecha.getFullYear()}-${timestamp}`;
+}
+
+// Método auxiliar para calcular IMC
+calcularIMC(): number | null {
+  const peso = this.notaPreoperatoriaForm.get('peso_actual')?.value;
+  const talla = this.notaPreoperatoriaForm.get('talla_actual')?.value;
+
+  if (peso && talla && talla > 0) {
+    const tallaMetros = talla / 100;
+    return Math.round((peso / (tallaMetros * tallaMetros)) * 100) / 100;
+  }
+  return null;
+}
 
  private initializeNotaPostoperatoriaForm(): FormGroup {
-   return this.fb.group({
-     // Información básica
-     fecha_cirugia: ['', Validators.required],
-     duracion_cirugia: [null],
+  return this.fb.group({
+    // Información básica de la cirugía (OBLIGATORIO NOM-004)
+    fecha_cirugia: [new Date().toISOString().split('T')[0], [Validators.required]],
+    hora_inicio: ['', [Validators.required]],
+    hora_fin: ['', [Validators.required]],
+    duracion_cirugia: [null, [Validators.min(1), Validators.max(720)]], // 1 min a 12 horas
+    quirofano_utilizado: [''],
 
-     // Diagnósticos (NOM-004: 8.8.1 y 8.8.4)
-     diagnostico_preoperatorio: ['', Validators.required],
-     diagnostico_postoperatorio: ['', Validators.required],
+    // Diagnósticos (OBLIGATORIO NOM-004: 8.8.1 y 8.8.4)
+    diagnostico_preoperatorio: ['', [Validators.required, Validators.minLength(10)]],
+    diagnostico_postoperatorio: ['', [Validators.required, Validators.minLength(10)]],
+    diagnosticos_adicionales: [''],
 
-     // Procedimientos (NOM-004: 8.8.2 y 8.8.3)
-     operacion_planeada: ['', Validators.required],
-     operacion_realizada: ['', Validators.required],
+    // Procedimientos realizados (OBLIGATORIO NOM-004: 8.8.2 y 8.8.3)
+    operacion_planeada: ['', [Validators.required, Validators.minLength(10)]],
+    operacion_realizada: ['', [Validators.required, Validators.minLength(10)]],
+    procedimientos_adicionales: [''],
+    modificaciones_plan_original: [''],
 
-     // Técnica y hallazgos (NOM-004: 8.8.5 y 8.8.6)
-     descripcion_tecnica: ['', Validators.required],
-     hallazgos_transoperatorios: ['', Validators.required],
+    // Técnica quirúrgica (OBLIGATORIO NOM-004: 8.8.5)
+    descripcion_tecnica: ['', [Validators.required, Validators.minLength(30)]],
+    tipo_anestesia_utilizada: ['', [Validators.required]],
+    posicion_paciente: [''],
+    abordaje_quirurgico: [''],
+    instrumental_utilizado: [''],
 
-     // Conteo (NOM-004: 8.8.7)
-     conteo_gasas_completo: ['', Validators.required],
-     conteo_instrumental_completo: ['', Validators.required],
-     observaciones_conteo: [''],
+    // Hallazgos transoperatorios (OBLIGATORIO NOM-004: 8.8.6)
+    hallazgos_transoperatorios: ['', [Validators.required, Validators.minLength(20)]],
+    hallazgos_inesperados: [''],
+    anatomia_patologica: [''],
 
-     // Incidentes y sangrado (NOM-004: 8.8.8 y 8.8.9)
-     incidentes_accidentes: ['', Validators.required],
-     sangrado: [0, [Validators.required, Validators.min(0)]],
-     transfusiones_realizadas: [false],
-     detalles_transfusiones: [''],
+    // Conteo de material (OBLIGATORIO NOM-004: 8.8.7)
+    conteo_gasas_completo: ['Correcto', [Validators.required]],
+    conteo_instrumental_completo: ['Correcto', [Validators.required]],
+    conteo_compresas_completo: ['Correcto'],
+    observaciones_conteo: [''],
+    conteo_realizado_por: [''],
 
-     // Estudios (NOM-004: 8.8.10)
-     estudios_transoperatorios: ['', Validators.required],
+    // Incidentes y complicaciones (OBLIGATORIO NOM-004: 8.8.8)
+    incidentes_accidentes: ['Sin incidentes', [Validators.required]],
+    complicaciones_transoperatorias: [''],
+    medidas_correctivas: [''],
 
-     // Equipo quirúrgico (NOM-004: 8.8.11)
-     cirujano_principal: ['', Validators.required],
-     ayudantes: ['', Validators.required],
-     instrumentista: ['', Validators.required],
-     anestesiologo: ['', Validators.required],
-     circulante: ['', Validators.required],
+    // Sangrado y pérdidas (OBLIGATORIO NOM-004: 8.8.9)
+    sangrado_estimado: [0, [Validators.required, Validators.min(0)]],
+    sangrado_cuantificado: [false],
+    metodo_hemostasia: [''],
 
-     // Estado y plan (NOM-004: 8.8.12 y 8.8.13)
-     estado_postquirurgico: ['', Validators.required],
-     plan_postoperatorio: ['', Validators.required],
+    // Transfusiones
+    transfusiones_realizadas: [false],
+    tipo_componente_transfundido: [''],
+    volumen_transfundido: [null],
+    reacciones_transfusionales: [''],
 
-     // Pronóstico (NOM-004: 8.8.14)
-     pronostico: ['', Validators.required],
+    // Líquidos y balance
+    liquidos_administrados: [null],
+    diuresis_transoperatoria: [null],
+    balance_hidroelectrolitico: [''],
 
-     // Piezas (NOM-004: 8.8.15)
-     piezas_enviadas_patologia: ['', Validators.required],
-     se_enviaron_piezas: [false],
-     numero_registro_patologia: [''],
+    // Estudios transoperatorios (OBLIGATORIO NOM-004: 8.8.10)
+    estudios_transoperatorios: ['No se realizaron estudios transoperatorios', [Validators.required]],
+    biopsias_realizadas: [false],
+    detalles_biopsias: [''],
+    cultivos_tomados: [false],
+    detalles_cultivos: [''],
 
-     // Otros hallazgos (NOM-004: 8.8.16)
-     otros_hallazgos: ['', Validators.required],
+    // Especímenes enviados
+    piezas_enviadas_patologia: [false],
+    descripcion_especimenes: [''],
+    numero_frascos_patologia: [null],
 
-     // Responsabilidad (NOM-004: 8.8.17)
-     nombre_responsable_cirugia: ['', Validators.required],
-     cedula_responsable_cirugia: [''],
-     especialidad_responsable: [''],
-     firma_responsable_verificada: [false],
+    // Equipo quirúrgico (OBLIGATORIO NOM-004: 8.8.11)
+    cirujano_principal: ['', [Validators.required]],
+    primer_ayudante: [''],
+    segundo_ayudante: [''],
+    instrumentista: ['', [Validators.required]],
+    anestesiologo: ['', [Validators.required]],
+    circulante: ['', [Validators.required]],
 
-     // Información adicional
-     quirofano: [''],
-     tipo_anestesia: [''],
-     hora_inicio: [''],
-     hora_fin: [''],
-     observaciones_adicionales: [''],
-   });
- }
+    // Estado del paciente (OBLIGATORIO NOM-004: 8.8.12)
+    estado_postquirurgico: ['', [Validators.required, Validators.minLength(15)]],
+    signos_vitales_finales: [''],
+    estabilidad_hemodinamica: ['Estable'],
+    estado_conciencia: [''],
+    dolor_postoperatorio: [''],
+
+    // Destino postoperatorio
+    destino_paciente: ['', [Validators.required]],
+    requiere_cuidados_intensivos: [false],
+    justificacion_uci: [''],
+
+    // Plan postoperatorio (OBLIGATORIO NOM-004: 8.8.13)
+    plan_postoperatorio: ['', [Validators.required, Validators.minLength(30)]],
+    indicaciones_postoperatorias: ['', [Validators.required]],
+    dieta_postoperatoria: [''],
+    movilizacion_temprana: [''],
+    cuidados_herida: [''],
+
+    // Medicación postoperatoria
+    analgesia_prescrita: [''],
+    antibioticos_postoperatorios: [''],
+    otros_medicamentos: [''],
+
+    // Pronóstico (OBLIGATORIO NOM-004: 8.8.14)
+    pronostico: ['', [Validators.required]],
+    expectativa_recuperacion: [''],
+    complicaciones_esperadas: [''],
+    seguimiento_requerido: [''],
+
+    // Información para familiares
+    informacion_familiares: [''],
+    explicacion_resultado: [''],
+    recomendaciones_familiares: [''],
+
+    // Control de calidad
+    cirugia_sin_complicaciones: [true],
+    objetivos_alcanzados: [true],
+    satisfaccion_resultado: [''],
+
+    // Observaciones adicionales
+    observaciones_cirujano: [''],
+    observaciones_anestesiologo: [''],
+    observaciones_enfermeria: [''],
+
+    // Información administrativa
+    tiempo_quirofano: [null], // Tiempo total de ocupación
+    material_implantado: [''],
+    costo_estimado_adicional: [null],
+
+    // Seguimiento
+    fecha_primer_control: [''],
+    fecha_retiro_puntos: [''],
+    incapacidad_dias: [null],
+
+    // Validaciones finales
+    nota_completa: [false, [Validators.requiredTrue]],
+    revision_cirujano: [false, [Validators.requiredTrue]]
+  });
+}
+
+// ===================================
+// NOTA POSTOPERATORIA
+// ===================================
+
+async guardarNotaPostoperatoria(): Promise<void> {
+  if (!this.notaPostoperatoriaForm.valid) {
+    this.marcarCamposInvalidos(this.notaPostoperatoriaForm);
+    this.error = 'Por favor complete todos los campos obligatorios del registro postoperatorio.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Nota Postoperatoria');
+    }
+
+    // Calcular duración si se tienen horas
+    const duracionCalculada = this.calcularDuracionCirugia();
+
+    // Preparar datos para la nota postoperatoria
+    const notaPostoperatoriaData = {
+      id_documento: this.documentoClinicoActual!,
+      ...this.notaPostoperatoriaForm.value,
+      // Campos calculados
+      duracion_cirugia: duracionCalculada,
+      folio_postoperatorio: this.generarFolioPostoperatorio(),
+      fecha_elaboracion: new Date().toISOString(),
+      medico_responsable: this.medicoActual
+    };
+
+    // Guardar nota postoperatoria (integrar con servicio backend cuando esté listo)
+    console.log('📄 Datos de nota postoperatoria preparados:', notaPostoperatoriaData);
+
+    this.success = '⚕️ Nota Postoperatoria guardada correctamente';
+    this.formularioEstado.notaPostoperatoria = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFNotaPostoperatoria();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar nota postoperatoria:', error);
+    this.error = 'Error al guardar la nota postoperatoria. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFNotaPostoperatoria(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Nota Postoperatoria', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      notaPostoperatoria: {
+        ...this.notaPostoperatoriaForm.value,
+        folio_postoperatorio: this.generarFolioPostoperatorio(),
+        duracion_calculada: this.calcularDuracionCirugia()
+      }
+    });
+
+    console.log('✅ PDF de Nota Postoperatoria generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la nota postoperatoria';
+  }
+}
+
+private generarFolioPostoperatorio(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `POSTOP-${fecha.getFullYear()}-${timestamp}`;
+}
+
+public calcularDuracionCirugia(): number | null {
+  const horaInicio = this.notaPostoperatoriaForm.get('hora_inicio')?.value;
+  const horaFin = this.notaPostoperatoriaForm.get('hora_fin')?.value;
+
+  if (horaInicio && horaFin) {
+    const inicio = new Date(`2000-01-01T${horaInicio}`);
+    const fin = new Date(`2000-01-01T${horaFin}`);
+    const diferencia = fin.getTime() - inicio.getTime();
+    return Math.round(diferencia / (1000 * 60)); // Minutos
+  }
+  return null;
+}
+
+// Método para formatear la duración
+formatearDuracion(minutos: number | null): string {
+  if (!minutos) return 'No calculada';
+
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+
+  if (horas > 0) {
+    return `${horas}h ${mins}min`;
+  }
+  return `${mins} minutos`;
+}
 
  private initializeNotaPreanestesicaForm(): FormGroup {
    return this.fb.group({
@@ -1609,16 +1979,6 @@ private initializeNotaUrgenciasForm(): FormGroup {
 }
 
 
-
-
-
-
-
-
-
-
-
-
  private initializeReferenciaForm(): FormGroup {
   return this.fb.group({
     // Información de la institución destino (OBLIGATORIO NOM-004)
@@ -1752,6 +2112,7 @@ private generarFolioReferencia(): string {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////INITIALIZE
  private initializeControlCrecimientoForm(): FormGroup {
    return this.fb.group({
      peso: ['', [Validators.required, Validators.min(0.1), Validators.max(200)]],
@@ -2115,24 +2476,181 @@ private generarFolioReferencia(): string {
    });
  }
 
- private initializeAltaVoluntariaForm(): FormGroup {
-   return this.fb.group({
-     fecha_egreso: ['', Validators.required],
-     hora_egreso: ['', Validators.required],
-     nombre_solicitante: ['', Validators.required],
-     parentesco: ['', Validators.required],
-     edad_solicitante: [null, [Validators.required, Validators.min(18), Validators.max(120)]],
-     resumen_clinico: ['', Validators.required],
-     motivo_egreso: [''],
-    recomendaciones_medicas: ['', Validators.required],
-     factores_riesgo: [''],
-     continua_tratamiento_externo: [false],
-     establecimiento_destino: [''],
-     testigo1_nombre: ['', Validators.required],
-     testigo2_nombre: ['', Validators.required],
-     medico_autoriza: ['', Validators.required],
-   });
- }
+private initializeAltaVoluntariaForm(): FormGroup {
+  return this.fb.group({
+    // Información básica del alta (OBLIGATORIO NOM-004)
+    fecha_egreso: [new Date().toISOString().split('T')[0], [Validators.required]],
+    hora_egreso: [new Date().toTimeString().slice(0, 5), [Validators.required]],
+    tipo_alta: ['CONTRA_OPINION_MEDICA', [Validators.required]],
+
+    // Motivo del alta voluntaria (OBLIGATORIO NOM-004)
+    motivo_alta_voluntaria: ['', [Validators.required, Validators.minLength(20)]],
+    motivo_egreso: [''],
+
+    // Información médica actual (OBLIGATORIO NOM-004)
+    diagnostico_actual: ['', [Validators.required, Validators.minLength(10)]],
+    estado_clinico_actual: ['', [Validators.required, Validators.minLength(15)]],
+    resumen_clinico: ['', [Validators.required, Validators.minLength(30)]],
+
+    // Tratamiento y recomendaciones (OBLIGATORIO NOM-004)
+    tratamiento_recomendado: ['', [Validators.required, Validators.minLength(20)]],
+    riesgos_explicados: ['', [Validators.required, Validators.minLength(30)]],
+    consecuencias_informadas: ['', [Validators.required, Validators.minLength(20)]],
+    recomendaciones_medicas: ['', [Validators.required, Validators.minLength(15)]],
+
+    // Cuidados y seguimiento
+    medicamentos_prescritos: [''],
+    cuidados_domiciliarios: [''],
+    signos_alarma: [''],
+    cuando_regresar: ['Ante cualquier complicación o deterioro'],
+    cita_control: [''],
+
+    // Pronóstico y complicaciones
+    pronostico_sin_tratamiento: [''],
+    complicaciones_posibles: [''],
+    alternativas_tratamiento: [''],
+
+    // Responsable de la decisión (OBLIGATORIO NOM-004)
+    paciente_decide: [true, [Validators.required]],
+    nombre_responsable: ['', [Validators.required]],
+    parentesco_responsable: ['paciente', [Validators.required]],
+    identificacion_responsable: [''],
+    edad_responsable: [null, [Validators.min(18), Validators.max(120)]],
+    motivo_responsabilidad: [''], // Solo si no es el paciente
+
+    // Testigos (OBLIGATORIO NOM-004)
+    testigo1_nombre: ['', [Validators.required]],
+    testigo1_identificacion: [''],
+    testigo1_telefono: [''],
+    testigo2_nombre: ['', [Validators.required]],
+    testigo2_identificacion: [''],
+    testigo2_telefono: [''],
+
+    // Información médica del egreso
+    medico_autoriza: ['', [Validators.required]],
+    servicio_medico: [''],
+    numero_cama: [''],
+
+    // Condiciones del egreso
+    condiciones_egreso: [''],
+    medio_transporte: [''],
+    acompañado_por: [''],
+    continua_tratamiento_externo: [false],
+    establecimiento_destino: [''],
+
+    // Información administrativa
+    pendiente_pago: [false],
+    monto_pendiente: [null],
+    convenio_pago: [''],
+
+    // Confirmaciones (OBLIGATORIO para protección legal)
+    confirma_riesgos_entendidos: [false, [Validators.requiredTrue]],
+    confirma_consecuencias_claras: [false, [Validators.requiredTrue]],
+    confirma_decision_voluntaria: [false, [Validators.requiredTrue]],
+    confirma_recomendaciones_recibidas: [false, [Validators.requiredTrue]],
+
+    // Observaciones
+    observaciones_medicas: [''],
+    observaciones_enfermeria: [''],
+    observaciones_adicionales: ['']
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===================================
+// ALTA VOLUNTARIA
+// ===================================
+
+async guardarAltaVoluntaria(): Promise<void> {
+  if (!this.altaVoluntariaForm.valid) {
+    this.marcarCamposInvalidos(this.altaVoluntariaForm);
+    this.error = 'Por favor complete todos los campos obligatorios y confirmaciones.';
+    return;
+  }
+
+  this.isCreatingDocument = true;
+  this.error = null;
+
+  try {
+    // Verificar que hay expediente
+    if (!this.pacienteCompleto?.expediente.id_expediente) {
+      throw new Error('No hay expediente disponible');
+    }
+
+    // Crear documento padre si no existe
+    if (!this.documentoClinicoActual) {
+      await this.crearDocumentoClinicoPadre('Alta Voluntaria');
+    }
+
+    // Preparar datos para el alta voluntaria
+    const altaVoluntariaData = {
+      id_documento: this.documentoClinicoActual!,
+      id_expediente: this.pacienteCompleto.expediente.id_expediente,
+      id_paciente: this.pacienteCompleto.paciente.id_paciente,
+      id_personal_medico: this.medicoActual!,
+      ...this.altaVoluntariaForm.value,
+      // Campos calculados
+      folio_alta: this.generarFolioAlta(),
+      fecha_elaboracion: new Date().toISOString()
+    };
+
+    // Guardar alta voluntaria (integrar con servicio backend cuando esté listo)
+    console.log('📄 Datos de alta voluntaria preparados:', altaVoluntariaData);
+
+    this.success = '🚪 Alta Voluntaria guardada correctamente';
+    this.formularioEstado.altaVoluntaria = true;
+
+    // Generar PDF automáticamente
+    await this.generarPDFAltaVoluntaria();
+
+  } catch (error: any) {
+    console.error('❌ Error al guardar alta voluntaria:', error);
+    this.error = 'Error al guardar el alta voluntaria. Por favor intente nuevamente.';
+  } finally {
+    this.isCreatingDocument = false;
+  }
+}
+
+private async generarPDFAltaVoluntaria(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Alta Voluntaria', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      altaVoluntaria: {
+        ...this.altaVoluntariaForm.value,
+        folio_alta: this.generarFolioAlta()
+      }
+    });
+
+    console.log('✅ PDF de Alta Voluntaria generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF del alta voluntaria';
+  }
+}
+
+private generarFolioAlta(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `AV-${fecha.getFullYear()}-${timestamp}`;
+}
 
  // ===================================
  // RESTO DE MÉTODOS Y PROPIEDADES
@@ -2296,17 +2814,34 @@ private generarFolioReferencia(): string {
         break;
 
         case 'notaUrgencias':
-  await this.guardarNotaUrgencias();
-  this.formularioEstado['notaUrgencias'] = true;
-  this.success = 'Nota de Urgencias guardada correctamente';
-  break;
+        await this.guardarNotaUrgencias();
+        this.formularioEstado['notaUrgencias'] = true;
+        this.success = 'Nota de Urgencias guardada correctamente';
+        break;
 
-  case 'referenciaTraslado':
+        case 'referenciaTraslado':
         await this.guardarReferenciaTraslado();
         this.formularioEstado['referenciaTraslado'] = true;
         this.success = 'Referencia y Contrarreferencia guardada correctamente';
         break;
 
+        case 'altaVoluntaria':
+        await this.guardarAltaVoluntaria();
+        this.formularioEstado['altaVoluntaria'] = true;
+        this.success = 'Alta Voluntaria guardada correctamente';
+        break;
+
+        case 'notaPreoperatoria':
+        await this.guardarNotaPreoperatoria();
+        this.formularioEstado['notaPreoperatoria'] = true;
+        this.success = 'Nota Preoperatoria guardada correctamente';
+        break;
+
+        case 'notaPostoperatoria':
+        await this.guardarNotaPostoperatoria();
+        this.formularioEstado['notaPostoperatoria'] = true;
+        this.success = 'Nota Postoperatoria guardada correctamente';
+        break;
 
        default:
          throw new Error('Tipo de formulario no válido');
@@ -2496,57 +3031,80 @@ case 'Nota de Urgencias Médicas':
    }, 2000);
  }
 
- cambiarFormulario(tipoFormulario: string): void {
-   if (this.formularioActivo === tipoFormulario) return;
+cambiarFormulario(tipoFormulario: string): void {
+  if (this.formularioActivo === tipoFormulario) return;
 
-   if (!this.puedeAccederFormulario(tipoFormulario)) {
-     this.mostrarMensajeValidacion(tipoFormulario);
-     return;
-   }
+  if (!this.puedeAccederFormulario(tipoFormulario)) {
+    this.mostrarMensajeValidacion(tipoFormulario);
+    return;
+  }
 
-   console.log(`Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`);
+  console.log(`Cambiando formulario de ${this.formularioActivo} a ${tipoFormulario}`);
 
-   const formulariosValidos: FormularioActivo[] = [
-  'signosVitales', 'historiaClinica', 'hojaFrontal', 'notaUrgencias', 'notaEvolucion',
-  'consentimiento', 'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica',
-  'notaPostanestesica', 'notaInterconsulta', 'controlCrecimiento', 'esquemaVacunacion',
-  'solicitudEstudio', 'referenciaTraslado', 'prescripcionMedicamento', 'solicitudCultivo',
-  'solicitudGasometria', 'altaVoluntaria'
-];
+  const formulariosValidos: FormularioActivo[] = [
+    // Principales
+    'signosVitales', 'historiaClinica', 'hojaFrontal',
+    // Clínicos
+    'notaUrgencias', 'notaEvolucion',
+    // Quirúrgicos ✅ ACTUALIZADO
+    'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica',
+    // Solicitudes
+    'solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria',
+    // Prescripciones
+    'prescripcionMedicamento', 'registroTransfusion',
+    // Administrativos
+    'referenciaTraslado', 'altaVoluntaria', 'consentimiento',
+    // Otros
+    'notaInterconsulta', 'controlCrecimiento', 'esquemaVacunacion'
+  ];
 
-   if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
-     this.error = null;
-     this.success = null;
-     this.formularioActivo = tipoFormulario as FormularioActivo;
-   } else {
-     console.warn(`Formulario no válido: ${tipoFormulario}`);
-   }
- }
+  if (formulariosValidos.includes(tipoFormulario as FormularioActivo)) {
+    this.error = null;
+    this.success = null;
+    this.formularioActivo = tipoFormulario as FormularioActivo;
+  } else {
+    console.warn(`Formulario no válido: ${tipoFormulario}`);
+  }
+}
 
- private getTituloFormulario(formulario: string): string {
-   const titulos: { [key: string]: string } = {
-     signosVitales: 'Signos Vitales',
-     historiaClinica: this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
-     hojaFrontal: 'Hoja Frontal',
-     notaUrgencias: 'Nota de Urgencias',
-     notaEvolucion: 'Nota de Evolución',
-     consentimiento: 'Consentimiento Informado',
-     notaInterconsulta: 'Nota de Interconsulta',
-     notaPreoperatoria: 'Nota Preoperatoria',
-     notaPostoperatoria: 'Nota Postoperatoria',
-     notaPreanestesica: 'Nota Preanestésica',
-     notaPostanestesica: 'Nota Postanestésica',
-     controlCrecimiento: 'Control de Crecimiento',
-     esquemaVacunacion: 'Esquema de Vacunación',
-     solicitudEstudio: 'Solicitud de Estudio',
- referenciaTraslado: 'Referencia y Contrarreferencia',
-      solicitudCultivo: 'Solicitud Cultivo',
-      prescripcionMedicamento: 'Prescripción de Medicamentos',
-     solicitudGasometria: 'Solicitud Gasometría',
-     altaVoluntaria: 'Alta Voluntaria',
-   };
-   return titulos[formulario] || formulario;
- }
+private getTituloFormulario(formulario: string): string {
+  const titulos: { [key: string]: string } = {
+    // Documentos principales
+    signosVitales: 'Signos Vitales',
+    historiaClinica: this.esPacientePediatrico ? 'Historia Clínica Pediátrica' : 'Historia Clínica',
+    hojaFrontal: 'Hoja Frontal',
+
+    // Documentos clínicos
+    notaUrgencias: 'Nota de Urgencias',
+    notaEvolucion: 'Nota de Evolución',
+
+    // Documentos quirúrgicos ✅ NUEVO
+    notaPreoperatoria: 'Nota Preoperatoria',
+    notaPostoperatoria: 'Nota Postoperatoria',
+    notaPreanestesica: 'Nota Preanestésica',
+    notaPostanestesica: 'Nota Postanestésica',
+
+    // Solicitudes
+    solicitudEstudio: 'Solicitud de Estudio',
+    solicitudCultivo: 'Solicitud de Cultivo',
+    solicitudGasometria: 'Solicitud de Gasometría',
+
+    // Prescripciones
+    prescripcionMedicamento: 'Prescripción de Medicamentos',
+    registroTransfusion: 'Registro de Transfusión',
+
+    // Administrativos
+    referenciaTraslado: 'Referencia y Traslado',
+    altaVoluntaria: 'Alta Voluntaria',
+    consentimiento: 'Consentimiento Informado',
+
+    // Otros
+    notaInterconsulta: 'Nota de Interconsulta',
+    controlCrecimiento: 'Control de Crecimiento',
+    esquemaVacunacion: 'Esquema de Vacunación'
+  };
+  return titulos[formulario] || formulario;
+}
 
  // ===================================
  // MÉTODOS DE NAVEGACIÓN Y UI
@@ -2624,6 +3182,8 @@ case 'Nota de Urgencias Médicas':
      case 'solicitudEstudio': return this.solicitudEstudioForm.valid;
      case 'prescripcionMedicamento':return this.prescripcionForm.valid && this.medicamentosFormArray.length > 0;
      case 'referenciaTraslado':return this.referenciaForm.valid;
+     case 'altaVoluntaria': return this.altaVoluntariaForm.valid;
+     case 'notaPostoperatoria': return this.notaPostoperatoriaForm.valid;
      default: return false;
    }
  }
@@ -3232,8 +3792,6 @@ private construirEstudiosSeleccionados(tipoEstudio: string): string {
      throw error;
    }
  }
-
-
 
  // ===================================
  // MÉTODOS DE DOCUMENTOS
@@ -4181,18 +4739,64 @@ await this.crearDocumentoClinicoPadre();
     }
 
     getGruposVisibles(): any[] {
-      // Retornar grupos básicos
-      return [
-        { key: 'principales', data: { nombre: 'Documentos Principales', icono: 'fas fa-star', color: 'blue', formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal'] } },
-        { key: 'clinicos', data: { nombre: 'Documentos Clínicos', icono: 'fas fa-file-medical', color: 'green', formularios: ['notaUrgencias', 'notaEvolucion'] } },
-        { key: 'solicitudes',data: {nombre: 'Solicitudes de Estudios',icono: 'fas fa-microscope',color: 'green',formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']}},
-        { key: 'prescripciones', data: {nombre: 'Prescripciones y Medicamentos',icono: 'fas fa-pills', color: 'purple',formularios: ['prescripcionMedicamento', 'registroTransfusion']}},
-        { key: 'administrativos', data: { nombre: 'Documentos Administrativos', icono: 'fas fa-folder-open', color: 'gray', formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento'] }}
-
-
-
-      ];
+  // Retornar grupos básicos actualizados
+  return [
+    {
+      key: 'principales',
+      data: {
+        nombre: 'Documentos Principales',
+        icono: 'fas fa-star',
+        color: 'blue',
+        formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal']
+      }
+    },
+    {
+      key: 'clinicos',
+      data: {
+        nombre: 'Documentos Clínicos',
+        icono: 'fas fa-file-medical',
+        color: 'green',
+        formularios: ['notaUrgencias', 'notaEvolucion']
+      }
+    },
+    {
+      key: 'quirurgicos',  // ✅ NUEVO GRUPO
+      data: {
+        nombre: 'Documentos Quirúrgicos',
+        icono: 'fas fa-user-md',
+        color: 'orange',
+        formularios: ['notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica']
+      }
+    },
+    {
+      key: 'solicitudes',
+      data: {
+        nombre: 'Solicitudes de Estudios',
+        icono: 'fas fa-microscope',
+        color: 'teal',  // ✅ CAMBIADO de green a teal para diferencia
+        formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']
+      }
+    },
+    {
+      key: 'prescripciones',
+      data: {
+        nombre: 'Prescripciones y Medicamentos',
+        icono: 'fas fa-pills',
+        color: 'purple',
+        formularios: ['prescripcionMedicamento', 'registroTransfusion']
+      }
+    },
+    {
+      key: 'administrativos',
+      data: {
+        nombre: 'Documentos Administrativos',
+        icono: 'fas fa-folder-open',
+        color: 'gray',
+        formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento']
+      }
     }
+  ];
+}
 
     getFormulariosVisiblesEnGrupo(formularios: string[]): any[] {
   if (!formularios || !Array.isArray(formularios)) {

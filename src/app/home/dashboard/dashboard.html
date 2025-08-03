@@ -1,8 +1,6 @@
 <div class="min-h-screen bg-gray-50">
 
-  <!-- ==========================================
-       1. HEADER EJECUTIVO CON BREADCRUMB
-       ========================================== -->
+  <!-- Header Principal -->
   <div class="bg-white border-b border-gray-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -10,10 +8,10 @@
       <nav class="flex py-3 text-sm" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
           <li class="inline-flex items-center">
-            <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 mr-2 text-hospital-primary" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
             </svg>
-            <span class="text-blue-600 font-medium">Centro de Control</span>
+            <span class="text-hospital-primary font-medium">Centro de Control</span>
           </li>
         </ol>
       </nav>
@@ -22,8 +20,8 @@
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-6">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="bg-blue-100 p-3 rounded-lg">
-              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-hospital-primary-light bg-opacity-20 p-3 rounded-lg">
+              <svg class="w-8 h-8 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
               </svg>
             </div>
@@ -46,7 +44,7 @@
         <!-- Estado del Sistema -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-6 lg:mt-0">
           <div class="flex items-center space-x-2 text-sm">
-            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <div class="w-2 h-2 bg-hospital-success rounded-full animate-pulse"></div>
             <span class="text-gray-600">Sistema Operativo</span>
           </div>
           <div class="flex items-center space-x-2 text-sm text-gray-500">
@@ -60,108 +58,19 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       2. PANEL DE ESTADÍSTICAS MODERNAS
-       ========================================== -->
-  <div *ngIf="estadisticas" class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-900">Resumen del Sistema SICEG-HG</h3>
-        <button (click)="toggleEstadisticas()"
-                class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-          {{ mostrarEstadisticas ? 'Ocultar' : 'Mostrar' }} métricas
-        </button>
-      </div>
-
-      <div *ngIf="mostrarEstadisticas" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-        <!-- Pacientes Activos -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-blue-100 text-sm font-medium">Pacientes Activos</p>
-              <p class="text-2xl font-bold">{{ statistics.pacientesActivos }}</p>
-              <p class="text-blue-100 text-xs mt-1">+{{ statistics.pacientesNuevos }} este mes</p>
-            </div>
-            <div class="bg-blue-400 bg-opacity-50 rounded-lg p-2">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expedientes Nuevos -->
-        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-emerald-100 text-sm font-medium">Expedientes Nuevos</p>
-              <p class="text-2xl font-bold">{{ statistics.expedientesNuevos }}</p>
-              <p class="text-emerald-100 text-xs mt-1">Esta semana</p>
-            </div>
-            <div class="bg-emerald-400 bg-opacity-50 rounded-lg p-2">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Documentos Clínicos -->
-        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-purple-100 text-sm font-medium">Documentos Clínicos</p>
-              <p class="text-2xl font-bold">{{ statistics.documentosClinicosHoy }}</p>
-              <p class="text-purple-100 text-xs mt-1">Generados hoy</p>
-            </div>
-            <div class="bg-purple-400 bg-opacity-50 rounded-lg p-2">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ocupación de Camas -->
-        <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl p-4 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-amber-100 text-sm font-medium">Ocupación Camas</p>
-              <p class="text-2xl font-bold">{{ statistics.camasOcupadas }}/{{ statistics.camasTotal }}</p>
-              <p class="text-amber-100 text-xs mt-1">{{ getOcupacionPorcentaje() }}% ocupación</p>
-            </div>
-            <div class="bg-amber-400 bg-opacity-50 rounded-lg p-2">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2V7z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================
-       3. CONTENIDO PRINCIPAL
-       ========================================== -->
+  <!-- Contenido principal -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-
 
     <!-- Grid Principal -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-      <!-- ==========================================
-           ACCIONES RÁPIDAS HOSPITALARIAS
-           ========================================== -->
+      <!-- Acciones Rápidas -->
       <div class="lg:col-span-1">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-semibold text-gray-900">Acciones Rápidas</h2>
             <div class="flex items-center space-x-2">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
               </svg>
               <span class="text-sm text-gray-500">SICEG-HG</span>
@@ -170,23 +79,20 @@
 
           <div class="space-y-4">
 
-            <!-- Nuevo Paciente (Wizard) -->
+            <!-- Nuevo Paciente -->
             <a routerLink="/app/nuevo-paciente/inicio"
-               class="group block p-4 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 transition-all duration-300 relative">
-              <div class="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-medium animate-pulse">
-                Wizard
-              </div>
+               class="group block p-4 border-2 border-dashed border-hospital-primary-light rounded-xl hover:border-hospital-primary hover:bg-hospital-primary-light hover:bg-opacity-10 transition-all duration-300 relative">
               <div class="flex items-center">
-                <div class="p-3 rounded-xl mr-4 bg-gradient-to-br from-purple-100 to-pink-100 group-hover:scale-110 transition-transform duration-300">
-                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-3 rounded-xl mr-4 bg-hospital-primary-light bg-opacity-20 group-hover:scale-110 transition-transform duration-300">
+                  <svg class="w-6 h-6 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m0 0V9a3 3 0 013-3m-3 12a3 3 0 01-3-3m0 3c1.657 0 3-1.007 3-2.25s-1.343-2.25-3-2.25-3 1.007-3 2.25 1.343 2.25 3 2.25zm9-3a3 3 0 01-3-3m3 3c1.657 0 3-1.007 3-2.25s-1.343-2.25-3-2.25-3 1.007-3 2.25 1.343 2.25 3 2.25z"/>
                   </svg>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                  <h3 class="font-semibold text-gray-900 group-hover:text-hospital-primary transition-colors">
                     Nuevo Paciente
                   </h3>
-                  <p class="text-sm text-gray-600 mt-1">Registro guiado completo</p>
+                  <p class="text-sm text-gray-600 mt-1">Registro completo paso a paso</p>
                 </div>
                 <svg class="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,14 +103,14 @@
 
             <!-- Buscar Pacientes -->
             <a routerLink="/app/personas/pacientes"
-               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300">
-              <div class="p-3 rounded-xl mr-4 bg-emerald-100 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-hospital-success hover:bg-hospital-success-light hover:bg-opacity-10 transition-all duration-300">
+              <div class="p-3 rounded-xl mr-4 bg-hospital-success-light bg-opacity-20 group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-6 h-6 text-hospital-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors">
+                <h3 class="font-semibold text-gray-900 group-hover:text-hospital-success transition-colors">
                   Buscar Pacientes
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Consultar expedientes</p>
@@ -217,14 +123,14 @@
 
             <!-- Documentos Clínicos -->
             <a routerLink="/app/documentos-clinicos/documentos"
-               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-300">
-              <div class="p-3 rounded-xl mr-4 bg-purple-100 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-hospital-info hover:bg-hospital-info-light hover:bg-opacity-10 transition-all duration-300">
+              <div class="p-3 rounded-xl mr-4 bg-hospital-info-light bg-opacity-20 group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-6 h-6 text-hospital-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                <h3 class="font-semibold text-gray-900 group-hover:text-hospital-info transition-colors">
                   Documentos Clínicos
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Historias y notas médicas</p>
@@ -237,14 +143,14 @@
 
             <!-- Gestión de Camas -->
             <a routerLink="/app/gestion-expedientes/camas"
-               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition-all duration-300">
-              <div class="p-3 rounded-xl mr-4 bg-amber-100 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-hospital-warning hover:bg-hospital-warning-light hover:bg-opacity-10 transition-all duration-300">
+              <div class="p-3 rounded-xl mr-4 bg-hospital-warning-light bg-opacity-20 group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-6 h-6 text-hospital-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2V7z"/>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">
+                <h3 class="font-semibold text-gray-900 group-hover:text-hospital-warning transition-colors">
                   Gestión de Camas
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Administrar ocupación</p>
@@ -257,14 +163,14 @@
 
             <!-- Catálogos -->
             <a routerLink="/app/catalogos/servicios"
-               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-300">
-              <div class="p-3 rounded-xl mr-4 bg-indigo-100 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="group flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-hospital-primary-dark hover:bg-hospital-primary-dark hover:bg-opacity-10 transition-all duration-300">
+              <div class="p-3 rounded-xl mr-4 bg-hospital-primary-dark bg-opacity-20 group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-6 h-6 text-hospital-primary-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                <h3 class="font-semibold text-gray-900 group-hover:text-hospital-primary-dark transition-colors">
                   Catálogos del Sistema
                 </h3>
                 <p class="text-sm text-gray-600 mt-1">Servicios, medicamentos...</p>
@@ -279,230 +185,126 @@
         </div>
       </div>
 
-      <!-- ==========================================
-           ACTIVIDAD RECIENTE
-           ========================================== -->
+      <!-- Módulos del Sistema -->
       <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Actividad Reciente del Sistema</h2>
-            <div class="flex items-center space-x-4">
-              <button (click)="refreshData()"
-                      class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center space-x-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            <h2 class="text-xl font-semibold text-gray-900">Módulos del Sistema SICEG-HG</h2>
+            <span class="text-sm text-gray-500">Acceso directo a funcionalidades</span>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+            <!-- Personas -->
+            <a routerLink="/app/personas/pacientes"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-primary-light hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-primary">
+              <div class="w-12 h-12 bg-hospital-primary-light bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
-                <span>Actualizar</span>
-              </button>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Gestión de Personas</span>
+            </a>
+
+            <!-- Expedientes -->
+            <a routerLink="/app/gestion-expedientes/expedientes"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-success-light hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-success">
+              <div class="w-12 h-12 bg-hospital-success-light bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Expedientes</span>
+            </a>
+
+            <!-- Documentos Clínicos -->
+            <a routerLink="/app/documentos-clinicos/documentos"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-info-light hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-info">
+              <div class="w-12 h-12 bg-hospital-info-light bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Documentos Clínicos</span>
+            </a>
+
+            <!-- Historias Clínicas -->
+            <a routerLink="/app/documentos-clinicos/historias-clinicas"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-primary-dark hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-primary-dark">
+              <div class="w-12 h-12 bg-hospital-primary-dark bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-primary-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Historias Clínicas</span>
+            </a>
+
+            <!-- Notas de Evolución -->
+            <a routerLink="/app/documentos-clinicos/notas-evolucion"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-success-dark hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-success-dark">
+              <div class="w-12 h-12 bg-hospital-success-dark bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-success-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Notas Evolución</span>
+            </a>
+
+            <!-- Catálogos -->
+            <a routerLink="/app/catalogos/servicios"
+               class="flex flex-col items-center p-4 rounded-xl hover:bg-hospital-warning-light hover:bg-opacity-10 transition-colors group border border-gray-200 hover:border-hospital-warning">
+              <div class="w-12 h-12 bg-hospital-warning-light bg-opacity-20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 text-hospital-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-gray-700 text-center">Catálogos</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="mt-8">
+      <div class="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200 p-6">
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-hospital-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Estado del Sistema SICEG-HG</h3>
+            <p class="text-sm text-gray-600 mb-4">
+              Sistema Integral de Control de Expedientes - Hospital General San Luis de la Paz, Guanajuato.
+              Todos los módulos funcionando correctamente.
+            </p>
+            <div class="flex flex-wrap items-center gap-6 text-sm">
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-hospital-success rounded-full animate-pulse"></div>
+                <span class="text-gray-600">Base de Datos: Activa</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-hospital-success rounded-full"></div>
+                <span class="text-gray-600">API Backend: Operativa</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-hospital-success rounded-full"></div>
+                <span class="text-gray-600">Documentos: Generando PDFs</span>
+              </div>
             </div>
           </div>
 
-          <div class="space-y-4">
-            <div *ngFor="let activity of recentActivities; trackBy: trackById"
-                 class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 border border-gray-100">
-
-              <div class="flex items-center space-x-4 flex-1">
-                <!-- Indicador de Prioridad -->
-                <div class="w-1 h-12 rounded-full"
-                     [class.bg-emerald-500]="activity.priority === 'low'"
-                     [class.bg-amber-500]="activity.priority === 'medium'"
-                     [class.bg-red-500]="activity.priority === 'high'">
-                </div>
-
-                <!-- Icono de Actividad -->
-                <div class="p-2 rounded-lg"
-                     [class.bg-blue-100]="activity.type.includes('Wizard')"
-                     [class.bg-emerald-100]="activity.type.includes('Historia')"
-                     [class.bg-purple-100]="activity.type.includes('Nota')"
-                     [class.bg-amber-100]="activity.type.includes('Expediente')">
-                  <svg class="w-5 h-5"
-                       [class.text-blue-600]="activity.type.includes('Wizard')"
-                       [class.text-emerald-600]="activity.type.includes('Historia')"
-                       [class.text-purple-600]="activity.type.includes('Nota')"
-                       [class.text-amber-600]="activity.type.includes('Expediente')"
-                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                  </svg>
-                </div>
-
-                <div class="flex-1">
-                  <div class="flex items-center space-x-2 mb-1">
-                    <span class="font-semibold text-gray-900">{{ activity.type }}</span>
-                    <span class="px-2 py-1 text-xs font-medium rounded-full"
-                          [ngClass]="getStatusClasses(activity.status)">
-                      {{ activity.status }}
-                    </span>
-                  </div>
-                  <p class="text-sm text-gray-600">{{ activity.patient }}</p>
-                 <p class="text-xs text-gray-500 mt-1">{{ activity.time }}</p>
-               </div>
-             </div>
-
-             <div class="text-right">
-               <button *ngIf="activity.action"
-                       (click)="handleActivityAction(activity)"
-                       class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors px-3 py-1 rounded-lg hover:bg-blue-50">
-                 {{ activity.action }}
-               </button>
-             </div>
-           </div>
-         </div>
-
-         <!-- Mensaje si no hay actividad -->
-         <div *ngIf="recentActivities.length === 0" class="text-center py-8">
-           <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-           </svg>
-           <p class="text-gray-500">No hay actividad reciente registrada</p>
-           <p class="text-gray-400 text-sm mt-1">Los nuevos eventos aparecerán aquí automáticamente</p>
-         </div>
-       </div>
-     </div>
-   </div>
-
-   <!-- ==========================================
-        MÓDULOS DEL SISTEMA SICEG-HG
-        ========================================== -->
-   <div class="mt-8">
-     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-       <div class="flex items-center justify-between mb-6">
-         <h2 class="text-xl font-semibold text-gray-900">Módulos del Sistema SICEG-HG</h2>
-         <span class="text-sm text-gray-500">Acceso directo a funcionalidades</span>
-       </div>
-
-       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-
-         <!-- Personas -->
-         <a routerLink="/app/personas/pacientes"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition-colors group border border-gray-200 hover:border-blue-300">
-           <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Gestión de Personas</span>
-         </a>
-
-         <!-- Expedientes -->
-         <a routerLink="/app/gestion-expedientes/expedientes"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-emerald-50 transition-colors group border border-gray-200 hover:border-emerald-300">
-           <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Expedientes</span>
-         </a>
-
-         <!-- Documentos Clínicos -->
-         <a routerLink="/app/documentos-clinicos/documentos"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-purple-50 transition-colors group border border-gray-200 hover:border-purple-300">
-           <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Documentos Clínicos</span>
-         </a>
-
-         <!-- Historias Clínicas -->
-         <a routerLink="/app/documentos-clinicos/historias-clinicas"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-indigo-50 transition-colors group border border-gray-200 hover:border-indigo-300">
-           <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Historias Clínicas</span>
-         </a>
-
-         <!-- Notas de Evolución -->
-         <a routerLink="/app/documentos-clinicos/notas-evolucion"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-teal-50 transition-colors group border border-gray-200 hover:border-teal-300">
-           <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Notas Evolución</span>
-         </a>
-
-         <!-- Catálogos -->
-         <a routerLink="/app/catalogos/servicios"
-            class="flex flex-col items-center p-4 rounded-xl hover:bg-amber-50 transition-colors group border border-gray-200 hover:border-amber-300">
-           <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-             <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-             </svg>
-           </div>
-           <span class="text-sm font-medium text-gray-700 text-center">Catálogos</span>
-         </a>
-       </div>
-     </div>
-   </div>
-
-   <!-- ==========================================
-        INFORMACIÓN DEL SISTEMA
-        ========================================== -->
-   <div class="mt-8">
-     <div class="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200 p-6">
-       <div class="flex items-start space-x-4">
-         <div class="flex-shrink-0">
-           <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-           </svg>
-         </div>
-         <div class="flex-1">
-           <h3 class="text-lg font-medium text-gray-900 mb-2">Estado del Sistema SICEG-HG</h3>
-           <p class="text-sm text-gray-600 mb-4">
-             Sistema Integral de Control de Expedientes - Hospital General San Luis de la Paz, Guanajuato.
-             Todos los módulos funcionando correctamente. Wizard de registro implementado y activo.
-           </p>
-           <div class="flex flex-wrap items-center gap-6 text-sm">
-             <div class="flex items-center space-x-2">
-               <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-               <span class="text-gray-600">Base de Datos: Activa</span>
-             </div>
-             <div class="flex items-center space-x-2">
-               <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
-               <span class="text-gray-600">API Backend: Operativa</span>
-             </div>
-             <div class="flex items-center space-x-2">
-               <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
-               <span class="text-gray-600">Documentos: Generando PDFs</span>
-             </div>
-             <div class="flex items-center space-x-2">
-               <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
-               <span class="text-gray-600">Wizard: Activo</span>
-             </div>
-           </div>
-         </div>
-
-         <!-- Botón de acceso rápido al wizard -->
-         <div class="flex-shrink-0">
-           <a routerLink="/app/nuevo-paciente/inicio"
-              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm">
-             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-             </svg>
-             Nuevo Registro
-           </a>
-         </div>
-
-         <div class="mt-6">
-    <button
-      (click)="irAAreaBienestar()"
-      class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center">
-      <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      Área de Bienestar Personal
-    </button>
+          <!-- Botón oculto de bienestar (discreto) -->
+          <div class="flex-shrink-0 opacity-30 hover:opacity-100 transition-opacity duration-300">
+            <button (click)="irAAreaBienestar()"
+                    class="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
+              Bienestar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-       </div>
-     </div>
-   </div>
-
- </div>
 </div>

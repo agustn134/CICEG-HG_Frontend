@@ -212,19 +212,29 @@ export class PdfGeneratorService {
           );
         break;
       case 'Nota de Urgencias':
-case 'Nota de Urgencias Médicas':
-  documentDefinition = await this.pdfTemplatesService.generarNotaUrgencias(datosParaTemplate);
-  break;
-  case 'Referencia y Contrarreferencia':
-case 'Referencia':
-case 'Contrarreferencia':
-  documentDefinition = await this.pdfTemplatesService.generarReferenciaContrarreferencia(datosParaTemplate);
-  break;
-  case 'Consentimiento Informado':
-case 'Consentimiento':
-  documentDefinition = await this.pdfTemplatesService.generarNotaConsentimientoProcedimientos(datosParaTemplate);
-  break;
-      // Aquí iremos agregando cada nuevo documento
+      case 'Nota de Urgencias Médicas':
+        documentDefinition = await this.pdfTemplatesService.generarNotaUrgencias(datosParaTemplate);
+        break;
+        case 'Referencia y Contrarreferencia':
+      case 'Referencia':
+      case 'Contrarreferencia':
+        documentDefinition = await this.pdfTemplatesService.generarReferenciaContrarreferencia(datosParaTemplate);
+        break;
+        case 'Consentimiento Informado':
+      case 'Consentimiento':
+        documentDefinition = await this.pdfTemplatesService.generarNotaConsentimientoProcedimientos(datosParaTemplate);
+        break;
+        case 'Alta Voluntaria':
+        documentDefinition = await this.pdfTemplatesService.generarAltaVoluntaria(datosParaTemplate);
+        break;
+      case 'Nota Preoperatoria':
+      case 'Preoperatoria':
+        documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
+        break;
+      case 'Nota Postoperatoria':
+      case 'Postoperatoria':
+        documentDefinition = await this.pdfTemplatesService.generarNotaPostoperatoria(datosParaTemplate);
+        break;
       default:
         throw new Error(`Documento ${tipoDocumento} no implementado aún`);
     }

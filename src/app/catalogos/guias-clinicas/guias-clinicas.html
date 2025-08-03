@@ -1,20 +1,20 @@
 <div class="min-h-screen bg-gray-50">
   <!-- Header Section -->
-  <div class="bg-white shadow-sm border-b border-gray-200">
+  <header class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center py-6">
-        <div class="flex items-center">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center py-4 md:py-6">
+        <div class="flex items-center mb-4 md:mb-0">
           <div class="flex-shrink-0">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div class="ml-4">
-            <h1 class="text-2xl font-bold text-gray-900">Guías Clínicas</h1>
-            <p class="text-sm text-gray-600">Gestión de guías clínicas y protocolos</p>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-900">Guías Clínicas</h1>
+            <p class="text-xs md:text-sm text-gray-600">Protocolos y recomendaciones basadas en evidencia</p>
           </div>
         </div>
-        <button (click)="resetForm()" class="btn bg-blue-600 text-white hover:bg-blue-700">
+        <button (click)="resetForm()" class="btn bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center w-full md:w-auto">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -22,10 +22,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- Status Messages -->
-  <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+  <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 max-w-7xl mx-auto">
     <div class="flex items-center">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <div *ngIf="success" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+  <div *ngIf="success" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 max-w-7xl mx-auto">
     <div class="flex items-center">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -44,27 +44,28 @@
   </div>
 
   <!-- Main Content -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- Filters Section -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white shadow rounded-lg p-4 md:p-6 mb-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4 hidden md:block">Filtros de búsqueda</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Área</label>
-          <select (change)="filterByArea($event)" class="form-select">
-      <option value="">Todas las áreas</option>
-      <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
-    </select>
+          <label for="areaFilter" class="block text-sm font-medium text-gray-700 mb-1">Área médica</label>
+          <select id="areaFilter" (change)="filterByArea($event)" class="form-select w-full">
+            <option value="">Todas las áreas</option>
+            <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+          </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Fuente</label>
-          <select (change)="filterByFuente($event)" class="form-select">
-      <option value="">Todas las fuentes</option>
-      <option *ngFor="let fuente of fuentes" [value]="fuente">{{ fuente }}</option>
-    </select>
+          <label for="fuenteFilter" class="block text-sm font-medium text-gray-700 mb-1">Fuente</label>
+          <select id="fuenteFilter" (change)="filterByFuente($event)" class="form-select w-full">
+            <option value="">Todas las fuentes</option>
+            <option *ngFor="let fuente of fuentes" [value]="fuente">{{ fuente }}</option>
+          </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Especialidad</label>
-          <select class="form-select">
+          <label for="especialidadFilter" class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+          <select id="especialidadFilter" class="form-select w-full">
             <option value="">Todas las especialidades</option>
             <option *ngFor="let especialidad of especialidades" [value]="especialidad">{{ especialidad }}</option>
           </select>
@@ -73,47 +74,56 @@
     </div>
 
     <!-- Form Section -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6" *ngIf="editingId || guiasClinicasForm.dirty">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">
-        {{ editingId ? 'Editar Guía Clínica' : 'Nueva Guía Clínica' }}
-      </h2>
+    <div class="bg-white shadow rounded-lg p-4 md:p-6 mb-6" *ngIf="editingId || guiasClinicasForm.dirty">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-medium text-gray-900">
+          {{ editingId ? 'Editar Guía Clínica' : 'Nueva Guía Clínica' }}
+        </h2>
+        <button (click)="resetForm()" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       <form [formGroup]="guiasClinicasForm" (ngSubmit)="onSubmit()" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <!-- Left Column -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Código</label>
-              <input type="text" formControlName="codigo" class="form-input" placeholder="Código de la guía">
+              <label for="codigo" class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+              <input id="codigo" type="text" formControlName="codigo" class="form-input w-full" placeholder="Ej. GC-001">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">
                 Nombre <span class="text-red-500">*</span>
               </label>
-              <input type="text" formControlName="nombre" class="form-input" [class.border-red-500]="isFieldInvalid('nombre')" placeholder="Nombre de la guía clínica">
+              <input id="nombre" type="text" formControlName="nombre" class="form-input w-full"
+                     [class.border-red-500]="isFieldInvalid('nombre')"
+                     placeholder="Ej. Manejo de Diabetes Tipo 2">
               <p *ngIf="getFieldError('nombre')" class="mt-1 text-sm text-red-600">{{ getFieldError('nombre') }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Área</label>
-              <select formControlName="area" class="form-select">
+              <label for="area" class="block text-sm font-medium text-gray-700 mb-1">Área</label>
+              <select id="area" formControlName="area" class="form-select w-full">
                 <option value="">Seleccionar área</option>
                 <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
-              <select formControlName="especialidad" class="form-select">
+              <label for="especialidad" class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+              <select id="especialidad" formControlName="especialidad" class="form-select w-full">
                 <option value="">Seleccionar especialidad</option>
                 <option *ngFor="let especialidad of especialidades" [value]="especialidad">{{ especialidad }}</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fuente</label>
-              <select formControlName="fuente" class="form-select">
+              <label for="fuente" class="block text-sm font-medium text-gray-700 mb-1">Fuente</label>
+              <select id="fuente" formControlName="fuente" class="form-select w-full">
                 <option value="">Seleccionar fuente</option>
                 <option *ngFor="let fuente of fuentes" [value]="fuente">{{ fuente }}</option>
               </select>
@@ -123,36 +133,39 @@
           <!-- Right Column -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Versión</label>
-              <input type="text" formControlName="version" class="form-input" placeholder="Versión de la guía">
+              <label for="version" class="block text-sm font-medium text-gray-700 mb-1">Versión</label>
+              <input id="version" type="text" formControlName="version" class="form-input w-full" placeholder="Ej. 2.1">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de Evidencia</label>
-              <select formControlName="nivel_evidencia" class="form-select">
+              <label for="nivel_evidencia" class="block text-sm font-medium text-gray-700 mb-1">Nivel de Evidencia</label>
+              <select id="nivel_evidencia" formControlName="nivel_evidencia" class="form-select w-full">
                 <option value="">Seleccionar nivel</option>
                 <option *ngFor="let nivel of nivelesEvidencia" [value]="nivel">{{ nivel }}</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Actualización</label>
-              <input type="date" formControlName="fecha_actualizacion" class="form-input">
+              <label for="fecha_actualizacion" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Actualización</label>
+              <input id="fecha_actualizacion" type="date" formControlName="fecha_actualizacion" class="form-input w-full">
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="grid grid-cols-2 gap-4">
               <div class="flex items-center">
-                <input type="checkbox" formControlName="aplicable_pediatria" id="aplicable_pediatria" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                <label for="aplicable_pediatria" class="ml-2 block text-sm text-gray-700">Aplicable a Pediatría</label>
+                <input id="aplicable_pediatria" type="checkbox" formControlName="aplicable_pediatria"
+                       class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="aplicable_pediatria" class="ml-2 block text-sm text-gray-700">Pediatría</label>
               </div>
 
               <div class="flex items-center">
-                <input type="checkbox" formControlName="aplicable_adultos" id="aplicable_adultos" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                <label for="aplicable_adultos" class="ml-2 block text-sm text-gray-700">Aplicable a Adultos</label>
+                <input id="aplicable_adultos" type="checkbox" formControlName="aplicable_adultos"
+                       class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <label for="aplicable_adultos" class="ml-2 block text-sm text-gray-700">Adultos</label>
               </div>
 
               <div class="flex items-center">
-                <input type="checkbox" formControlName="activo" id="activo" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                <input id="activo" type="checkbox" formControlName="activo"
+                       class="h-4 w-4 text-blue-600 border-gray-300 rounded">
                 <label for="activo" class="ml-2 block text-sm text-gray-700">Activa</label>
               </div>
             </div>
@@ -160,16 +173,19 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-          <textarea formControlName="descripcion" rows="3" class="form-textarea" placeholder="Descripción detallada de la guía clínica"></textarea>
+          <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea id="descripcion" formControlName="descripcion" rows="3" class="form-textarea w-full"
+                    placeholder="Descripción detallada de la guía clínica"></textarea>
         </div>
 
-        <div class="flex justify-end space-x-3 pt-4">
-          <button type="button" (click)="resetForm()" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300">
+        <div class="flex flex-col-reverse sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
+          <button type="button" (click)="resetForm()"
+                  class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 w-full sm:w-auto">
             Cancelar
           </button>
-          <button type="submit" [disabled]="guiasClinicasForm.invalid || isLoading" class="btn bg-blue-600 text-white hover:bg-blue-700">
-            <span *ngIf="isLoading" class="inline-flex items-center">
+          <button type="submit" [disabled]="guiasClinicasForm.invalid || isLoading"
+                  class="btn bg-blue-600 text-white hover:bg-blue-700 w-full sm:w-auto">
+            <span *ngIf="isLoading" class="inline-flex items-center justify-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -195,10 +211,13 @@
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay guías clínicas</h3>
-      <p class="mt-1 text-sm text-gray-500">Comience creando una nueva guía clínica.</p>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay guías clínicas registradas</h3>
+      <p class="mt-1 text-sm text-gray-500">Comience creando una nueva guía clínica o importando existentes.</p>
       <div class="mt-6">
         <button (click)="resetForm()" class="btn bg-blue-600 text-white hover:bg-blue-700">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
           Crear Primera Guía
         </button>
       </div>
@@ -210,49 +229,51 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Código
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Nombre
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Área / Especialidad
+              <th scope="col" class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Área
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Fuente
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Última Actualización
+              <th scope="col" class="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actualización
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Estado
               </th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr *ngFor="let guia of guiasClinicas" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ guia.codigo || 'N/A' }}
+              <td class="px-4 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-blue-600">{{ guia.codigo || '--' }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4">
                 <div class="text-sm font-medium text-gray-900">{{ guia.nombre }}</div>
-                <div class="text-sm text-gray-500">{{ guia.version || 'Sin versión' }}</div>
+                <div class="text-xs text-gray-500 mt-1">
+                  <span class="md:hidden">{{ guia.area || 'Sin área' }} • {{ guia.version || 'v0' }}</span>
+                </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ guia.area || 'N/A' }}</div>
-                <div class="text-sm text-gray-500">{{ guia.especialidad || 'N/A' }}</div>
+              <td class="hidden md:table-cell px-4 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ guia.area || '--' }}</div>
+                <div class="text-xs text-gray-500">{{ guia.especialidad || '--' }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ guia.fuente || 'N/A' }}
+              <td class="hidden lg:table-cell px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ guia.fuente || '--' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="hidden sm:table-cell px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(guia.fecha_actualizacion) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                   [class.bg-green-100]="guia.activo"
                   [class.text-green-800]="guia.activo"
@@ -261,7 +282,7 @@
                   {{ guia.activo ? 'Activa' : 'Inactiva' }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex justify-end space-x-2">
                   <button (click)="editGuiaClinica(guia)" class="text-blue-600 hover:text-blue-900" title="Editar">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,5 +301,5 @@
         </table>
       </div>
     </div>
-  </div>
+  </main>
 </div>
