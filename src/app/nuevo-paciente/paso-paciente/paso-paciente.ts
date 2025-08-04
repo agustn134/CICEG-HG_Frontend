@@ -89,39 +89,93 @@ export class PasoPaciente implements OnInit, OnDestroy {
     });
   }
 
+// private loadCatalogos(): void {
+//   console.log('  Iniciando carga de catálogos...');
+
+//   //   CORRECCIÓN: Cargar tipos de sangre con mapeo correcto
+//   this.catalogoService.getTiposSangre()
+//     .pipe(takeUntil(this.destroy$))
+//     .subscribe({
+//       next: (tipos) => {
+//         console.log('  Tipos de sangre desde backend:', tipos);
+
+//         // 🔧 MAPEAR la respuesta del backend al formato esperado
+//         this.tiposSangre = tipos.map((tipo: any) => ({
+//           value: tipo.value || tipo.nombre || tipo.id_tipo_sangre,  // Usar cualquier campo disponible
+//           label: tipo.label || tipo.nombre || `Tipo ${tipo.id_tipo_sangre}`  // Mostrar nombre legible
+//         }));
+
+//         console.log('🩸 Tipos de sangre mapeados para el select:', this.tiposSangre);
+//       },
+//       error: (error) => {
+//         console.error('❌ Error cargando tipos de sangre:', error);
+//         // Fallback manual
+//         this.tiposSangre = [
+//           { value: 'A+', label: 'A+' },
+//           { value: 'A-', label: 'A-' },
+//           { value: 'B+', label: 'B+' },
+//           { value: 'B-', label: 'B-' },
+//           { value: 'AB+', label: 'AB+' },
+//           { value: 'AB-', label: 'AB-' },
+//           { value: 'O+', label: 'O+' },
+//           { value: 'O-', label: 'O-' },
+//           { value: 'Desconocido', label: 'Desconocido' }
+//         ];
+//         console.log('  Usando tipos de sangre de fallback:', this.tiposSangre);
+//       }
+//     });
+
+//   // Cargar parentescos (ya funcionan con fallback)
+//   this.catalogoService.getParentescos()
+//     .pipe(takeUntil(this.destroy$))
+//     .subscribe(parentescos => {
+//       this.parentescos = parentescos;
+//       console.log('👨‍👩‍👧‍👦 Parentescos cargados:', parentescos.length);
+//     });
+
+//   // Cargar niveles de escolaridad (ya funcionan con fallback)
+//   this.catalogoService.getNivelesEscolaridad()
+//     .pipe(takeUntil(this.destroy$))
+//     .subscribe(niveles => {
+//       this.nivelesEscolaridad = niveles;
+//       console.log('🎓 Niveles de escolaridad cargados:', niveles.length);
+//     });
+// }
+
 private loadCatalogos(): void {
   console.log('  Iniciando carga de catálogos...');
 
-  //   CORRECCIÓN: Cargar tipos de sangre con mapeo correcto
+  // 🔧 CORRECCIÓN: Asegurar que los tipos de sangre incluyen IDs
   this.catalogoService.getTiposSangre()
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (tipos) => {
         console.log('  Tipos de sangre desde backend:', tipos);
 
-        // 🔧 MAPEAR la respuesta del backend al formato esperado
+        // Mapear la respuesta del backend incluyendo los IDs
         this.tiposSangre = tipos.map((tipo: any) => ({
-          value: tipo.value || tipo.nombre || tipo.id_tipo_sangre,  // Usar cualquier campo disponible
-          label: tipo.label || tipo.nombre || `Tipo ${tipo.id_tipo_sangre}`  // Mostrar nombre legible
+          value: tipo.nombre || tipo.value,
+          label: tipo.nombre || tipo.label,
+          id: tipo.id_tipo_sangre, // 🔧 INCLUIR EL ID
+          id_tipo_sangre: tipo.id_tipo_sangre // 🔧 BACKUP ID
         }));
 
         console.log('🩸 Tipos de sangre mapeados para el select:', this.tiposSangre);
       },
       error: (error) => {
         console.error('❌ Error cargando tipos de sangre:', error);
-        // Fallback manual
+        // Fallback manual con IDs basados en los IDs reales de tu base de datos
         this.tiposSangre = [
-          { value: 'A+', label: 'A+' },
-          { value: 'A-', label: 'A-' },
-          { value: 'B+', label: 'B+' },
-          { value: 'B-', label: 'B-' },
-          { value: 'AB+', label: 'AB+' },
-          { value: 'AB-', label: 'AB-' },
-          { value: 'O+', label: 'O+' },
-          { value: 'O-', label: 'O-' },
-          { value: 'Desconocido', label: 'Desconocido' }
+          { value: 'A+', label: 'A+', id: 1, id_tipo_sangre: 1 },
+          { value: 'A-', label: 'A-', id: 2, id_tipo_sangre: 2 },
+          { value: 'B+', label: 'B+', id: 3, id_tipo_sangre: 3 },
+          { value: 'B-', label: 'B-', id: 4, id_tipo_sangre: 4 },
+          { value: 'AB+', label: 'AB+', id: 5, id_tipo_sangre: 5 },
+          { value: 'AB-', label: 'AB-', id: 6, id_tipo_sangre: 6 },
+          { value: 'O+', label: 'O+', id: 7, id_tipo_sangre: 7 },
+          { value: 'O-', label: 'O-', id: 8, id_tipo_sangre: 8 }
         ];
-        console.log('  Usando tipos de sangre de fallback:', this.tiposSangre);
+        console.log('  Usando tipos de sangre de fallback con IDs:', this.tiposSangre);
       }
     });
 
@@ -141,6 +195,7 @@ private loadCatalogos(): void {
       console.log('🎓 Niveles de escolaridad cargados:', niveles.length);
     });
 }
+
 
   private loadExistingData(): void {
     const currentState = this.wizardStateService.getCurrentState();
@@ -279,262 +334,278 @@ private loadCatalogos(): void {
     }
   }
 
-  /**
-   * Guardar paciente en la base de datos usando PacientesService
-   */
-  // private saveAndContinue(): void {
-  //   this.isLoading = true;
-  //   this.autoGuardadoStatus = 'Guardando información médica...';
 
-  //   // Obtener ID de persona del paso anterior
-  //   const currentState = this.wizardStateService.getCurrentState();
-  //   const idPersona = currentState.id_persona_creada;
+// private saveAndContinue(): void {
+//   this.isLoading = true;
+//   this.autoGuardadoStatus = 'Guardando información médica...';
 
-  //   if (!idPersona) {
-  //     console.error('❌ No se encontró el ID de la persona.');
-  //     alert('Error: No se encontró el ID de la persona. Debe completar el paso anterior.');
-  //     this.isLoading = false;
-  //     this.autoGuardadoStatus = '';
-  //     this.wizardStateService.goToStep(WizardStep.PERSONA);
-  //     return;
-  //   }
+//   const currentState = this.wizardStateService.getCurrentState();
+//   const idPersona = currentState.id_persona_creada;
 
-  //   try {
-  //     // Preparar datos del formulario
-  //     const formData = this.pacienteForm.value;
+//   if (!idPersona) {
+//     console.error('❌ No se encontró el ID de la persona.');
+//     alert(
+//       'Error: No se encontró el ID de la persona. Debe completar el paso anterior.'
+//     );
+//     this.isLoading = false;
+//     this.autoGuardadoStatus = '';
+//     this.wizardStateService.goToStep(WizardStep.PERSONA);
+//     return;
+//   }
 
-  //     console.log('  Datos del formulario paciente:', formData);
+//   try {
+//     const formData = this.pacienteForm.value;
+//     console.log('  Datos del formulario paciente:', formData);
 
-  //     // Preparar DTO para el backend
-  //     const createPacienteDto: CreatePacienteDto = {
-  //       id_persona: idPersona,
-  //       tipo_sangre: this.mapTipoSangre(formData.tipo_sangre),
-  //       alergias: formData.alergias || undefined,
-  //       transfusiones: formData.transfusiones === 'Si',
-  //       detalles_transfusiones: formData.detalles_transfusiones || undefined,
-  //       familiar_responsable: formData.familiar_responsable,
-  //       parentesco_familiar: formData.parentesco_familiar,
-  //       telefono_familiar: formData.telefono_familiar,
-  //       ocupacion: formData.ocupacion || undefined,
-  //       escolaridad: formData.escolaridad || undefined,
-  //       lugar_nacimiento: formData.lugar_nacimiento || undefined,
-  //       // Aquí deberías agregar el ID del doctor si tienes login
-  //       // id_doctor: currentState.id_doctor || 1, // Por ahora usamos 1 como default
-  //       activo: true
-  //     };
+//     //   CORRECCIÓN: Buscar el nombre del tipo de sangre seleccionado
+//     const tipoSangreSeleccionado = this.tiposSangre.find(
+//       (tipo) => tipo.value === formData.tipo_sangre
+//     );
+//     const tipoSangreNombre =
+//       tipoSangreSeleccionado?.label || 'No especificado';
 
-  //     console.log('  Enviando al backend (PacientesService):', createPacienteDto);
+//     console.log('🩸 Tipo de sangre seleccionado:', {
+//       valor: formData.tipo_sangre,
+//       nombre: tipoSangreNombre,
+//       tipos_disponibles: this.tiposSangre,
+//     });
 
-  //     // Llamada real al backend
-  //     this.pacientesService.createPaciente(createPacienteDto).subscribe({
-  //       next: (response) => {
-  //         console.log('  Respuesta del backend (paciente creado):', response);
+//     // Preparar DTO para el backend
+//     const createPacienteDto: CreatePacienteDto = {
+//       id_persona: idPersona,
+//       tipo_sangre: this.mapTipoSangre(formData.tipo_sangre),
+//       alergias: formData.alergias || undefined,
+//       transfusiones: formData.transfusiones === 'Si',
+//       detalles_transfusiones: formData.detalles_transfusiones || undefined,
+//       familiar_responsable: formData.familiar_responsable,
+//       parentesco_familiar: formData.parentesco_familiar,
+//       telefono_familiar: formData.telefono_familiar,
+//       ocupacion: formData.ocupacion || undefined,
+//       escolaridad: formData.escolaridad || undefined,
+//       lugar_nacimiento: formData.lugar_nacimiento || undefined,
+//       activo: true,
+//     };
 
-  //         if (response.success && response.data) {
-  //           // Actualizar datos en el wizard state
-  //           const datosPacienteCompletos: Partial<DatosPaciente> = {
-  //             ...formData,
-  //             id_persona: idPersona,
-  //             id_paciente: response.data.id_paciente
-  //           };
+//     console.log(
+//       '  Enviando al backend (PacientesService):',
+//       createPacienteDto
+//     );
 
-  //           this.wizardStateService.updatePacienteData(datosPacienteCompletos);
+//     // Llamada real al backend
+//     this.pacientesService.createPaciente(createPacienteDto).subscribe({
+//       next: (response) => {
+//         console.log('  Respuesta del backend (paciente creado):', response);
 
-  //           // Guardar ID del paciente creado
-  //           this.wizardStateService.updateIds({
-  //             id_paciente: response.data.id_paciente!
-  //           });
+//         if (response.success && response.data) {
+//           //   CORRECCIÓN: Incluir el nombre del tipo de sangre en los datos guardados
+//           const datosPacienteCompletos: Partial<DatosPaciente> = {
+//             ...formData,
+//             tipo_sangre_nombre: tipoSangreNombre, //   Agregar nombre para el resumen
+//             id_persona: idPersona,
+//             id_paciente: response.data.id_paciente,
+//           };
 
-  //           // Marcar paso como completado
-  //           this.wizardStateService.markStepAsCompleted(WizardStep.PACIENTE);
+//           this.wizardStateService.updatePacienteData(datosPacienteCompletos);
 
-  //           // Actualizar UI
-  //           this.isLoading = false;
-  //           this.autoGuardadoStatus = '  Información médica registrada exitosamente';
+//           // Guardar ID del paciente creado
+//           this.wizardStateService.updateIds({
+//             id_paciente: response.data.id_paciente!,
+//           });
 
-  //           console.log('  Paciente creado con ID:', response.data.id_paciente);
-  //           console.log('➡️ Navegando al siguiente paso...');
+//           // Marcar paso como completado
+//           this.wizardStateService.markStepAsCompleted(WizardStep.PACIENTE);
 
-  //           // Navegar al siguiente paso después de una breve pausa
-  //           setTimeout(() => {
-  //             this.wizardStateService.goToNextStep();
-  //           }, 1000);
+//           // Actualizar UI
+//           this.isLoading = false;
+//           this.autoGuardadoStatus =
+//             '  Información médica registrada exitosamente';
 
-  //         } else {
-  //           throw new Error(response.message || 'Error desconocido al crear paciente');
-  //         }
-  //       },
+//           console.log(
+//             '  Paciente creado con ID:',
+//             response.data.id_paciente
+//           );
+//           console.log(
+//             '  Datos guardados con tipo de sangre:',
+//             datosPacienteCompletos
+//           );
 
-  //       error: (error) => {
-  //         console.error('❌ Error al crear paciente:', error);
+//           // Navegar al siguiente paso después de una breve pausa
+//           setTimeout(() => {
+//             this.wizardStateService.goToNextStep();
+//           }, 1000);
+//         } else {
+//           throw new Error(
+//             response.message || 'Error desconocido al crear paciente'
+//           );
+//         }
+//       },
 
-  //         this.isLoading = false;
+//       error: (error) => {
+//         console.error('❌ Error al crear paciente:', error);
+//         this.isLoading = false;
 
-  //         // Determinar mensaje de error apropiado
-  //         let errorMessage = '❌ Error al guardar información médica';
+//         let errorMessage = '❌ Error al guardar información médica';
+//         if (error.error?.message) {
+//           errorMessage = `❌ ${error.error.message}`;
+//         } else if (error.message) {
+//           errorMessage = `❌ ${error.message}`;
+//         }
 
-  //         if (error.error?.message) {
-  //           errorMessage = `❌ ${error.error.message}`;
-  //         } else if (error.message) {
-  //           errorMessage = `❌ ${error.message}`;
-  //         } else if (error.status === 0) {
-  //           errorMessage = '❌ Sin conexión al servidor';
-  //         } else if (error.status >= 400 && error.status < 500) {
-  //           errorMessage = '❌ Error en los datos enviados';
-  //         } else if (error.status >= 500) {
-  //           errorMessage = '❌ Error del servidor';
-  //         }
+//         this.autoGuardadoStatus = errorMessage;
+//         setTimeout(() => {
+//           this.autoGuardadoStatus = '';
+//         }, 8000);
+//       },
+//     });
+//   } catch (error) {
+//     console.error('❌ Error al preparar datos:', error);
+//     this.isLoading = false;
+//     this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
+//   }
+// }
 
-  //         this.autoGuardadoStatus = errorMessage;
+/**
+ * Obtener el ID del tipo de sangre desde el catálogo
+ */
+private getTipoSangreId(tipoSangre: string): number | null {
+  const tipoEncontrado = this.tiposSangre.find(
+    (tipo) => tipo.value === tipoSangre
+  );
+  
+  // Buscar el ID en los datos originales del backend
+  if (!tipoEncontrado) {
+    console.warn('🩸 Tipo de sangre no encontrado:', tipoSangre);
+    return null;
+  }
 
-  //         // Limpiar mensaje de error después de 8 segundos
-  //         setTimeout(() => {
-  //           this.autoGuardadoStatus = '';
-  //         }, 8000);
-  //       }
-  //     });
+  // El ID debe venir del backend, verificar que existe
+  const tipoSangreId = tipoEncontrado.id || tipoEncontrado.id_tipo_sangre;
+  
+  if (!tipoSangreId) {
+    console.warn('🩸 ID de tipo de sangre no encontrado para:', tipoSangre);
+    return null;
+  }
 
-  //   } catch (error) {
-  //     console.error('❌ Error al preparar datos:', error);
-  //     this.isLoading = false;
-  //     this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
+  return Number(tipoSangreId);
+}
 
-  //     setTimeout(() => {
-  //       this.autoGuardadoStatus = '';
-  //     }, 5000);
-  //   }
-  // }
+private saveAndContinue(): void {
+  this.isLoading = true;
+  this.autoGuardadoStatus = 'Guardando información médica...';
 
-  // En paso-paciente.ts, busca el método saveAndContinue() y actualiza esta parte:
+  const currentState = this.wizardStateService.getCurrentState();
+  const idPersona = currentState.id_persona_creada;
 
-  private saveAndContinue(): void {
-    this.isLoading = true;
-    this.autoGuardadoStatus = 'Guardando información médica...';
+  if (!idPersona) {
+    console.error('❌ No se encontró el ID de la persona.');
+    alert('Error: No se encontró el ID de la persona. Debe completar el paso anterior.');
+    this.isLoading = false;
+    this.autoGuardadoStatus = '';
+    this.wizardStateService.goToStep(WizardStep.PERSONA);
+    return;
+  }
 
-    const currentState = this.wizardStateService.getCurrentState();
-    const idPersona = currentState.id_persona_creada;
+  try {
+    const formData = this.pacienteForm.value;
+    console.log('  Datos del formulario paciente:', formData);
 
-    if (!idPersona) {
-      console.error('❌ No se encontró el ID de la persona.');
-      alert(
-        'Error: No se encontró el ID de la persona. Debe completar el paso anterior.'
-      );
+    // 🔧 CORRECCIÓN: Obtener el ID del tipo de sangre
+    const tipoSangreId = this.getTipoSangreId(formData.tipo_sangre);
+    
+    if (!tipoSangreId) {
+      console.error('❌ No se pudo obtener el ID del tipo de sangre');
+      alert('Error: Seleccione un tipo de sangre válido.');
       this.isLoading = false;
       this.autoGuardadoStatus = '';
-      this.wizardStateService.goToStep(WizardStep.PERSONA);
       return;
     }
 
-    try {
-      const formData = this.pacienteForm.value;
-      console.log('  Datos del formulario paciente:', formData);
+    // Preparar DTO para el backend
+    const createPacienteDto: CreatePacienteDto = {
+      id_persona: idPersona,
+      tipo_sangre_id: tipoSangreId, // 🔧 USAR ID EN LUGAR DEL ENUM
+      alergias: formData.alergias || undefined,
+      transfusiones: formData.transfusiones === 'Si',
+      detalles_transfusiones: formData.detalles_transfusiones || undefined,
+      familiar_responsable: formData.familiar_responsable,
+      parentesco_familiar: formData.parentesco_familiar,
+      telefono_familiar: formData.telefono_familiar,
+      ocupacion: formData.ocupacion || undefined,
+      escolaridad: formData.escolaridad || undefined,
+      lugar_nacimiento: formData.lugar_nacimiento || undefined,
+      activo: true,
+    };
 
-      //   CORRECCIÓN: Buscar el nombre del tipo de sangre seleccionado
-      const tipoSangreSeleccionado = this.tiposSangre.find(
-        (tipo) => tipo.value === formData.tipo_sangre
-      );
-      const tipoSangreNombre =
-        tipoSangreSeleccionado?.label || 'No especificado';
+    console.log('  Enviando al backend (PacientesService):', createPacienteDto);
 
-      console.log('🩸 Tipo de sangre seleccionado:', {
-        valor: formData.tipo_sangre,
-        nombre: tipoSangreNombre,
-        tipos_disponibles: this.tiposSangre,
-      });
+    // Llamada real al backend
+    this.pacientesService.createPaciente(createPacienteDto).subscribe({
+      next: (response) => {
+        console.log('  Respuesta del backend (paciente creado):', response);
 
-      // Preparar DTO para el backend
-      const createPacienteDto: CreatePacienteDto = {
-        id_persona: idPersona,
-        tipo_sangre: this.mapTipoSangre(formData.tipo_sangre),
-        alergias: formData.alergias || undefined,
-        transfusiones: formData.transfusiones === 'Si',
-        detalles_transfusiones: formData.detalles_transfusiones || undefined,
-        familiar_responsable: formData.familiar_responsable,
-        parentesco_familiar: formData.parentesco_familiar,
-        telefono_familiar: formData.telefono_familiar,
-        ocupacion: formData.ocupacion || undefined,
-        escolaridad: formData.escolaridad || undefined,
-        lugar_nacimiento: formData.lugar_nacimiento || undefined,
-        activo: true,
-      };
+        if (response.success && response.data) {
+          // Encontrar el nombre del tipo de sangre para el resumen
+          const tipoSangreSeleccionado = this.tiposSangre.find(
+            (tipo) => tipo.id === tipoSangreId || tipo.id_tipo_sangre === tipoSangreId
+          );
+          const tipoSangreNombre = tipoSangreSeleccionado?.label || 'No especificado';
 
-      console.log(
-        '  Enviando al backend (PacientesService):',
-        createPacienteDto
-      );
+          const datosPacienteCompletos: Partial<DatosPaciente> = {
+            ...formData,
+            tipo_sangre_nombre: tipoSangreNombre,
+            id_persona: idPersona,
+            id_paciente: response.data.id_paciente,
+          };
 
-      // Llamada real al backend
-      this.pacientesService.createPaciente(createPacienteDto).subscribe({
-        next: (response) => {
-          console.log('  Respuesta del backend (paciente creado):', response);
+          this.wizardStateService.updatePacienteData(datosPacienteCompletos);
 
-          if (response.success && response.data) {
-            //   CORRECCIÓN: Incluir el nombre del tipo de sangre en los datos guardados
-            const datosPacienteCompletos: Partial<DatosPaciente> = {
-              ...formData,
-              tipo_sangre_nombre: tipoSangreNombre, //   Agregar nombre para el resumen
-              id_persona: idPersona,
-              id_paciente: response.data.id_paciente,
-            };
+          // Guardar ID del paciente creado
+          this.wizardStateService.updateIds({
+            id_paciente: response.data.id_paciente!,
+          });
 
-            this.wizardStateService.updatePacienteData(datosPacienteCompletos);
+          // Marcar paso como completado
+          this.wizardStateService.markStepAsCompleted(WizardStep.PACIENTE);
 
-            // Guardar ID del paciente creado
-            this.wizardStateService.updateIds({
-              id_paciente: response.data.id_paciente!,
-            });
-
-            // Marcar paso como completado
-            this.wizardStateService.markStepAsCompleted(WizardStep.PACIENTE);
-
-            // Actualizar UI
-            this.isLoading = false;
-            this.autoGuardadoStatus =
-              '  Información médica registrada exitosamente';
-
-            console.log(
-              '  Paciente creado con ID:',
-              response.data.id_paciente
-            );
-            console.log(
-              '  Datos guardados con tipo de sangre:',
-              datosPacienteCompletos
-            );
-
-            // Navegar al siguiente paso después de una breve pausa
-            setTimeout(() => {
-              this.wizardStateService.goToNextStep();
-            }, 1000);
-          } else {
-            throw new Error(
-              response.message || 'Error desconocido al crear paciente'
-            );
-          }
-        },
-
-        error: (error) => {
-          console.error('❌ Error al crear paciente:', error);
+          // Actualizar UI
           this.isLoading = false;
+          this.autoGuardadoStatus = '  Información médica registrada exitosamente';
 
-          let errorMessage = '❌ Error al guardar información médica';
-          if (error.error?.message) {
-            errorMessage = `❌ ${error.error.message}`;
-          } else if (error.message) {
-            errorMessage = `❌ ${error.message}`;
-          }
+          console.log('  Paciente creado con ID:', response.data.id_paciente);
 
-          this.autoGuardadoStatus = errorMessage;
+          // Navegar al siguiente paso después de una breve pausa
           setTimeout(() => {
-            this.autoGuardadoStatus = '';
-          }, 8000);
-        },
-      });
-    } catch (error) {
-      console.error('❌ Error al preparar datos:', error);
-      this.isLoading = false;
-      this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
-    }
+            this.wizardStateService.goToNextStep();
+          }, 1000);
+        } else {
+          throw new Error(response.message || 'Error desconocido al crear paciente');
+        }
+      },
+
+      error: (error) => {
+        console.error('❌ Error al crear paciente:', error);
+        this.isLoading = false;
+
+        let errorMessage = '❌ Error al guardar información médica';
+        if (error.error?.message) {
+          errorMessage = `❌ ${error.error.message}`;
+        } else if (error.message) {
+          errorMessage = `❌ ${error.message}`;
+        }
+
+        this.autoGuardadoStatus = errorMessage;
+        setTimeout(() => {
+          this.autoGuardadoStatus = '';
+        }, 8000);
+      },
+    });
+
+  } catch (error) {
+    console.error('❌ Error al preparar datos:', error);
+    this.isLoading = false;
+    this.autoGuardadoStatus = '❌ Error al procesar datos del formulario';
   }
+}
 
   /**
    * Mapear tipo de sangre del formulario al enum del backend

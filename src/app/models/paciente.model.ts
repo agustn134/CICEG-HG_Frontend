@@ -87,22 +87,24 @@ export interface PacienteFilters extends BaseFilters {
 // ==========================================
 // DTOS PARA PACIENTE
 // ==========================================
+
 // export interface CreatePacienteDto {
 //   id_persona: number;
+//   tipo_sangre: TipoSangreEnum;
 //   alergias?: string;
-//   transfusiones?: boolean;
+//   transfusiones: boolean;
 //   detalles_transfusiones?: string;
-//   familiar_responsable?: string;
-//   parentesco_familiar?: string;
-//   telefono_familiar?: string;
+//   familiar_responsable: string;
+//   parentesco_familiar: string;
+//   telefono_familiar: string;
 //   ocupacion?: string;
 //   escolaridad?: string;
 //   lugar_nacimiento?: string;
+//   activo: boolean;
 // }
-
 export interface CreatePacienteDto {
   id_persona: number;
-  tipo_sangre: TipoSangreEnum;
+  tipo_sangre_id?: number; // 🔧 CAMBIAR: usar ID en lugar del enum
   alergias?: string;
   transfusiones: boolean;
   detalles_transfusiones?: string;

@@ -8,12 +8,22 @@ import { API_CONFIG, ApiResponse } from '../models/base.models';
 // ==========================================
 // INTERFACES ESPECÍFICAS
 // ==========================================
+// export interface CatalogoItem {
+//   value: string | number;
+//   label: string;
+//   descripcion?: string;
+//   activo?: boolean;
+//   orden?: number;
+// }
 export interface CatalogoItem {
   value: string | number;
   label: string;
   descripcion?: string;
   activo?: boolean;
   orden?: number;
+  // 🔧 AGREGAR PROPIEDADES PARA TIPOS DE SANGRE
+  id?: number;
+  id_tipo_sangre?: number;
 }
 
 export interface CatalogoResponse {

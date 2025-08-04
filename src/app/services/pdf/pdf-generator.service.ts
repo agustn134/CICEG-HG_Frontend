@@ -108,8 +108,6 @@ interface DatosNotaPostoperatoria {
   pronostico?: string;
 }
 
-
-
 @Injectable({
   providedIn: 'root',
 })
@@ -117,8 +115,6 @@ interface DatosNotaPostoperatoria {
 export class PdfGeneratorService {
   private pdfMake: any;
   private isLoaded = false;
-
-  // Using inject() to avoid circular dependency issues
   private personalMedicoService = inject(PersonalMedicoService);
   private configuracionService = inject(ConfiguracionService);
   private authService = inject(AuthService);
@@ -167,8 +163,6 @@ export class PdfGeneratorService {
       // 1. Procesar datos común para todos
       const medicoCompleto = await this.obtenerDatosMedicoActual();
       const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
-
-      // 2. Preparar datos para template
       const datosParaTemplate = {
         ...datos,
         medicoCompleto,
@@ -183,7 +177,8 @@ export class PdfGeneratorService {
             );
           break;
         case 'Hoja Frontal':
-        case 'Hoja Frontal Expediente': // ✅ AGREGADO
+        case 'Hoja Frontal Expediente':
+           case 'Hoja Frontal de Expediente':
           documentDefinition =
             await this.pdfTemplatesService.generarHojaFrontalExpediente(
               datosParaTemplate
@@ -251,7 +246,6 @@ export class PdfGeneratorService {
       pdfDocGenerator.download(nombreArchivo);
 
       console.log(`✅ ${tipoDocumento} generado exitosamente`);
-
     } catch (error) {
       console.error(`❌ Error generando ${tipoDocumento}:`, error);
       throw error;
@@ -261,23 +255,18 @@ export class PdfGeneratorService {
   private async obtenerDatosMedicoActual(): Promise<any> {
     try {
       const usuarioActual = this.authService.getCurrentUser();
-
       if (!usuarioActual || usuarioActual.tipo_usuario !== 'medico') {
         throw new Error('Usuario no es médico o no está autenticado');
       }
-
       console.log(
         '🩺 Obteniendo datos completos del médico:',
         usuarioActual.id
       );
-
       const response = await this.personalMedicoService
         .getPersonalMedicoById(usuarioActual.id)
         .toPromise();
-
       if (response?.success && response.data) {
         const medico = response.data;
-
         return {
           id_personal_medico: medico.id_personal_medico,
           nombre_completo: `${medico.nombre} ${medico.apellido_paterno} ${medico.apellido_materno}`,
@@ -293,7 +282,6 @@ export class PdfGeneratorService {
           ),
         };
       }
-
       throw new Error('No se pudieron obtener los datos del médico');
     } catch (error) {
       console.error('❌ Error al obtener datos del médico:', error);
@@ -315,7 +303,6 @@ export class PdfGeneratorService {
     if (!especialidad) return 'Dr.';
 
     const especialidadLower = especialidad.toLowerCase();
-
     if (
       especialidadLower.includes('psicología') ||
       especialidadLower.includes('psicolog')
@@ -334,7 +321,6 @@ export class PdfGeneratorService {
     ) {
       return 'Enf.';
     }
-
     return 'Dr.';
   }
 
@@ -403,27 +389,27 @@ export class PdfGeneratorService {
 
       // Contacto
       telefono: pacienteInfo?.telefono || 'No registrado',
-      correo_electronico:
-        pacienteInfo?.correo_electronico ||
-        pacienteInfo?.email ||
-        'No registrado',
-      direccion_completa: this.formatearDireccionMejorada(pacienteInfo),
+    correo_electronico:
+      pacienteInfo?.correo_electronico ||
+      pacienteInfo?.['email'] ||
+      'No registrado',
+    direccion_completa: this.formatearDireccionMejorada(pacienteInfo),
 
       // Información médica
       tipo_sangre: pacienteInfo?.tipo_sangre ||
-        datosPaciente?.paciente?.tipo_sangre ||
-        datosPaciente?.tipo_sangre ||
-        'No registrado',
-      ocupacion:
-        pacienteInfo?.ocupacion ||
-        datosPaciente?.paciente?.ocupacion ||
-        'No registrado',
-      escolaridad:
-        pacienteInfo?.escolaridad ||
-        datosPaciente?.paciente?.escolaridad ||
-        'No registrado',
-      estado_civil: pacienteInfo?.estado_civil || 'No registrado',
-      religion: pacienteInfo?.religion || 'No registrado',
+      datosPaciente?.paciente?.['tipo_sangre'] ||
+      datosPaciente?.['tipo_sangre'] ||
+      'No registrado',
+    ocupacion:
+      pacienteInfo?.ocupacion ||
+      datosPaciente?.paciente?.ocupacion ||
+      'No registrado',
+    escolaridad:
+      pacienteInfo?.escolaridad ||
+      datosPaciente?.paciente?.escolaridad ||
+      'No registrado',
+    estado_civil: pacienteInfo?.estado_civil || 'No registrado',
+    religion: pacienteInfo?.religion || 'No registrado',
 
       // Expediente
       numero_expediente: expedienteInfo?.numero_expediente || 'No disponible',
@@ -479,9 +465,6 @@ export class PdfGeneratorService {
       saturacion_oxigeno: null as number | null,
       glucosa: null as number | null,
     };
-
-    // 🔥 BUSCAR EN DIFERENTES UBICACIONES POSIBLES
-    // 1. En datos.signosVitales (datos del formulario actual)
     if (datos.signosVitales) {
       console.log('Encontrados signos vitales en datos.signosVitales');
       signosVitales = {
@@ -494,8 +477,6 @@ export class PdfGeneratorService {
         ),
       };
     }
-
-    // 2. En datos.paciente.signosVitales (datos históricos del paciente)
     if (
       datos.paciente?.signosVitales &&
       Array.isArray(datos.paciente.signosVitales) &&
@@ -515,14 +496,12 @@ export class PdfGeneratorService {
         ),
       };
     }
-
     console.log('🩺 Signos vitales finales para el PDF:', signosVitales);
     return signosVitales;
   }
 
   private formatearDireccion(paciente: any): string {
     if (!paciente) return 'Sin dirección registrada';
-
     const partes = [
       paciente.calle,
       paciente.numero_exterior ? `#${paciente.numero_exterior}` : '',
@@ -532,31 +511,26 @@ export class PdfGeneratorService {
       paciente.estado,
       paciente.codigo_postal ? `C.P. ${paciente.codigo_postal}` : '',
     ].filter((parte) => parte && parte.trim() !== '');
-
     return partes.length > 0 ? partes.join(', ') : 'Sin dirección registrada';
   }
 
   private calcularEdad(fechaNacimiento: string): number {
     if (!fechaNacimiento) return 0;
-
     const hoy = new Date();
     const nacimiento = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
     const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
-
     if (
       diferenciaMeses < 0 ||
       (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())
     ) {
       edad--;
     }
-
     return edad;
   }
 
   private calcularIMC(peso: number, talla: number): string {
     if (!peso || !talla || peso <= 0 || talla <= 0) return '__';
-
     const imc = peso / Math.pow(talla / 100, 2);
     return imc.toFixed(1);
   }
@@ -631,44 +605,43 @@ export class PdfGeneratorService {
     }
   }
 
-  private formatearDireccionMejorada(paciente: any): string {
-    // ✅ DEBUG TEMPORAL - Verificar qué datos llegan
-    console.log('🏠 DEBUG - Datos del paciente recibidos:', {
-      domicilio: paciente.domicilio,
-      direccion: paciente.direccion,
-      persona_domicilio: paciente.persona?.domicilio,
-      estructura_completa: Object.keys(paciente)
-    });
-
-    if (!paciente) return 'Sin dirección registrada';
-
-    const domicilio =
-      paciente.domicilio ||
-      paciente.direccion ||
-      paciente.persona?.domicilio ||
-      paciente.persona?.direccion ||
-      '';
-
-    const domicilioLimpio = domicilio.toString().trim();
-
-    return domicilioLimpio !== '' &&
-      domicilioLimpio !== 'null' &&
-      domicilioLimpio !== 'undefined'
-      ? domicilioLimpio
-      : 'Sin dirección registrada';
-  }
+  // pdf-generator.service.ts - Método corregido
+private formatearDireccionMejorada(paciente: any): string {
+  console.log('🏠 DEBUG - Datos del paciente recibidos:', {
+    domicilio: paciente.domicilio,
+    direccion: paciente.direccion,
+    persona_domicilio: paciente.persona?.domicilio,
+    estructura_completa: Object.keys(paciente)
+  });
+  
+  if (!paciente) return 'Sin dirección registrada';
+  
+  // ✅ USAR BRACKET NOTATION para propiedades con índice signature
+  const domicilio =
+    paciente.domicilio ||
+    paciente.direccion ||
+    paciente.persona?.domicilio ||
+    paciente.persona?.['direccion'] ||
+    paciente['direccion_completa'] ||
+    '';
+    
+  const domicilioLimpio = domicilio.toString().trim();
+  return domicilioLimpio !== '' &&
+    domicilioLimpio !== 'null' &&
+    domicilioLimpio !== 'undefined'
+    ? domicilioLimpio
+    : 'Sin dirección registrada';
+}
 
   private obtenerDatosPadres(datos: any): DatosPadres {
     console.log('  Buscando datos de padres para Historia Clínica...');
-
     const datosPadres: DatosPadres = {
       nombre_padre: 'No registrado',
       nombre_madre: 'No registrado',
       edad_padre: null,
       edad_madre: null,
     };
-
-    // 1. Buscar en datos del paciente
+    //1. Buscar en datos del paciente
     if (datos.paciente?.paciente) {
       const pacienteData = datos.paciente.paciente;
       datosPadres.nombre_padre = pacienteData.nombre_padre || 'No registrado';
@@ -1559,43 +1532,40 @@ export class PdfGeneratorService {
     }
   }
 
-  // 🔧 AGREGAR ESTE MÉTODO EN LA CLASE PdfGeneratorService
-
   async generarHojaFrontalExpediente(datos: any): Promise<void> {
-  console.log('📂 Generando Hoja Frontal de Expediente...');
+    console.log('📂 Generando Hoja Frontal de Expediente...');
 
-  try {
-    await this.ensurePdfMakeLoaded();
+    try {
+      await this.ensurePdfMakeLoaded();
 
-    // 1. Procesar datos
-    const medicoCompleto = await this.obtenerDatosMedicoActual();
-    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+      // 1. Procesar datos
+      const medicoCompleto = await this.obtenerDatosMedicoActual();
+      const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
 
-    // 2. Preparar datos para template
-    const datosParaTemplate = {
-      ...datos,
-      medicoCompleto,
-      pacienteCompleto
-    };
+      // 2. Preparar datos para template
+      const datosParaTemplate = {
+        ...datos,
+        medicoCompleto,
+        pacienteCompleto
+      };
 
-    // 3. Obtener definición del template
-    const documentDefinition = await this.pdfTemplatesService.generarHojaFrontalExpediente(datosParaTemplate);
+      // 3. Obtener definición del template
+      const documentDefinition = await this.pdfTemplatesService.generarHojaFrontalExpediente(datosParaTemplate);
 
-    // 4. Generar y descargar
-    const fechaActual = new Date();
-    const nombreArchivo = `hoja-frontal-expediente-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+      // 4. Generar y descargar
+      const fechaActual = new Date();
+      const nombreArchivo = `hoja-frontal-expediente-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
 
-    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
-    pdfDocGenerator.download(nombreArchivo);
+      const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+      pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+      console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
 
-  } catch (error) {
-    console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
-    throw error;
+    } catch (error) {
+      console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
+      throw error;
+    }
   }
-}
-
 
   async generarPrescripcionMedicamentos(datos: any): Promise<void> {
     console.log('💊 Generando PDF de Prescripción de Medicamentos...');
