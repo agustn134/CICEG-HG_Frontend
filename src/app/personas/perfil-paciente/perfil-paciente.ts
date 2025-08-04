@@ -625,41 +625,72 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
 
   private initializeNotaEvolucionForm(): FormGroup {
-    return this.fb.group({
-      sintomas_signos: ['', [Validators.required, Validators.minLength(10)]],
-      habitus_exterior: ['', [Validators.required, Validators.minLength(5)]],
-      estado_nutricional: ['', [Validators.required, Validators.minLength(5)]],
-      estudios_laboratorio_gabinete: ['', [Validators.required, Validators.minLength(10)]],
-      evolucion_analisis: ['', [Validators.required, Validators.minLength(10)]],
-      diagnosticos: ['', [Validators.required, Validators.minLength(10)]],
-      plan_estudios_tratamiento: ['', [Validators.required, Validators.minLength(10)]],
-      pronostico: ['', [Validators.required, Validators.minLength(5)]],
-      id_guia_diagnostico: [null],
-      dias_hospitalizacion: [null, [Validators.min(0), Validators.max(365)]],
-      fecha_ultimo_ingreso: [''],
-      temperatura: [null, [Validators.min(30), Validators.max(45)]],
-      frecuencia_cardiaca: [null, [Validators.min(30), Validators.max(250)]],
-      frecuencia_respiratoria: [null, [Validators.min(8), Validators.max(60)]],
-      presion_arterial_sistolica: [null, [Validators.min(60), Validators.max(250)]],
-      presion_arterial_diastolica: [null, [Validators.min(30), Validators.max(150)]],
-      saturacion_oxigeno: [null, [Validators.min(50), Validators.max(100)]],
-      peso_actual: [null, [Validators.min(0.5), Validators.max(300)]],
-      talla_actual: [null, [Validators.min(30), Validators.max(250)]],
-      exploracion_cabeza: [''],
-      exploracion_cuello: [''],
-      exploracion_torax: [''],
-      exploracion_abdomen: [''],
-      exploracion_extremidades: [''],
-      exploracion_columna: [''],
-      exploracion_genitales: [''],
-      exploracion_neurologico: [''],
-      diagnosticos_guias: [''],
-      interconsultas: ['No se solicitaron interconsultas en esta evolución'],
-      indicaciones_medicas: [''],
-      observaciones_adicionales: [''],
-    });
-  }
+  return this.fb.group({
+    // ✅ SOLO REQUIRED, SIN minLength
+    sintomas_signos: ['', [Validators.required]],
+    habitus_exterior: ['', [Validators.required]],
+    estado_nutricional: ['', [Validators.required]],
+    estudios_laboratorio_gabinete: ['', [Validators.required]],
+    evolucion_analisis: ['', [Validators.required]],
+    diagnosticos: ['', [Validators.required]],
+    plan_estudios_tratamiento: ['', [Validators.required]],
+    pronostico: ['', [Validators.required]],
 
+    // ✅ CAMPOS OPCIONALES (sin cambios)
+    id_guia_diagnostico: [null],
+    dias_hospitalizacion: [null, [Validators.min(0), Validators.max(365)]],
+    fecha_ultimo_ingreso: [''],
+    temperatura: [null, [Validators.min(30), Validators.max(45)]],
+    frecuencia_cardiaca: [null, [Validators.min(30), Validators.max(250)]],
+    frecuencia_respiratoria: [null, [Validators.min(8), Validators.max(60)]],
+    presion_arterial_sistolica: [null, [Validators.min(60), Validators.max(250)]],
+    presion_arterial_diastolica: [null, [Validators.min(30), Validators.max(150)]],
+    saturacion_oxigeno: [null, [Validators.min(50), Validators.max(100)]],
+    peso_actual: [null, [Validators.min(0.5), Validators.max(300)]],
+    talla_actual: [null, [Validators.min(30), Validators.max(250)]],
+
+    // ✅ CAMPOS OPCIONALES
+    exploracion_cabeza: [''],
+    exploracion_cuello: [''],
+    exploracion_torax: [''],
+    exploracion_abdomen: [''],
+    exploracion_extremidades: [''],
+    exploracion_columna: [''],
+    exploracion_genitales: [''],
+    exploracion_neurologico: [''],
+    diagnosticos_guias: [''],
+    interconsultas: ['No se solicitaron interconsultas en esta evolución'],
+    indicaciones_medicas: [''],
+    observaciones_adicionales: ['']
+  });
+}
+public debugNotaEvolucion(): void {
+  console.log('🔍 DEBUG NOTA EVOLUCIÓN:');
+  console.log('✅ Formulario válido:', this.notaEvolucionForm.valid);
+
+  const obligatorios = [
+    'sintomas_signos', 'habitus_exterior', 'estado_nutricional',
+    'estudios_laboratorio_gabinete', 'evolucion_analisis',
+    'diagnosticos', 'plan_estudios_tratamiento', 'pronostico'
+  ];
+
+  obligatorios.forEach(campo => {
+    const control = this.notaEvolucionForm.get(campo);
+    const valor = control?.value || '';
+    const esValido = control?.valid;
+    const errores = control?.errors;
+
+    console.log(`📋 ${campo}:`, {
+      valor: `"${valor}" (${valor.length} caracteres)`,
+      válido: esValido,
+      errores: errores
+    });
+
+    if (!esValido) {
+      console.log(`❌ ${campo} NO VÁLIDO:`, errores);
+    }
+  });
+}
   private initializeConsentimientoForm(): FormGroup {
     return this.fb.group({
       // Información del procedimiento (OBLIGATORIO NOM-004)
@@ -3140,7 +3171,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
       paciente: datosPacienteEstructurados,
       medico: medicoCompleto,
       expediente: this.pacienteCompleto?.expediente,
-      configuracion: { 
+      configuracion: {
         logo_gobierno: '/uploads/logos/logo-gobierno-default.svg',
         logo_principal: '/uploads/logos/logo-principal-default.svg'
       }
@@ -5281,7 +5312,7 @@ async guardarHojaFrontal(): Promise<void> {
       id_expediente: this.pacienteCompleto?.expediente?.id_expediente,
       id_paciente: this.pacienteCompleto?.paciente?.id_paciente,
       id_personal_registro: this.medicoActual,
-      
+
       // Estructurar contactos de emergencia
       contacto_emergencia_1: {
         nombre_completo: this.hojaFrontalForm.value.contacto_emergencia_1_nombre,
@@ -5290,7 +5321,7 @@ async guardarHojaFrontal(): Promise<void> {
         telefono_secundario: this.hojaFrontalForm.value.contacto_emergencia_1_telefono_secundario,
         direccion: this.hojaFrontalForm.value.contacto_emergencia_1_direccion
       },
-      
+
       contacto_emergencia_2: this.hojaFrontalForm.value.contacto_emergencia_2_nombre ? {
         nombre_completo: this.hojaFrontalForm.value.contacto_emergencia_2_nombre,
         parentesco: this.hojaFrontalForm.value.contacto_emergencia_2_parentesco,
@@ -5307,10 +5338,10 @@ async guardarHojaFrontal(): Promise<void> {
     if (response.success) {
       this.formularioEstado.hojaFrontal = true;
       this.success = 'Hoja Frontal de Expediente guardada correctamente';
-      
+
       // Actualizar estado en localStorage
       this.guardarLocalmenteFormulario();
-      
+
       console.log('✅ Hoja Frontal guardada:', response.data);
     } else {
       throw new Error(response.message || 'Error al guardar la hoja frontal');
@@ -5339,17 +5370,17 @@ private prellenarDatosHojaFrontal(): void {
     // ✅ CORREGIR ACCESO CON BRACKET NOTATION
     telefono_secundario: personaData['telefono_secundario'] || pacienteData['telefono_secundario'] || '',
     email: personaData.correo_electronico || pacienteData['email'] || '',
-    
+
     // Datos socioeconómicos
     escolaridad: pacienteData.escolaridad || '',
     ocupacion: pacienteData.ocupacion || '',
     estado_conyugal: personaData.estado_civil || '',
     religion: personaData.religion || '',
-    
+
     // Contacto de emergencia desde datos del paciente
     contacto_emergencia_1_nombre: pacienteData.familiar_responsable || '',
     contacto_emergencia_1_telefono_principal: pacienteData.telefono_familiar || '',
-    
+
     // Información médica
     alergias_conocidas: pacienteData.alergias || 'Ninguna conocida',
   };
