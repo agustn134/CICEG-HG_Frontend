@@ -3,12 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { GuiaClinica, CreateGuiaClinicaDto, UpdateGuiaClinicaDto, GuiaClinicaFilters } from '../../models/guia-clinica.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GuiasClinicasService {
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/guias-clinicas';
+  private readonly API_URL = `${environment.apiUrl}/catalogos/guias-clinicas`;
 
   private httpOptions = {
     headers: new HttpHeaders({

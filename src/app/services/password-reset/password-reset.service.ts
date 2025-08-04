@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { environment } from '../../../environments/environments';
 
 // ==========================================
 // INTERFACES
@@ -38,7 +39,7 @@ export interface ResetPasswordRequest {
 })
 export class PasswordResetService {
   // 🔥 URL del API
-  private readonly API_URL = 'http://localhost:3000/api/auth/password-reset';
+  private readonly API_URL = `${environment.apiUrl}/auth/password-reset`;
 
   // Estados del proceso
   private loadingSubject = new BehaviorSubject<boolean>(false);

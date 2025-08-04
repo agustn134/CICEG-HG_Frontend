@@ -9,7 +9,7 @@ import { ApiResponse } from '../../models/base.models';
 })
 export class ReferenciasTraslado {
 
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/referencias-traslado';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/referencias-traslado`;
 
   constructor(private http: HttpClient) { }
 

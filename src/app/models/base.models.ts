@@ -1,5 +1,7 @@
 // src/app/models/base.models.ts
 
+import { environment } from "../../environments/environments";
+
 // ==========================================
 // INTERFACES BASE PARA TODA LA APLICACIÓN
 // ==========================================
@@ -166,7 +168,7 @@ export interface ValidationResult {
 // ==========================================
 
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000/api',
+  BASE_URL: environment.apiUrl,
   TIMEOUT: 30000,
   DEFAULT_PAGE_SIZE: 10,
   MAX_PAGE_SIZE: 100

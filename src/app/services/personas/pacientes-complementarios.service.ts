@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 export interface DatosComplementariosPaciente {
   tipo_sangre?: string;
@@ -22,7 +23,7 @@ export interface DatosComplementariosPaciente {
   providedIn: 'root'
 })
 export class PacientesComplementariosService {
-  private readonly API_URL = 'http://localhost:3000/api/personas/pacientes';
+  private readonly API_URL = `${environment.apiUrl}/personas/pacientes`;
 
   constructor(private http: HttpClient) {}
 

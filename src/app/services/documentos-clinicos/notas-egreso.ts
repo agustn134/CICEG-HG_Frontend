@@ -17,12 +17,13 @@ import {
   NotaEgresoUtils
 } from '../../models/nota-egreso.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotasEgresoService {
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/notas-egreso';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/notas-egreso`;
 
   constructor(private http: HttpClient) { }
 

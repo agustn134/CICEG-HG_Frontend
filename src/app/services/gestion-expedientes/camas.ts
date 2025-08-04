@@ -4,12 +4,13 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { Cama, CreateCamaDto, UpdateCamaDto, CamaFilters } from '../../models/cama.model';
 import { EstadoCama } from '../../models/base.models';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CamasService {
-  private readonly API_URL = 'http://localhost:3000/api/gestion-expedientes/camas';
+  private readonly API_URL = `${environment.apiUrl}/gestion-expedientes/camas`;
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -139,7 +140,7 @@ export class CamasService {
   // Obtener camas disponibles
 async getCamasDisponibles(idServicio?: number): Promise<ApiResponse<Cama[]>> {
   try {
-    let url = this.API_URL; // http://localhost:3000/api/gestion-expedientes/camas
+    let url = this.API_URL; 
 
     // Usar query parameters
     if (idServicio) {

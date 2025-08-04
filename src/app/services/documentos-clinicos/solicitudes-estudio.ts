@@ -9,7 +9,7 @@ import { ApiResponse } from '../../models/base.models';
 })
 export class SolicitudesEstudio {
 
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/solicitudes-estudio';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/solicitudes-estudio`;
 
 
   constructor(private http: HttpClient) { }

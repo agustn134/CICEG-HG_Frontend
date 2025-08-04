@@ -13,12 +13,13 @@ import {
   PersonaMapper,
   ApiResponse,
 } from '../../models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PersonasService {
-  private readonly API_URL = 'http://localhost:3000/api/personas';
+  private readonly API_URL = `${environment.apiUrl}/personas`;
 
   // Estado del servicio (mantenemos formato frontend para la UI)
   private personasSubject = new BehaviorSubject<PersonaFrontend[]>([]);

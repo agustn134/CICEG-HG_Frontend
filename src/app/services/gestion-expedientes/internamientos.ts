@@ -17,12 +17,13 @@ import {
   HistorialInternamientosPaciente
 } from '../../models/internamiento.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InternamientosService {
-  private readonly API_URL = 'http://localhost:3000/api/gestion-expedientes/internamientos';
+  private readonly API_URL = `${environment.apiUrl}/gestion-expedientes/internamientos`;
 
   // Estado de carga para la UI
   private loadingSubject = new BehaviorSubject<boolean>(false);

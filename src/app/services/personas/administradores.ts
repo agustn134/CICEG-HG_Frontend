@@ -19,6 +19,7 @@ import {
   NivelAcceso,
   ApiResponse
 } from '../../models';
+import { environment } from '../../../environments/environments';
 
 // ==========================================
 // INTERFACES ESPECÍFICAS PARA EL SERVICIO
@@ -47,7 +48,7 @@ export interface AdministradorParaLogin {
   providedIn: 'root'
 })
 export class AdministradorService {
-  private readonly API_URL = 'http://localhost:3000/api/personas/administradores';
+  private readonly API_URL = `${environment.apiUrl}/personas/administradores`;
 
   // Estado del servicio
   private administradoresSubject = new BehaviorSubject<Administrador[]>([]);

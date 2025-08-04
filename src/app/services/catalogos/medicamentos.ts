@@ -3,12 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { Medicamento, CreateMedicamentoDto, UpdateMedicamentoDto, MedicamentoFilters } from '../../models/medicamento.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MedicamentosService {
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/medicamentos';
+  private readonly API_URL = `${environment.apiUrl}/catalogos/medicamentos`;
 
   private httpOptions = {
     headers: new HttpHeaders({

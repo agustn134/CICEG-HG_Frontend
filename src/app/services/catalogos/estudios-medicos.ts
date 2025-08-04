@@ -1,24 +1,15 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class EstudiosMedicos {
-//   private readonly API_URL = 'http://localhost:3000/api/catalogos/estudios-medicos';
-
-//   constructor() { }
-// }
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { EstudioMedico, CreateEstudioMedicoDto, UpdateEstudioMedicoDto, EstudioMedicoFilters } from '../../models/estudio-medico.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EstudiosMedicosService {
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/estudios-medicos';
+  private readonly API_URL = `${environment.apiUrl}/api/catalogos/estudios-medicos`;
 
   private httpOptions = {
     headers: new HttpHeaders({

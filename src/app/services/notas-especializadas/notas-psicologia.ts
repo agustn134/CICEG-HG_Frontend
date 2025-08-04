@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotasPsicologia {
 
-  private readonly API_URL = 'http://localhost:3000/api/notas-especializadas/notas-nutricion';
+  private readonly API_URL = `${environment.apiUrl}/notas-especializadas/notas-nutricion`;
 
   constructor() { }
 }

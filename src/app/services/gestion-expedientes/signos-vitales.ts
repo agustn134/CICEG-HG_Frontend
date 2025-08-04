@@ -20,12 +20,13 @@ import {
   RANGOS_NORMALES_NEONATO
 } from '../../models/signos-vitales.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignosVitalesService {
-  private readonly API_URL = 'http://localhost:3000/api/gestion-expedientes/signos-vitales';
+  private readonly API_URL = `${environment.apiUrl}/gestion-expedientes/signos-vitales`;
 
   constructor(private http: HttpClient) { }
 

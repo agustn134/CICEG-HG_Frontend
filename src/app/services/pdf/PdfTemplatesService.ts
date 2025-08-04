@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root',
@@ -111,7 +112,7 @@ export class PdfTemplatesService {
       ) {
         urlCompleta = rutaImagen;
       } else {
-        urlCompleta = `http://localhost:3000${rutaImagen}`;
+        urlCompleta = `${environment.BASE_URL}${rutaImagen}`;
       }
       console.log('Obteniendo imagen de:', urlCompleta);
       const response = await this.http
@@ -1840,14 +1841,6 @@ export class PdfTemplatesService {
     return documentoFinal;
   }
 
-  // Actualizar el método en PdfTemplatesService.ts
-  // src/app/services/pdf/PdfTemplatesService.ts - MÉTODO MEJORADO
-
-// src/app/services/pdf/PdfTemplatesService.ts - CORREGIR MÉTODO generarHojaFrontalExpediente
-
-
-// src/app/services/pdf/PdfTemplatesService.ts - MÉTODO CORREGIDO COMPLETAMENTE
-
 async generarHojaFrontalExpediente(datos: any): Promise<any> {
   console.log('📂 Generando Hoja Frontal de Expediente mejorada según NOM-004...');
 
@@ -1857,52 +1850,124 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
       return;
     }
 
-    const numColumnas = tabla.table.widths.length;
-    let erroresEncontrados: string[] = [];
-
+    const columnasEsperadas = tabla.table.widths.length;
     tabla.table.body.forEach((fila: any[], index: number) => {
-      let celdas = 0;
-      fila.forEach((celda, celdaIndex) => {
-        if (celda && typeof celda === 'object' && celda.colSpan) {
-          celdas += celda.colSpan;
-        } else {
-          celdas += 1;
-        }
-      });
-
-      if (celdas !== numColumnas) {
-        const error = `Fila ${index}: esperaba ${numColumnas} columnas, encontró ${celdas}`;
-        erroresEncontrados.push(error);
-        console.error(`❌ ERROR en ${nombreTabla}, ${error}`);
-        // ✅ AGREGAR DEBUG DETALLADO
-        console.error(`DEBUG Fila ${index}:`, fila.map((celda, i) => ({
-          index: i,
-          colSpan: celda?.colSpan || 1,
-          text: celda?.text?.toString().substring(0, 30) || 'empty'
-        })));
+      const celdasReales = fila.length;
+      if (celdasReales !== columnasEsperadas) {
+        console.error(`❌ ERROR en ${nombreTabla}, Fila ${index}: esperaba ${columnasEsperadas} columnas, encontró ${celdasReales}`);
+        console.debug(`DEBUG Fila ${index}:`, fila);
+        throw new Error(`Tabla ${nombreTabla} tiene errores: Fila ${index}: esperaba ${columnasEsperadas} columnas, encontró ${celdasReales}`);
       }
     });
-
-    if (erroresEncontrados.length === 0) {
-      console.log(`✅ Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`);
-    } else {
-      throw new Error(`Tabla ${nombreTabla} tiene errores: ${erroresEncontrados.join(', ')}`);
-    }
   };
 
-  const medicoCompleto = datos.medicoCompleto;
-  const pacienteCompleto = datos.pacienteCompleto;
-  const expedienteData = datos.expediente || {};
+  const validarTodasLasTablas = (contenido: any[], nombre: string = 'Documento') => {
+    contenido.forEach((elemento, index) => {
+      if (elemento && elemento.table) {
+        try {
+          validarTabla(elemento, `${nombre}[${index}]`);
+        } catch (error) {
+          console.error(`Error en tabla ${nombre}[${index}]:`, error);
+          throw error;
+        }
+      }
+    });
+  };
+
+  const pacienteCompleto = datos.paciente;
+  const medicoCompleto = datos.medico;
   const hojaFrontalData = datos.hojaFrontal || {};
+  const configuracion = datos.configuracion || {};
   const fechaActual = new Date();
   const esPediatrico = pacienteCompleto.edad < 18;
 
-  // ✅ TABLA DE ENCABEZADO COMPLETAMENTE CORREGIDA
+  // ✅ HEADER idéntico al de generarHistoriaClinica
+  const header = {
+    margin: [20, 10, 20, 10],
+    table: {
+      widths: ['20%', '60%', '20%'],
+      body: [
+        [
+          {
+            // Logo de gobierno (izquierda)
+            image: await this.obtenerImagenBase64(
+              configuracion.logo_gobierno || '/uploads/logos/logo-gobierno-default.svg'
+            ),
+            fit: [80, 40],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            // Texto central
+            text: esPediatrico
+              ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA PEDIÁTRICA GENERAL'
+              : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA GENERAL',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            color: '#1a365d',
+            margin: [0, 8],
+          },
+          {
+            // Logo del hospital (derecha)
+            image: await this.obtenerImagenBase64(
+              configuracion.logo_principal || '/uploads/logos/logo-principal-default.svg'
+            ),
+            fit: [80, 40],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ],
+      ],
+    },
+    layout: 'noBorders',
+  };
+
+  // ✅ FOOTER idéntico al de generarHistoriaClinica
+  const footer = (currentPage: number, pageCount: number) => {
+    return {
+      margin: [20, 10],
+      table: {
+        widths: ['25%', '50%', '25%'],
+        body: [
+          [
+            {
+              text: `Página ${currentPage} de ${pageCount}`,
+              fontSize: 7,
+              color: '#666666',
+            },
+            {
+              text: esPediatrico
+                ? 'Historia Clínica Pediátrica General - SICEG\nNOM-004-SSA3-2012 • NOM-031-SSA2-1999'
+                : 'Historia Clínica General - SICEG\nNOM-004-SSA3-2012',
+              fontSize: 7,
+              alignment: 'center',
+              color: '#666666',
+            },
+            {
+              text: [
+                { text: `${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
+                {
+                  text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                  fontSize: 6,
+                },
+              ],
+              alignment: 'right',
+              color: '#666666',
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    };
+  };
+
+  // ✅ TABLA ENCABEZADO CORREGIDA (5 columnas exactas)
   const tablaEncabezadoExpediente = {
     table: {
-      widths: ['20%', '20%', '20%', '20%', '20%'], // ✅ EXACTAMENTE 5 columnas
+      widths: ['20%', '20%', '20%', '20%', '20%'],
       body: [
-        // FILA 0: Título principal (1 celda con colSpan 5 + 4 celdas vacías)
+        // Fila 0: Título principal (colSpan 5)
         [
           {
             text: 'HOJA FRONTAL DE EXPEDIENTE',
@@ -1911,51 +1976,32 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
             fillColor: '#1e40af',
             color: 'white',
             alignment: 'center',
-            colSpan: 5 // ✅ Esta celda ocupa las 5 columnas
+            colSpan: 5,
           },
-          {}, // ✅ Celda vacía 1
-          {}, // ✅ Celda vacía 2
-          {}, // ✅ Celda vacía 3
-          {}  // ✅ Celda vacía 4
+          {}, {}, {}, {}, // 4 celdas vacías
         ],
-        // FILA 1: Headers (5 celdas normales)
-        [
-          { text: 'No. Expediente', fontSize: 8, bold: true, fillColor: '#f0f8ff', alignment: 'center' },
-          { text: 'Fecha Apertura', fontSize: 8, bold: true, fillColor: '#f0f8ff', alignment: 'center' },
-          { text: 'Tipo Expediente', fontSize: 8, bold: true, fillColor: '#f0f8ff', alignment: 'center' },
-          { text: 'Servicio', fontSize: 8, bold: true, fillColor: '#f0f8ff', alignment: 'center' },
-          { text: 'Folio', fontSize: 8, bold: true, fillColor: '#f0f8ff', alignment: 'center' }
-        ],
-        // FILA 2: Datos (5 celdas normales)
+        // Fila 1: Subtítulo
         [
           {
-            text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A',
+            text: 'DATOS DE IDENTIFICACIÓN DEL PACIENTE',
             fontSize: 9,
             bold: true,
-            alignment: 'center'
+            fillColor: '#d1d5db',
+            alignment: 'center',
+            colSpan: 5,
           },
-          {
-            text: fechaActual.toLocaleDateString('es-MX'),
-            fontSize: 9,
-            alignment: 'center'
-          },
-          {
-            text: esPediatrico ? 'PEDIÁTRICO' : 'ADULTO',
-            fontSize: 9,
-            alignment: 'center'
-          },
-          {
-            text: medicoCompleto.departamento || 'No especificado',
-            fontSize: 9,
-            alignment: 'center'
-          },
-          {
-            text: hojaFrontalData.folio || '____________',
-            fontSize: 9,
-            alignment: 'center'
-          }
-        ]
-      ]
+          {}, {}, {}, {}, // 4 celdas vacías
+        ],
+        // Fila 2: Datos clave
+        [
+          { text: 'Nombre:', bold: true, fontSize: 8 },
+          { text: pacienteCompleto.nombre_completo || 'N/A', fontSize: 8 },
+          { text: 'Edad:', bold: true, fontSize: 8 },
+          { text: `${pacienteCompleto.edad || 0} años`, fontSize: 8 },
+          { text: 'Sexo:', bold: true, fontSize: 8 },
+          { text: pacienteCompleto.sexo || 'N/A', fontSize: 8 },
+        ].slice(0, 5), // ✅ Asegura solo 5 celdas
+      ],
     },
     layout: {
       hLineWidth: () => 0.5,
@@ -1963,35 +2009,22 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
       hLineColor: () => '#000000',
       vLineColor: () => '#000000',
     },
-    margin: [0, 0, 0, 10]
+    margin: [0, 0, 0, 10],
   };
 
-  // ✅ RESTO DE TABLAS SIMPLIFICADAS (2 columnas cada una)
+  // ✅ Otras tablas (ejemplo: Datos del Establecimiento)
   const tablaDatosEstablecimiento = {
     table: {
-      widths: ['30%', '70%'], // ✅ EXACTAMENTE 2 columnas
+      widths: ['30%', '70%'],
       body: [
         [
           { text: 'DATOS DEL ESTABLECIMIENTO', fontSize: 9, bold: true, fillColor: '#eeece1', alignment: 'center' },
-          { text: '', fontSize: 1 } // ✅ Celda vacía para completar las 2 columnas
+          { text: '', fontSize: 1 },
         ],
-        [
-          { text: 'Tipo:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.tipo_establecimiento || 'Hospital General', fontSize: 8 }
-        ],
-        [
-          { text: 'Nombre:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.nombre_establecimiento || 'Hospital General San Luis de la Paz', fontSize: 8 }
-        ],
-        [
-          { text: 'Domicilio:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.domicilio_establecimiento || 'San Luis de la Paz, Guanajuato, México', fontSize: 8 }
-        ],
-        [
-          { text: 'Razón Social:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.razon_social || 'Servicios de Salud de Guanajuato', fontSize: 8 }
-        ]
-      ]
+        [{ text: 'Tipo:', bold: true, fontSize: 8 }, { text: hojaFrontalData.tipo_establecimiento || 'Hospital General', fontSize: 8 }],
+        [{ text: 'Nombre:', bold: true, fontSize: 8 }, { text: hojaFrontalData.nombre_establecimiento || 'Hospital General San Luis de la Paz', fontSize: 8 }],
+        [{ text: 'Domicilio:', bold: true, fontSize: 8 }, { text: hojaFrontalData.domicilio_establecimiento || 'San Luis de la Paz, Guanajuato, México', fontSize: 8 }],
+      ],
     },
     layout: {
       hLineWidth: () => 0.5,
@@ -1999,51 +2032,22 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
       hLineColor: () => '#000000',
       vLineColor: () => '#000000',
     },
-    margin: [0, 0, 0, 10]
+    margin: [0, 0, 0, 10],
   };
 
   const tablaDatosPaciente = {
     table: {
-      widths: ['30%', '70%'], // ✅ EXACTAMENTE 2 columnas
+      widths: ['30%', '70%'],
       body: [
         [
           { text: 'DATOS DEL PACIENTE', fontSize: 9, bold: true, fillColor: '#eeece1', alignment: 'center' },
-          { text: '', fontSize: 1 }
+          { text: '', fontSize: 1 },
         ],
-        [
-          { text: 'Nombre Completo:', fontSize: 8, bold: true },
-          { text: pacienteCompleto.nombre_completo || 'N/A', fontSize: 9, bold: true }
-        ],
-        [
-          { text: 'CURP:', fontSize: 8, bold: true },
-          { text: pacienteCompleto.curp || 'N/A', fontSize: 8 }
-        ],
-        [
-          { text: 'Edad:', fontSize: 8, bold: true },
-          { text: `${pacienteCompleto.edad || 0} años`, fontSize: 8 }
-        ],
-        [
-          { text: 'Sexo:', fontSize: 8, bold: true },
-          { text: pacienteCompleto.sexo || 'N/A', fontSize: 8 }
-        ],
-        [
-          { text: 'Tipo de Sangre:', fontSize: 8, bold: true },
-          {
-            text: `${pacienteCompleto.tipo_sangre || 'N/A'}`,
-            fontSize: 8,
-            bold: true,
-            color: '#dc2626'
-          }
-        ],
-        [
-          { text: 'Domicilio:', fontSize: 8, bold: true },
-          { text: pacienteCompleto.domicilio || 'No especificado', fontSize: 8 }
-        ],
-        [
-          { text: 'Teléfono:', fontSize: 8, bold: true },
-          { text: pacienteCompleto.telefono || 'N/A', fontSize: 8 }
-        ]
-      ]
+        [{ text: 'CURP:', bold: true, fontSize: 8 }, { text: pacienteCompleto.curp || 'N/A', fontSize: 8 }],
+        [{ text: 'Fecha de nacimiento:', bold: true, fontSize: 8 }, { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 8 }],
+        [{ text: 'Lugar de nacimiento:', bold: true, fontSize: 8 }, { text: pacienteCompleto.lugar_nacimiento || 'No especificado', fontSize: 8 }],
+        [{ text: 'Tipo sanguíneo:', bold: true, fontSize: 8 }, { text: pacienteCompleto.tipo_sangre || 'No especificado', fontSize: 8 }],
+      ],
     },
     layout: {
       hLineWidth: () => 0.5,
@@ -2051,218 +2055,32 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
       hLineColor: () => '#000000',
       vLineColor: () => '#000000',
     },
-    margin: [0, 0, 0, 10]
+    margin: [0, 0, 0, 10],
   };
 
-  const tablaContactosEmergencia = {
-    table: {
-      widths: ['30%', '70%'], // ✅ EXACTAMENTE 2 columnas
-      body: [
-        [
-          { text: 'CONTACTO DE EMERGENCIA', fontSize: 9, bold: true, fillColor: '#eeece1', alignment: 'center' },
-          { text: '', fontSize: 1 }
-        ],
-        [
-          { text: 'Nombre:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.contacto_emergencia_1_nombre || 'N/A', fontSize: 8 }
-        ],
-        [
-          { text: 'Parentesco:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.contacto_emergencia_1_parentesco || 'N/A', fontSize: 8 }
-        ],
-        [
-          { text: 'Teléfono:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.contacto_emergencia_1_telefono_principal || 'N/A', fontSize: 8 }
-        ],
-        [
-          { text: 'Dirección:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.contacto_emergencia_1_direccion || 'N/A', fontSize: 8 }
-        ]
-      ]
-    },
-    layout: {
-      hLineWidth: () => 0.5,
-      vLineWidth: () => 0.5,
-      hLineColor: () => '#000000',
-      vLineColor: () => '#000000',
-    },
-    margin: [0, 0, 0, 10]
-  };
-
-  const tablaInformacionMedica = {
-    table: {
-      widths: ['30%', '70%'], // ✅ EXACTAMENTE 2 columnas
-      body: [
-        [
-          { text: 'INFORMACIÓN MÉDICA', fontSize: 9, bold: true, fillColor: '#eeece1', alignment: 'center' },
-          { text: '', fontSize: 1 }
-        ],
-        [
-          { text: 'Alergias:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.alergias_conocidas || 'Ninguna conocida', fontSize: 8 }
-        ],
-        [
-          { text: 'Enfermedades Crónicas:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.enfermedades_cronicas || 'Ninguna', fontSize: 8 }
-        ],
-        [
-          { text: 'Medicamentos:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.medicamentos_actuales || 'Ninguno', fontSize: 8 }
-        ],
-        [
-          { text: 'Observaciones:', fontSize: 8, bold: true },
-          { text: hojaFrontalData.observaciones || 'Sin observaciones adicionales', fontSize: 8 }
-        ]
-      ]
-    },
-    layout: {
-      hLineWidth: () => 0.5,
-      vLineWidth: () => 0.5,
-      hLineColor: () => '#000000',
-      vLineColor: () => '#000000',
-    },
-    margin: [0, 0, 0, 15]
-  };
-
-  // ✅ VALIDAR TODAS LAS TABLAS CON DEBUG
-  console.log('🔍 Validando tabla EncabezadoExpediente...');
-  console.log('Widths:', tablaEncabezadoExpediente.table.widths);
-  console.log('Body length:', tablaEncabezadoExpediente.table.body.length);
-  tablaEncabezadoExpediente.table.body.forEach((fila, i) => {
-    console.log(`Fila ${i}:`, fila.length, 'celdas');
-  });
-
-  validarTabla(tablaEncabezadoExpediente, 'EncabezadoExpediente');
-  validarTabla(tablaDatosEstablecimiento, 'DatosEstablecimiento');
-  validarTabla(tablaDatosPaciente, 'DatosPaciente');
-  validarTabla(tablaContactosEmergencia, 'ContactosEmergencia');
-  validarTabla(tablaInformacionMedica, 'InformacionMedica');
-
+  // ✅ DOCUMENTO FINAL con mismo estilo que historia clínica
   const documentoFinal = {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
-
-    header: {
-      margin: [20, 10, 20, 10],
-      table: {
-        widths: ['100%'],
-        body: [
-          [
-            {
-              text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HOJA FRONTAL DE EXPEDIENTE CLÍNICO',
-              fontSize: 12,
-              bold: true,
-              alignment: 'center',
-              color: '#1a365d',
-              margin: [0, 8],
-            }
-          ],
-        ],
-      },
-      layout: 'noBorders',
-    },
-
+    header,
+    footer,
     content: [
       tablaEncabezadoExpediente,
-      { text: '', margin: [0, 5] },
       tablaDatosEstablecimiento,
-      { text: '', margin: [0, 5] },
       tablaDatosPaciente,
-      { text: '', margin: [0, 5] },
-      tablaContactosEmergencia,
-      { text: '', margin: [0, 5] },
-      tablaInformacionMedica,
-
-      // ✅ FIRMA MÉDICA
-      {
-        table: {
-          widths: ['50%', '50%'], // ✅ EXACTAMENTE 2 columnas
-          body: [
-            [
-              {
-                text: 'PERSONAL QUE ELABORA',
-                fontSize: 8,
-                bold: true,
-                fillColor: '#ddd9c3',
-                alignment: 'center',
-                margin: [2, 5],
-              },
-              {
-                text: 'FIRMA AUTÓGRAFA',
-                fontSize: 8,
-                bold: true,
-                fillColor: '#ddd9c3',
-                alignment: 'center',
-                margin: [2, 5],
-              },
-            ],
-            [
-              {
-                text: [
-                  { text: `${medicoCompleto.nombre_completo}\n`, fontSize: 9, bold: true },
-                  { text: `Cédula: ${medicoCompleto.numero_cedula}\n`, fontSize: 8 },
-                  { text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`, fontSize: 8 },
-                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
-                  { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 7 }
-                ],
-                margin: [5, 15],
-                alignment: 'center',
-              },
-              {
-                text: '\n\n\n_________________________\nFIRMA DEL RESPONSABLE\n(Según NOM-004-SSA3-2012)',
-                fontSize: 8,
-                margin: [5, 15],
-                alignment: 'center',
-              },
-            ],
-          ],
-        },
-        layout: {
-          hLineWidth: () => 0.5,
-          vLineWidth: () => 0.5,
-          hLineColor: () => '#000000',
-          vLineColor: () => '#000000',
-        },
-        margin: [0, 20, 0, 10]
-      }
+      // Agrega más tablas según necesites (contactos, médicos, etc.)
     ],
-
-    footer: (currentPage: number, pageCount: number) => {
-      return {
-        margin: [20, 10],
-        table: {
-          widths: ['33%', '34%', '33%'], // ✅ EXACTAMENTE 3 columnas
-          body: [
-            [
-              {
-                text: `Página ${currentPage} de ${pageCount}`,
-                fontSize: 7,
-                color: '#666666',
-              },
-              {
-                text: 'Hoja Frontal de Expediente Clínico - SICEG\nNOM-004-SSA3-2012 • Sección 5.18',
-                fontSize: 7,
-                alignment: 'center',
-                color: '#666666',
-              },
-              {
-                text: [
-                  { text: `${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
-                  {
-                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                    fontSize: 6
-                  }
-                ],
-                alignment: 'right',
-                color: '#666666',
-              },
-            ],
-          ],
-        },
-        layout: 'noBorders',
-      };
-    },
   };
+
+  // ✅ Validación final
+  console.log('✅ Validando todas las tablas del documento...');
+  try {
+    validarTodasLasTablas(documentoFinal.content, 'HojaFrontal');
+    console.log('✅ Todas las tablas validadas correctamente');
+  } catch (error) {
+    console.error('❌ Error en validación de tablas:', error);
+    throw error;
+  }
 
   console.log('✅ Hoja Frontal de Expediente generada correctamente');
   return documentoFinal;
@@ -2674,8 +2492,6 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     };
   }
 
-  // MÉTODOS AUXILIARES PARA LA SOLICITUD
-
   private generarSeccionEstudios(
     solicitudEstudio: any,
     tipoEstudio: string
@@ -2746,7 +2562,7 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
   }
 
 async generarNotaEvolucion(datos: any): Promise<any> {
-  console.log('📄 Generando Nota de Evolución Médica con estilo Historia Clínica...');
+  console.log('📄 Generando Nota de Evolución Médica con logos y estilo sobrio...');
 
   const { pacienteCompleto, medicoCompleto, notaEvolucion } = datos;
   const fechaActual = new Date();
@@ -2754,96 +2570,64 @@ async generarNotaEvolucion(datos: any): Promise<any> {
 
   return {
     pageSize: 'LETTER',
-    pageMargins: [25, 70, 25, 60],
+    pageMargins: [20, 60, 20, 40],
 
-    header: (currentPage: number, pageCount: number) => {
-      return {
-        margin: [25, 10, 25, 10],
-        table: {
-          widths: ['20%', '60%', '20%'],
-          body: [
-            [
-              {
-                image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-                width: 40,
-                height: 40,
-                alignment: 'left'
-              },
-              {
-                stack: [
-                  {
-                    text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
-                    fontSize: 11,
-                    bold: true,
-                    alignment: 'center',
-                    color: '#1a365d'
-                  },
-                  {
-                    text: 'SERVICIOS DE SALUD DE GUANAJUATO',
-                    fontSize: 8,
-                    alignment: 'center',
-                    color: '#4a5568'
-                  },
-                  {
-                    text: 'NOTA DE EVOLUCIÓN MÉDICA',
-                    fontSize: 9,
-                    bold: true,
-                    alignment: 'center',
-                    margin: [0, 3, 0, 0]
-                  },
-                  {
-                    text: 'NOM-004-SSA3-2012 • Sección 6.2',
-                    fontSize: 6,
-                    alignment: 'center',
-                    color: '#666666'
-                  }
-                ]
-              },
-              {
-                stack: [
-                  {
-                    text: `No. Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
-                    fontSize: 7,
-                    alignment: 'right'
-                  },
-                  {
-                    text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`,
-                    fontSize: 7,
-                    alignment: 'right'
-                  },
-                  {
-                    text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
-                    fontSize: 7,
-                    alignment: 'right'
-                  },
-                  {
-                    text: `Pág. ${currentPage} de ${pageCount}`,
-                    fontSize: 7,
-                    alignment: 'right',
-                    margin: [0, 2, 0, 0]
-                  }
-                ]
-              }
-            ]
-          ]
-        },
-        layout: 'noBorders'
-      };
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'], // ✅ MISMO PATRÓN QUE HISTORIA CLÍNICA
+        body: [
+          [
+            {
+              // ✅ LOGO DE GOBIERNO (izquierda)
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_gobierno ||
+                '/uploads/logos/logo-gobierno-default.svg'
+              ),
+              fit: [80, 40], // ✅ USAR fit EN LUGAR DE width/height
+              alignment: 'left',
+              margin: [0, 5],
+            },
+            {
+              // ✅ TEXTO CENTRAL SOBRIO
+              text: esPediatrico
+                ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN MÉDICA PEDIÁTRICA'
+                : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - NOTA DE EVOLUCIÓN MÉDICA',
+              fontSize: 10,
+              bold: true,
+              alignment: 'center',
+              color: '#1a365d', // ✅ MISMO COLOR SOBRIO
+              margin: [0, 8],
+            },
+            {
+              // ✅ LOGO DEL HOSPITAL (derecha)
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_principal ||
+                '/uploads/logos/logo-principal-default.svg'
+              ),
+              fit: [80, 40], // ✅ USAR fit EN LUGAR DE width/height
+              alignment: 'right',
+              margin: [0, 5],
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
     },
 
     content: [
-      // ✅ TABLA PRINCIPAL CON EL MISMO ESTILO QUE HISTORIA CLÍNICA
+      // ✅ TABLA PRINCIPAL CON ESTILO SOBRIO
       {
         table: {
           widths: ['25%', '75%'], // ✅ MISMO PATRÓN: 25% etiquetas, 75% contenido
           body: [
-            // HEADER PRINCIPAL
+            // HEADER PRINCIPAL SOBRIO
             [
               {
                 text: 'EVOLUCIÓN MÉDICA',
                 fontSize: 8,
                 bold: true,
-                fillColor: '#1a365d',
+                fillColor: '#1a365d', // ✅ COLOR SOBRIO
                 color: 'white',
                 alignment: 'center',
                 margin: [5, 5]
@@ -2852,7 +2636,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: `${esPediatrico ? 'PACIENTE PEDIÁTRICO' : 'PACIENTE ADULTO'} - DÍAS DE ESTANCIA: ${notaEvolucion.dias_hospitalizacion || 'AMBULATORIO'}`,
                 fontSize: 8,
                 bold: true,
-                fillColor: '#1a365d',
+                fillColor: '#1a365d', // ✅ COLOR SOBRIO
                 color: 'white',
                 alignment: 'center',
                 margin: [5, 5]
@@ -2865,7 +2649,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'DATOS DEL PACIENTE',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: [
@@ -2892,7 +2676,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                   text: 'SIGNOS VITALES ACTUALES',
                   fontSize: 7,
                   bold: true,
-                  fillColor: '#f0f0f0'
+                  fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
                 },
                 {
                   table: {
@@ -2937,7 +2721,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'SÍNTOMAS Y SIGNOS',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.sintomas_signos || 'Sin información registrada',
@@ -2953,7 +2737,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'HÁBITUS EXTERIOR',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.habitus_exterior || 'Sin información registrada',
@@ -2969,7 +2753,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'ESTADO NUTRICIONAL',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.estado_nutricional || 'Sin información registrada',
@@ -2986,7 +2770,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                   text: 'EXPLORACIÓN POR APARATOS Y SISTEMAS',
                   fontSize: 7,
                   bold: true,
-                  fillColor: '#f0f0f0'
+                  fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
                 },
                 {
                   text: [
@@ -3046,7 +2830,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'ESTUDIOS DE LABORATORIO Y GABINETE',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.estudios_laboratorio_gabinete || 'No se realizaron estudios',
@@ -3062,7 +2846,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'EVOLUCIÓN Y ANÁLISIS DEL CUADRO CLÍNICO',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.evolucion_analisis || 'Sin información registrada',
@@ -3078,7 +2862,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.diagnosticos || 'Sin información registrada',
@@ -3095,7 +2879,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'PLAN DE ESTUDIOS Y TRATAMIENTO',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.plan_estudios_tratamiento || 'Sin información registrada',
@@ -3106,14 +2890,14 @@ async generarNotaEvolucion(datos: any): Promise<any> {
             ],
 
             // INTERCONSULTAS (si las hay)
-            ...(notaEvolucion.interconsultas &&
+            ...(notaEvolucion.interconsultas && 
                 notaEvolucion.interconsultas !== 'No se solicitaron interconsultas en esta evolución' ? [
               [
                 {
                   text: 'INTERCONSULTAS SOLICITADAS',
                   fontSize: 7,
                   bold: true,
-                  fillColor: '#f0f0f0'
+                  fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
                 },
                 {
                   text: notaEvolucion.interconsultas,
@@ -3130,7 +2914,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                 text: 'PRONÓSTICO',
                 fontSize: 7,
                 bold: true,
-                fillColor: '#f0f0f0'
+                fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
               },
               {
                 text: notaEvolucion.pronostico || 'Sin información registrada',
@@ -3147,7 +2931,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                   text: 'INDICACIONES MÉDICAS',
                   fontSize: 7,
                   bold: true,
-                  fillColor: '#f0f0f0'
+                  fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
                 },
                 {
                   text: notaEvolucion.indicaciones_medicas,
@@ -3165,7 +2949,7 @@ async generarNotaEvolucion(datos: any): Promise<any> {
                   text: 'OBSERVACIONES ADICIONALES',
                   fontSize: 7,
                   bold: true,
-                  fillColor: '#f0f0f0'
+                  fillColor: '#f0f0f0' // ✅ GRIS SOBRIO
                 },
                 {
                   text: notaEvolucion.observaciones_adicionales,
@@ -3183,61 +2967,107 @@ async generarNotaEvolucion(datos: any): Promise<any> {
           hLineColor: () => '#000000',
           vLineColor: () => '#000000'
         }
-      }
+      },
+
+      // ✅ ESPACIO Y NOTAS AL PIE COMO HISTORIA CLÍNICA
+      { text: '', margin: [0, 5] },
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              {
+                text: '* Elaborado conforme a:\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '• NOM-004-SSA3-2012 Del expediente clínico\n',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: esPediatrico ? '• NOM-031-SSA2-1999 Para la atención a la salud del niño\n' : '',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: '• Sección 6.2 - Nota de evolución',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              {
+                text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: `Documento generado el: ${fechaActual.toLocaleString('es-MX')}\n`,
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: 'Hospital General San Luis de la Paz, Guanajuato',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'right',
+          },
+        ],
+      },
     ],
 
     footer: (currentPage: number, pageCount: number) => {
       return {
-        margin: [25, 5, 25, 10],
+        margin: [20, 10],
         table: {
-          widths: ['70%', '30%'],
+          widths: ['25%', '50%', '25%'], // ✅ MISMO LAYOUT QUE HISTORIA CLÍNICA
           body: [
             [
               {
-                stack: [
-                  {
-                    text: `${medicoCompleto.nombre_completo || 'NOMBRE DEL MÉDICO'}`,
-                    fontSize: 8,
-                    bold: true
-                  },
-                  {
-                    text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'N/A'}`,
-                    fontSize: 7
-                  },
-                  {
-                    text: `${medicoCompleto.cargo || 'MÉDICO'} - ${medicoCompleto.departamento || 'DEPARTAMENTO'}`,
-                    fontSize: 7
-                  }
-                ]
+                text: `Página ${currentPage} de ${pageCount}`,
+                fontSize: 7,
+                color: '#666666',
               },
               {
-                stack: [
+                text: esPediatrico
+                  ? 'Nota de Evolución Médica Pediátrica - SICEG\nNOM-004-SSA3-2012 • NOM-031-SSA2-1999'
+                  : 'Nota de Evolución Médica - SICEG\nNOM-004-SSA3-2012 • Sección 6.2',
+                fontSize: 7,
+                alignment: 'center',
+                color: '#666666',
+              },
+              {
+                text: [
                   {
-                    text: '_'.repeat(30),
-                    fontSize: 8,
-                    alignment: 'center',
-                    margin: [0, 10, 0, 0]
+                    text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    fontSize: 7,
                   },
                   {
-                    text: 'FIRMA AUTÓGRAFA',
+                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    )}`,
                     fontSize: 6,
-                    alignment: 'center',
-                    bold: true
                   },
-                  {
-                    text: '(Según NOM-004-SSA3-2012)',
-                    fontSize: 5,
-                    alignment: 'center',
-                    color: '#666666'
-                  }
-                ]
-              }
-            ]
-          ]
+                ],
+                alignment: 'right',
+                color: '#666666',
+              },
+            ],
+          ],
         },
-        layout: 'noBorders'
+        layout: 'noBorders',
       };
-    }
+    },
   };
 }
 
@@ -8384,24 +8214,6 @@ async generarNotaEvolucion(datos: any): Promise<any> {
     };
   }
 
-  // // MÉTODOS AUXILIARES PARA INTERCONSULTA
-  // private tieneSignosVitales(interconsulta: any): boolean {
-  //  return !!(interconsulta.presion_arterial_actual ||
-  //           interconsulta.frecuencia_cardiaca_actual ||
-  //           interconsulta.frecuencia_respiratoria_actual ||
-  //           interconsulta.temperatura_actual ||
-  //           interconsulta.saturacion_oxigeno_actual);
-  // }
-
-  // private formatearUrgencia(urgencia: string): string {
-  //  const urgencias: { [key: string]: string } = {
-  //    'Urgente': 'URGENTE',
-  //    'Alta': 'ALTA PRIORIDAD',
-  //    'Normal': 'NORMAL',
-  //    'Baja': 'BAJA PRIORIDAD'
-  //  };
-  //  return urgencias[urgencia] || urgencia;
-  // }
 
   private getColorUrgencia(urgencia: string): string {
     const colores: { [key: string]: string } = {

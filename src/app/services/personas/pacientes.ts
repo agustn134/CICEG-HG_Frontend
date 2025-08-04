@@ -12,6 +12,7 @@ import {
   Genero,
   ExpedienteResumen
 } from '../../models';
+import { environment } from '../../../environments/environments';
 
 // ==========================================
 // INTERFACES ESPECÍFICAS PARA EL SERVICIO
@@ -142,7 +143,7 @@ export interface PacienteFilters {
   providedIn: 'root'
 })
 export class PacientesService {
-  private readonly API_URL = 'http://localhost:3000/api/personas/pacientes';
+  private readonly API_URL = `${environment.apiUrl}/personas/pacientes`;
 
   // Estado del servicio
   private pacientesSubject = new BehaviorSubject<Paciente[]>([]);

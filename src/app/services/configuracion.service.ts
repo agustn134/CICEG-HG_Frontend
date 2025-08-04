@@ -4,13 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { ConfiguracionSistema, ConfiguracionLogos, CONFIGURACION_DEFAULT } from '../models/configuracion.model';
+import { environment } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfiguracionService {
-  private readonly API_URL = 'http://localhost:3000/api/configuracion';
-  private readonly BASE_URL = 'http://localhost:3000'; // 🔥 AGREGADO
+  private readonly API_URL = `${environment.apiUrl}/configuracion`;
+  private readonly BASE_URL = `${environment.BASE_URL}`; // 🔥 AGREGADO
 
   // Estado reactivo de la configuración
   private configuracionSubject = new BehaviorSubject<ConfiguracionLogos>(CONFIGURACION_DEFAULT);

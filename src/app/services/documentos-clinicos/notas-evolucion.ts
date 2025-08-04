@@ -12,12 +12,13 @@ import {
   CAMPOS_RECOMENDADOS_NOM004
 } from '../../models/nota-evolucion.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotasEvolucionService {
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/notas-evolucion';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/notas-evolucion`;
 
   constructor(private http: HttpClient) {}
 

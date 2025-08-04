@@ -20,12 +20,13 @@ import {
   EstadoActualPaciente
 } from '../../models/nota-urgencias.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotasUrgenciasService {
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/notas-urgencias';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/notas-urgencias`;
 
   constructor(private http: HttpClient) { }
 

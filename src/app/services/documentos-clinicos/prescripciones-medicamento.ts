@@ -9,6 +9,7 @@ import {
 } from '../../models/prescripcion-medicamento.model';
 import { ApiResponse } from '../../models/base.models';
 import { ExpedienteResumen } from '../../models/expediente.model';
+import { environment } from '../../../environments/environments';
 
 // Interfaz para respuesta paginada
 export interface PaginatedResponse<T> {
@@ -30,7 +31,7 @@ export interface PaginatedResponse<T> {
 })
 export class PrescripcionesMedicamentoService {
 
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/prescripciones-medicamento';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/prescripciones-medicamento`;
 
   constructor(private http: HttpClient) { }
 

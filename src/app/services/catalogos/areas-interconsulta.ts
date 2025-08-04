@@ -1,23 +1,15 @@
-// import { Injectable } from '@angular/core';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class AreasInterconsulta {
-//   private readonly API_URL = 'http://localhost:3000/api/catalogos/servicios';
-//   constructor() { }
-// }
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { AreaInterconsulta, CreateAreaInterconsultaDto, UpdateAreaInterconsultaDto, AreaInterconsultaFilters } from '../../models/area-interconsulta.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AreasInterconsultaService {
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/areas-interconsulta';
+  private readonly API_URL = `${environment.apiUrl}/catalogos/areas-interconsulta`;
 
   private httpOptions = {
     headers: new HttpHeaders({

@@ -23,12 +23,13 @@ import {
   TipoVivienda
 } from '../../models/historia-clinica.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HistoriasClinicasService {
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/historias-clinicas';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/historias-clinicas`;
 
   constructor(private http: HttpClient) { }
 

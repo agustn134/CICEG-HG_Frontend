@@ -14,12 +14,13 @@ import {
 } from '../../models/documento-clinico.model';
 import { ApiResponse, EstadoDocumento } from '../../models/base.models';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentosService {
-  private readonly API_URL = 'http://localhost:3000/api/documentos-clinicos/documentos';
+  private readonly API_URL = `${environment.apiUrl}/documentos-clinicos/documentos`;
 
   constructor(private http: HttpClient) { }
 
@@ -714,7 +715,7 @@ getDocumentosByPacienteId(idPaciente: number): Observable<ApiResponse<DocumentoC
  */
 getDocumentosByPacienteIdViaExpediente(idPaciente: number): Observable<ApiResponse<DocumentoClinico[]>> {
   // Primero obtener el expediente del paciente, luego sus documentos
-  return this.http.get<ApiResponse<{id_expediente: number}>>(`http://localhost:3000/api/gestion-expedientes/expedientes/by-paciente/${idPaciente}`).pipe(
+  return this.http.get<ApiResponse<{id_expediente: number}>>(`${environment.apiUrl}/gestion-expedientes/expedientes/by-paciente/${idPaciente}`).pipe(
     switchMap(expedienteResponse => {
       if (expedienteResponse.success && expedienteResponse.data?.id_expediente) {
         return this.getDocumentosByExpediente(expedienteResponse.data.id_expediente);

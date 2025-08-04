@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { TipoDocumento, CreateTipoDocumentoDto, UpdateTipoDocumentoDto, TipoDocumentoFilters } from '../../models/tipo-documento.model';
 import { ApiResponse } from '../../models/base.models';
+import { environment } from '../../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TiposDocumentoService {
-  private readonly API_URL = 'http://localhost:3000/api/catalogos/tipos-documento';
+  private readonly API_URL = `${environment.apiUrl}/catalogos/tipos-documento`;
 
   constructor(private http: HttpClient) { }
 
