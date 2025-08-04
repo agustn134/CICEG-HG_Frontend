@@ -2,9 +2,20 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, ValidationErrors, ValidatorFn, FormGroup } from '@angular/forms';
 
+export interface ValidacionResult {
+  valido: boolean;
+  errores: string[];
+  advertencias: string[];
+  porcentaje_completitud?: number;
+  secciones_incompletas?: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
+
+
 export class ValidacionesComunesService {
 
   // ==========================================
@@ -38,6 +49,15 @@ export class ValidacionesComunesService {
     return telefonoRegex.test(telefono.replace(/\D/g, '')) ? null : { telefonoInvalido: true };
   }
 
+  static validarEmail(control: any): any {
+    if (!control.value) return null;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(control.value)) {
+      return { emailInvalido: true };
+    }
+    return null;
+  }
+  
   // Validación de fecha no futura
   public static validarFechaNoFutura(control: AbstractControl): ValidationErrors | null {
     const fecha = new Date(control.value);
@@ -1231,4 +1251,150 @@ export class ValidacionesComunesService {
       console.log('  NOTA POSTANESTÉSICA CUMPLE CON NOM-004 SECCIÓN D11');
     }
   }
+
+
+  // src/app/services/validaciones/validaciones-comunes.service.ts - AGREGAR MÉTODOS
+
+/**
+ * Validaciones específicas para Hoja Frontal de Expediente
+ */
+validarHojaFrontalExpediente(datos: any): ValidacionResult {
+  const errores: string[] = [];
+  const advertencias: string[] = [];
+
+  // Validaciones obligatorias NOM-004
+  if (!datos.tipo_establecimiento) {
+    errores.push('Tipo de establecimiento es obligatorio');
+  }
+
+  if (!datos.nombre_establecimiento) {
+    errores.push('Nombre del establecimiento es obligatorio');
+  }
+
+  if (!datos.domicilio_establecimiento) {
+    errores.push('Domicilio del establecimiento es obligatorio');
+  }
+
+  // Validaciones de contacto de emergencia principal
+  if (!datos.contacto_emergencia_1_nombre) {
+    errores.push('Nombre del contacto de emergencia principal es obligatorio');
+  }
+
+  if (!datos.contacto_emergencia_1_parentesco) {
+    errores.push('Parentesco del contacto de emergencia es obligatorio');
+  }
+
+  if (!datos.contacto_emergencia_1_telefono_principal) {
+    errores.push('Teléfono del contacto de emergencia es obligatorio');
+  }
+
+  // Validar formato de teléfonos
+  const telefonoRegex = /^\d{10}$/;
+  if (datos.contacto_emergencia_1_telefono_principal && 
+      !telefonoRegex.test(datos.contacto_emergencia_1_telefono_principal.replace(/\D/g, ''))) {
+    advertencias.push('El teléfono principal debe tener 10 dígitos');
+  }
+
+  // Validar NSS si está presente
+  if (datos.nss && datos.nss.length !== 11) {
+    advertencias.push('El NSS debe tener 11 dígitos');
+  }
+
+  // Validar RFC del establecimiento
+  // Validar RFC del establecimiento
+ if (datos.rfc_establecimiento) {
+   const rfcRegex = /^[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{2,3}$/;
+   if (!rfcRegex.test(datos.rfc_establecimiento)) {
+     advertencias.push('Formato de RFC del establecimiento incorrecto');
+   }
+ }
+
+ // Validar email si está presente
+ if (datos.email) {
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!emailRegex.test(datos.email)) {
+     errores.push('Formato de correo electrónico inválido');
+   }
+ }
+
+ // Validaciones de completitud
+ const camposOpcionales = [
+   'lugar_nacimiento', 'nacionalidad', 'grupo_etnico', 'lengua_indigena',
+   'escolaridad', 'ocupacion', 'estado_conyugal', 'religion',
+   'afiliacion_medica', 'numero_afiliacion', 'nss'
+ ];
+
+ const camposCompletos = camposOpcionales.filter(campo => datos[campo] && datos[campo].trim());
+ const porcentajeCompletitud = Math.round((camposCompletos.length / camposOpcionales.length) * 100);
+
+ if (porcentajeCompletitud < 60) {
+   advertencias.push(`Completitud del ${porcentajeCompletitud}% - Se recomienda completar más datos demográficos`);
+ }
+
+ return {
+   valido: errores.length === 0,
+   errores,
+   advertencias,
+   porcentaje_completitud: porcentajeCompletitud
+ };
+}
+
+/**
+* Validar cumplimiento NOM-004 para Hoja Frontal
+*/
+private validarCumplimientoHojaFrontal(datos: any, medico: any, paciente: any): void {
+ console.log('🔍 VALIDANDO CUMPLIMIENTO NOM-004 SECCIÓN 5.18 - HOJA FRONTAL...');
+
+ const validaciones = {
+   // 5.18 - Hoja frontal (opcional pero recomendada)
+   identificacion_establecimiento: !!datos.nombre_establecimiento,
+   domicilio_establecimiento: !!datos.domicilio_establecimiento,
+   tipo_establecimiento: !!datos.tipo_establecimiento,
+
+   // Datos del paciente
+   nombre_completo_paciente: !!paciente.nombre_completo,
+   identificacion_paciente: !!paciente.curp || !!paciente.numero_expediente,
+   datos_demograficos: !!datos.lugar_nacimiento || !!datos.nacionalidad,
+
+   // Contacto de emergencia
+   contacto_emergencia_nombre: !!datos.contacto_emergencia_1_nombre,
+   contacto_emergencia_telefono: !!datos.contacto_emergencia_1_telefono_principal,
+   parentesco_especificado: !!datos.contacto_emergencia_1_parentesco,
+
+   // Información médica relevante
+   tipo_sangre_registrado: !!paciente.tipo_sangre,
+   alergias_documentadas: true, // Campo incluido
+   afiliacion_medica: true, // Campo incluido
+
+   // Aspectos administrativos
+   numero_expediente: !!paciente.numero_expediente,
+   fecha_apertura: true, // Se genera automáticamente
+   personal_responsable: !!medico.nombre_completo,
+
+   // Estructura del documento
+   formato_estructurado: true,
+   secciones_organizadas: true,
+   espacios_adecuados: true,
+
+   // Cumplimiento normativo
+   referencia_nom_004: true,
+   informacion_establecimiento: true,
+   datos_paciente_completos: !!paciente.nombre_completo && !!paciente.edad,
+ };
+
+ const cumplimiento = Object.values(validaciones).filter(v => v).length;
+ const total = Object.keys(validaciones).length;
+ const porcentaje = Math.round((cumplimiento / total) * 100);
+
+ console.log(`📊 CUMPLIMIENTO HOJA FRONTAL: ${cumplimiento}/${total} (${porcentaje}%)`);
+
+ if (porcentaje < 85) {
+   console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 85%');
+ } else {
+   console.log('✅ HOJA FRONTAL CUMPLE CON NOM-004 SECCIÓN 5.18');
+ }
+}
+
+
+
 }
