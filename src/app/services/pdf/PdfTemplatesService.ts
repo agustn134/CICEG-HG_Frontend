@@ -1914,7 +1914,7 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
             colSpan: 5 // ✅ Esta celda ocupa las 5 columnas
           },
           {}, // ✅ Celda vacía 1
-          {}, // ✅ Celda vacía 2  
+          {}, // ✅ Celda vacía 2
           {}, // ✅ Celda vacía 3
           {}  // ✅ Celda vacía 4
         ],
@@ -2028,9 +2028,9 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
         ],
         [
           { text: 'Tipo de Sangre:', fontSize: 8, bold: true },
-          { 
-            text: `${pacienteCompleto.tipo_sangre || 'N/A'}`, 
-            fontSize: 8, 
+          {
+            text: `${pacienteCompleto.tipo_sangre || 'N/A'}`,
+            fontSize: 8,
             bold: true,
             color: '#dc2626'
           }
@@ -2131,7 +2131,7 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
   tablaEncabezadoExpediente.table.body.forEach((fila, i) => {
     console.log(`Fila ${i}:`, fila.length, 'celdas');
   });
-  
+
   validarTabla(tablaEncabezadoExpediente, 'EncabezadoExpediente');
   validarTabla(tablaDatosEstablecimiento, 'DatosEstablecimiento');
   validarTabla(tablaDatosPaciente, 'DatosPaciente');
@@ -2248,9 +2248,9 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
               {
                 text: [
                   { text: `${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
-                  { 
-                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`, 
-                    fontSize: 6 
+                  {
+                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                    fontSize: 6
                   }
                 ],
                 alignment: 'right',
@@ -2745,663 +2745,501 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     };
   }
 
-  async generarNotaEvolucion(datos: any): Promise<any> {
-    console.log('📄 Generando Nota de Evolución Médica...');
+async generarNotaEvolucion(datos: any): Promise<any> {
+  console.log('📄 Generando Nota de Evolución Médica con estilo Historia Clínica...');
 
-    const { pacienteCompleto, medicoCompleto, notaEvolucion } = datos;
-    const fechaActual = new Date();
+  const { pacienteCompleto, medicoCompleto, notaEvolucion } = datos;
+  const fechaActual = new Date();
+  const esPediatrico = pacienteCompleto.edad < 18;
 
-    return {
-      pageSize: 'LETTER',
-      pageMargins: [40, 80, 40, 60],
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [25, 70, 25, 60],
 
-      header: (currentPage: number, pageCount: number) => {
-        return {
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                {
-                  image:
-                    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-                  width: 50,
-                  height: 50,
-                  alignment: 'left',
-                },
-                {
-                  stack: [
-                    {
-                      text: 'HOSPITAL GENERAL',
-                      fontSize: 14,
-                      bold: true,
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'SAN LUIS DE LA PAZ, GTO.',
-                      fontSize: 10,
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'NOTA DE EVOLUCIÓN MÉDICA',
-                      fontSize: 12,
-                      bold: true,
-                      alignment: 'center',
-                      margin: [0, 5, 0, 0],
-                    },
-                    {
-                      text: 'NOM-004-SSA3-2012',
-                      fontSize: 8,
-                      alignment: 'center',
-                      color: '#666666',
-                    },
-                  ],
-                },
-                {
-                  stack: [
-                    {
-                      text: `Expediente: ${this.obtenerNumeroExpedientePreferido(
-                        pacienteCompleto.expediente
-                      )}`,
-                      fontSize: 9,
-                      alignment: 'right',
-                    },
-                    {
-                      text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`,
-                      fontSize: 9,
-                      alignment: 'right',
-                    },
-                    {
-                      text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
-                      fontSize: 9,
-                      alignment: 'right',
-                    },
-                  ],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [40, 20, 40, 20],
-        };
-      },
-
-      content: [
-        // DATOS DEL PACIENTE
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '👤 DATOS DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#e3f2fd',
-                  margin: [10, 8],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10],
-        },
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                { text: 'Nombre:', style: 'fieldLabel' },
-                {
-                  text: pacienteCompleto.nombre || 'No especificado',
-                  style: 'fieldValue',
-                },
-                { text: 'Edad:', style: 'fieldLabel' },
-                {
-                  text: `${pacienteCompleto.edad || 'N/A'} años`,
-                  style: 'fieldValue',
-                },
-              ],
-              [
-                { text: 'Sexo:', style: 'fieldLabel' },
-                {
-                  text: pacienteCompleto.sexo || 'No especificado',
-                  style: 'fieldValue',
-                },
-                { text: 'Días Hospitalización:', style: 'fieldLabel' },
-                {
-                  text: notaEvolucion.dias_hospitalizacion
-                    ? `${notaEvolucion.dias_hospitalizacion} días`
-                    : 'Ambulatorio',
-                  style: 'fieldValue',
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15],
-        },
-
-        // SIGNOS VITALES
-        ...(this.tieneSignosVitales(notaEvolucion)
-          ? [
-            {
-              table: {
-                widths: ['100%'],
-                body: [
-                  [
-                    {
-                      text: '💓 SIGNOS VITALES',
-                      style: 'sectionHeader',
-                      fillColor: '#ffebee',
-                      margin: [10, 8],
-                    },
-                  ],
-                ],
+    header: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [25, 10, 25, 10],
+        table: {
+          widths: ['20%', '60%', '20%'],
+          body: [
+            [
+              {
+                image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+                width: 40,
+                height: 40,
+                alignment: 'left'
               },
-              layout: this.getTableLayout(),
-              margin: [0, 10, 0, 10],
-            },
-            {
-              table: {
-                widths: [
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                  '12.5%',
-                ],
-                body: [
-                  [
-                    {
-                      text: 'Temp.',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                    { text: 'FC', style: 'fieldLabel', alignment: 'center' },
-                    { text: 'FR', style: 'fieldLabel', alignment: 'center' },
-                    {
-                      text: 'TA Sist.',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'TA Diast.',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'SatO₂',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'Peso',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'Talla',
-                      style: 'fieldLabel',
-                      alignment: 'center',
-                    },
-                  ],
-                  [
-                    {
-                      text: notaEvolucion.temperatura
-                        ? `${notaEvolucion.temperatura}°C`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.frecuencia_cardiaca
-                        ? `${notaEvolucion.frecuencia_cardiaca} lpm`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.frecuencia_respiratoria
-                        ? `${notaEvolucion.frecuencia_respiratoria} rpm`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.presion_arterial_sistolica
-                        ? `${notaEvolucion.presion_arterial_sistolica}`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.presion_arterial_diastolica
-                        ? `${notaEvolucion.presion_arterial_diastolica}`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.saturacion_oxigeno
-                        ? `${notaEvolucion.saturacion_oxigeno}%`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.peso_actual
-                        ? `${notaEvolucion.peso_actual} kg`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                    {
-                      text: notaEvolucion.talla_actual
-                        ? `${notaEvolucion.talla_actual} cm`
-                        : '--',
-                      style: 'fieldValue',
-                      alignment: 'center',
-                    },
-                  ],
-                ],
+              {
+                stack: [
+                  {
+                    text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ',
+                    fontSize: 11,
+                    bold: true,
+                    alignment: 'center',
+                    color: '#1a365d'
+                  },
+                  {
+                    text: 'SERVICIOS DE SALUD DE GUANAJUATO',
+                    fontSize: 8,
+                    alignment: 'center',
+                    color: '#4a5568'
+                  },
+                  {
+                    text: 'NOTA DE EVOLUCIÓN MÉDICA',
+                    fontSize: 9,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 3, 0, 0]
+                  },
+                  {
+                    text: 'NOM-004-SSA3-2012 • Sección 6.2',
+                    fontSize: 6,
+                    alignment: 'center',
+                    color: '#666666'
+                  }
+                ]
               },
-              layout: this.getTableLayout(),
-              margin: [0, 0, 0, 15],
-            },
+              {
+                stack: [
+                  {
+                    text: `No. Exp: ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`,
+                    fontSize: 7,
+                    alignment: 'right'
+                  },
+                  {
+                    text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`,
+                    fontSize: 7,
+                    alignment: 'right'
+                  },
+                  {
+                    text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+                    fontSize: 7,
+                    alignment: 'right'
+                  },
+                  {
+                    text: `Pág. ${currentPage} de ${pageCount}`,
+                    fontSize: 7,
+                    alignment: 'right',
+                    margin: [0, 2, 0, 0]
+                  }
+                ]
+              }
+            ]
           ]
-          : []),
-
-        // EXPLORACIÓN FÍSICA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🔍 EXPLORACIÓN FÍSICA',
-                  style: 'sectionHeader',
-                  fillColor: '#e8f5e8',
-                  margin: [10, 8],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 10, 0, 10],
         },
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'SÍNTOMAS Y SIGNOS:', style: 'fieldLabel' },
-                    {
-                      text: notaEvolucion.sintomas_signos || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 10],
-                    },
+        layout: 'noBorders'
+      };
+    },
 
-                    { text: 'HABITUS EXTERIOR:', style: 'fieldLabel' },
-                    {
-                      text: notaEvolucion.habitus_exterior || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 10],
-                    },
-
-                    { text: 'ESTADO NUTRICIONAL:', style: 'fieldLabel' },
-                    {
-                      text:
-                        notaEvolucion.estado_nutricional || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 0],
-                    },
-                  ],
-                  margin: [10, 10],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15],
-        },
-
-        // EXPLORACIÓN POR SISTEMAS (si hay datos)
-        ...(this.tieneExploracionSistemas(notaEvolucion)
-          ? [
-            {
-              table: {
-                widths: ['50%', '50%'],
-                body: [
-                  [
-                    {
-                      stack: [
-                        ...(notaEvolucion.exploracion_cabeza
-                          ? [
-                            {
-                              text: 'CABEZA Y CUELLO:',
-                              style: 'fieldLabel',
-                            },
-                            {
-                              text: notaEvolucion.exploracion_cabeza,
-                              style: 'fieldValue',
-                              margin: [0, 2, 0, 8],
-                            },
-                          ]
-                          : []),
-                        ...(notaEvolucion.exploracion_torax
-                          ? [
-                            { text: 'TÓRAX:', style: 'fieldLabel' },
-                            {
-                              text: notaEvolucion.exploracion_torax,
-                              style: 'fieldValue',
-                              margin: [0, 2, 0, 8],
-                            },
-                          ]
-                          : []),
-                        ...(notaEvolucion.exploracion_extremidades
-                          ? [
-                            { text: 'EXTREMIDADES:', style: 'fieldLabel' },
-                            {
-                              text: notaEvolucion.exploracion_extremidades,
-                              style: 'fieldValue',
-                              margin: [0, 2, 0, 0],
-                            },
-                          ]
-                          : []),
-                      ],
-                      margin: [10, 10],
-                    },
-                    {
-                      stack: [
-                        ...(notaEvolucion.exploracion_abdomen
-                          ? [
-                            { text: 'ABDOMEN:', style: 'fieldLabel' },
-                            {
-                              text: notaEvolucion.exploracion_abdomen,
-                              style: 'fieldValue',
-                              margin: [0, 2, 0, 8],
-                            },
-                          ]
-                          : []),
-                        ...(notaEvolucion.exploracion_neurologico
-                          ? [
-                            { text: 'NEUROLÓGICO:', style: 'fieldLabel' },
-                            {
-                              text: notaEvolucion.exploracion_neurologico,
-                              style: 'fieldValue',
-                              margin: [0, 2, 0, 0],
-                            },
-                          ]
-                          : []),
-                      ],
-                      margin: [10, 10],
-                    },
-                  ],
-                ],
+    content: [
+      // ✅ TABLA PRINCIPAL CON EL MISMO ESTILO QUE HISTORIA CLÍNICA
+      {
+        table: {
+          widths: ['25%', '75%'], // ✅ MISMO PATRÓN: 25% etiquetas, 75% contenido
+          body: [
+            // HEADER PRINCIPAL
+            [
+              {
+                text: 'EVOLUCIÓN MÉDICA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#1a365d',
+                color: 'white',
+                alignment: 'center',
+                margin: [5, 5]
               },
-              layout: this.getTableLayout(),
-              margin: [0, 0, 0, 15],
-            },
+              {
+                text: `${esPediatrico ? 'PACIENTE PEDIÁTRICO' : 'PACIENTE ADULTO'} - DÍAS DE ESTANCIA: ${notaEvolucion.dias_hospitalizacion || 'AMBULATORIO'}`,
+                fontSize: 8,
+                bold: true,
+                fillColor: '#1a365d',
+                color: 'white',
+                alignment: 'center',
+                margin: [5, 5]
+              }
+            ],
+
+            // DATOS DEL PACIENTE
+            [
+              {
+                text: 'DATOS DEL PACIENTE',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: [
+                  { text: 'NOMBRE: ', bold: true, fontSize: 7 },
+                  { text: `${pacienteCompleto.nombre_completo || 'N/A'}\n`, fontSize: 7 },
+                  { text: 'EDAD: ', bold: true, fontSize: 7 },
+                  { text: `${pacienteCompleto.edad || 'N/A'} años   `, fontSize: 7 },
+                  { text: 'SEXO: ', bold: true, fontSize: 7 },
+                  { text: `${pacienteCompleto.sexo || 'N/A'}   `, fontSize: 7 },
+                  { text: 'TIPO SANGUÍNEO: ', bold: true, fontSize: 7 },
+                  { text: `${pacienteCompleto.tipo_sangre || 'N/A'}\n`, fontSize: 7, color: '#dc2626' },
+                  { text: 'EXPEDIENTE: ', bold: true, fontSize: 7 },
+                  { text: `${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`, fontSize: 7 }
+                ],
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // SIGNOS VITALES (si existen)
+            ...(this.tieneSignosVitales(notaEvolucion) ? [
+              [
+                {
+                  text: 'SIGNOS VITALES ACTUALES',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f0f0'
+                },
+                {
+                  table: {
+                    widths: ['12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%', '12.5%'],
+                    body: [
+                      [
+                        { text: 'T°C', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'FC', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'FR', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'T/A Sist', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'T/A Diast', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'SatO₂', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'Peso', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' },
+                        { text: 'Talla', fontSize: 6, bold: true, alignment: 'center', fillColor: '#e2e8f0' }
+                      ],
+                      [
+                        { text: notaEvolucion.temperatura ? `${notaEvolucion.temperatura}°` : '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.frecuencia_cardiaca ? `${notaEvolucion.frecuencia_cardiaca}` : '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.frecuencia_respiratoria ? `${notaEvolucion.frecuencia_respiratoria}` : '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.presion_arterial_sistolica || '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.presion_arterial_diastolica || '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.saturacion_oxigeno ? `${notaEvolucion.saturacion_oxigeno}%` : '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.peso_actual ? `${notaEvolucion.peso_actual}kg` : '--', fontSize: 6, alignment: 'center' },
+                        { text: notaEvolucion.talla_actual ? `${notaEvolucion.talla_actual}cm` : '--', fontSize: 6, alignment: 'center' }
+                      ]
+                    ]
+                  },
+                  layout: {
+                    hLineWidth: () => 0.5,
+                    vLineWidth: () => 0.5,
+                    hLineColor: () => '#000000',
+                    vLineColor: () => '#000000'
+                  },
+                  margin: [3, 2]
+                }
+              ]
+            ] : []),
+
+            // SÍNTOMAS Y SIGNOS
+            [
+              {
+                text: 'SÍNTOMAS Y SIGNOS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.sintomas_signos || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // HÁBITUS EXTERIOR
+            [
+              {
+                text: 'HÁBITUS EXTERIOR',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.habitus_exterior || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // ESTADO NUTRICIONAL
+            [
+              {
+                text: 'ESTADO NUTRICIONAL',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.estado_nutricional || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // EXPLORACIÓN POR SISTEMAS (si existe)
+            ...(this.tieneExploracionSistemas(notaEvolucion) ? [
+              [
+                {
+                  text: 'EXPLORACIÓN POR APARATOS Y SISTEMAS',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f0f0'
+                },
+                {
+                  text: [
+                    ...(notaEvolucion.exploracion_cabeza ? [
+                      { text: 'CABEZA Y CUELLO: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_cabeza}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_torax ? [
+                      { text: 'TÓRAX Y PULMONES: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_torax}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_abdomen ? [
+                      { text: 'ABDOMEN: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_abdomen}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_extremidades ? [
+                      { text: 'EXTREMIDADES: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_extremidades}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_neurologico ? [
+                      { text: 'NEUROLÓGICO: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_neurologico}`, fontSize: 7 }
+                    ] : [])
+                  ].length > 0 ? [
+                    ...(notaEvolucion.exploracion_cabeza ? [
+                      { text: 'CABEZA Y CUELLO: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_cabeza}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_torax ? [
+                      { text: 'TÓRAX Y PULMONES: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_torax}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_abdomen ? [
+                      { text: 'ABDOMEN: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_abdomen}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_extremidades ? [
+                      { text: 'EXTREMIDADES: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_extremidades}\n\n`, fontSize: 7 }
+                    ] : []),
+                    ...(notaEvolucion.exploracion_neurologico ? [
+                      { text: 'NEUROLÓGICO: ', bold: true, fontSize: 7 },
+                      { text: `${notaEvolucion.exploracion_neurologico}`, fontSize: 7 }
+                    ] : [])
+                  ] : [
+                    { text: 'Sin exploración por sistemas registrada', fontSize: 7, italics: true }
+                  ],
+                  margin: [5, 3],
+                  lineHeight: 1.1
+                }
+              ]
+            ] : []),
+
+            // ESTUDIOS DE LABORATORIO Y GABINETE
+            [
+              {
+                text: 'ESTUDIOS DE LABORATORIO Y GABINETE',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.estudios_laboratorio_gabinete || 'No se realizaron estudios',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // EVOLUCIÓN Y ANÁLISIS DEL CUADRO CLÍNICO
+            [
+              {
+                text: 'EVOLUCIÓN Y ANÁLISIS DEL CUADRO CLÍNICO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.evolucion_analisis || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // DIAGNÓSTICOS ACTUALIZADOS
+            [
+              {
+                text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.diagnosticos || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2,
+                bold: true
+              }
+            ],
+
+            // PLAN DE ESTUDIOS Y TRATAMIENTO
+            [
+              {
+                text: 'PLAN DE ESTUDIOS Y TRATAMIENTO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.plan_estudios_tratamiento || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // INTERCONSULTAS (si las hay)
+            ...(notaEvolucion.interconsultas &&
+                notaEvolucion.interconsultas !== 'No se solicitaron interconsultas en esta evolución' ? [
+              [
+                {
+                  text: 'INTERCONSULTAS SOLICITADAS',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f0f0'
+                },
+                {
+                  text: notaEvolucion.interconsultas,
+                  fontSize: 7,
+                  margin: [5, 3],
+                  lineHeight: 1.2
+                }
+              ]
+            ] : []),
+
+            // PRONÓSTICO
+            [
+              {
+                text: 'PRONÓSTICO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0'
+              },
+              {
+                text: notaEvolucion.pronostico || 'Sin información registrada',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.2
+              }
+            ],
+
+            // INDICACIONES MÉDICAS (si las hay)
+            ...(notaEvolucion.indicaciones_medicas ? [
+              [
+                {
+                  text: 'INDICACIONES MÉDICAS',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f0f0'
+                },
+                {
+                  text: notaEvolucion.indicaciones_medicas,
+                  fontSize: 7,
+                  margin: [5, 3],
+                  lineHeight: 1.2
+                }
+              ]
+            ] : []),
+
+            // OBSERVACIONES ADICIONALES (si las hay)
+            ...(notaEvolucion.observaciones_adicionales ? [
+              [
+                {
+                  text: 'OBSERVACIONES ADICIONALES',
+                  fontSize: 7,
+                  bold: true,
+                  fillColor: '#f0f0f0'
+                },
+                {
+                  text: notaEvolucion.observaciones_adicionales,
+                  fontSize: 7,
+                  margin: [5, 3],
+                  lineHeight: 1.2
+                }
+              ]
+            ] : [])
           ]
-          : []),
-
-        // ESTUDIOS Y EVOLUCIÓN
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '📊 ESTUDIOS Y EVOLUCIÓN',
-                  style: 'sectionHeader',
-                  fillColor: '#f3e5f5',
-                  margin: [10, 8],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 10, 0, 10],
         },
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    {
-                      text: 'ESTUDIOS DE LABORATORIO Y GABINETE:',
-                      style: 'fieldLabel',
-                    },
-                    {
-                      text:
-                        notaEvolucion.estudios_laboratorio_gabinete ||
-                        'No se realizaron estudios',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 15],
-                    },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000'
+        }
+      }
+    ],
 
-                    {
-                      text: 'EVOLUCIÓN Y ANÁLISIS DEL CUADRO CLÍNICO:',
-                      style: 'fieldLabel',
-                    },
-                    {
-                      text:
-                        notaEvolucion.evolucion_analisis || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 15],
-                    },
-
-                    { text: 'DIAGNÓSTICOS ACTUALIZADOS:', style: 'fieldLabel' },
-                    {
-                      text: notaEvolucion.diagnosticos || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 0],
-                    },
-                  ],
-                  margin: [10, 10],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15],
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [25, 5, 25, 10],
+        table: {
+          widths: ['70%', '30%'],
+          body: [
+            [
+              {
+                stack: [
+                  {
+                    text: `${medicoCompleto.nombre_completo || 'NOMBRE DEL MÉDICO'}`,
+                    fontSize: 8,
+                    bold: true
+                  },
+                  {
+                    text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'N/A'}`,
+                    fontSize: 7
+                  },
+                  {
+                    text: `${medicoCompleto.cargo || 'MÉDICO'} - ${medicoCompleto.departamento || 'DEPARTAMENTO'}`,
+                    fontSize: 7
+                  }
+                ]
+              },
+              {
+                stack: [
+                  {
+                    text: '_'.repeat(30),
+                    fontSize: 8,
+                    alignment: 'center',
+                    margin: [0, 10, 0, 0]
+                  },
+                  {
+                    text: 'FIRMA AUTÓGRAFA',
+                    fontSize: 6,
+                    alignment: 'center',
+                    bold: true
+                  },
+                  {
+                    text: '(Según NOM-004-SSA3-2012)',
+                    fontSize: 5,
+                    alignment: 'center',
+                    color: '#666666'
+                  }
+                ]
+              }
+            ]
+          ]
         },
-
-        // PLAN TERAPÉUTICO Y PRONÓSTICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '📋 PLAN TERAPÉUTICO Y PRONÓSTICO',
-                  style: 'sectionHeader',
-                  fillColor: '#fff3e0',
-                  margin: [10, 8],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 10, 0, 10],
-        },
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    {
-                      text: 'PLAN DE ESTUDIOS Y TRATAMIENTO:',
-                      style: 'fieldLabel',
-                    },
-                    {
-                      text:
-                        notaEvolucion.plan_estudios_tratamiento ||
-                        'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 15],
-                    },
-
-                    { text: 'PRONÓSTICO:', style: 'fieldLabel' },
-                    {
-                      text: notaEvolucion.pronostico || 'No especificado',
-                      style: 'fieldValue',
-                      margin: [0, 5, 0, 15],
-                    },
-
-                    ...(notaEvolucion.interconsultas &&
-                      notaEvolucion.interconsultas !==
-                      'No se solicitaron interconsultas en esta evolución'
-                      ? [
-                        { text: 'INTERCONSULTAS:', style: 'fieldLabel' },
-                        {
-                          text: notaEvolucion.interconsultas,
-                          style: 'fieldValue',
-                          margin: [0, 5, 0, 15],
-                        },
-                      ]
-                      : []),
-
-                    ...(notaEvolucion.indicaciones_medicas
-                      ? [
-                        {
-                          text: 'INDICACIONES MÉDICAS:',
-                          style: 'fieldLabel',
-                        },
-                        {
-                          text: notaEvolucion.indicaciones_medicas,
-                          style: 'fieldValue',
-                          margin: [0, 5, 0, 15],
-                        },
-                      ]
-                      : []),
-
-                    ...(notaEvolucion.observaciones_adicionales
-                      ? [
-                        {
-                          text: 'OBSERVACIONES ADICIONALES:',
-                          style: 'fieldLabel',
-                        },
-                        {
-                          text: notaEvolucion.observaciones_adicionales,
-                          style: 'fieldValue',
-                          margin: [0, 5, 0, 0],
-                        },
-                      ]
-                      : []),
-                  ],
-                  margin: [10, 10],
-                },
-              ],
-            ],
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 30],
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                {
-                  stack: [
-                    {
-                      text: medicoCompleto.nombre_completo || '[Nombre]',
-                      fontSize: 8,
-                    },
-                    {
-                      text: `Cédula: ${medicoCompleto.cedula || 'N/A'}`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: '_'.repeat(25),
-                      fontSize: 8,
-                      margin: [0, 10, 0, 0],
-                    },
-                    { text: 'FIRMA', fontSize: 7, alignment: 'center' },
-                  ],
-                },
-                {
-                  stack: [
-                    {
-                      text: `Página ${currentPage} de ${pageCount}`,
-                      fontSize: 8,
-                      alignment: 'center',
-                    },
-                    {
-                      text: 'NOTA DE EVOLUCIÓN MÉDICA',
-                      fontSize: 7,
-                      alignment: 'center',
-                      margin: [0, 5, 0, 0],
-                    },
-                    {
-                      text: 'NOM-004-SSA3-2012',
-                      fontSize: 6,
-                      alignment: 'center',
-                      color: '#666666',
-                    },
-                  ],
-                },
-                {
-                  stack: [
-                    {
-                      text: 'FECHA Y HORA:',
-                      fontSize: 8,
-                      bold: true,
-                      alignment: 'right',
-                    },
-                    {
-                      text: fechaActual.toLocaleString('es-MX'),
-                      fontSize: 8,
-                      alignment: 'right',
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(
-                        pacienteCompleto.expediente
-                      )}`,
-                      fontSize: 7,
-                      alignment: 'right',
-                      margin: [0, 5, 0, 0],
-                    },
-                  ],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-
-      styles: {
-        sectionHeader: {
-          fontSize: 12,
-          bold: true,
-          color: '#374151',
-        },
-        fieldLabel: {
-          fontSize: 9,
-          bold: true,
-          color: '#4b5563',
-        },
-        fieldValue: {
-          fontSize: 9,
-          color: '#111827',
-        },
-      },
-    };
-  }
-
+        layout: 'noBorders'
+      };
+    }
+  };
+}
 
   async generarPrescripcionMedicamentos(datos: any): Promise<any> {
     console.log('💊 Generando Prescripción de Medicamentos...');
