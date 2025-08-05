@@ -1604,7 +1604,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
 
   async generarNotaUrgenciasMedicas(datos: any): Promise<void> {
-    console.log('🚨 Generando PDF de Nota de Urgencias...');
+    console.log('  Generando PDF de Nota de Urgencias...');
 
     try {
       await this.ensurePdfMakeLoaded();

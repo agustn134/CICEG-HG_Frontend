@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environments';
   providedIn: 'root'
 })
 export class EstudiosMedicosService {
-  private readonly API_URL = `${environment.apiUrl}/api/catalogos/estudios-medicos`;
+  private readonly API_URL = `${environment.BASE_URL}/api/catalogos/estudios-medicos`;
 
   private httpOptions = {
     headers: new HttpHeaders({

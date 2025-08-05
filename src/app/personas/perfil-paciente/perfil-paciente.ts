@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef, } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, FormArray, } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -387,6 +387,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
+    private changeDetectorRef: ChangeDetectorRef,
     private expedientesService: ExpedientesService,
     private pacientesService: PacientesService,
     private documentosService: DocumentosService,
@@ -2232,7 +2233,7 @@ public debugNotaEvolucion(): void {
 
       console.log('📄 Nota de Urgencias guardada exitosamente:', response);
 
-      this.success = '🚨 Nota de Urgencias guardada correctamente';
+      this.success = '  Nota de Urgencias guardada correctamente';
       this.formularioEstado.notaUrgencias = true;
 
       // Generar PDF automáticamente
@@ -2266,28 +2267,41 @@ public debugNotaEvolucion(): void {
   }
 
   private initializeNotaUrgenciasForm(): FormGroup {
-    return this.fb.group({
-      // Campos obligatorios según NOM-004
-      motivo_atencion: ['', [Validators.required, Validators.minLength(10)]],
-      estado_conciencia: ['', [Validators.required]],
-      resumen_interrogatorio: ['', [Validators.required, Validators.minLength(20)]],
-      exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
-      diagnostico: ['', [Validators.required, Validators.minLength(10)]],
-      plan_tratamiento: ['', [Validators.required, Validators.minLength(20)]],
-      pronostico: ['', [Validators.required, Validators.minLength(10)]],
+  return this.fb.group({
+    // Campos obligatorios según NOM-004
+    motivo_atencion: ['', [Validators.required, Validators.minLength(10)]],
+    estado_conciencia: ['', [Validators.required]],
+    resumen_interrogatorio: ['', [Validators.required, Validators.minLength(20)]],
+    exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
+    diagnostico: ['', [Validators.required, Validators.minLength(10)]],
+    plan_tratamiento: ['', [Validators.required, Validators.minLength(20)]],
+    pronostico: ['', [Validators.required]],
 
-      // Campos opcionales pero importantes
-      resultados_estudios: [''],
-      estado_mental: [''],
-      id_guia_diagnostico: [null],
-      numero_cama: [''],
-      hora_atencion: [new Date().toTimeString().slice(0, 5)], // Hora actual por defecto
+    // Campos de atención básicos
+    hora_atencion: [new Date().toTimeString().slice(0, 5)],
+    numero_cama: [''],
+    id_cama: [null],
+    area_interconsulta: [null],
+    id_guia_diagnostico: [null],
 
-      // Campos específicos de urgencias (NOM-004)
-      destino_paciente: [''], // D4.14 - Se menciona destino después de urgencias
-      procedimientos_urgencias: [''] // D4.15 - Procedimientos en área de urgencias
-    });
-  }
+    // 🔥 SIGNOS VITALES AGREGADOS (faltaban estos campos)
+    presion_arterial_sistolica: [null, [Validators.min(60), Validators.max(250)]],
+    presion_arterial_diastolica: [null, [Validators.min(30), Validators.max(150)]],
+    frecuencia_cardiaca: [null, [Validators.min(30), Validators.max(250)]],
+    frecuencia_respiratoria: [null, [Validators.min(8), Validators.max(60)]],
+    temperatura: [null, [Validators.min(30), Validators.max(45)]],
+    saturacion_oxigeno: [null, [Validators.min(50), Validators.max(100)]],
+    glucosa: [null, [Validators.min(30), Validators.max(600)]],
+    escala_dolor: [null, [Validators.min(0), Validators.max(10)]],
+    peso: [null, [Validators.min(0.5), Validators.max(300)]],
+
+    // Campos opcionales pero importantes
+    resultados_estudios: [''],
+    estado_mental: [''],
+    destino_paciente: [''],
+    procedimientos_urgencias: ['']
+  });
+}
 
 
   private initializeReferenciaForm(): FormGroup {
@@ -3789,18 +3803,88 @@ public debugNotaEvolucion(): void {
   }
 
   // Métodos para guías clínicas
-  agregarGuiaClinica(guia: GuiaClinica): void {
-    const yaSeleccionada = this.guiasClinicasSeleccionadas.find(g => g.id_guia_diagnostico === guia.id_guia_diagnostico);
-    if (!yaSeleccionada) {
-      this.guiasClinicasSeleccionadas.push(guia);
-      this.limpiarBusquedaGuia();
-    }
+agregarGuiaClinica(guia: GuiaClinica): void {
+  console.log('➕ Agregando guía clínica:', guia.nombre);
+  
+  // Verificar si ya está seleccionada
+  if (this.esGuiaSeleccionada(guia)) {
+    console.log('⚠️ La guía ya está seleccionada');
+    return;
   }
 
+  // Agregar a la lista
+  this.guiasClinicasSeleccionadas.push(guia);
+  
+  // 🔥 ACTUALIZAR LOS FORMCONTROLS
+  const idsSeleccionados = this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico);
+  
+  // Historia Clínica (permite múltiples)
+  if (this.historiaClinicaForm && this.historiaClinicaForm.get('guias_clinicas_ids')) {
+    this.historiaClinicaForm.get('guias_clinicas_ids')?.setValue(idsSeleccionados);
+  }
+  
+  // Nota Urgencias (solo una principal)
+  if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('id_guia_diagnostico')) {
+    // Si es la primera guía, establecerla como principal
+    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1 
+      ? guia.id_guia_diagnostico 
+      : this.notaUrgenciasForm.get('id_guia_diagnostico')?.value;
+    this.notaUrgenciasForm.get('id_guia_diagnostico')?.setValue(guiaPrincipal);
+  }
+  
+  // Nota Evolución (solo una principal)
+  if (this.notaEvolucionForm && this.notaEvolucionForm.get('id_guia_diagnostico')) {
+    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1 
+      ? guia.id_guia_diagnostico 
+      : this.notaEvolucionForm.get('id_guia_diagnostico')?.value;
+    this.notaEvolucionForm.get('id_guia_diagnostico')?.setValue(guiaPrincipal);
+  }
+  
+  // 🔥 LIMPIAR LA BÚSQUEDA Y CERRAR DROPDOWN
+  this.limpiarBusquedaGuia();
+  
+  console.log('✅ Guía agregada. Total guías:', this.guiasClinicasSeleccionadas.length);
+}
+
   eliminarGuiaClinica(guia: GuiaClinica): void {
+    console.log('🗑️ Eliminando guía clínica:', guia.nombre);
+    
+    // Filtrar la guía de la lista seleccionada
     this.guiasClinicasSeleccionadas = this.guiasClinicasSeleccionadas.filter(
       g => g.id_guia_diagnostico !== guia.id_guia_diagnostico
     );
+    
+    // 🔥 ACTUALIZAR EL FORMCONTROL CORRESPONDIENTE
+    const idsSeleccionados = this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico);
+    
+    // Actualizar todos los formularios que tengan guías clínicas
+    if (this.historiaClinicaForm && this.historiaClinicaForm.get('guias_clinicas_ids')) {
+      this.historiaClinicaForm.get('guias_clinicas_ids')?.setValue(idsSeleccionados);
+    }
+    
+    if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('id_guia_diagnostico')) {
+      // Si solo queda una guía, mantenerla en el campo único
+      // Si no quedan guías, limpiar el campo
+      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0 
+        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico 
+        : null;
+      this.notaUrgenciasForm.get('id_guia_diagnostico')?.setValue(nuevaGuiaPrincipal);
+    }
+    
+    if (this.notaEvolucionForm && this.notaEvolucionForm.get('id_guia_diagnostico')) {
+      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0 
+        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico 
+        : null;
+      this.notaEvolucionForm.get('id_guia_diagnostico')?.setValue(nuevaGuiaPrincipal);
+    }
+    
+    // 🔥 MOSTRAR FEEDBACK VISUAL
+    console.log('✅ Guía eliminada. Guías restantes:', this.guiasClinicasSeleccionadas.length);
+    
+    // Opcional: Mostrar mensaje temporal
+    if (this.guiasClinicasSeleccionadas.length === 0) {
+      console.log('ℹ️ No hay guías clínicas seleccionadas');
+    }
   }
 
   limpiarBusquedaGuia(): void {
@@ -4067,6 +4151,489 @@ public debugNotaEvolucion(): void {
       this.documentoClinicoActual = response.data.id_documento;
     }
   }
+
+
+  // Métodos para cálculos automáticos en urgencias
+onSignosVitalesChange(): void {
+  console.log('🔄 Cambio detectado en signos vitales de urgencias');
+  
+  // 1. 🔥 AUTO-SINCRONIZACIÓN con formulario principal
+  this.sincronizarSignosVitalesAutomatico();
+  
+  // 2. 🔥 VALIDACIONES EN TIEMPO REAL
+  this.validarRangosSignosVitales();
+  
+  // 3. 🔥 CÁLCULOS AUTOMÁTICOS
+  this.actualizarCalculosAutomaticos();
+  
+  // 4. 🔥 ACTUALIZAR INTERPRETACIONES
+  this.actualizarInterpretacionesSignosVitales();
+}
+
+
+private sincronizarSignosVitalesAutomatico(): void {
+  const signosUrgencias = this.notaUrgenciasForm.value;
+  
+  // Solo sincronizar valores que no estén vacíos
+  const valoresParaSincronizar: any = {};
+  
+  if (signosUrgencias.temperatura) valoresParaSincronizar.temperatura = signosUrgencias.temperatura;
+  if (signosUrgencias.presion_arterial_sistolica) valoresParaSincronizar.presion_arterial_sistolica = signosUrgencias.presion_arterial_sistolica;
+  if (signosUrgencias.presion_arterial_diastolica) valoresParaSincronizar.presion_arterial_diastolica = signosUrgencias.presion_arterial_diastolica;
+  if (signosUrgencias.frecuencia_cardiaca) valoresParaSincronizar.frecuencia_cardiaca = signosUrgencias.frecuencia_cardiaca;
+  if (signosUrgencias.frecuencia_respiratoria) valoresParaSincronizar.frecuencia_respiratoria = signosUrgencias.frecuencia_respiratoria;
+  if (signosUrgencias.saturacion_oxigeno) valoresParaSincronizar.saturacion_oxigeno = signosUrgencias.saturacion_oxigeno;
+  if (signosUrgencias.glucosa) valoresParaSincronizar.glucosa = signosUrgencias.glucosa;
+  if (signosUrgencias.peso) valoresParaSincronizar.peso = signosUrgencias.peso;
+  
+  // Actualizar formulario principal sin triggear eventos infinitos
+  this.signosVitalesForm.patchValue(valoresParaSincronizar, { emitEvent: false });
+  
+  console.log('✅ Signos vitales sincronizados automáticamente');
+}
+
+private validarRangosSignosVitales(): void {
+  // 🔥 CORREGIR: Calcular edad desde fecha de nacimiento
+  const edad = this.calcularEdadPaciente();
+  const signosActuales = this.notaUrgenciasForm.value;
+  
+  // 🔥 VALIDAR CADA SIGNO VITAL
+  this.validarTemperatura(signosActuales.temperatura);
+  this.validarPresionArterial(signosActuales.presion_arterial_sistolica, signosActuales.presion_arterial_diastolica);
+  this.validarFrecuenciaCardiaca(signosActuales.frecuencia_cardiaca, edad);
+  this.validarFrecuenciaRespiratoria(signosActuales.frecuencia_respiratoria, edad);
+  this.validarSaturacionOxigeno(signosActuales.saturacion_oxigeno);
+  this.validarGlucosa(signosActuales.glucosa);
+}
+
+// 🔥 MÉTODO AUXILIAR para calcular edad
+private calcularEdadPaciente(): number {
+  if (!this.pacienteCompleto?.persona?.fecha_nacimiento) {
+    return 25; // Edad por defecto si no hay datos
+  }
+  
+  const fechaNacimiento = new Date(this.pacienteCompleto.persona.fecha_nacimiento);
+  const hoy = new Date();
+  const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+  const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+  
+  if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+    return edad - 1;
+  }
+  
+  return edad;
+}
+private actualizarCalculosAutomaticos(): void {
+  // Forzar recálculo de todos los valores calculados
+  // Esto hará que Angular actualice los valores mostrados en el template
+  this.changeDetectorRef?.detectChanges();
+  
+  console.log('📊 Cálculos actualizados:', {
+    imc: this.getIMCCalculado(),
+    superficieCorporal: this.getSuperficieCorporal(),
+    pam: this.getPresionArterialMedia()
+  });
+}
+
+// 🔥 MÉTODOS DE INTERPRETACIÓN Y COLORES PARA EL TEMPLATE
+
+// Presión Arterial
+getPresionArterialFormatted(): string | null {
+  const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
+  const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
+  
+  if (sistolica && diastolica) {
+    return `${sistolica}/${diastolica}`;
+  }
+  return null;
+}
+
+getColorPresionArterial(): string {
+  const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
+  const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
+  
+  if (!sistolica || !diastolica) return '';
+  
+  if (sistolica > 180 || diastolica > 110) return 'bg-red-100 text-red-800';
+  if (sistolica > 140 || diastolica > 90) return 'bg-orange-100 text-orange-800';
+  if (sistolica < 90 || diastolica < 60) return 'bg-yellow-100 text-yellow-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionPresionArterial(): string {
+  const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
+  const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
+  
+  if (!sistolica || !diastolica) return '';
+  
+  if (sistolica > 180 || diastolica > 110) return 'Crisis hipertensiva';
+  if (sistolica > 140 || diastolica > 90) return 'Hipertensión';
+  if (sistolica < 90 || diastolica < 60) return 'Hipotensión';
+  return 'Normal';
+}
+
+// Frecuencia Cardíaca
+getColorFrecuenciaCardiaca(): string {
+  const fc = this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value;
+  const edad = this.calcularEdadPaciente();
+  
+  if (!fc) return '';
+  
+  let rangoNormal = { min: 60, max: 100 }; // Adulto por defecto
+  if (edad < 1) rangoNormal = { min: 100, max: 160 };
+  else if (edad < 12) rangoNormal = { min: 80, max: 120 };
+  else if (edad < 18) rangoNormal = { min: 70, max: 110 };
+  
+  if (fc > 150 || fc < 50) return 'bg-red-100 text-red-800'; // Crítico
+  if (fc < rangoNormal.min || fc > rangoNormal.max) return 'bg-orange-100 text-orange-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionFrecuenciaCardiaca(): string {
+  const fc = this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value;
+  const edad = this.calcularEdadPaciente();
+  
+  if (!fc) return '';
+  
+  let rangoNormal = { min: 60, max: 100 };
+  if (edad < 1) rangoNormal = { min: 100, max: 160 };
+  else if (edad < 12) rangoNormal = { min: 80, max: 120 };
+  else if (edad < 18) rangoNormal = { min: 70, max: 110 };
+  
+  if (fc > 150) return 'Taquicardia severa';
+  if (fc < 50) return 'Bradicardia severa';
+  if (fc < rangoNormal.min) return 'Bradicardia';
+  if (fc > rangoNormal.max) return 'Taquicardia';
+  return 'Normal';
+}
+
+// Frecuencia Respiratoria
+getColorFrecuenciaRespiratoria(): string {
+  const fr = this.notaUrgenciasForm.get('frecuencia_respiratoria')?.value;
+  const edad = this.calcularEdadPaciente();
+  
+  if (!fr) return '';
+  
+  let rangoNormal = { min: 12, max: 20 }; // Adulto
+  if (edad < 1) rangoNormal = { min: 30, max: 60 };
+  else if (edad < 5) rangoNormal = { min: 20, max: 30 };
+  else if (edad < 12) rangoNormal = { min: 16, max: 25 };
+  
+  if (fr < rangoNormal.min || fr > rangoNormal.max) return 'bg-orange-100 text-orange-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionFrecuenciaRespiratoria(): string {
+  const fr = this.notaUrgenciasForm.get('frecuencia_respiratoria')?.value;
+  const edad = this.calcularEdadPaciente();
+  
+  if (!fr) return '';
+  
+  let rangoNormal = { min: 12, max: 20 };
+  if (edad < 1) rangoNormal = { min: 30, max: 60 };
+  else if (edad < 5) rangoNormal = { min: 20, max: 30 };
+  else if (edad < 12) rangoNormal = { min: 16, max: 25 };
+  
+  if (fr < rangoNormal.min) return 'Bradipnea';
+  if (fr > rangoNormal.max) return 'Taquipnea';
+  return 'Normal';
+}
+
+// Temperatura
+getColorTemperatura(): string {
+  const temp = this.notaUrgenciasForm.get('temperatura')?.value;
+  
+  if (!temp) return '';
+  
+  if (temp > 40.0 || temp < 35.0) return 'bg-red-100 text-red-800'; // Crítico
+  if (temp > 38.5) return 'bg-orange-100 text-orange-800'; // Fiebre
+  if (temp < 36.0) return 'bg-blue-100 text-blue-800'; // Hipotermia leve
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionTemperatura(): string {
+  const temp = this.notaUrgenciasForm.get('temperatura')?.value;
+  
+  if (!temp) return '';
+  
+  if (temp > 40.0) return 'Hipertermia crítica';
+  if (temp > 38.5) return 'Fiebre';
+  if (temp < 35.0) return 'Hipotermia';
+  if (temp < 36.0) return 'Temperatura baja';
+  return 'Normal';
+}
+
+// Saturación de Oxígeno
+getColorSaturacionOxigeno(): string {
+  const satO2 = this.notaUrgenciasForm.get('saturacion_oxigeno')?.value;
+  
+  if (!satO2) return '';
+  
+  if (satO2 < 90) return 'bg-red-100 text-red-800'; // Crítico
+  if (satO2 < 95) return 'bg-orange-100 text-orange-800'; // Bajo
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionSaturacionOxigeno(): string {
+  const satO2 = this.notaUrgenciasForm.get('saturacion_oxigeno')?.value;
+  
+  if (!satO2) return '';
+  
+  if (satO2 < 90) return 'Hipoxemia crítica';
+  if (satO2 < 95) return 'Saturación baja';
+  return 'Normal';
+}
+
+// Glucosa
+getColorGlucosa(): string {
+  const glucosa = this.notaUrgenciasForm.get('glucosa')?.value;
+  
+  if (!glucosa) return '';
+  
+  if (glucosa < 50 || glucosa > 400) return 'bg-red-100 text-red-800'; // Crítico
+  if (glucosa < 70 || glucosa > 200) return 'bg-orange-100 text-orange-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionGlucosa(): string {
+  const glucosa = this.notaUrgenciasForm.get('glucosa')?.value;
+  
+  if (!glucosa) return '';
+  
+  if (glucosa < 50) return 'Hipoglucemia crítica';
+  if (glucosa > 400) return 'Hiperglucemia crítica';
+  if (glucosa < 70) return 'Hipoglucemia';
+  if (glucosa > 200) return 'Hiperglucemia';
+  return 'Normal';
+}
+
+// Escala de Dolor
+getColorEscalaDolor(): string {
+  const dolor = this.notaUrgenciasForm.get('escala_dolor')?.value;
+  
+  if (dolor === null || dolor === undefined) return '';
+  
+  if (dolor >= 8) return 'bg-red-100 text-red-800'; // Severo
+  if (dolor >= 5) return 'bg-orange-100 text-orange-800'; // Moderado
+  if (dolor >= 1) return 'bg-yellow-100 text-yellow-800'; // Leve
+  return 'bg-green-100 text-green-800'; // Sin dolor
+}
+
+getInterpretacionEscalaDolor(): string {
+  const dolor = this.notaUrgenciasForm.get('escala_dolor')?.value;
+  
+  if (dolor === null || dolor === undefined) return '';
+  
+  if (dolor >= 8) return 'Dolor severo';
+  if (dolor >= 5) return 'Dolor moderado';
+  if (dolor >= 1) return 'Dolor leve';
+  return 'Sin dolor';
+}
+
+// IMC
+getColorIMC(): string {
+  const imc = parseFloat(this.getIMCCalculado() || '0');
+  
+  if (!imc) return '';
+  
+  if (imc < 18.5 || imc >= 30) return 'bg-orange-100 text-orange-800';
+  if (imc >= 25) return 'bg-yellow-100 text-yellow-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionIMC(): string {
+  const imc = parseFloat(this.getIMCCalculado() || '0');
+  
+  if (!imc) return '';
+  
+  if (imc < 18.5) return 'Bajo peso';
+  if (imc >= 18.5 && imc < 25) return 'Normal';
+  if (imc >= 25 && imc < 30) return 'Sobrepeso';
+  return 'Obesidad';
+}
+
+// PAM (Presión Arterial Media)
+getColorPAM(): string {
+  const pam = this.getPresionArterialMedia();
+  
+  if (!pam) return '';
+  
+  if (pam < 65 || pam > 110) return 'bg-orange-100 text-orange-800';
+  return 'bg-green-100 text-green-800';
+}
+
+getInterpretacionPAM(): string {
+  const pam = this.getPresionArterialMedia();
+  
+  if (!pam) return '';
+  
+  if (pam < 65) return 'PAM baja';
+  if (pam > 110) return 'PAM alta';
+  return 'PAM normal';
+}
+
+
+
+
+private actualizarInterpretacionesSignosVitales(): void {
+  // Este método fuerza la actualización de todas las interpretaciones
+  // que se muestran en el template (Normal, Alto, Bajo, etc.)
+  
+  // Marcar el formulario como "dirty" para que Angular detecte cambios
+  this.notaUrgenciasForm.markAsDirty();
+}
+
+// 🔥 MÉTODOS DE VALIDACIÓN ESPECÍFICOS
+private validarTemperatura(temperatura: number): void {
+  if (!temperatura) return;
+  
+  if (temperatura < 35.0) {
+    console.warn('⚠️ Hipotermia detectada:', temperatura);
+  } else if (temperatura > 38.5) {
+    console.warn('⚠️ Fiebre detectada:', temperatura);
+  } else if (temperatura > 40.0) {
+    console.error('  Hipertermia CRÍTICA:', temperatura);
+  }
+}
+
+private validarPresionArterial(sistolica: number, diastolica: number): void {
+  if (!sistolica || !diastolica) return;
+  
+  if (sistolica > 180 || diastolica > 110) {
+    console.error('  Crisis hipertensiva CRÍTICA:', `${sistolica}/${diastolica}`);
+  } else if (sistolica > 140 || diastolica > 90) {
+    console.warn('⚠️ Hipertensión detectada:', `${sistolica}/${diastolica}`);
+  } else if (sistolica < 90 || diastolica < 60) {
+    console.warn('⚠️ Hipotensión detectada:', `${sistolica}/${diastolica}`);
+  }
+}
+
+private validarFrecuenciaCardiaca(fc: number, edad: number): void {
+  if (!fc) return;
+  
+  // Rangos por edad
+  let rangoNormal = { min: 60, max: 100 }; // Adulto
+  
+  if (edad < 1) rangoNormal = { min: 100, max: 160 }; // Lactante
+  else if (edad < 12) rangoNormal = { min: 80, max: 120 }; // Niño
+  else if (edad < 18) rangoNormal = { min: 70, max: 110 }; // Adolescente
+  
+  if (fc < rangoNormal.min) {
+    console.warn('⚠️ Bradicardia detectada:', fc);
+  } else if (fc > rangoNormal.max) {
+    console.warn('⚠️ Taquicardia detectada:', fc);
+  }
+  
+  if (fc > 150) {
+    console.error('  Taquicardia CRÍTICA:', fc);
+  } else if (fc < 50) {
+    console.error('  Bradicardia CRÍTICA:', fc);
+  }
+}
+
+private validarFrecuenciaRespiratoria(fr: number, edad: number): void {
+  if (!fr) return;
+  
+  // Rangos por edad
+  let rangoNormal = { min: 12, max: 20 }; // Adulto
+  
+  if (edad < 1) rangoNormal = { min: 30, max: 60 }; // Lactante
+  else if (edad < 5) rangoNormal = { min: 20, max: 30 }; // Preescolar
+  else if (edad < 12) rangoNormal = { min: 16, max: 25 }; // Escolar
+  
+  if (fr < rangoNormal.min) {
+    console.warn('⚠️ Bradipnea detectada:', fr);
+  } else if (fr > rangoNormal.max) {
+    console.warn('⚠️ Taquipnea detectada:', fr);
+  }
+}
+
+private validarSaturacionOxigeno(satO2: number): void {
+  if (!satO2) return;
+  
+  if (satO2 < 90) {
+    console.error('  Hipoxemia CRÍTICA:', satO2);
+  } else if (satO2 < 95) {
+    console.warn('⚠️ Saturación baja:', satO2);
+  }
+}
+
+private validarGlucosa(glucosa: number): void {
+  if (!glucosa) return;
+  
+  if (glucosa < 70) {
+    console.warn('⚠️ Hipoglucemia detectada:', glucosa);
+  } else if (glucosa > 200) {
+    console.warn('⚠️ Hiperglucemia detectada:', glucosa);
+  }
+  
+  if (glucosa < 50) {
+    console.error('  Hipoglucemia CRÍTICA:', glucosa);
+  } else if (glucosa > 400) {
+    console.error('  Hiperglucemia CRÍTICA:', glucosa);
+  }
+}
+
+// 🔥 MÉTODO AUXILIAR: Detectar si hay signos vitales para cálculos
+tieneSignosVitalesParaCalculos(): boolean {
+  const signos = this.notaUrgenciasForm.value;
+  return !!(signos.peso || signos.temperatura || signos.presion_arterial_sistolica || signos.frecuencia_cardiaca);
+}
+
+
+getIMCCalculado(): string | null {
+  const peso = this.notaUrgenciasForm.get('peso')?.value;
+  const talla = this.pacienteCompleto?.signosVitales?.[0]?.talla; // Obtener talla del historial
+  
+  if (peso && talla) {
+    const tallaM = talla / 100;
+    const imc = peso / (tallaM * tallaM);
+    return imc.toFixed(1);
+  }
+  return null;
+}
+
+getSuperficieCorporal(): string | null {
+  const peso = this.notaUrgenciasForm.get('peso')?.value;
+  const talla = this.pacienteCompleto?.signosVitales?.[0]?.talla;
+  
+  if (peso && talla) {
+    // Fórmula de Mosteller: SC = √(peso × talla) / 60
+    const sc = Math.sqrt(peso * talla) / 60;
+    return sc.toFixed(2);
+  }
+  return null;
+}
+
+getPresionArterialMedia(): number | null {
+  const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
+  const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
+  
+  if (sistolica && diastolica) {
+    // PAM = (2 × diastólica + sistólica) / 3
+    return Math.round((2 * diastolica + sistolica) / 3);
+  }
+  return null;
+}
+
+sincronizarSignosVitales(): void {
+  // Sincronizar los signos vitales con el historial principal
+  const signosUrgencias = this.notaUrgenciasForm.value;
+  
+  // Actualizar el formulario de signos vitales principal
+  this.signosVitalesForm.patchValue({
+    temperatura: signosUrgencias.temperatura,
+    presion_arterial_sistolica: signosUrgencias.presion_arterial_sistolica,
+    presion_arterial_diastolica: signosUrgencias.presion_arterial_diastolica,
+    frecuencia_cardiaca: signosUrgencias.frecuencia_cardiaca,
+    frecuencia_respiratoria: signosUrgencias.frecuencia_respiratoria,
+    saturacion_oxigeno: signosUrgencias.saturacion_oxigeno,
+    glucosa: signosUrgencias.glucosa,
+    peso: signosUrgencias.peso
+  });
+  
+  console.log('✅ Signos vitales sincronizados');
+}
 
   private async guardarHistoriaClinica(): Promise<void> {
     if (!this.historiaClinicaForm.valid) {
@@ -5178,15 +5745,93 @@ public debugNotaEvolucion(): void {
   }
 
   limpiarCama(): void {
-    this.camaSeleccionada = null;
-    this.filtroCama = '';
-  }
+  console.log('🗑️ Limpiando selección de cama');
+  
+  this.camaSeleccionada = null;
+  this.filtroCama = '';
+  
+  // 🔥 LIMPIAR EN TODOS LOS FORMULARIOS
+  const formulariosConCama = [
+    'historiaClinicaForm',
+    'notaUrgenciasForm', 
+    'notaEvolucionForm',
+    'notaPreoperatoriaForm',
+    'notaPostoperatoriaForm',
+    'notaInterconsultaForm'
+  ];
+  
+  formulariosConCama.forEach(formName => {
+    const form = (this as any)[formName];
+    if (form) {
+      if (form.get('numero_cama')) {
+        form.get('numero_cama')?.setValue('');
+      }
+      if (form.get('id_cama')) {
+        form.get('id_cama')?.setValue(null);
+      }
+    }
+  });
+  
+  console.log('✅ Cama limpiada de todos los formularios');
+}
 
   seleccionarCama(cama: any): void {
-    this.camaSeleccionada = cama;
-    this.filtroCama = cama.numero;
-    this.mostrarDropdownCamas = false;
+  console.log('🛏️ Seleccionando cama:', cama);
+  
+  this.camaSeleccionada = cama;
+  this.filtroCama = cama.numero;
+  this.mostrarDropdownCamas = false;
+  
+  // 🔥 SINCRONIZAR CON TODOS LOS FORMULARIOS RELEVANTES
+  const numeroCama = `${cama.area ? cama.area + '-' : ''}${cama.numero}`;
+  
+  // Historia Clínica
+  if (this.historiaClinicaForm && this.historiaClinicaForm.get('numero_cama')) {
+    this.historiaClinicaForm.get('numero_cama')?.setValue(numeroCama);
+    this.historiaClinicaForm.get('id_cama')?.setValue(cama.id_cama);
   }
+  
+  // Nota Urgencias
+  if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('numero_cama')) {
+    this.notaUrgenciasForm.get('numero_cama')?.setValue(numeroCama);
+    // Agregar id_cama si el FormGroup lo tiene
+    if (this.notaUrgenciasForm.get('id_cama')) {
+      this.notaUrgenciasForm.get('id_cama')?.setValue(cama.id_cama);
+    }
+  }
+  
+  // Nota Evolución
+  if (this.notaEvolucionForm && this.notaEvolucionForm.get('numero_cama')) {
+    this.notaEvolucionForm.get('numero_cama')?.setValue(numeroCama);
+    if (this.notaEvolucionForm.get('id_cama')) {
+      this.notaEvolucionForm.get('id_cama')?.setValue(cama.id_cama);
+    }
+  }
+  
+  // Otros formularios que usen cama
+  const formulariosConCama = [
+    'notaPreoperatoriaForm',
+    'notaPostoperatoriaForm', 
+    'notaInterconsultaForm'
+  ];
+  
+  formulariosConCama.forEach(formName => {
+    const form = (this as any)[formName];
+    if (form && form.get('numero_cama')) {
+      form.get('numero_cama')?.setValue(numeroCama);
+      if (form.get('id_cama')) {
+        form.get('id_cama')?.setValue(cama.id_cama);
+      }
+    }
+  });
+  
+  console.log('✅ Cama sincronizada con formularios:', {
+    cama: numeroCama,
+    id_cama: cama.id_cama,
+    area: cama.area,
+    estado: cama.estado
+  });
+}
 
   esMujerAdolescente(): boolean {
     const sexo = this.personaInfo?.sexo;

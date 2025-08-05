@@ -1,0 +1,11 @@
+/* src/app/catalogos/guias-clinicas/guias-clinicas.css */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}

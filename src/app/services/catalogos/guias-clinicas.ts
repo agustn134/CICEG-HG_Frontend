@@ -1,6 +1,7 @@
+// src/app/services/catalogos/guias-clinicas.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, firstValueFrom } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { GuiaClinica, CreateGuiaClinicaDto, UpdateGuiaClinicaDto, GuiaClinicaFilters } from '../../models/guia-clinica.model';
 import { ApiResponse } from '../../models/base.models';
 import { environment } from '../../../environments/environments';
@@ -19,22 +20,21 @@ export class GuiasClinicasService {
 
   constructor(private http: HttpClient) { }
 
-  // Obtener todas las guías clínicas
+  // Obtener todas las guías clínicas con filtros
   async getAll(filters?: GuiaClinicaFilters): Promise<ApiResponse<GuiaClinica[]>> {
     try {
-      let url = this.API_URL;
+      let params = new HttpParams();
+      
       if (filters) {
-        const params = new URLSearchParams();
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            params.append(key, value.toString());
-          }
-        });
-        if (params.toString()) {
-          url += `?${params.toString()}`;
-        }
+        if (filters.area) params = params.set('area', filters.area);
+        if (filters.fuente) params = params.set('fuente', filters.fuente);
+        if (filters.codigo) params = params.set('codigo', filters.codigo);
+        if (filters.buscar) params = params.set('buscar', filters.buscar);
+        if (filters.activo !== undefined) params = params.set('activo', filters.activo.toString());
       }
 
+      const url = params.toString() ? `${this.API_URL}?${params.toString()}` : this.API_URL;
+      
       const response = await firstValueFrom(
         this.http.get<ApiResponse<GuiaClinica[]>>(url, this.httpOptions)
       );
@@ -97,129 +97,27 @@ export class GuiasClinicasService {
     }
   }
 
-  // Buscar guías clínicas por término
-  async search(term: string): Promise<ApiResponse<GuiaClinica[]>> {
+  // Obtener guías clínicas activas (para selects)
+  async getActivas(area?: string): Promise<ApiResponse<GuiaClinica[]>> {
     try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/search?q=${encodeURIComponent(term)}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in search:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías clínicas por área
-  async getByArea(area: string): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/area/${encodeURIComponent(area)}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getByArea:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías clínicas por fuente
-  async getByFuente(fuente: string): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/fuente/${encodeURIComponent(fuente)}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getByFuente:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías clínicas por especialidad
-  async getByEspecialidad(especialidad: string): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/especialidad/${encodeURIComponent(especialidad)}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getByEspecialidad:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías aplicables a pediatría
-  async getGuiasPediatricas(): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/pediatricas`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getGuiasPediatricas:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías aplicables a adultos
-  async getGuiasAdultos(): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/adultos`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getGuiasAdultos:', error);
-      throw error;
-    }
-  }
-
-  // Obtener guías por nivel de evidencia
-  async getByNivelEvidencia(nivel: string): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/nivel-evidencia/${encodeURIComponent(nivel)}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getByNivelEvidencia:', error);
-      throw error;
-    }
-  }
-
-  // Verificar si un código ya existe
-  async verifyCodigo(codigo: string, excludeId?: number): Promise<ApiResponse<{ exists: boolean }>> {
-    try {
-      let url = `${this.API_URL}/verify-codigo?codigo=${encodeURIComponent(codigo)}`;
-      if (excludeId) {
-        url += `&excludeId=${excludeId}`;
+      let params = new HttpParams();
+      if (area) {
+        params = params.set('area', area);
       }
 
+      const url = params.toString() ? `${this.API_URL}/activas?${params.toString()}` : `${this.API_URL}/activas`;
+
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<{ exists: boolean }>>(url, this.httpOptions)
+        this.http.get<ApiResponse<GuiaClinica[]>>(url, this.httpOptions)
       );
       return response;
     } catch (error) {
-      console.error('Error in verifyCodigo:', error);
+      console.error('Error in getActivas:', error);
       throw error;
     }
   }
 
-  // Obtener guías desactualizadas (más de X tiempo sin actualizar)
-  async getGuiasDesactualizadas(meses: number = 24): Promise<ApiResponse<GuiaClinica[]>> {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/desactualizadas?meses=${meses}`, this.httpOptions)
-      );
-      return response;
-    } catch (error) {
-      console.error('Error in getGuiasDesactualizadas:', error);
-      throw error;
-    }
-  }
-
-  // Obtener estadísticas de guías clínicas
+  // Obtener estadísticas
   async getEstadisticas(): Promise<ApiResponse<any>> {
     try {
       const response = await firstValueFrom(
@@ -232,54 +130,62 @@ export class GuiasClinicasService {
     }
   }
 
-  // Obtener todas las áreas disponibles
-  async getAreas(): Promise<ApiResponse<string[]>> {
+  // Búsqueda rápida por término
+  async buscar(termino: string): Promise<ApiResponse<GuiaClinica[]>> {
     try {
+      const params = new HttpParams().set('buscar', termino);
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<string[]>>(`${this.API_URL}/areas`, this.httpOptions)
+        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}?${params.toString()}`, this.httpOptions)
       );
       return response;
     } catch (error) {
-      console.error('Error in getAreas:', error);
+      console.error('Error in buscar:', error);
       throw error;
     }
   }
 
-  // Obtener todas las fuentes disponibles
-  async getFuentes(): Promise<ApiResponse<string[]>> {
+  // Filtrar por área específica
+  async filtrarPorArea(area: string): Promise<ApiResponse<GuiaClinica[]>> {
     try {
+      const params = new HttpParams().set('area', area);
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<string[]>>(`${this.API_URL}/fuentes`, this.httpOptions)
+        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}?${params.toString()}`, this.httpOptions)
       );
       return response;
     } catch (error) {
-      console.error('Error in getFuentes:', error);
+      console.error('Error in filtrarPorArea:', error);
       throw error;
     }
   }
 
-  // Obtener todas las especialidades disponibles
-  async getEspecialidades(): Promise<ApiResponse<string[]>> {
+  // Filtrar por fuente específica
+  async filtrarPorFuente(fuente: string): Promise<ApiResponse<GuiaClinica[]>> {
     try {
+      const params = new HttpParams().set('fuente', fuente);
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<string[]>>(`${this.API_URL}/especialidades`, this.httpOptions)
+        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}?${params.toString()}`, this.httpOptions)
       );
       return response;
     } catch (error) {
-      console.error('Error in getEspecialidades:', error);
+      console.error('Error in filtrarPorFuente:', error);
       throw error;
     }
   }
 
-  // Buscar por nombre o código
-  async buscarPorNombreOCodigo(termino: string): Promise<ApiResponse<GuiaClinica[]>> {
+  // Verificar si existe un código
+  async verificarCodigo(codigo: string, excludeId?: number): Promise<ApiResponse<{ exists: boolean }>> {
     try {
+      let params = new HttpParams().set('codigo', codigo);
+      if (excludeId) {
+        params = params.set('excludeId', excludeId.toString());
+      }
+
       const response = await firstValueFrom(
-        this.http.get<ApiResponse<GuiaClinica[]>>(`${this.API_URL}/buscar?termino=${encodeURIComponent(termino)}`, this.httpOptions)
+        this.http.get<ApiResponse<{ exists: boolean }>>(`${this.API_URL}/verificar-codigo?${params.toString()}`, this.httpOptions)
       );
       return response;
     } catch (error) {
-      console.error('Error in buscarPorNombreOCodigo:', error);
+      console.error('Error in verificarCodigo:', error);
       throw error;
     }
   }

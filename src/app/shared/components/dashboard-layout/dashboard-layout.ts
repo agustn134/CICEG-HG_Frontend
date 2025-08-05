@@ -225,6 +225,7 @@ import { ErrorNotificationsComponent } from '../error-notifications/error-notifi
 
                       <!-- Configuración -->
                       <button
+                      *ngIf="currentUser?.tipo_usuario !== 'medico'"
                         type="button"
                         (click)="onDropdownItemClick('settings', $event)"
                         class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-800 transition-all duration-200 group text-left"
@@ -659,6 +660,7 @@ private handleProfileClick(): void {
       '/app/personas/personal-medico': 'Personal Médico',
       '/app/personas/administradores': 'Administradores del Sistema',
       '/app/personas': 'Gestión de Personas',
+      '/app/personas/perfil-paciente': 'Perfil de Paciente', 
       '/app/gestion-expedientes/expedientes': 'Expedientes Clínicos',
       '/app/gestion-expedientes/expedientes/nuevo': 'Crear Nuevo Expediente',
       '/app/gestion-expedientes/camas': 'Gestión de Camas Hospitalarias',
