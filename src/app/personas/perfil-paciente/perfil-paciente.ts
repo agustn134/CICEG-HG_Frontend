@@ -69,6 +69,7 @@ import { Cama } from '../../models/cama.model';
 import { ValidacionesComunesService, ValidacionResult } from '../../services/validaciones/validaciones-comunes.service';
 import { MedicamentosService } from '../../services/catalogos/medicamentos';
 import { Medicamento } from '../../models/medicamento.model';
+import { LogoResolverService } from '../../services/logo-resolver.service';
 
 interface TipoDocumentoConfig {
   id: string;
@@ -423,6 +424,7 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     private camasService: CamasService,
     private medicamentosService: MedicamentosService,
      private validacionesService: ValidacionesComunesService,
+     private logoResolverService: LogoResolverService
   ) {
     // ✅ INICIALIZACIÓN CORREGIDA
     this.signosVitalesForm = this.initializeSignosVitalesForm();
@@ -3194,6 +3196,8 @@ public debugNotaEvolucion(): void {
     const medicoCompleto = await this.obtenerDatosMedicoCompleto();
     const datosPacienteEstructurados = this.extraerDatosPaciente();
 
+        const configuracionLogos = await this.logoResolverService.obtenerConfiguracionLogos();
+
     const datosBase = {
       paciente: datosPacienteEstructurados,
       medico: medicoCompleto,
@@ -5343,17 +5347,71 @@ private marcarCamposComoTocados(formGroup: FormGroup): void {
 /**
  * Guardar hoja frontal de expediente
  */
-async guardarHojaFrontal(): Promise<void> {
-  try {
-    this.isCreatingDocument = true;
-    this.error = null;
+// async guardarHojaFrontal(): Promise<void> {
+//   try {
+//     this.isCreatingDocument = true;
+//     this.error = null;
 
+//     if (!this.hojaFrontalForm.valid) {
+//       this.marcarCamposInvalidos(this.hojaFrontalForm);
+//       this.error = 'Por favor complete todos los campos obligatorios.';
+//       return;
+//     }
+
+//     if (!this.pacienteCompleto?.expediente.id_expediente) {
+//       throw new Error('No hay expediente disponible');
+//     }
+
+//     // Crear documento padre si no existe
+//     if (!this.documentoClinicoActual) {
+//       await this.crearDocumentoClinicoPadre('Hoja Frontal');
+//     }
+
+//     // ✅ Estructurar datos correctamente
+//     const hojaFrontalData = {
+//       id_documento: this.documentoClinicoActual!,
+//       id_expediente: this.pacienteCompleto.expediente.id_expediente,
+//       id_paciente: this.pacienteCompleto.paciente.id_paciente,
+//       id_personal_registro: this.medicoActual!,
+      
+//       // Datos básicos
+//       ...this.hojaFrontalForm.value,
+      
+//       // Generar campos adicionales
+//       folio: this.generarFolioHojaFrontal(),
+//       fecha_apertura: new Date().toISOString(),
+//       hora_apertura: new Date().toTimeString().slice(0, 5)
+//     };
+
+//     console.log('📂 Guardando Hoja Frontal...', hojaFrontalData);
+
+//     // Simular guardado exitoso (aquí integrarías con tu servicio)
+//     await new Promise(resolve => setTimeout(resolve, 1000));
+
+//     this.success = '✅ Hoja Frontal guardada correctamente';
+//     this.formularioEstado.hojaFrontal = true;
+
+//     // Generar PDF automáticamente
+//     await this.generarPDF('Hoja Frontal');
+
+//   } catch (error) {
+//     console.error('❌ Error al guardar hoja frontal:', error);
+//     this.error = 'Error al guardar la hoja frontal';
+//   } finally {
+//     this.isCreatingDocument = false;
+//   }
+// }
+
+
+// 🔥 ARREGLAR - Quitar la línea que genera PDF automáticamente
+async guardarHojaFrontal(): Promise<void> {
+  this.isCreatingDocument = true;
+  try {
     if (!this.hojaFrontalForm.valid) {
-      this.marcarCamposInvalidos(this.hojaFrontalForm);
-      this.error = 'Por favor complete todos los campos obligatorios.';
+      this.error = 'Por favor complete todos los campos obligatorios';
       return;
     }
-
+  
     if (!this.pacienteCompleto?.expediente.id_expediente) {
       throw new Error('No hay expediente disponible');
     }
@@ -5387,8 +5445,8 @@ async guardarHojaFrontal(): Promise<void> {
     this.success = '✅ Hoja Frontal guardada correctamente';
     this.formularioEstado.hojaFrontal = true;
 
-    // Generar PDF automáticamente
-    await this.generarPDF('Hoja Frontal');
+    // ❌ QUITAR ESTA LÍNEA - NO GENERAR PDF AUTOMÁTICAMENTE
+    // await this.generarPDF('Hoja Frontal');
 
   } catch (error) {
     console.error('❌ Error al guardar hoja frontal:', error);

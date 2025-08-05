@@ -692,449 +692,578 @@
       </div>
 <!-- C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.html -->
       <!-- FORMULARIO DE HOJA FRONTAL -->
-<!-- FORMULARIO DE HOJA FRONTAL OPTIMIZADO -->
-<div *ngIf="formularioActivo === 'hojaFrontal'" class="bg-white shadow-lg rounded-lg mb-6">
-  <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-    <h3 class="text-lg font-semibold text-gray-900">
-      <i class="fas fa-file-alt mr-2 text-blue-500"></i>
-      Hoja Frontal del Expediente
-      <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-md ml-2">NOM-004-SSA3-2012</span>
-    </h3>
-    <p class="text-sm text-gray-600 mt-1">Información obligatoria del expediente clínico según normativa</p>
+      <div *ngIf="formularioActivo === 'hojaFrontal'" class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">
+            <i class="fas fa-file-alt mr-2 text-blue-500"></i>
+            Hoja Frontal del Expediente
+            <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-md ml-2">NOM-004-SSA3-2012</span>
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">Información obligatoria del expediente clínico según normativa</p>
 
-    <!-- Indicador de completitud NOM-004 -->
-    <div *ngIf="completitudNOM004" class="mt-3">
-      <div class="w-full bg-gray-200 rounded-full h-2.5">
-        <div class="h-2.5 rounded-full transition-all duration-500 ease-in-out"
-          [style.width.%]="completitudNOM004.porcentaje_completitud"
-          [ngClass]="completitudNOM004.completo ? 'bg-green-500' : 'bg-yellow-500'">
+          <!-- Indicador de completitud NOM-004 -->
+          <div *ngIf="completitudNOM004" class="mt-3">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="h-2 rounded-full transition-all duration-300"
+                [style.width.%]="completitudNOM004.porcentaje_completitud"
+                [ngClass]="completitudNOM004.completo ? 'bg-green-500' : 'bg-yellow-500'">
+              </div>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+              <span class="text-xs text-gray-600">{{ completitudNOM004.porcentaje_completitud }}% completo</span>
+              <span class="text-xs" [ngClass]="completitudNOM004.completo ? 'text-green-600' : 'text-yellow-600'">
+                {{ completitudNOM004.completo ? 'Completo' : 'Incompleto' }}
+              </span>
+            </div>
+            <div *ngIf="!completitudNOM004.completo && completitudNOM004.campos_faltantes?.length > 0"
+              class="text-xs text-red-600 mt-1">
+              Campos faltantes: {{ completitudNOM004.campos_faltantes.join(', ') }}
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="flex justify-between items-center mt-1">
-        <span class="text-xs text-gray-600">{{ completitudNOM004.porcentaje_completitud }}% completo</span>
-        <span class="text-xs font-medium" [ngClass]="completitudNOM004.completo ? 'text-green-600' : 'text-yellow-600'">
-          {{ completitudNOM004.completo ? 'Completo' : 'Incompleto' }}
-        </span>
-      </div>
-      <div *ngIf="!completitudNOM004.completo && completitudNOM004.campos_faltantes?.length > 0"
-        class="text-xs text-red-600 mt-1 font-medium">
-        Campos faltantes: {{ completitudNOM004.campos_faltantes.join(', ') }}
-      </div>
-    </div>
+
+        <form [formGroup]="hojaFrontalForm" class="px-6 py-4">
+
+          <!-- ==========================================
+         SECCIÓN 1: DATOS DEL ESTABLECIMIENTO
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-hospital mr-2 text-blue-500"></i>
+              Datos del Establecimiento
+              <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md ml-2">Obligatorio</span>
+            </h4>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Establecimiento *</label>
+                <select formControlName="tipo_establecimiento"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="isFieldInvalid('tipo_establecimiento')">
+                  <option value="">Seleccionar...</option>
+                  <option value="Hospital General">Hospital General</option>
+                  <option value="Hospital Especializado">Hospital Especializado</option>
+                  <option value="Centro de Salud">Centro de Salud</option>
+                  <option value="Clínica">Clínica</option>
+                </select>
+                <div *ngIf="isFieldInvalid('tipo_establecimiento')" class="text-red-500 text-xs mt-1">
+                  Este campo es obligatorio
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Establecimiento *</label>
+                <input type="text" formControlName="nombre_establecimiento"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Hospital General San Luis de la Paz"
+                  [class.border-red-500]="isFieldInvalid('nombre_establecimiento')">
+                <div *ngIf="isFieldInvalid('nombre_establecimiento')" class="text-red-500 text-xs mt-1">
+                  Este campo es obligatorio
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 mt-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Domicilio del Establecimiento *</label>
+                <textarea formControlName="domicilio_establecimiento" rows="2"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Dirección completa del establecimiento"
+                  [class.border-red-500]="isFieldInvalid('domicilio_establecimiento')">
+          </textarea>
+                <div *ngIf="isFieldInvalid('domicilio_establecimiento')" class="text-red-500 text-xs mt-1">
+                  Este campo es obligatorio
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Razón Social</label>
+                <input type="text" formControlName="razon_social"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Razón social del establecimiento (opcional)">
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 2: DATOS DEMOGRÁFICOS ADICIONALES
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-user mr-2 text-green-500"></i>
+              Datos Demográficos Adicionales
+            </h4>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lugar de Nacimiento</label>
+                <input type="text" formControlName="lugar_nacimiento"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ciudad, Estado, País">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nacionalidad</label>
+                <select formControlName="nacionalidad"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccionar...</option>
+                  <option value="Mexicana">Mexicana</option>
+                  <option value="Estadounidense">Estadounidense</option>
+                  <option value="Guatemalteca">Guatemalteca</option>
+                  <option value="Otra">Otra</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Grupo Étnico</label>
+                <select formControlName="grupo_etnico"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccionar...</option>
+                  <option value="Mestizo">Mestizo</option>
+                  <option value="Indígena">Indígena</option>
+                  <option value="Afromexicano">Afromexicano</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 mt-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lengua Indígena</label>
+                <input type="text" formControlName="lengua_indigena"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Especificar si habla alguna lengua indígena">
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 3: DATOS SOCIOECONÓMICOS
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-briefcase mr-2 text-purple-500"></i>
+              Datos Socioeconómicos
+            </h4>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Estado Conyugal</label>
+                <select formControlName="estado_conyugal"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccionar...</option>
+                  <option value="Soltero(a)">Soltero(a)</option>
+                  <option value="Casado(a)">Casado(a)</option>
+                  <option value="Divorciado(a)">Divorciado(a)</option>
+                  <option value="Viudo(a)">Viudo(a)</option>
+                  <option value="Unión libre">Unión libre</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Afiliación Médica</label>
+                <select formControlName="afiliacion_medica"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="">Seleccionar...</option>
+                  <option value="IMSS">IMSS</option>
+                  <option value="ISSSTE">ISSSTE</option>
+                  <option value="SEDENA">SEDENA</option>
+                  <option value="SEMAR">SEMAR</option>
+                  <option value="PEMEX">PEMEX</option>
+                  <option value="INSABI">INSABI</option>
+                  <option value="PRIVADO">Seguro Privado</option>
+                  <option value="NINGUNO">Ninguno</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Afiliación</label>
+                <input type="text" formControlName="numero_afiliacion"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Número de afiliación médica">
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 4: CONTACTOS DE EMERGENCIA
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-phone-alt mr-2 text-red-500"></i>
+              Contactos de Emergencia
+              <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md ml-2">Mínimo 1 requerido</span>
+            </h4>
+
+            <!-- Contacto de Emergencia 1 (Obligatorio) -->
+            <div class="border border-gray-200 rounded-lg p-4 mb-4" formGroupName="contacto_emergencia_1">
+              <h5 class="text-sm font-semibold text-gray-700 mb-3">Contacto Principal *</h5>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                  <input type="text" formControlName="nombre_completo"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nombre completo del contacto"
+                    [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.nombre_completo')">
+                  <div *ngIf="isFieldInvalid('contacto_emergencia_1.nombre_completo')"
+                    class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco *</label>
+                  <select formControlName="parentesco"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.parentesco')">
+                    <option value="">Seleccionar...</option>
+                    <option value="Padre">Padre</option>
+                    <option value="Madre">Madre</option>
+                    <option value="Esposo(a)">Esposo(a)</option>
+                    <option value="Hijo(a)">Hijo(a)</option>
+                    <option value="Hermano(a)">Hermano(a)</option>
+                    <option value="Abuelo(a)">Abuelo(a)</option>
+                    <option value="Tío(a)">Tío(a)</option>
+                    <option value="Primo(a)">Primo(a)</option>
+                    <option value="Amigo(a)">Amigo(a)</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <div *ngIf="isFieldInvalid('contacto_emergencia_1.parentesco')" class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono Principal *</label>
+                  <input type="tel" formControlName="telefono_principal"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="10 dígitos" maxlength="10"
+                    [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.telefono_principal')">
+                  <div *ngIf="isFieldInvalid('contacto_emergencia_1.telefono_principal')"
+                    class="text-red-500 text-xs mt-1">
+                    Teléfono requerido (10 dígitos)
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono Secundario</label>
+                  <input type="tel" formControlName="telefono_secundario"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="10 dígitos (opcional)" maxlength="10">
+                </div>
+              </div>
+
+<div class="grid grid-cols-1 gap-6 mt-4">
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+    <textarea 
+      formControlName="direccion" 
+      rows="2"
+      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      placeholder="Dirección completa del contacto"
+      (keydown)="onTextareaKeydown($event)">
+    </textarea>
   </div>
-
-  <form [formGroup]="hojaFrontalForm" class="px-6 py-4">
-
-    <!-- ==========================================
-     SECCIÓN 1: DATOS DEL ESTABLECIMIENTO
-     ========================================== -->
-    <div class="mb-8">
-      <div class="flex items-center mb-4">
-        <div class="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-        <h4 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-hospital mr-2 text-blue-500"></i>
-          Datos del Establecimiento
-        </h4>
-        <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md ml-3">Obligatorio</span>
-      </div>
-
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Establecimiento *</label>
-            <select formControlName="tipo_establecimiento"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              [class.border-red-500]="isFieldInvalid('tipo_establecimiento')">
-              <option value="">Seleccionar...</option>
-              <option value="Hospital General">Hospital General</option>
-              <option value="Hospital Especializado">Hospital Especializado</option>
-              <option value="Centro de Salud">Centro de Salud</option>
-              <option value="Clínica">Clínica</option>
-            </select>
-            <div *ngIf="isFieldInvalid('tipo_establecimiento')" class="text-red-500 text-xs mt-1 font-medium">
-              Este campo es obligatorio
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Establecimiento *</label>
-            <input type="text" formControlName="nombre_establecimiento"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              placeholder="Hospital General San Luis de la Paz"
-              [class.border-red-500]="isFieldInvalid('nombre_establecimiento')">
-            <div *ngIf="isFieldInvalid('nombre_establecimiento')" class="text-red-500 text-xs mt-1 font-medium">
-              Este campo es obligatorio
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Domicilio del Establecimiento *</label>
-            <textarea formControlName="domicilio_establecimiento" rows="2"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors"
-              placeholder="Dirección completa del establecimiento"
-              [class.border-red-500]="isFieldInvalid('domicilio_establecimiento')">
-            </textarea>
-            <div *ngIf="isFieldInvalid('domicilio_establecimiento')" class="text-red-500 text-xs mt-1 font-medium">
-              Este campo es obligatorio
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Razón Social</label>
-            <input type="text" formControlName="razon_social"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              placeholder="Razón social del establecimiento (opcional)">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================
-     SECCIÓN 2: DATOS DEMOGRÁFICOS ADICIONALES
-     ========================================== -->
-    <div class="mb-8">
-      <div class="flex items-center mb-4">
-        <div class="w-1 h-6 bg-green-500 rounded-full mr-3"></div>
-        <h4 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-user mr-2 text-green-500"></i>
-          Datos Demográficos Adicionales
-        </h4>
-      </div>
-
-      <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Lugar de Nacimiento</label>
-            <input type="text" formControlName="lugar_nacimiento"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-              placeholder="Ciudad, Estado, País">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
-            <select formControlName="nacionalidad"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors">
-              <option value="">Seleccionar...</option>
-              <option value="Mexicana">Mexicana</option>
-              <option value="Estadounidense">Estadounidense</option>
-              <option value="Guatemalteca">Guatemalteca</option>
-              <option value="Otra">Otra</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Grupo Étnico</label>
-            <select formControlName="grupo_etnico"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors">
-              <option value="">Seleccionar...</option>
-              <option value="Mestizo">Mestizo</option>
-              <option value="Indígena">Indígena</option>
-              <option value="Afromexicano">Afromexicano</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Lengua Indígena</label>
-            <input type="text" formControlName="lengua_indigena"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-              placeholder="Especificar si habla alguna lengua indígena">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================
-     SECCIÓN 3: DATOS SOCIOECONÓMICOS
-     ========================================== -->
-    <div class="mb-8">
-      <div class="flex items-center mb-4">
-        <div class="w-1 h-6 bg-purple-500 rounded-full mr-3"></div>
-        <h4 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-briefcase mr-2 text-purple-500"></i>
-          Datos Socioeconómicos
-        </h4>
-      </div>
-
-      <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Estado Conyugal</label>
-            <select formControlName="estado_conyugal"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
-              <option value="">Seleccionar...</option>
-              <option value="Soltero(a)">Soltero(a)</option>
-              <option value="Casado(a)">Casado(a)</option>
-              <option value="Divorciado(a)">Divorciado(a)</option>
-              <option value="Viudo(a)">Viudo(a)</option>
-              <option value="Unión libre">Unión libre</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Afiliación Médica</label>
-            <select formControlName="afiliacion_medica"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
-              <option value="">Seleccionar...</option>
-              <option value="IMSS">IMSS</option>
-              <option value="ISSSTE">ISSSTE</option>
-              <option value="SEDENA">SEDENA</option>
-              <option value="SEMAR">SEMAR</option>
-              <option value="PEMEX">PEMEX</option>
-              <option value="INSABI">INSABI</option>
-              <option value="PRIVADO">Seguro Privado</option>
-              <option value="NINGUNO">Ninguno</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Número de Afiliación</label>
-            <input type="text" formControlName="numero_afiliacion"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
-              placeholder="Número de afiliación médica">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================
-     SECCIÓN 4: CONTACTOS DE EMERGENCIA - MEJORADA
-     ========================================== -->
-    <div class="mb-8">
-      <div class="flex items-center mb-4">
-        <div class="w-1 h-6 bg-red-500 rounded-full mr-3"></div>
-        <h4 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-phone-alt mr-2 text-red-500"></i>
-          Contactos de Emergencia
-        </h4>
-        <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md ml-3">Mínimo 1 requerido</span>
-      </div>
-
-      <!-- Contacto de Emergencia 1 (Obligatorio) -->
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4" formGroupName="contacto_emergencia_1">
-        <div class="flex items-center mb-3">
-          <i class="fas fa-user-circle text-red-500 mr-2"></i>
-          <h5 class="text-md font-semibold text-gray-700">Contacto Principal *</h5>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo *</label>
-            <input type="text" formControlName="nombre_completo"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              placeholder="Nombre completo del contacto"
-              [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.nombre_completo')">
-            <div *ngIf="isFieldInvalid('contacto_emergencia_1.nombre_completo')" class="text-red-500 text-xs mt-1 font-medium">
-              Este campo es obligatorio
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Parentesco *</label>
-            <select formControlName="parentesco"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.parentesco')">
-              <option value="">Seleccionar...</option>
-              <option value="Padre">Padre</option>
-              <option value="Madre">Madre</option>
-              <option value="Esposo(a)">Esposo(a)</option>
-              <option value="Hijo(a)">Hijo(a)</option>
-              <option value="Hermano(a)">Hermano(a)</option>
-              <option value="Abuelo(a)">Abuelo(a)</option>
-              <option value="Tío(a)">Tío(a)</option>
-              <option value="Primo(a)">Primo(a)</option>
-              <option value="Amigo(a)">Amigo(a)</option>
-              <option value="Otro">Otro</option>
-            </select>
-            <div *ngIf="isFieldInvalid('contacto_emergencia_1.parentesco')" class="text-red-500 text-xs mt-1 font-medium">
-              Este campo es obligatorio
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono Principal *</label>
-            <input type="tel" formControlName="telefono_principal"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              placeholder="10 dígitos" maxlength="10"
-              [class.border-red-500]="isFieldInvalid('contacto_emergencia_1.telefono_principal')">
-            <div *ngIf="isFieldInvalid('contacto_emergencia_1.telefono_principal')" class="text-red-500 text-xs mt-1 font-medium">
-              Teléfono requerido (10 dígitos)
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono Secundario</label>
-            <input type="tel" formControlName="telefono_secundario"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              placeholder="10 dígitos (opcional)" maxlength="10">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
-            <textarea formControlName="direccion" rows="2"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none transition-colors"
-              placeholder="Dirección completa del contacto"
-              (keydown)="onTextareaKeydown($event)">
-            </textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- ✅ TOGGLE MEJORADO PARA SEGUNDO CONTACTO -->
-      <div class="mb-4">
-        <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
-          <div class="flex items-center">
-            <i class="fas fa-user-plus text-gray-500 mr-2"></i>
-            <span class="text-sm font-medium text-gray-700">¿Desea agregar un segundo contacto de emergencia?</span>
-          </div>
-          
-          <!-- ✅ SWITCH MEJORADO -->
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" 
-                   [checked]="mostrarContacto2" 
-                   (change)="toggleContacto2($event)"
-                   class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            <span class="ml-3 text-sm font-medium text-gray-700">
-              {{ mostrarContacto2 ? 'Sí' : 'No' }}
-            </span>
-          </label>
-        </div>
-      </div>
-
-      <!-- ✅ CONTACTO DE EMERGENCIA 2 CON ANIMACIÓN -->
-      <div *ngIf="mostrarContacto2" 
-           [@slideInOut]
-           class="bg-orange-50 border border-orange-200 rounded-lg p-4 transition-all duration-300"
-           formGroupName="contacto_emergencia_2">
-        
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center">
-            <i class="fas fa-user-circle text-orange-500 mr-2"></i>
-            <h5 class="text-md font-semibold text-gray-700">Contacto Secundario</h5>
-          </div>
-          <button type="button" 
-                  (click)="removerContacto2()" 
-                  class="text-red-500 hover:text-red-700 transition-colors"
-                  title="Quitar segundo contacto">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
-            <input type="text" formControlName="nombre_completo"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
-              placeholder="Nombre completo del contacto">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Parentesco</label>
-            <select formControlName="parentesco"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors">
-              <option value="">Seleccionar...</option>
-              <option value="Padre">Padre</option>
-              <option value="Madre">Madre</option>
-              <option value="Esposo(a)">Esposo(a)</option>
-              <option value="Hijo(a)">Hijo(a)</option>
-              <option value="Hermano(a)">Hermano(a)</option>
-              <option value="Abuelo(a)">Abuelo(a)</option>
-              <option value="Tío(a)">Tío(a)</option>
-              <option value="Primo(a)">Primo(a)</option>
-              <option value="Amigo(a)">Amigo(a)</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono Principal</label>
-            <input type="tel" formControlName="telefono_principal"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
-              placeholder="10 dígitos" maxlength="10">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono Secundario</label>
-            <input type="tel" formControlName="telefono_secundario"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
-              placeholder="10 dígitos (opcional)" maxlength="10">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 mt-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
-            <textarea formControlName="direccion" rows="2"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none transition-colors"
-              placeholder="Dirección completa del contacto"
-              (keydown)="onTextareaKeydown($event)">
-            </textarea>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Resto de las secciones con el mismo estilo mejorado... -->
-    <!-- SECCIÓN 5: RESPONSABLE LEGAL, SECCIÓN 6: INFORMACIÓN MÉDICA, etc. -->
-
-    <!-- ==========================================
-     BOTONES DE ACCIÓN MEJORADOS
-     ========================================== -->
-    <div class="mt-8 flex flex-wrap justify-end gap-3 pt-6 border-t border-gray-200">
-      <button type="button" (click)="resetearFormularioActual()"
-        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-md transition-colors duration-200 flex items-center">
-        <i class="fas fa-eraser mr-2"></i>
-        Limpiar Formulario
-      </button>
-
-      <button type="button" (click)="guardarFormularioActivo()"
-        [disabled]="!hojaFrontalForm.valid || isCreatingDocument"
-        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-colors duration-200 flex items-center">
-        <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-        <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-        {{ isCreatingDocument ? 'Guardando...' : 'Guardar Hoja Frontal' }}
-      </button>
-
-      <button type="button" (click)="generarPDF('Hoja Frontal')" 
-        [disabled]="!formularioEstado.hojaFrontal"
-        class="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-md transition-colors duration-200 flex items-center">
-        <i class="fas fa-file-pdf mr-2"></i>
-        {{ formularioEstado.hojaFrontal ? 'Generar PDF' : 'Guardar primero' }}
-      </button>
-    </div>
-
-    <!-- Estado de guardado mejorado -->
-    <div *ngIf="estadoGuardado" class="mt-4">
-      <div class="p-4 rounded-lg border-l-4 transition-all duration-300" [ngClass]="{
-         'bg-green-50 border-green-400 text-green-800': estadoGuardado.tipo === 'success',
-         'bg-red-50 border-red-400 text-red-800': estadoGuardado.tipo === 'error',
-         'bg-yellow-50 border-yellow-400 text-yellow-800': estadoGuardado.tipo === 'warning',
-         'bg-blue-50 border-blue-400 text-blue-800': estadoGuardado.tipo === 'info'
-       }">
-        <div class="flex items-center">
-          <i class="fas mr-3 text-lg" [ngClass]="{
-             'fa-check-circle': estadoGuardado.tipo === 'success',
-             'fa-exclamation-circle': estadoGuardado.tipo === 'error',
-             'fa-exclamation-triangle': estadoGuardado.tipo === 'warning',
-             'fa-info-circle': estadoGuardado.tipo === 'info'
-           }"></i>
-          <span class="font-medium">{{ estadoGuardado.mensaje }}</span>
-        </div>
-      </div>
-    </div>
-  </form>
 </div>
+            </div>
+
+            <!-- Toggle para segundo contacto -->
+            <div class="flex items-center mb-4">
+              <input type="checkbox" id="mostrarContacto2" [(ngModel)]="mostrarContacto2"
+                [ngModelOptions]="{standalone: true}" (change)="toggleContacto2()"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+              <label for="mostrarContacto2" class="ml-2 text-sm text-gray-700">
+                Agregar segundo contacto de emergencia
+              </label>
+            </div>
+
+            <!-- Contacto de Emergencia 2 (Opcional) -->
+            <div *ngIf="mostrarContacto2" class="border border-gray-200 rounded-lg p-4"
+              formGroupName="contacto_emergencia_2">
+              <h5 class="text-sm font-semibold text-gray-700 mb-3">Contacto Secundario</h5>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                  <input type="text" formControlName="nombre_completo"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nombre completo del contacto">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco</label>
+                  <select formControlName="parentesco"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Seleccionar...</option>
+                    <option value="Padre">Padre</option>
+                    <option value="Madre">Madre</option>
+                    <option value="Esposo(a)">Esposo(a)</option>
+                    <option value="Hijo(a)">Hijo(a)</option>
+                    <option value="Hermano(a)">Hermano(a)</option>
+                    <option value="Abuelo(a)">Abuelo(a)</option>
+                    <option value="Tío(a)">Tío(a)</option>
+                    <option value="Primo(a)">Primo(a)</option>
+                    <option value="Amigo(a)">Amigo(a)</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono Principal</label>
+                  <input type="tel" formControlName="telefono_principal"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="10 dígitos" maxlength="10">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono Secundario</label>
+                  <input type="tel" formControlName="telefono_secundario"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="10 dígitos (opcional)" maxlength="10">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-6 mt-4">
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+    <textarea 
+      formControlName="direccion" 
+      rows="2"
+      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      placeholder="Dirección completa del contacto"
+      (keydown)="onTextareaKeydown($event)">
+    </textarea>
+  </div>
+</div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 5: RESPONSABLE LEGAL (Solo si aplica)
+         ========================================== -->
+          <div *ngIf="requiereResponsableLegal" class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-balance-scale mr-2 text-yellow-500"></i>
+              Responsable Legal
+              <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-md ml-2">Requerido para menores</span>
+            </h4>
+
+            <div class="border border-gray-200 rounded-lg p-4" formGroupName="responsable_legal">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                  <input type="text" formControlName="nombre_completo"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nombre completo del responsable legal"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.nombre_completo')">
+                  <div *ngIf="isFieldInvalid('responsable_legal.nombre_completo')" class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio para menores
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco *</label>
+                  <select formControlName="parentesco"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.parentesco')">
+                    <option value="">Seleccionar...</option>
+                    <option value="Padre">Padre</option>
+                    <option value="Madre">Madre</option>
+                    <option value="Tutor legal">Tutor legal</option>
+                    <option value="Abuelo(a)">Abuelo(a)</option>
+                    <option value="Tío(a)">Tío(a)</option>
+                    <option value="Representante legal">Representante legal</option>
+                  </select>
+                  <div *ngIf="isFieldInvalid('responsable_legal.parentesco')" class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Identificación *</label>
+                  <select formControlName="identificacion_tipo"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.identificacion_tipo')">
+                    <option value="">Seleccionar...</option>
+                    <option value="INE">INE/IFE</option>
+                    <option value="PASAPORTE">Pasaporte</option>
+                    <option value="CEDULA_PROFESIONAL">Cédula Profesional</option>
+                    <option value="CARTILLA_MILITAR">Cartilla Militar</option>
+                    <option value="LICENCIA_CONDUCIR">Licencia de Conducir</option>
+                    <option value="OTRO">Otro</option>
+                  </select>
+                  <div *ngIf="isFieldInvalid('responsable_legal.identificacion_tipo')"
+                    class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Número de Identificación *</label>
+                  <input type="text" formControlName="identificacion_numero"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Número de la identificación"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.identificacion_numero')">
+                  <div *ngIf="isFieldInvalid('responsable_legal.identificacion_numero')"
+                    class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                  <input type="tel" formControlName="telefono"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="10 dígitos" maxlength="10"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.telefono')">
+                  <div *ngIf="isFieldInvalid('responsable_legal.telefono')" class="text-red-500 text-xs mt-1">
+                    Teléfono requerido (10 dígitos)
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
+                  <textarea formControlName="direccion" rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Dirección completa del responsable"
+                    [class.border-red-500]="isFieldInvalid('responsable_legal.direccion')">
+            </textarea>
+                  <div *ngIf="isFieldInvalid('responsable_legal.direccion')" class="text-red-500 text-xs mt-1">
+                    Este campo es obligatorio
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 6: INFORMACIÓN MÉDICA RELEVANTE
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-stethoscope mr-2 text-teal-500"></i>
+              Información Médica Relevante
+            </h4>
+
+            <div class="grid grid-cols-1 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Alergias Conocidas</label>
+                <textarea formControlName="alergias_conocidas" rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Describir alergias conocidas (medicamentos, alimentos, sustancias, etc.)">
+          </textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedades Crónicas</label>
+                <textarea formControlName="enfermedades_cronicas" rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Diabetes, hipertensión, asma, etc.">
+          </textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Medicamentos Actuales</label>
+                <textarea formControlName="medicamentos_actuales" rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Medicamentos que toma actualmente (nombre, dosis, frecuencia)">
+          </textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================
+         SECCIÓN 7: OBSERVACIONES Y CONTROL
+         ========================================== -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-800 mb-3">
+              <i class="fas fa-clipboard mr-2 text-gray-500"></i>
+              Observaciones y Control Administrativo
+            </h4>
+
+            <div class="grid grid-cols-1 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Adicionales</label>
+                <textarea formControlName="observaciones" rows="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Observaciones adicionales relevantes para el expediente">
+         </textarea>
+              </div>
+
+              <!-- Información del personal que registra -->
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h5 class="text-sm font-semibold text-gray-700 mb-3">Control de Registro</h5>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Registrado por:</label>
+                    <div class="text-sm text-gray-900">{{ medicoCompleto?.nombre_completo || 'Usuario actual' }}</div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Fecha de registro:</label>
+                    <div class="text-sm text-gray-900">{{ fechaActual | date:'dd/MM/yyyy HH:mm' }}</div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Expediente:</label>
+                    <div class="text-sm text-gray-900">{{ pacienteCompleto?.expediente?.numero_expediente ||
+                      'Generando...' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN -->
+          <div class="mt-6 flex justify-end space-x-3">
+  <button type="button" (click)="resetearFormularioActual()"
+    class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+    <i class="fas fa-eraser mr-2"></i>
+    Limpiar
+  </button>
+
+  <button type="button" (click)="guardarFormularioActivo()"
+    [disabled]="!hojaFrontalForm.valid || isCreatingDocument"
+    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+    <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+    <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+    {{ isCreatingDocument ? 'Guardando...' : 'Guardar Hoja Frontal' }}
+  </button>
+
+  <button type="button" (click)="generarPDF('Hoja Frontal')" 
+    [disabled]="!formularioEstado.hojaFrontal"
+    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+    <i class="fas fa-file-pdf mr-2"></i>
+    {{ formularioEstado.hojaFrontal ? 'Generar PDF' : 'Guardar primero' }}
+  </button>
+</div>
+
+          <!-- Estado de guardado -->
+          <div *ngIf="estadoGuardado" class="mt-4">
+            <div class="p-3 rounded-md" [ngClass]="{
+       'bg-green-100 text-green-800': estadoGuardado.tipo === 'success',
+       'bg-red-100 text-red-800': estadoGuardado.tipo === 'error',
+       'bg-yellow-100 text-yellow-800': estadoGuardado.tipo === 'warning',
+       'bg-blue-100 text-blue-800': estadoGuardado.tipo === 'info'
+     }">
+              <div class="flex items-center">
+                <i class="fas mr-2" [ngClass]="{
+           'fa-check-circle': estadoGuardado.tipo === 'success',
+           'fa-exclamation-circle': estadoGuardado.tipo === 'error',
+           'fa-exclamation-triangle': estadoGuardado.tipo === 'warning',
+           'fa-info-circle': estadoGuardado.tipo === 'info'
+         }"></i>
+                {{ estadoGuardado.mensaje }}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
 
 
 

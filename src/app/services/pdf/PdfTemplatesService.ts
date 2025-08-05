@@ -104,45 +104,165 @@ export class PdfTemplatesService {
       .join('\n');
   }
 
-  private async obtenerImagenBase64(rutaImagen: string): Promise<string> {
-    try {
-      let urlCompleta: string;
-      if (
-        rutaImagen.startsWith('http://') ||
-        rutaImagen.startsWith('https://')
-      ) {
-        urlCompleta = rutaImagen;
-      } else {
-        urlCompleta = `${environment.BASE_URL}${rutaImagen}`;
+  // public async obtenerImagenBase64(rutaImagen: string): Promise<string> {
+  //   try {
+  //     let urlCompleta: string;
+  //     if (
+  //       rutaImagen.startsWith('http://') ||
+  //       rutaImagen.startsWith('https://')
+  //     ) {
+  //       urlCompleta = rutaImagen;
+  //     } else {
+  //       urlCompleta = `${environment.BASE_URL}${rutaImagen}`;
+  //     }
+  //     console.log('Obteniendo imagen de:', urlCompleta);
+  //     const response = await this.http
+  //       .get(urlCompleta, { responseType: 'blob' })
+  //       .toPromise();
+  //     if (!response) {
+  //       throw new Error('No se pudo obtener la imagen');
+  //     }
+  //     const tipoImagen = response.type;
+  //     console.log('📄 Tipo de imagen:', tipoImagen);
+  //     if (tipoImagen === 'image/svg+xml' || rutaImagen.endsWith('.svg')) {
+  //       return await this.convertirSvgAPng(response);
+  //     }
+  //     // Para PNG, JPG, etc. - conversión normal
+  //     return new Promise((resolve, reject) => {
+  //       const reader = new FileReader();
+  //       reader.onload = () => {
+  //         const result = reader.result as string;
+  //         console.log('✅ Imagen convertida exitosamente');
+  //         resolve(result);
+  //       };
+  //       reader.onerror = reject;
+  //       reader.readAsDataURL(response);
+  //     });
+  //   } catch (error) {
+  //     console.error('Error al convertir imagen:', error);
+  //     return this.obtenerImagenPlaceholder();
+  //   }
+  // }
+
+
+  // 🔥 VERSIÓN MEJORADA - Reemplaza en PdfTemplatesService.ts
+private async obtenerImagenBase64(rutaImagen: string): Promise<string> {
+  try {
+    // 🔥 SISTEMA DE PRIORIDAD DE RUTAS
+    const rutasAIntentar = this.construirRutasPrioridad(rutaImagen);
+    
+    // Intentar cada ruta en orden de prioridad
+    for (const ruta of rutasAIntentar) {
+      try {
+        console.log(`🔍 Intentando cargar: ${ruta}`);
+        const response = await this.http
+          .get(ruta, { responseType: 'blob' })
+          .toPromise();
+          
+        if (response && response.size > 0) {
+          console.log(`✅ Imagen cargada exitosamente: ${ruta}`);
+          return await this.procesarImagen(response, ruta);
+        }
+      } catch (error) {
+        console.warn(`⚠️ No se pudo cargar: ${ruta}, intentando siguiente...`);
+        continue; // Intentar la siguiente ruta
       }
-      console.log('Obteniendo imagen de:', urlCompleta);
-      const response = await this.http
-        .get(urlCompleta, { responseType: 'blob' })
-        .toPromise();
-      if (!response) {
-        throw new Error('No se pudo obtener la imagen');
-      }
-      const tipoImagen = response.type;
-      console.log('📄 Tipo de imagen:', tipoImagen);
-      if (tipoImagen === 'image/svg+xml' || rutaImagen.endsWith('.svg')) {
-        return await this.convertirSvgAPng(response);
-      }
-      // Para PNG, JPG, etc. - conversión normal
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          console.log('✅ Imagen convertida exitosamente');
-          resolve(result);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(response);
-      });
-    } catch (error) {
-      console.error('Error al convertir imagen:', error);
-      return this.obtenerImagenPlaceholder();
     }
+    
+    throw new Error('No se encontraron imágenes válidas en ninguna ruta');
+    
+  } catch (error) {
+    console.error('❌ Error al obtener imagen:', error);
+    return this.obtenerImagenPlaceholder();
   }
+}
+private construirRutasPrioridad(rutaBase: string): string[] {
+  const rutas: string[] = [];
+  
+  // Si ya es una URL completa, usarla tal como está
+  if (rutaBase.startsWith('http://') || rutaBase.startsWith('https://')) {
+    rutas.push(rutaBase);
+    return rutas;
+  }
+  
+  // Determinar tipo de logo basado en la ruta
+  let tipoLogo = 'default';
+  if (rutaBase.includes('gobierno')) {
+    tipoLogo = 'gobierno';
+  } else if (rutaBase.includes('principal')) {
+    tipoLogo = 'principal';
+  } else if (rutaBase.includes('sidebar')) {
+    tipoLogo = 'sidebar';
+  }
+  
+  // 🔥 ORDEN DE PRIORIDAD:
+  // 1. Imagen importada PNG (mejor calidad)
+  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.png`);
+  
+  // 2. Imagen importada SVG (escalable)
+  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.svg`);
+  
+  // 3. Imagen por defecto SVG
+  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.svg`);
+  
+  // 4. Imagen por defecto PNG (fallback)
+  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.png`);
+  
+  // 5. Ruta original proporcionada (por si acaso)
+  const rutaCompleta = rutaBase.startsWith('/') 
+    ? `${environment.BASE_URL}${rutaBase}`
+    : `${environment.BASE_URL}/${rutaBase}`;
+  rutas.push(rutaCompleta);
+  
+  console.log(`🔍 Rutas a intentar para ${tipoLogo}:`, rutas);
+  return rutas;
+}
+
+// 🔥 FUNCIÓN 2: Procesar imagen según tipo
+private async procesarImagen(response: Blob, ruta: string): Promise<string> {
+  const tipoImagen = response.type;
+  console.log(`📄 Procesando imagen: ${tipoImagen} desde ${ruta}`);
+  
+  if (tipoImagen === 'image/svg+xml' || ruta.endsWith('.svg')) {
+    return await this.convertirSvgAPng(response);
+  }
+  
+  // Para PNG, JPG, etc. - conversión normal
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      console.log('✅ Imagen convertida exitosamente');
+      resolve(result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(response);
+  });
+}
+
+// 🔥 FUNCIÓN 3: Obtener configuración de logos inteligente
+private async obtenerConfiguracionLogosInteligente(): Promise<any> {
+  try {
+    // Intentar obtener configuración del backend
+    const config = await this.http.get<any>(`${environment.apiUrl}/configuracion/logos`).toPromise();
+    
+    return {
+      logo_gobierno: config?.logo_gobierno || '/uploads/logos/logo-gobierno-importado.png',
+      logo_principal: config?.logo_principal || '/uploads/logos/logo-principal-importado.png',
+      logo_sidebar: config?.logo_sidebar || '/uploads/logos/logo-sidebar-importado.png',
+      nombre_hospital: config?.nombre_hospital || 'Hospital General San Luis de la Paz'
+    };
+  } catch (error) {
+    console.warn('⚠️ No se pudo obtener configuración, usando valores por defecto inteligentes');
+    return {
+      logo_gobierno: '/uploads/logos/logo-gobierno-importado.png',
+      logo_principal: '/uploads/logos/logo-principal-importado.png',
+      logo_sidebar: '/uploads/logos/logo-sidebar-importado.png',
+      nombre_hospital: 'Hospital General San Luis de la Paz'
+    };
+  }
+}
+
 
   private async convertirSvgAPng(svgBlob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -580,7 +700,6 @@ export class PdfTemplatesService {
     const timestamp = fecha.getTime().toString().slice(-6);
     return `POSTOP-${fecha.getFullYear()}-${timestamp}`;
   }
-
 
 
   /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
@@ -2079,44 +2198,41 @@ export class PdfTemplatesService {
     return documentoFinal;
   }
 
-// PdfTemplatesService.ts - Método corregido
-// PdfTemplatesService.ts - REEMPLAZAR COMPLETAMENTE el método generarHojaFrontalExpediente
 
+  // 🔥 VERSIÓN MEJORADA - Reemplaza el método generarHojaFrontalExpediente completo
 async generarHojaFrontalExpediente(datos: any): Promise<any> {
   console.log('📂 Generando Hoja Frontal de Expediente según NOM-004...');
 
-  // 🔥 NUEVA VALIDADORA CORREGIDA - REEMPLAZA LA ANTERIOR
+  // ✅ VALIDACIÓN CORREGIDA (ya funcionaba)
   const validarTabla = (tabla: any, nombreTabla: string) => {
     if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
       console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
       return;
     }
 
+     if (!datos.configuracion) {
+    console.log('🔧 Obteniendo configuración inteligente de logos...');
+    datos.configuracion = this.obtenerConfiguracionLogosInteligente();
+  }
+
+
     const columnasEsperadas = tabla.table.widths.length;
     
     tabla.table.body.forEach((fila: any[], index: number) => {
       let celdas = 0;
       
-      // ✅ ALGORITMO CORRECTO - cuenta colSpan correctamente
       fila.forEach((celda) => {
-        if (celda && typeof celda === 'object' && celda.colSpan) {
-          celdas += celda.colSpan;
-        } else {
-          celdas += 1;
+        if (celda && Object.keys(celda).length > 0) {
+          if (celda.colSpan) {
+            celdas += celda.colSpan;
+          } else {
+            celdas += 1;
+          }
         }
       });
 
       if (celdas !== columnasEsperadas) {
         console.error(`❌ ERROR en ${nombreTabla}, Fila ${index}: esperaba ${columnasEsperadas} columnas, encontró ${celdas}`);
-        console.error(`🔍 Contenido de la fila [${index}]:`, fila);
-        console.error(`🔍 Desglose de celdas:`);
-        fila.forEach((celda, i) => {
-          console.error(`  Celda ${i}:`, {
-            colSpan: celda?.colSpan || 'sin colSpan',
-            texto: celda?.text || 'sin texto',
-            tipo: typeof celda
-          });
-        });
         throw new Error(`Tabla ${nombreTabla} tiene errores en fila ${index}`);
       }
     });
@@ -2145,7 +2261,7 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
   const fechaActual = new Date();
   const esPediatrico = pacienteCompleto.edad < 18;
 
-  // 🔥 HEADER SIMPLE Y FUNCIONAL
+  // 🔥 HEADER LIMPIO Y PROFESIONAL (igual que Historia Clínica)
   const header = {
     margin: [20, 10, 20, 10],
     table: {
@@ -2154,28 +2270,29 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
         [
           {
             image: await this.obtenerImagenBase64(
-              datos.configuracion?.logo_gobierno || '/uploads/logos/logo-gobierno-default.svg'
-            ),
-            fit: [80, 40],
-            alignment: 'left',
-            margin: [0, 5],
+            datos.configuracion?.logo_gobierno || 
+            '/uploads/logos/logo-gobierno-importado.png' // ✅ PRIORIZA IMPORTADO
+          ),
+          fit: [80, 40],
+          alignment: 'left',
+          margin: [0, 5],
           },
           {
-            text: [
-              { text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\n', fontSize: 12, bold: true, color: '#1a365d' },
-              { text: 'HOJA FRONTAL DE EXPEDIENTE CLÍNICO\n', fontSize: 10, bold: true },
-              { text: 'NOM-004-SSA3-2012', fontSize: 8, color: '#666666' },
-            ],
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nHOJA FRONTAL DE EXPEDIENTE CLÍNICO\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
             alignment: 'center',
+            color: '#1a365d',
             margin: [0, 8],
           },
           {
-            image: await this.obtenerImagenBase64(
-              datos.configuracion?.logo_principal || '/uploads/logos/logo-principal-default.svg'
-            ),
-            fit: [80, 40],
-            alignment: 'right',
-            margin: [0, 5],
+          image: await this.obtenerImagenBase64(
+            datos.configuracion?.logo_principal || 
+            '/uploads/logos/logo-principal-importado.png' // ✅ PRIORIZA IMPORTADO
+          ),
+          fit: [80, 40],
+          alignment: 'right',
+          margin: [0, 5],
           },
         ],
       ],
@@ -2183,32 +2300,37 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     layout: 'noBorders',
   };
 
-  // 🔥 TABLA SIMPLE DE PRUEBA PRIMERO
-  const tablaEstablecimiento = {
+  // 🔥 TABLA DATOS DEL ESTABLECIMIENTO - ESTILO LIMPIO
+  const tablaDatosEstablecimiento = {
     table: {
       widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
       body: [
-        // Fila 0: Título con colSpan + celda vacía
         [
           {
             text: 'DATOS DEL ESTABLECIMIENTO',
-            fontSize: 10,
+            fontSize: 8,
             bold: true,
-            fillColor: '#3b82f6',
-            color: 'white',
+            fillColor: '#f5f5f5',
             alignment: 'center',
-            colSpan: 2, // ✅ Ocupa 2 columnas
+            colSpan: 2,
           },
-          {}, // ✅ Celda vacía requerida
+          {},
         ],
-        // Fila 1: Datos normales
         [
-          { text: 'Tipo:', bold: true, fontSize: 8, fillColor: '#f3f4f6' },
+          { text: 'Tipo de establecimiento:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: hojaFrontalData.tipo_establecimiento || 'Hospital General', fontSize: 8 },
         ],
         [
-          { text: 'Nombre:', bold: true, fontSize: 8, fillColor: '#f3f4f6' },
+          { text: 'Nombre del establecimiento:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: hojaFrontalData.nombre_establecimiento || 'Hospital General San Luis de la Paz', fontSize: 8 },
+        ],
+        [
+          { text: 'Domicilio del establecimiento:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.domicilio_establecimiento || 'San Luis de la Paz, Guanajuato, México', fontSize: 8 },
+        ],
+        [
+          { text: 'Razón social:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.razon_social || 'Servicios de Salud de Guanajuato', fontSize: 8 },
         ],
       ],
     },
@@ -2221,33 +2343,53 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     margin: [0, 0, 0, 10],
   };
 
-  const tablaPaciente = {
+  // 🔥 TABLA DATOS DEL PACIENTE - ESTILO LIMPIO
+  const tablaDatosPaciente = {
     table: {
       widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
       body: [
         [
           {
             text: 'DATOS DEL PACIENTE',
-            fontSize: 10,
+            fontSize: 8,
             bold: true,
-            fillColor: '#dc2626',
-            color: 'white',
+            fillColor: '#f5f5f5',
             alignment: 'center',
             colSpan: 2,
           },
-          {}, // ✅ Celda vacía
+          {},
         ],
         [
-          { text: 'Nombre:', bold: true, fontSize: 8, fillColor: '#fef2f2' },
+          { text: 'Nombre completo:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: pacienteCompleto.nombre_completo || 'N/A', fontSize: 9, bold: true },
         ],
         [
-          { text: 'CURP:', bold: true, fontSize: 8, fillColor: '#fef2f2' },
+          { text: 'CURP:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: pacienteCompleto.curp || 'No registrado', fontSize: 8 },
         ],
         [
-          { text: 'Edad:', bold: true, fontSize: 8, fillColor: '#fef2f2' },
+          { text: 'Fecha de nacimiento:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: this.formatearFecha(pacienteCompleto.fecha_nacimiento) || 'No registrada', fontSize: 8 },
+        ],
+        [
+          { text: 'Edad:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: `${pacienteCompleto.edad || 0} años`, fontSize: 8 },
+        ],
+        [
+          { text: 'Sexo:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.sexo || 'No especificado', fontSize: 8 },
+        ],
+        [
+          { text: 'Tipo sanguíneo:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.tipo_sangre || 'No especificado', fontSize: 8, bold: true },
+        ],
+        [
+          { text: 'Lugar de nacimiento:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.lugar_nacimiento || 'No especificado', fontSize: 8 },
+        ],
+        [
+          { text: 'Nacionalidad:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.nacionalidad || 'Mexicana', fontSize: 8 },
         ],
       ],
     },
@@ -2260,29 +2402,135 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     margin: [0, 0, 0, 10],
   };
 
-  const tablaContacto = {
+  // 🔥 TABLA DATOS DE CONTACTO - ESTILO LIMPIO
+  const tablaDatosContacto = {
+    table: {
+      widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+      body: [
+        [
+          {
+            text: 'DATOS DE CONTACTO Y DOMICILIO',
+            fontSize: 8,
+            bold: true,
+            fillColor: '#f5f5f5',
+            alignment: 'center',
+            colSpan: 2,
+          },
+          {},
+        ],
+        [
+          { text: 'Domicilio:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: this.formatearDireccionCompleta(pacienteCompleto) || 'Sin dirección registrada', fontSize: 8 },
+        ],
+        [
+          { text: 'Teléfono principal:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.telefono || 'No registrado', fontSize: 8 },
+        ],
+        [
+          { text: 'Teléfono secundario:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.telefono_secundario || 'No registrado', fontSize: 8 },
+        ],
+        [
+          { text: 'Correo electrónico:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.correo_electronico || hojaFrontalData.email || 'No registrado', fontSize: 8 },
+        ],
+      ],
+    },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+    margin: [0, 0, 0, 10],
+  };
+
+  // 🔥 TABLA DATOS SOCIOECONÓMICOS - ESTILO LIMPIO
+  const tablaDatosSocioeconomicos = {
+    table: {
+      widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+      body: [
+        [
+          {
+            text: 'DATOS SOCIOECONÓMICOS',
+            fontSize: 8,
+            bold: true,
+            fillColor: '#f5f5f5',
+            alignment: 'center',
+            colSpan: 2,
+          },
+          {},
+        ],
+        [
+          { text: 'Ocupación:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.ocupacion || hojaFrontalData.ocupacion || (esPediatrico ? 'Estudiante' : 'No registrada'), fontSize: 8 },
+        ],
+        [
+          { text: 'Escolaridad:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.escolaridad || hojaFrontalData.escolaridad || 'No registrada', fontSize: 8 },
+        ],
+        [
+          { text: 'Estado civil:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.estado_civil || hojaFrontalData.estado_conyugal || 'No registrado', fontSize: 8 },
+        ],
+        [
+          { text: 'Religión:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: pacienteCompleto.religion || hojaFrontalData.religion || 'No registrada', fontSize: 8 },
+        ],
+        [
+          { text: 'Afiliación médica:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.afiliacion_medica || 'Sin afiliación', fontSize: 8 },
+        ],
+        [
+          { text: 'Número de afiliación:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.numero_afiliacion || 'No aplica', fontSize: 8 },
+        ],
+      ],
+    },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+    margin: [0, 0, 0, 10],
+  };
+
+  // 🔥 TABLA CONTACTO DE EMERGENCIA - ESTILO LIMPIO
+  const tablaContactoEmergencia = {
     table: {
       widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
       body: [
         [
           {
             text: 'CONTACTO DE EMERGENCIA',
-            fontSize: 10,
+            fontSize: 8,
             bold: true,
-            fillColor: '#059669',
-            color: 'white',
+            fillColor: '#f5f5f5',
             alignment: 'center',
             colSpan: 2,
           },
-          {}, // ✅ Celda vacía
+          {},
         ],
         [
-          { text: 'Nombre:', bold: true, fontSize: 8, fillColor: '#ecfdf5' },
+          { text: 'Nombre completo:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: hojaFrontalData?.contacto_emergencia_1?.nombre_completo || pacienteCompleto.familiar_responsable || 'No registrado', fontSize: 8 },
         ],
         [
-          { text: 'Teléfono:', bold: true, fontSize: 8, fillColor: '#ecfdf5' },
+          { text: 'Parentesco:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData?.contacto_emergencia_1?.parentesco || 'No especificado', fontSize: 8 },
+        ],
+        [
+          { text: 'Teléfono principal:', bold: true, fontSize: 8, fillColor: '#fafafa' },
           { text: hojaFrontalData?.contacto_emergencia_1?.telefono_principal || pacienteCompleto.telefono_familiar || 'No registrado', fontSize: 8 },
+        ],
+        [
+          { text: 'Teléfono secundario:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData?.contacto_emergencia_1?.telefono_secundario || 'No registrado', fontSize: 8 },
+        ],
+        [
+          { text: 'Dirección:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData?.contacto_emergencia_1?.direccion || 'No registrada', fontSize: 8 },
         ],
       ],
     },
@@ -2295,34 +2543,128 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     margin: [0, 0, 0, 10],
   };
 
-  const tablaFirma = {
+  // 🔥 TABLA INFORMACIÓN MÉDICA - ESTILO LIMPIO
+  const tablaInformacionMedica = {
+    table: {
+      widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+      body: [
+        [
+          {
+            text: 'INFORMACIÓN MÉDICA RELEVANTE',
+            fontSize: 8,
+            bold: true,
+            fillColor: '#f5f5f5',
+            alignment: 'center',
+            colSpan: 2,
+          },
+          {},
+        ],
+        [
+          { text: 'Alergias conocidas:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.alergias_conocidas || 'Ninguna conocida', fontSize: 8 },
+        ],
+        [
+          { text: 'Enfermedades crónicas:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.enfermedades_cronicas || 'Ninguna registrada', fontSize: 8 },
+        ],
+        [
+          { text: 'Medicamentos actuales:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.medicamentos_actuales || 'Ninguno', fontSize: 8 },
+        ],
+        [
+          { text: 'Antecedentes quirúrgicos:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.antecedentes_quirurgicos || 'Ninguno', fontSize: 8 },
+        ],
+      ],
+    },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+    margin: [0, 0, 0, 10],
+  };
+
+  // 🔥 TABLA DATOS DEL EXPEDIENTE - ESTILO LIMPIO
+  const tablaDatosExpediente = {
+    table: {
+      widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+      body: [
+        [
+          {
+            text: 'DATOS DEL EXPEDIENTE CLÍNICO',
+            fontSize: 8,
+            bold: true,
+            fillColor: '#f5f5f5',
+            alignment: 'center',
+            colSpan: 2,
+          },
+          {},
+        ],
+        [
+          { text: 'Número de expediente:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: this.obtenerNumeroExpedientePreferido(expedienteData) || 'Sin asignar', fontSize: 9, bold: true },
+        ],
+        [
+          { text: 'Fecha de apertura:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: this.formatearFecha(expedienteData.fecha_apertura) || fechaActual.toLocaleDateString('es-MX'), fontSize: 8 },
+        ],
+        [
+          { text: 'Hora de apertura:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.hora_apertura || fechaActual.toLocaleTimeString('es-MX'), fontSize: 8 },
+        ],
+        [
+          { text: 'Folio hoja frontal:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: hojaFrontalData.folio || `HF-${fechaActual.getFullYear()}-${fechaActual.getTime().toString().slice(-6)}`, fontSize: 8 },
+        ],
+        [
+          { text: 'Estado del expediente:', bold: true, fontSize: 8, fillColor: '#fafafa' },
+          { text: expedienteData.estado || 'Activo', fontSize: 8 },
+        ],
+      ],
+    },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+    margin: [0, 0, 0, 10],
+  };
+
+  // 🔥 TABLA FIRMA DEL RESPONSABLE - ESTILO LIMPIO
+  const tablaFirmaResponsable = {
     table: {
       widths: ['50%', '50%'], // ✅ 2 COLUMNAS EXACTAS
       body: [
         [
           {
-            text: 'RESPONSABLE DE ELABORACIÓN',
-            fontSize: 10,
+            text: 'RESPONSABLE DE LA ELABORACIÓN',
+            fontSize: 8,
             bold: true,
-            fillColor: '#374151',
-            color: 'white',
+            fillColor: '#f5f5f5',
             alignment: 'center',
             colSpan: 2,
           },
-          {}, // ✅ Celda vacía
+          {},
         ],
         [
           {
             text: [
-              { text: `${medicoCompleto.nombre_completo}\n`, fontSize: 9, bold: true },
-              { text: `Cédula: ${medicoCompleto.numero_cedula || 'No registrada'}\n`, fontSize: 8 },
-              { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8 },
+              { text: `${medicoCompleto.titulo_profesional || 'Dr.'} ${medicoCompleto.nombre_completo}\n\n`, fontSize: 9, bold: true },
+              { text: `Cédula profesional: ${medicoCompleto.numero_cedula || 'No registrada'}\n`, fontSize: 8 },
+              { text: `Especialidad: ${medicoCompleto.especialidad || 'Medicina General'}\n`, fontSize: 8 },
+              { text: `Cargo: ${medicoCompleto.cargo || 'Médico'}\n`, fontSize: 8 },
+              { text: `Departamento: ${medicoCompleto.departamento || 'No especificado'}\n\n`, fontSize: 8 },
+              { text: `Fecha de elaboración: ${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 8, color: '#666666' },
+              { text: `Hora de elaboración: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 8, color: '#666666' },
             ],
             margin: [5, 10],
             alignment: 'center',
           },
           {
-            text: '\n\n\n_________________________\nFIRMA AUTÓGRAFA',
+            text: '\n\n\n\n_____________________________\nFIRMA AUTÓGRAFA\n\n(Conforme a NOM-004-SSA3-2012)',
             fontSize: 8,
             margin: [5, 10],
             alignment: 'center',
@@ -2336,37 +2678,44 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
       hLineColor: () => '#000000',
       vLineColor: () => '#000000',
     },
-    margin: [0, 0, 0, 10],
+    margin: [0, 10, 0, 10],
   };
 
-  // 🔥 DOCUMENTO FINAL SIMPLIFICADO
+  // 🔥 DOCUMENTO FINAL LIMPIO Y PROFESIONAL
   const documentoFinal = {
     pageSize: 'LETTER',
     pageMargins: [20, 70, 20, 50],
     header,
     content: [
-      { text: '', margin: [0, 10] },
-      tablaEstablecimiento,
-      tablaPaciente,
-      tablaContacto,
-      tablaFirma,
+      { text: '', margin: [0, 5] },
+      tablaDatosEstablecimiento,
+      tablaDatosPaciente,
+      tablaDatosContacto,
+      tablaDatosSocioeconomicos,
+      tablaContactoEmergencia,
+      tablaInformacionMedica,
+      tablaDatosExpediente,
+      tablaFirmaResponsable,
       
-      { text: '', margin: [0, 20] },
+      { text: '', margin: [0, 15] },
       {
         columns: [
           {
             width: '50%',
             text: [
-              { text: '* Documento conforme a NOM-004-SSA3-2012\n', fontSize: 7, color: '#666666' },
-              { text: 'Sistema SICEG - Hospital San Luis de la Paz', fontSize: 7, color: '#666666' },
+              { text: '* Documento elaborado conforme a:\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: '• NOM-004-SSA3-2012 Del expediente clínico\n', fontSize: 7, color: '#666666' },
+              { text: '• Lineamientos para la integración del expediente clínico\n', fontSize: 7, color: '#666666' },
+              { text: '• Modelo de Evaluación del Expediente Clínico (MECIC)', fontSize: 7, color: '#666666' },
             ],
             alignment: 'left',
           },
           {
             width: '50%',
             text: [
-              { text: `Generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
-              { text: `Exp: ${this.obtenerNumeroExpedientePreferido(expedienteData)}`, fontSize: 7, color: '#666666' },
+              { text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
+              { text: 'Hospital General San Luis de la Paz, Guanajuato', fontSize: 7, color: '#666666' },
             ],
             alignment: 'right',
           },
@@ -2376,11 +2725,11 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     footer: (currentPage: number, pageCount: number) => ({
       margin: [20, 10],
       table: {
-        widths: ['33%', '34%', '33%'], // ✅ 3 COLUMNAS EXACTAS
+        widths: ['33%', '34%', '33%'], // ✅ 3 COLUMNAS PARA EL FOOTER
         body: [
           [
             { text: `Página ${currentPage} de ${pageCount}`, fontSize: 7, color: '#666666' },
-            { text: 'Hoja Frontal - SICEG', fontSize: 7, alignment: 'center', color: '#666666' },
+            { text: 'Hoja Frontal de Expediente Clínico - SICEG\nNOM-004-SSA3-2012', fontSize: 7, alignment: 'center', color: '#666666' },
             { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'right', color: '#666666' },
           ],
         ],
@@ -2399,9 +2748,10 @@ async generarHojaFrontalExpediente(datos: any): Promise<any> {
     throw error;
   }
 
-  console.log('✅ Hoja Frontal de Expediente generada correctamente');
+  console.log('✅ Hoja Frontal de Expediente generada exitosamente');
   return documentoFinal;
 }
+
 
   async generarSolicitudEstudio(datos: any): Promise<any> {
     console.log('📄 Generando Solicitud de Estudio...');
