@@ -691,33 +691,33 @@ private initializeHojaFrontalForm(): FormGroup {
     observaciones_adicionales: ['']
   });
 }
-public debugNotaEvolucion(): void {
-  console.log('🔍 DEBUG NOTA EVOLUCIÓN:');
-  console.log('✅ Formulario válido:', this.notaEvolucionForm.valid);
+  public debugNotaEvolucion(): void {
+    console.log('🔍 DEBUG NOTA EVOLUCIÓN:');
+    console.log('✅ Formulario válido:', this.notaEvolucionForm.valid);
 
-  const obligatorios = [
-    'sintomas_signos', 'habitus_exterior', 'estado_nutricional',
-    'estudios_laboratorio_gabinete', 'evolucion_analisis',
-    'diagnosticos', 'plan_estudios_tratamiento', 'pronostico'
-  ];
+    const obligatorios = [
+      'sintomas_signos', 'habitus_exterior', 'estado_nutricional',
+      'estudios_laboratorio_gabinete', 'evolucion_analisis',
+      'diagnosticos', 'plan_estudios_tratamiento', 'pronostico'
+    ];
 
-  obligatorios.forEach(campo => {
-    const control = this.notaEvolucionForm.get(campo);
-    const valor = control?.value || '';
-    const esValido = control?.valid;
-    const errores = control?.errors;
+    obligatorios.forEach(campo => {
+      const control = this.notaEvolucionForm.get(campo);
+      const valor = control?.value || '';
+      const esValido = control?.valid;
+      const errores = control?.errors;
 
-    console.log(`📋 ${campo}:`, {
-      valor: `"${valor}" (${valor.length} caracteres)`,
-      válido: esValido,
-      errores: errores
+      console.log(`📋 ${campo}:`, {
+        valor: `"${valor}" (${valor.length} caracteres)`,
+        válido: esValido,
+        errores: errores
+      });
+
+      if (!esValido) {
+        console.log(`❌ ${campo} NO VÁLIDO:`, errores);
+      }
     });
-
-    if (!esValido) {
-      console.log(`❌ ${campo} NO VÁLIDO:`, errores);
-    }
-  });
-}
+  }
   private initializeConsentimientoForm(): FormGroup {
     return this.fb.group({
       // Información del procedimiento (OBLIGATORIO NOM-004)
@@ -895,7 +895,7 @@ getFormErrors(): any[] {
 }
 
   // ===================================
-  // NOTA PREOPERATORIA
+  // NOTA PREOPERATORIA CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
   // ===================================
 
   async guardarNotaPreoperatoria(): Promise<void> {
@@ -936,7 +936,7 @@ getFormErrors(): any[] {
       this.formularioEstado.notaPreoperatoria = true;
 
       // Generar PDF automáticamente
-      await this.generarPDFNotaPreoperatoria();
+      // await this.generarPDFNotaPreoperatoria();
 
     } catch (error: any) {
       console.error('❌ Error al guardar nota preoperatoria:', error);

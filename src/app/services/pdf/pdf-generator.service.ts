@@ -153,7 +153,6 @@ export class PdfGeneratorService {
     this.loadPdfMake();
   }
 
-
   async generarDocumento(tipoDocumento: string, datos: any): Promise<void> {
     console.log(`📄 Generando ${tipoDocumento}...`);
 
@@ -605,7 +604,6 @@ export class PdfGeneratorService {
     }
   }
 
-  // pdf-generator.service.ts - Método corregido
 private formatearDireccionMejorada(paciente: any): string {
   console.log('🏠 DEBUG - Datos del paciente recibidos:', {
     domicilio: paciente.domicilio,
