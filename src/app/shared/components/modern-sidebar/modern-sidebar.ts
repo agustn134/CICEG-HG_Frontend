@@ -66,7 +66,7 @@ interface MenuSection {
           >
             <img
               [src]="configuracion.logo_sidebar"
-              alt="Logo Hospital"
+              
               class="max-h-full max-w-full object-contain"
               [title]="configuracion.nombre_hospital"
             />
