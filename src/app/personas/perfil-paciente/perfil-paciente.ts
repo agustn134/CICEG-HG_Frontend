@@ -854,109 +854,46 @@ public debugNotaEvolucion(): void {
     return `CI-${fecha.getFullYear()}-${timestamp}`;
   }
 
-  private initializeNotaPreoperatoriaForm(): FormGroup {
-    return this.fb.group({
-      // Información del procedimiento programado (OBLIGATORIO NOM-004)
-      procedimiento_programado: ['', [Validators.required, Validators.minLength(10)]],
-      fecha_cirugia_programada: [new Date().toISOString().split('T')[0], [Validators.required]],
-      hora_programada: ['', [Validators.required]],
-      duracion_estimada_minutos: [null, [Validators.min(15), Validators.max(720)]], // 15 min a 12 horas
 
-      // Diagnósticos (OBLIGATORIO NOM-004)
-      diagnostico_preoperatorio: ['', [Validators.required, Validators.minLength(10)]],
-      id_guia_diagnostico: [null],
-      indicacion_quirurgica: ['', [Validators.required, Validators.minLength(15)]],
+private initializeNotaPreoperatoriaForm(): FormGroup {
+  return this.fb.group({
+    // Campos según la estructura de BD real
+    fecha_cirugia: ['', [Validators.required]],
+    
+    // 🔥 QUITAR minLength de estos campos:
+    resumen_interrogatorio: ['', [Validators.required]], // ← SIN minLength(50)
+    exploracion_fisica: ['', [Validators.required]], // ← SIN minLength(50)
+    resultados_estudios: [''],
+    diagnostico_preoperatorio: ['', [Validators.required]], // ← SIN minLength(20)
+    id_guia_diagnostico: [null],
+    plan_quirurgico: ['', [Validators.required]], // ← SIN minLength(30)
+    plan_terapeutico_preoperatorio: [''],
+    pronostico: ['', [Validators.required]], // ← SIN minLength(20)
+    
+    tipo_cirugia: ['', [Validators.required]],
+    riesgo_quirurgico: ['', [Validators.required]]
+  });
+}
 
-      // Clasificación de riesgo (OBLIGATORIO NOM-004)
-      riesgo_quirurgico: ['Moderado', [Validators.required]],
-      clasificacion_asa: ['II', [Validators.required]], // ASA I-VI
+getFormErrors(): any[] {
+  const errors: any[] = [];
+  
+  Object.keys(this.notaPreoperatoriaForm.controls).forEach(key => {
+    const control = this.notaPreoperatoriaForm.get(key);
+    if (control && control.errors) {
+      Object.keys(control.errors).forEach(errorKey => {
+        errors.push({
+          field: key,
+          error: errorKey,
+          value: control.value
+        });
+      });
+    }
+  });
+  
+  return errors;
+}
 
-      // Antecedentes relevantes para cirugía
-      antecedentes_quirurgicos: [''],
-      antecedentes_anestesicos: [''],
-      alergias_conocidas: ['', [Validators.required]], // Obligatorio por seguridad
-      medicamentos_habituales: [''],
-      comorbilidades: [''],
-
-      // Examen físico preoperatorio (OBLIGATORIO NOM-004)
-      estado_general: ['', [Validators.required]],
-      exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
-      via_aerea: [''], // Importante para anestesia
-
-      // Signos vitales preoperatorios
-      temperatura_preop: [null, [Validators.min(35), Validators.max(42)]],
-      presion_arterial_sistolica: [null, [Validators.min(70), Validators.max(220)]],
-      presion_arterial_diastolica: [null, [Validators.min(40), Validators.max(120)]],
-      frecuencia_cardiaca: [null, [Validators.min(50), Validators.max(150)]],
-      frecuencia_respiratoria: [null, [Validators.min(12), Validators.max(30)]],
-      saturacion_oxigeno: [null, [Validators.min(90), Validators.max(100)]],
-      peso_actual: [null, [Validators.min(1), Validators.max(300)]],
-      talla_actual: [null, [Validators.min(50), Validators.max(250)]],
-
-      // Estudios preoperatorios (OBLIGATORIO NOM-004)
-      laboratorios_preoperatorios: ['', [Validators.required]],
-      estudios_imagen: [''],
-      electrocardiograma: [''],
-      estudios_adicionales: [''],
-
-      // Interconsultas
-      interconsultas_realizadas: [''],
-      valoracion_cardiologica: [''],
-      valoracion_anestesiologica: [''],
-      otras_valoraciones: [''],
-
-      // Preparación preoperatoria (OBLIGATORIO NOM-004)
-      ayuno_indicado: ['8 horas para sólidos, 2 horas para líquidos claros', [Validators.required]],
-      preparacion_intestinal: [false],
-      profilaxis_antibiotica: [''],
-      medicacion_preanestesica: [''],
-      suspender_medicamentos: [''],
-
-      // Planificación quirúrgica
-      tipo_anestesia_propuesta: ['', [Validators.required]],
-      tecnica_quirurgica_planeada: ['', [Validators.required]],
-      equipo_quirurgico: [''],
-      material_especial: [''],
-
-      // Consentimiento y autorizaciones (OBLIGATORIO NOM-004)
-      consentimiento_informado: [false, [Validators.requiredTrue]],
-      autorizacion_familiar: [false],
-      riesgos_explicados: ['', [Validators.required, Validators.minLength(30)]],
-      alternativas_explicadas: [''],
-
-      // Personal médico asignado
-      cirujano_principal: ['', [Validators.required]],
-      ayudante_cirugia: [''],
-      anestesiologo_asignado: [''],
-      instrumentista_asignada: [''],
-
-      // Indicaciones preoperatorias específicas
-      indicaciones_preoperatorias: ['', [Validators.required]],
-      cuidados_especiales: [''],
-      restricciones_preoperatorias: [''],
-
-      // Información para quirófano
-      quirofano_asignado: [''],
-      posicion_quirurgica: [''],
-      tipo_monitorizacion: [''],
-      accesos_vasculares: [''],
-
-      // Condiciones especiales
-      requiere_cuidados_intensivos: [false],
-      transfusion_programada: [false],
-      banco_sangre_reservado: [false],
-      unidades_sangre_reservadas: [null],
-
-      // Observaciones y notas
-      observaciones: [''],
-      consideraciones_especiales: [''],
-      fecha_ultima_evaluacion: [new Date().toISOString().split('T')[0]],
-
-      // Control de calidad
-      evaluacion_completa: [false, [Validators.requiredTrue]],
-      paciente_apto_cirugia: [false, [Validators.requiredTrue]]
-    });
-  }
   // ===================================
   // NOTA PREOPERATORIA
   // ===================================
@@ -1009,27 +946,30 @@ public debugNotaEvolucion(): void {
     }
   }
 
-  private async generarPDFNotaPreoperatoria(): Promise<void> {
-    try {
-      const medicoCompleto = await this.obtenerDatosMedicoCompleto();
-      const datosPacienteEstructurados = this.extraerDatosPaciente();
+private async generarPDFNotaPreoperatoria(): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
 
-      await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
-        paciente: datosPacienteEstructurados,
-        medico: medicoCompleto,
-        expediente: this.pacienteCompleto?.expediente,
-        notaPreoperatoria: {
-          ...this.notaPreoperatoriaForm.value,
-          folio_preoperatorio: this.generarFolioPreoperatorio()
-        }
-      });
+    // 🔥 CORRECCIÓN: Usar la estructura correcta de datos
+    await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
+      // ✅ Pasar el pacienteCompleto directamente (ya tiene la estructura correcta)
+      paciente: this.pacienteCompleto,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      notaPreoperatoria: {
+        ...this.notaPreoperatoriaForm.value,
+        folio_preoperatorio: this.generarFolioPreoperatorio(),
+        numero_cama: this.camaSeleccionada?.numero || null,
+        guias_clinicas: this.guiasClinicasSeleccionadas
+      }
+    });
 
-      console.log('✅ PDF de Nota Preoperatoria generado correctamente');
-    } catch (error) {
-      console.error('❌ Error al generar PDF:', error);
-      this.error = 'Error al generar el PDF de la nota preoperatoria';
-    }
+    console.log('✅ PDF de Nota Preoperatoria generado correctamente');
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la nota preoperatoria';
   }
+}
 
   private generarFolioPreoperatorio(): string {
     const fecha = new Date();
@@ -1189,7 +1129,35 @@ public debugNotaEvolucion(): void {
       revision_cirujano: [false, [Validators.requiredTrue]]
     });
   }
+// Método temporal para debug
+debugNotaPreoperatoria(): void {
+  console.log('🔍 DEBUG NOTA PREOPERATORIA:');
+  console.log('✅ Formulario válido:', this.notaPreoperatoriaForm.valid);
+  console.log('📋 Errores encontrados:', this.getFormErrors());
 
+  const obligatorios = [
+    'fecha_cirugia', 'resumen_interrogatorio', 'exploracion_fisica',
+    'diagnostico_preoperatorio', 'plan_quirurgico', 'pronostico',
+    'tipo_cirugia', 'riesgo_quirurgico'
+  ];
+
+  obligatorios.forEach(campo => {
+    const control = this.notaPreoperatoriaForm.get(campo);
+    const valor = control?.value || '';
+    const esValido = control?.valid;
+    const errores = control?.errors;
+
+    console.log(`📋 ${campo}:`, {
+      valor: `"${valor}" (${typeof valor === 'string' ? valor.length : 'N/A'} caracteres)`,
+      válido: esValido,
+      errores: errores
+    });
+
+    if (!esValido) {
+      console.log(`❌ ${campo} NO VÁLIDO:`, errores);
+    }
+  });
+}
   // ===================================
   // NOTA POSTOPERATORIA
   // ===================================
@@ -3204,6 +3172,11 @@ public debugNotaEvolucion(): void {
 
   // ✅ MÉTODO CORREGIDO generarPDF
   async generarPDF(tipoDocumento: string): Promise<void> {
+    console.log('🔄 Generando PDF para:', tipoDocumento);
+     console.log('🔍 DEBUG - Datos disponibles:');
+  console.log('- pacienteCompleto:', this.pacienteCompleto);
+  console.log('- formulario válido:', this.notaPreoperatoriaForm.valid);
+  console.log('- errores formulario:', this.getFormErrors());
   try {
     console.log(`🔄 Generando PDF para: ${tipoDocumento}`);
     this.isCreatingDocument = true;
@@ -3273,6 +3246,24 @@ public debugNotaEvolucion(): void {
             ...this.notaUrgenciasForm.value,
             destino_paciente: this.notaUrgenciasForm.value.destino_paciente || 'A definir según evolución',
             procedimientos_urgencias: this.notaUrgenciasForm.value.procedimientos_urgencias || 'Ningún procedimiento específico realizado'
+          }
+        });
+        break;
+
+       case 'Nota Preoperatoria':
+        // 🔥 MÁS DEBUG
+        console.log('📋 Datos que se envían al PDF:');
+        console.log('- paciente:', this.pacienteCompleto);
+        console.log('- notaPreoperatoria:', this.notaPreoperatoriaForm.value);
+        
+        await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
+          paciente: this.pacienteCompleto,
+          medico: medicoCompleto,
+          expediente: this.pacienteCompleto?.expediente,
+          notaPreoperatoria: {
+            ...this.notaPreoperatoriaForm.value,
+            numero_cama: this.camaSeleccionada?.numero || null,
+            guias_clinicas: this.guiasClinicasSeleccionadas
           }
         });
         break;

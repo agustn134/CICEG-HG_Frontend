@@ -6602,7 +6602,7 @@ console.log('📊 ESTRUCTURA COMPLETA DE DATOS:', {
       }
     };
   }
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\services\pdf\PdfTemplatesService.ts
   async generarNotaPreoperatoria(datos: any): Promise<any> {
     console.log('⚕️ Generando Nota Preoperatoria...');
 

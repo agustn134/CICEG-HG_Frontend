@@ -1,389 +1,343 @@
-<div class="min-h-screen bg-gray-50">
-
-  <!-- Header Principal -->
-  <div class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4">
-        <!-- Título y descripción -->
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-blue-100 p-2 rounded-lg">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h1 class="text-xl md:text-2xl font-bold text-gray-900">Gestión de Pacientes</h1>
-            <p class="text-gray-600 text-sm hidden sm:block">Administración de historias clínicas</p>
-          </div>
-        </div>
-
-        <!-- Acciones principales -->
-        <div class="flex flex-col sm:flex-row gap-2 mt-4 lg:mt-0">
-          <button (click)="crearNuevoPaciente()"
-                  class="flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-            Nuevo Paciente
-          </button>
-
-          <button (click)="recargarDatos()"
-                  [disabled]="loading"
-                  class="flex items-center justify-center px-3 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg transition-colors text-sm sm:text-base">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            {{ loading ? 'Cargando...' : 'Actualizar' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Panel de Control -->
-  <div class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <form [formGroup]="filtrosForm">
-        <!-- Búsqueda y controles -->
-        <div class="flex flex-col md:flex-row md:items-center gap-4">
-          <!-- Barra de búsqueda -->
-          <div class="flex-1 relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-            </div>
-            <input type="text"
-                   formControlName="buscar"
-                   class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                   placeholder="Buscar pacientes...">
-          </div>
-
-          <!-- Controles -->
-          <div class="flex items-center gap-2">
-            <!-- Botón de filtros -->
-            <button type="button"
-                    (click)="toggleFiltros()"
-                    class="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                    [ngClass]="mostrarFiltros ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-              </svg>
-              Filtros
-            </button>
-
-            <!-- Selector de vista -->
-            <div class="flex bg-gray-200 rounded-lg p-1">
-              <button type="button"
-                      (click)="cambiarVista('tabla')"
-                      class="px-2 py-1 text-sm font-medium rounded-md transition-colors"
-                      [ngClass]="vistaActual === 'tabla' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
-                <svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9M3 14h18M3 18h18"/>
-                </svg>
-                Tabla
-              </button>
-              <button type="button"
-                      (click)="cambiarVista('tarjetas')"
-                      class="px-2 py-1 text-sm font-medium rounded-md transition-colors"
-                      [ngClass]="vistaActual === 'tarjetas' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
-                <svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/>
-                </svg>
-                Tarjetas
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filtros avanzados -->
-        <div *ngIf="mostrarFiltros" class="mt-4 pt-4 border-t border-gray-200">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Filtro por género -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
-              <select formControlName="sexo" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                <option *ngFor="let opcion of opcionesGenero" [value]="opcion.valor">
-                  {{ opcion.etiqueta }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Filtro por edad -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Rango de edad</label>
-              <div class="flex gap-2">
-                <input type="number"
-                       formControlName="edad_min"
-                       min="0" max="120"
-                       placeholder="Mín"
-                       class="w-1/2 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                <input type="number"
-                       formControlName="edad_max"
-                       min="0" max="120"
-                       placeholder="Máx"
-                       class="w-1/2 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
-              </div>
-            </div>
-
-            <!-- Filtro por alergias -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Alergias</label>
-              <select formControlName="tiene_alergias" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                <option value="">Todos</option>
-                <option value="true">Con alergias</option>
-                <option value="false">Sin alergias</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Botones de acción -->
-          <div class="flex justify-end gap-2 mt-4">
-            <button type="button"
-                    (click)="limpiarFiltros()"
-                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors text-sm">
-              Limpiar
-            </button>
-            <button type="button"
-                    (click)="aplicarFiltros()"
-                    class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm">
-              Aplicar
-            </button>
-          </div>
-        </div>
-
-        <!-- Resumen de resultados -->
-        <div class="flex items-center justify-between mt-3 text-sm text-gray-600">
-          <div>
-            <span *ngIf="hayFiltrosAplicados" class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mr-2">
-              Filtrado
-            </span>
-            {{ totalPacientes }} pacientes encontrados
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Contenido principal -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-
-    <!-- Mensaje de error -->
-    <div *ngIf="error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
-      <div class="flex">
-        <svg class="w-4 h-4 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <div>
-          <p>{{ error }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading -->
-    <div *ngIf="loading" class="text-center py-8">
-      <div class="inline-flex items-center px-4 py-2 text-blue-600">
-        <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Cargando pacientes...
-      </div>
-    </div>
-
-    <!-- Vista Tabla -->
-    <div *ngIf="vistaActual === 'tabla' && !loading">
-      <!-- No hay pacientes -->
-      <div *ngIf="!hayPacientes" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron pacientes</h3>
-        <p class="mt-1 text-sm text-gray-500">No hay pacientes que coincidan con los criterios de búsqueda</p>
-      </div>
-
-      <!-- Tabla de pacientes -->
-      <div *ngIf="hayPacientes" class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-xs">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                  Paciente
-                </th>
-                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                  Información
-                </th>
-                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Contacto
-                </th>
-                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let paciente of pacientes; trackBy: trackById"
-                  class="hover:bg-gray-50 transition-colors">
-
-                <!-- Columna: Paciente -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-8 w-8">
-                      <div class="h-8 w-8 rounded-full flex items-center justify-center text-white font-medium text-xs"
-                           [ngClass]="obtenerClasePorGenero(paciente.sexo)">
-                        {{ obtenerIconoPorGenero(paciente.sexo) }}
-                      </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pacientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header Principal -->
+    <header class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <!-- Título y descripción -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-200 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
                     </div>
                     <div class="ml-3">
-                      <div class="font-medium text-gray-900">
-                        {{ paciente.nombre_completo }}
-                      </div>
-                      <div class="text-gray-500 text-xs">
-                        {{ calcularEdad(paciente.fecha_nacimiento) }} años
-                      </div>
+                        <h1 class="text-xl md:text-2xl font-bold text-white">Gestión de Pacientes</h1>
+                        <p class="text-gray-200 text-sm hidden sm:block">Administración de historias clínicas</p>
                     </div>
-                  </div>
-                </td>
-
-                <!-- Columna: Información -->
-                <td class="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
-                  <div class="text-gray-900">
-                    {{ obtenerTextoGenero(paciente.sexo) }}
-                  </div>
-                  <div class="text-gray-500 text-xs">
-                    {{ formatearFecha(paciente.fecha_nacimiento) }}
-                  </div>
-                </td>
-
-                <!-- Columna: Contacto -->
-                <td class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
-                  <div class="text-gray-900">
-                    {{ paciente.telefono || 'Sin teléfono' }}
-                  </div>
-                  <div class="text-gray-500 text-xs truncate max-w-xs">
-                    {{ paciente.correo_electronico || 'Sin email' }}
-                  </div>
-                </td>
-
-                <!-- Columna: Acciones -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <div class="flex gap-2">
-                    <!-- Ver Perfil -->
-                    <button (click)="verDetallePaciente(paciente)"
-                            class="p-1 text-blue-600 hover:text-blue-800 transition-colors"
-                            title="Ver perfil">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                      </svg>
-                    </button>
-
-                    <!-- Expediente -->
-                    <button (click)="crearExpediente(paciente)"
-                            class="p-1 text-emerald-600 hover:text-emerald-800 transition-colors"
-                            title="Expediente">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                      </svg>
-                    </button>
-
-                    <!-- Ver Expedientes -->
-                    <button (click)="verExpedientes(paciente)"
-                            class="p-1 text-gray-600 hover:text-gray-800 transition-colors"
-                            title="Historial">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Vista Tarjetas -->
-    <div *ngIf="vistaActual === 'tarjetas' && !loading">
-      <!-- No hay pacientes -->
-      <div *ngIf="!hayPacientes" class="text-center py-8">
-        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron pacientes</h3>
-        <p class="mt-1 text-sm text-gray-500">No hay pacientes que coincidan con los criterios de búsqueda</p>
-      </div>
-
-      <!-- Grid de tarjetas -->
-      <div *ngIf="hayPacientes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div *ngFor="let paciente of pacientes; trackBy: trackById"
-             class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden">
-
-          <!-- Header de la tarjeta -->
-          <div class="p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
-                     [ngClass]="obtenerClasePorGenero(paciente.sexo)">
-                  {{ obtenerIconoPorGenero(paciente.sexo) }}
                 </div>
-                <div class="ml-3">
-                  <h3 class="font-medium text-gray-900">
-                    {{ paciente.nombre_completo }}
-                  </h3>
-                  <p class="text-xs text-gray-500">{{ calcularEdad(paciente.fecha_nacimiento) }} años • {{ obtenerTextoGenero(paciente.sexo) }}</p>
+                <!-- Acciones principales -->
+                <div class="flex flex-col sm:flex-row gap-2 mt-4 lg:mt-0">
+                    <button (click)="crearNuevoPaciente()"
+                            class="flex items-center justify-center px-3 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Nuevo Paciente
+                    </button>
+                    <button (click)="recargarDatos()"
+                            [disabled]="loading"
+                            class="flex items-center justify-center px-3 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg transition-colors text-sm sm:text-base">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        {{ loading ? 'Cargando...' : 'Actualizar' }}
+                    </button>
                 </div>
-              </div>
-
-              <!-- Indicadores -->
-              <div class="flex flex-col items-end">
-                <span *ngIf="tieneAlergias(paciente)"
-                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-1">
-                  Alergias
-                </span>
-              </div>
             </div>
-
-            <!-- Información básica -->
-            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
-              <div>
-                <p class="text-gray-500">Teléfono</p>
-                <p class="text-gray-900">{{ paciente.telefono || 'No disp.' }}</p>
-              </div>
-              <div>
-                <p class="text-gray-500">Tipo sangre</p>
-                <p class="text-gray-900">{{ paciente.tipo_sangre || 'No disp.' }}</p>
-              </div>
-            </div>
-
-            <!-- Email (si existe) -->
-            <div *ngIf="paciente.correo_electronico" class="mb-2">
-              <p class="text-gray-500 text-xs">Email</p>
-              <p class="text-gray-900 text-xs truncate">{{ paciente.correo_electronico }}</p>
-            </div>
-          </div>
-
-          <!-- Botones de acción -->
-          <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
-            <div class="flex justify-between">
-              <button (click)="verDetallePaciente(paciente)"
-                      class="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
-                Ver perfil
-              </button>
-              <button (click)="crearExpediente(paciente)"
-                      class="text-xs px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors">
-                Expediente
-              </button>
-              <button (click)="verExpedientes(paciente)"
-                      class="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded transition-colors">
-                Historial
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+    </header>
+    <!-- Panel de Control -->
+    <section class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <form [formGroup]="filtrosForm">
+                <!-- Búsqueda y controles -->
+                <div class="flex flex-col md:flex-row md:items-center gap-4">
+                    <!-- Barra de búsqueda -->
+                    <div class="flex-1 relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input type="text"
+                               formControlName="buscar"
+                               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                               placeholder="Buscar pacientes...">
+                    </div>
+                    <!-- Controles -->
+                    <div class="flex items-center gap-2">
+                        <!-- Botón de filtros -->
+                        <button type="button"
+                                (click)="toggleFiltros()"
+                                class="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                                [ngClass]="mostrarFiltros ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            Filtros
+                        </button>
+                        <!-- Selector de vista -->
+                        <div class="flex bg-gray-200 rounded-lg p-1">
+                            <button type="button"
+                                    (click)="cambiarVista('tabla')"
+                                    class="px-2 py-1 text-sm font-medium rounded-md transition-colors"
+                                    [ngClass]="vistaActual === 'tabla' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                                <svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9M3 14h18M3 18h18"/>
+                                </svg>
+                                Tabla
+                            </button>
+                            <button type="button"
+                                    (click)="cambiarVista('tarjetas')"
+                                    class="px-2 py-1 text-sm font-medium rounded-md transition-colors"
+                                    [ngClass]="vistaActual === 'tarjetas' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                                <svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/>
+                                </svg>
+                                Tarjetas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filtros avanzados -->
+                <div *ngIf="mostrarFiltros" class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Filtro por género -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                            <select formControlName="sexo" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option *ngFor="let opcion of opcionesGenero" [value]="opcion.valor">
+                                    {{ opcion.etiqueta }}
+                                </option>
+                            </select>
+                        </div>
+                        <!-- Filtro por edad -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rango de edad</label>
+                            <div class="flex gap-2">
+                                <input type="number"
+                                       formControlName="edad_min"
+                                       min="0" max="120"
+                                       placeholder="Mín"
+                                       class="w-1/2 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <input type="number"
+                                       formControlName="edad_max"
+                                       min="0" max="120"
+                                       placeholder="Máx"
+                                       class="w-1/2 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            </div>
+                        </div>
+                        <!-- Filtro por alergias -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Alergias</label>
+                            <select formControlName="tiene_alergias" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="">Todos</option>
+                                <option value="true">Con alergias</option>
+                                <option value="false">Sin alergias</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Botones de acción -->
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button"
+                                (click)="limpiarFiltros()"
+                                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors text-sm">
+                            Limpiar
+                        </button>
+                        <button type="button"
+                                (click)="aplicarFiltros()"
+                                class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm">
+                            Aplicar
+                        </button>
+                    </div>
+                </div>
+                <!-- Resumen de resultados -->
+                <div class="flex items-center justify-between mt-3 text-sm text-gray-600">
+                    <div>
+                        <span *ngIf="hayFiltrosAplicados" class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mr-2">
+                            Filtrado
+                        </span>
+                        {{ totalPacientes }} pacientes encontrados
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- Contenido principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <!-- Mensaje de error -->
+        <div *ngIf="error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+            <div class="flex">
+                <svg class="w-4 h-4 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <p>{{ error }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- Loading -->
+        <div *ngIf="loading" class="text-center py-8">
+            <div class="inline-flex items-center px-4 py-2 text-blue-600">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Cargando pacientes...
+            </div>
+        </div>
+        <!-- Vista Tabla -->
+        <div *ngIf="vistaActual === 'tabla' && !loading">
+            <!-- No hay pacientes -->
+            <div *ngIf="!hayPacientes" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron pacientes</h3>
+                <p class="mt-1 text-sm text-gray-500">No hay pacientes que coincidan con los criterios de búsqueda</p>
+            </div>
+            <!-- Tabla de pacientes -->
+            <div *ngIf="hayPacientes" class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    Paciente
+                                </th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                                    Información
+                                </th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                                    Contacto
+                                </th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr *ngFor="let paciente of pacientes; trackBy: trackById"
+                                class="hover:bg-gray-50 transition-colors">
+                                <!-- Columna: Paciente -->
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-8 w-8">
+                                            <div class="h-8 w-8 rounded-full flex items-center justify-center text-white font-medium text-xs"
+                                                 [ngClass]="obtenerClasePorGenero(paciente.sexo)">
+                                                {{ obtenerIconoPorGenero(paciente.sexo) }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <div class="font-medium text-gray-900">
+                                                {{ paciente.nombre_completo }}
+                                            </div>
+                                            <div class="text-gray-500 text-xs">
+                                                {{ calcularEdad(paciente.fecha_nacimiento) }} años
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- Columna: Información -->
+                                <td class="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
+                                    <div class="text-gray-900">
+                                        {{ paciente.tipo_sangre || 'Desconocido' }}
+                                    </div>
+                                </td>
+                                <!-- Columna: Contacto -->
+                                <td class="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                                    <div class="text-gray-900">
+                                        {{ paciente.telefono || 'Sin teléfono' }}
+                                    </div>
+                                    <div class="text-gray-500 text-xs truncate max-w-xs">
+                                        {{ paciente.correo_electronico || 'Sin email' }}
+                                    </div>
+                                </td>
+                                <!-- Columna: Acciones -->
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex gap-2">
+                                        <!-- Ver Perfil -->
+                                        <button (click)="verDetallePaciente(paciente)"
+                                                class="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                                                title="Ver perfil">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Vista Tarjetas -->
+        <div *ngIf="vistaActual === 'tarjetas' && !loading">
+            <!-- No hay pacientes -->
+            <div *ngIf="!hayPacientes" class="text-center py-8">
+                <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron pacientes</h3>
+                <p class="mt-1 text-sm text-gray-500">No hay pacientes que coincidan con los criterios de búsqueda</p>
+            </div>
+            <!-- Grid de tarjetas -->
+            <div *ngIf="hayPacientes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let paciente of pacientes; trackBy: trackById"
+                     class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden">
+                    <!-- Header de la tarjeta -->
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                                     [ngClass]="obtenerClasePorGenero(paciente.sexo)">
+                                    {{ obtenerIconoPorGenero(paciente.sexo) }}
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="font-medium text-gray-900">
+                                        {{ paciente.nombre_completo }}
+                                    </h3>
+                                    <p class="text-xs text-gray-500">{{ calcularEdad(paciente.fecha_nacimiento) }} años • {{ obtenerTextoGenero(paciente.sexo) }}</p>
+                                </div>
+                            </div>
+                            <!-- Indicadores -->
+                            <div class="flex flex-col items-end">
+                                <span *ngIf="tieneAlergias(paciente)"
+                                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-1">
+                                    Alergias
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Información básica -->
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                            <div>
+                                <p class="text-gray-500">Teléfono</p>
+                                <p class="text-gray-900">{{ paciente.telefono || 'No disp.' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Tipo sangre</p>
+                                <p class="text-gray-900">{{ paciente.tipo_sangre || 'No disp.' }}</p>
+                            </div>
+                        </div>
+                        <!-- Email (si existe) -->
+                        <div *ngIf="paciente.correo_electronico" class="mb-2">
+                            <p class="text-gray-500 text-xs">Email</p>
+                            <p class="text-gray-900 text-xs truncate">{{ paciente.correo_electronico }}</p>
+                        </div>
+                    </div>
+                    <!-- Botones de acción -->
+                    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
+                        <div class="flex justify-between">
+                            <button (click)="verDetallePaciente(paciente)"
+                                    class="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+                                Ver perfil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
