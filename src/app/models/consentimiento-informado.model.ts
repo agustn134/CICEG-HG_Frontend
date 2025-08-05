@@ -1,3 +1,4 @@
+// C:\Proyectos\CICEG-HG_Frontend\src\app\models\consentimiento-informado.model.ts
 import { BaseEntity, AuditInfo, BaseFilters } from './base.models';
 
 export interface ConsentimientoInformado extends BaseEntity, AuditInfo {

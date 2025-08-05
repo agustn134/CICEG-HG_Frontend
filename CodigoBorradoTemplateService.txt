@@ -3775,6 +3775,8 @@ async generarNotaUrgencias(datos: any): Promise<any> {
       },
     };
   }
+
+  
   // 📄 HOJA DE ALTA VOLUNTARIA SEGÚN NOM-004-SSA3-2012
   async generarHojaAltaVoluntaria(datos: any): Promise<any> {
     console.log('🚪 Generando Hoja de Alta Voluntaria según NOM-004...');

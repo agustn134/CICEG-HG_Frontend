@@ -45,6 +45,8 @@ export class GuiasClinicasComponent implements OnInit {
   ngOnInit(): void {
     this.loadGuiasClinicas();
     this.setupFilters();
+      this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
   }
 
   createForm(): FormGroup {
@@ -266,4 +268,37 @@ export class GuiasClinicasComponent implements OnInit {
       return 'Fecha inválida';
     }
   }
+
+
+
+  // Variables adicionales para controlar el formulario en móvil
+showFormMobile: boolean = false;
+isMobile: boolean = window.innerWidth < 1024; // lg breakpoint
+
+// Métodos para controlar la visualización del formulario
+showMobileForm() {
+  this.showFormMobile = true;
+}
+
+hideMobileForm() {
+  this.showFormMobile = false;
+}
+
+toggleMobileForm() {
+  this.showFormMobile = !this.showFormMobile;
+}
+
+
+
+checkScreenSize() {
+  this.isMobile = window.innerWidth < 1024;
+  if (!this.isMobile) {
+    this.showFormMobile = true; // Mostrar siempre en desktop
+  }
+}
+
+// Limpiar al destruir el componente
+ngOnDestroy() {
+  window.removeEventListener('resize', this.checkScreenSize.bind(this));
+}
 }
