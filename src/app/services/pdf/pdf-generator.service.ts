@@ -153,6 +153,7 @@ export class PdfGeneratorService {
     this.loadPdfMake();
   }
 
+  // C:\Proyectos\CICEG-HG_Frontend\src\app\services\pdf\pdf-generator.service.ts
   async generarDocumento(tipoDocumento: string, datos: any): Promise<void> {
     console.log(`📄 Generando ${tipoDocumento}...`);
 
@@ -170,40 +171,24 @@ export class PdfGeneratorService {
       let documentDefinition;
       switch (tipoDocumento) {
         case 'Historia Clínica':
-          documentDefinition =
-            await this.pdfTemplatesService.generarHistoriaClinica(
-              datosParaTemplate
-            );
+          documentDefinition = await this.pdfTemplatesService.generarHistoriaClinica( datosParaTemplate );
           break;
         case 'Hoja Frontal':
         case 'Hoja Frontal Expediente':
-           case 'Hoja Frontal de Expediente':
-          documentDefinition =
-            await this.pdfTemplatesService.generarHojaFrontalExpediente(
-              datosParaTemplate
-            );
+        case 'Hoja Frontal de Expediente':
+          documentDefinition =  await this.pdfTemplatesService.generarHojaFrontalExpediente( datosParaTemplate );
           break;
         case 'Solicitud de Estudio':
         case 'Solicitud de Laboratorio':
         case 'Solicitud de Imagenología':
-          documentDefinition =
-            await this.pdfTemplatesService.generarSolicitudEstudio(
-              datosParaTemplate
-            );
+          documentDefinition =  await this.pdfTemplatesService.generarSolicitudEstudio( datosParaTemplate );
           break;
         case 'Prescripción de Medicamentos':
         case 'Prescripción':
-          documentDefinition =
-            await this.pdfTemplatesService.generarPrescripcionMedicamentos(
-              datosParaTemplate
-            );
+          documentDefinition = await this.pdfTemplatesService.generarPrescripcionMedicamentos( datosParaTemplate );
           break;
         case 'Nota de Evolución':
-        case 'Nota de Evolución Médica':
-          documentDefinition =
-            await this.pdfTemplatesService.generarNotaEvolucion(
-              datosParaTemplate
-            );
+        case 'Nota de Evolución Médica': documentDefinition = await this.pdfTemplatesService.generarNotaEvolucion( datosParaTemplate);
           break;
         case 'Nota de Urgencias':
         case 'Nota de Urgencias Médicas':
@@ -221,18 +206,37 @@ export class PdfGeneratorService {
         case 'Alta Voluntaria':
           documentDefinition = await this.pdfTemplatesService.generarAltaVoluntaria(datosParaTemplate);
           break;
-        case 'Nota Preoperatoria':
-        case 'Preoperatoria':
-          documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
+        
+        case 'Nota Preanestésica': 
+        documentDefinition = await this.pdfTemplatesService.generarNotaPreanestesica(datosParaTemplate);
           break;
+        // case 'Nota Preoperatoria':
+        // case 'Preoperatoria':
+        //   documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
+        //   break;
+      case 'Nota Preoperatoria':
+      case 'Preoperatoria':
+        documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
+        break;
         case 'Nota Postoperatoria':
         case 'Postoperatoria':
           documentDefinition = await this.pdfTemplatesService.generarNotaPostoperatoria(datosParaTemplate);
           break;
+        case 'Nota Postanestésica':
+          documentDefinition = await this.pdfTemplatesService.generarNotaPostanestesica(datosParaTemplate);
+        break;
         case 'Nota de Interconsulta':
         case 'Interconsulta':
           documentDefinition = await this.pdfTemplatesService.generarNotaInterconsulta(datosParaTemplate);
           break;
+
+        // ✅ AGREGAR ESTE CASO SIMPLE:
+        case 'Nota de Egreso':
+        case 'notaEgreso':
+          documentDefinition = await this.pdfTemplatesService.generarNotaEgreso(datosParaTemplate);
+          break;
+
+  
         default:
           throw new Error(`Documento ${tipoDocumento} no implementado aún`);
       }

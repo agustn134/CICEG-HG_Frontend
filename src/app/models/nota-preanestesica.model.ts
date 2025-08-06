@@ -13,51 +13,32 @@ import {
 export interface NotaPreanestesica extends BaseEntity, AuditInfo {
   id_nota_preanestesica: number;
   id_documento: number;
-
   clasificacion_asa?: ClasificacionASA;
   tipo_anestesia_propuesto?: TipoAnestesia;
-
-  // Evaluación preanestésica
   antecedentes_anestesicos?: string;
   alergias_medicamentos?: string;
   medicamentos_actuales?: string;
   ayuno_horas?: number;
-
-  // Examen físico preoperatorio
   estado_general?: string;
   via_aerea?: string;
   sistema_cardiovascular?: string;
   sistema_respiratorio?: string;
   sistema_nervioso?: string;
-
-  // Laboratorios y estudios
   laboratorios_relevantes?: string;
   estudios_gabinete?: string;
-
-  // Evaluación de riesgo
   riesgo_cardiovascular?: string;
   riesgo_respiratorio?: string;
   riesgo_anestesico?: 'Bajo' | 'Moderado' | 'Alto' | 'Muy Alto';
-
-  // Plan anestésico
   tecnica_anestesica?: string;
   medicamentos_preanestesicos?: string;
   precauciones_especiales?: string;
-
-  // Información del procedimiento
   procedimiento_quirurgico?: string;
   duracion_estimada_minutos?: number;
   posicion_quirurgica?: string;
-
-  // Consentimiento y observaciones
   consentimiento_informado?: boolean;
   observaciones?: string;
   recomendaciones?: string;
-
-  // Personal médico
   id_anestesiologo?: number;
-
-  // Información adicional del documento
   fecha_documento?: string;
   nombre_paciente?: string;
   edad_paciente?: number;
@@ -136,7 +117,6 @@ export interface NotaPreanestesicaCompleta extends NotaPreanestesica {
     alergias_conocidas?: string;
     enfermedades_cronicas?: string;
   };
-
   // Información del anestesiólogo
   anestesiologo?: {
     id: number;

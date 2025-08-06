@@ -11,21 +11,21 @@ import { environment } from '../../../environments/environments';
 export class PdfTemplatesService {
   constructor(private http: HttpClient) { }
 
-private obtenerNumeroExpedientePreferido(expediente: any): string {
-  console.log('🔍 DEBUG obtenerNumeroExpedientePreferido:', {
-    expediente_completo: expediente,
-    numero_expediente_administrativo: expediente?.numero_expediente_administrativo,
-    numero_expediente: expediente?.numero_expediente,
-    tipo: typeof expediente
-  });
-  
-  const resultado = expediente?.numero_expediente_administrativo ||
-    expediente?.numero_expediente ||
-    'Sin número';
+  private obtenerNumeroExpedientePreferido(expediente: any): string {
+    console.log('🔍 DEBUG obtenerNumeroExpedientePreferido:', {
+      expediente_completo: expediente,
+      numero_expediente_administrativo: expediente?.numero_expediente_administrativo,
+      numero_expediente: expediente?.numero_expediente,
+      tipo: typeof expediente
+    });
     
-  console.log('📋 Resultado del número de expediente:', resultado);
-  return resultado;
-}
+    const resultado = expediente?.numero_expediente_administrativo ||
+      expediente?.numero_expediente ||
+      'Sin número';
+      
+    console.log('📋 Resultado del número de expediente:', resultado);
+    return resultado;
+  }
 
   private calcularIMC(peso: number, talla: number): string {
     if (!peso || !talla || peso <= 0 || talla <= 0) return '__';
@@ -111,165 +111,120 @@ private obtenerNumeroExpedientePreferido(expediente: any): string {
       .join('\n');
   }
 
-  // public async obtenerImagenBase64(rutaImagen: string): Promise<string> {
-  //   try {
-  //     let urlCompleta: string;
-  //     if (
-  //       rutaImagen.startsWith('http://') ||
-  //       rutaImagen.startsWith('https://')
-  //     ) {
-  //       urlCompleta = rutaImagen;
-  //     } else {
-  //       urlCompleta = `${environment.BASE_URL}${rutaImagen}`;
-  //     }
-  //     console.log('Obteniendo imagen de:', urlCompleta);
-  //     const response = await this.http
-  //       .get(urlCompleta, { responseType: 'blob' })
-  //       .toPromise();
-  //     if (!response) {
-  //       throw new Error('No se pudo obtener la imagen');
-  //     }
-  //     const tipoImagen = response.type;
-  //     console.log('📄 Tipo de imagen:', tipoImagen);
-  //     if (tipoImagen === 'image/svg+xml' || rutaImagen.endsWith('.svg')) {
-  //       return await this.convertirSvgAPng(response);
-  //     }
-  //     // Para PNG, JPG, etc. - conversión normal
-  //     return new Promise((resolve, reject) => {
-  //       const reader = new FileReader();
-  //       reader.onload = () => {
-  //         const result = reader.result as string;
-  //         console.log('✅ Imagen convertida exitosamente');
-  //         resolve(result);
-  //       };
-  //       reader.onerror = reject;
-  //       reader.readAsDataURL(response);
-  //     });
-  //   } catch (error) {
-  //     console.error('Error al convertir imagen:', error);
-  //     return this.obtenerImagenPlaceholder();
-  //   }
-  // }
-
-
-  // 🔥 VERSIÓN MEJORADA - Reemplaza en PdfTemplatesService.ts
-private async obtenerImagenBase64(rutaImagen: string): Promise<string> {
-  try {
-    // 🔥 SISTEMA DE PRIORIDAD DE RUTAS
-    const rutasAIntentar = this.construirRutasPrioridad(rutaImagen);
-    
-    // Intentar cada ruta en orden de prioridad
-    for (const ruta of rutasAIntentar) {
-      try {
-        console.log(`🔍 Intentando cargar: ${ruta}`);
-        const response = await this.http
-          .get(ruta, { responseType: 'blob' })
-          .toPromise();
-          
-        if (response && response.size > 0) {
-          console.log(`✅ Imagen cargada exitosamente: ${ruta}`);
-          return await this.procesarImagen(response, ruta);
+  public async obtenerImagenBase64(rutaImagen: string): Promise<string> {
+    try {
+      // 🔥 SISTEMA DE PRIORIDAD DE RUTAS
+      const rutasAIntentar = this.construirRutasPrioridad(rutaImagen);
+      
+      // Intentar cada ruta en orden de prioridad
+      for (const ruta of rutasAIntentar) {
+        try {
+          console.log(`🔍 Intentando cargar: ${ruta}`);
+          const response = await this.http
+            .get(ruta, { responseType: 'blob' })
+            .toPromise();
+            
+          if (response && response.size > 0) {
+            console.log(`✅ Imagen cargada exitosamente: ${ruta}`);
+            return await this.procesarImagen(response, ruta);
+          }
+        } catch (error) {
+          console.warn(`⚠️ No se pudo cargar: ${ruta}, intentando siguiente...`);
+          continue; // Intentar la siguiente ruta
         }
-      } catch (error) {
-        console.warn(`⚠️ No se pudo cargar: ${ruta}, intentando siguiente...`);
-        continue; // Intentar la siguiente ruta
       }
+      
+      throw new Error('No se encontraron imágenes válidas en ninguna ruta');
+      
+    } catch (error) {
+      console.error('❌ Error al obtener imagen:', error);
+      return this.obtenerImagenPlaceholder();
+    }
+  }
+
+  private construirRutasPrioridad(rutaBase: string): string[] {
+    const rutas: string[] = [];
+    
+    // Si ya es una URL completa, usarla tal como está
+    if (rutaBase.startsWith('http://') || rutaBase.startsWith('https://')) {
+      rutas.push(rutaBase);
+      return rutas;
     }
     
-    throw new Error('No se encontraron imágenes válidas en ninguna ruta');
+    // Determinar tipo de logo basado en la ruta
+    let tipoLogo = 'default';
+    if (rutaBase.includes('gobierno')) {
+      tipoLogo = 'gobierno';
+    } else if (rutaBase.includes('principal')) {
+      tipoLogo = 'principal';
+    } else if (rutaBase.includes('sidebar')) {
+      tipoLogo = 'sidebar';
+    }
     
-  } catch (error) {
-    console.error('❌ Error al obtener imagen:', error);
-    return this.obtenerImagenPlaceholder();
-  }
-}
-private construirRutasPrioridad(rutaBase: string): string[] {
-  const rutas: string[] = [];
-  
-  // Si ya es una URL completa, usarla tal como está
-  if (rutaBase.startsWith('http://') || rutaBase.startsWith('https://')) {
-    rutas.push(rutaBase);
+    // 🔥 ORDEN DE PRIORIDAD:
+    // 1. Imagen importada PNG (mejor calidad)
+    rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.png`);
+    
+    // 2. Imagen importada SVG (escalable)
+    rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.svg`);
+    
+    // 3. Imagen por defecto SVG
+    rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.svg`);
+    
+    // 4. Imagen por defecto PNG (fallback)
+    rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.png`);
+    
+    // 5. Ruta original proporcionada (por si acaso)
+    const rutaCompleta = rutaBase.startsWith('/') 
+      ? `${environment.BASE_URL}${rutaBase}`
+      : `${environment.BASE_URL}/${rutaBase}`;
+    rutas.push(rutaCompleta);
+    
+    console.log(`🔍 Rutas a intentar para ${tipoLogo}:`, rutas);
     return rutas;
   }
-  
-  // Determinar tipo de logo basado en la ruta
-  let tipoLogo = 'default';
-  if (rutaBase.includes('gobierno')) {
-    tipoLogo = 'gobierno';
-  } else if (rutaBase.includes('principal')) {
-    tipoLogo = 'principal';
-  } else if (rutaBase.includes('sidebar')) {
-    tipoLogo = 'sidebar';
-  }
-  
-  // 🔥 ORDEN DE PRIORIDAD:
-  // 1. Imagen importada PNG (mejor calidad)
-  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.png`);
-  
-  // 2. Imagen importada SVG (escalable)
-  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.svg`);
-  
-  // 3. Imagen por defecto SVG
-  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.svg`);
-  
-  // 4. Imagen por defecto PNG (fallback)
-  rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-default.png`);
-  
-  // 5. Ruta original proporcionada (por si acaso)
-  const rutaCompleta = rutaBase.startsWith('/') 
-    ? `${environment.BASE_URL}${rutaBase}`
-    : `${environment.BASE_URL}/${rutaBase}`;
-  rutas.push(rutaCompleta);
-  
-  console.log(`🔍 Rutas a intentar para ${tipoLogo}:`, rutas);
-  return rutas;
-}
 
-// 🔥 FUNCIÓN 2: Procesar imagen según tipo
-private async procesarImagen(response: Blob, ruta: string): Promise<string> {
-  const tipoImagen = response.type;
-  console.log(`📄 Procesando imagen: ${tipoImagen} desde ${ruta}`);
-  
-  if (tipoImagen === 'image/svg+xml' || ruta.endsWith('.svg')) {
-    return await this.convertirSvgAPng(response);
-  }
-  
-  // Para PNG, JPG, etc. - conversión normal
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      console.log('✅ Imagen convertida exitosamente');
-      resolve(result);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(response);
-  });
-}
-
-// 🔥 FUNCIÓN 3: Obtener configuración de logos inteligente
-private async obtenerConfiguracionLogosInteligente(): Promise<any> {
-  try {
-    // Intentar obtener configuración del backend
-    const config = await this.http.get<any>(`${environment.apiUrl}/configuracion/logos`).toPromise();
+  private async procesarImagen(response: Blob, ruta: string): Promise<string> {
+    const tipoImagen = response.type;
+    console.log(`📄 Procesando imagen: ${tipoImagen} desde ${ruta}`);
     
-    return {
-      logo_gobierno: config?.logo_gobierno || '/uploads/logos/logo-gobierno-importado.png',
-      logo_principal: config?.logo_principal || '/uploads/logos/logo-principal-importado.png',
-      logo_sidebar: config?.logo_sidebar || '/uploads/logos/logo-sidebar-importado.png',
-      nombre_hospital: config?.nombre_hospital || 'Hospital General San Luis de la Paz'
-    };
-  } catch (error) {
-    console.warn('⚠️ No se pudo obtener configuración, usando valores por defecto inteligentes');
-    return {
-      logo_gobierno: '/uploads/logos/logo-gobierno-importado.png',
-      logo_principal: '/uploads/logos/logo-principal-importado.png',
-      logo_sidebar: '/uploads/logos/logo-sidebar-importado.png',
-      nombre_hospital: 'Hospital General San Luis de la Paz'
-    };
+    if (tipoImagen === 'image/svg+xml' || ruta.endsWith('.svg')) {
+      return await this.convertirSvgAPng(response);
+    }
+    
+    // Para PNG, JPG, etc. - conversión normal
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        console.log('✅ Imagen convertida exitosamente');
+        resolve(result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(response);
+    });
   }
-}
-
+  public async obtenerConfiguracionLogosInteligente(): Promise<any> {
+    try {
+      // Intentar obtener configuración del backend
+      const config = await this.http.get<any>(`${environment.apiUrl}/configuracion/logos`).toPromise();
+      
+      return {
+        logo_gobierno: config?.logo_gobierno || '/uploads/logos/logo-gobierno-importado.png',
+        logo_principal: config?.logo_principal || '/uploads/logos/logo-principal-importado.png',
+        logo_sidebar: config?.logo_sidebar || '/uploads/logos/logo-sidebar-importado.png',
+        nombre_hospital: config?.nombre_hospital || 'Hospital General San Luis de la Paz'
+      };
+    } catch (error) {
+      console.warn('⚠️ No se pudo obtener configuración, usando valores por defecto inteligentes');
+      return {
+        logo_gobierno: '/uploads/logos/logo-gobierno-importado.png',
+        logo_principal: '/uploads/logos/logo-principal-importado.png',
+        logo_sidebar: '/uploads/logos/logo-sidebar-importado.png',
+        nombre_hospital: 'Hospital General San Luis de la Paz'
+      };
+    }
+  }
 
   private async convertirSvgAPng(svgBlob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -6601,2568 +6556,3846 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
     };
   }
 
-
-  async generarNotaPreoperatoria(datos: any): Promise<any> {
-      console.log(' Generando Nota Preoperatoria...');
-
-      const { pacienteCompleto, medicoCompleto, notaPreoperatoria } = datos;
-      const fechaActual = new Date();
-      const configuracion = await this.obtenerConfiguracionLogosInteligente();
-
-  // Función segura para crear filas de tabla
-      const crearFilaSegura = (celdas: any[]) => {
-        return celdas.map(celda => celda || { text: '' });
-      };
-
-      // Función para crear tablas con validación
-      const crearTablaSegura = (widths: any[], body: any[][]) => {
-        return {
-          table: {
-            widths: widths,
-            body: body.map(fila => crearFilaSegura(fila))
-          },
-          layout: this.getTableLayout()
-        };
-      };
-      
-      // Validación de tablas (igual que en otros métodos)
-      const validarTabla = (tabla: any, nombreTabla: string) => {
-    if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
-      console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
-      return;
-    }
-
-    console.log(`🔍 Validando tabla ${nombreTabla}:`, {
-      widths: tabla.table.widths,
-      body: tabla.table.body.map((fila: any) => fila.map((celda: any) => ({
-        text: celda.text || 'NO_TEXT',
-        rowSpan: celda.rowSpan || 0,
-        colSpan: celda.colSpan || 0
-      })))
-    });
-
-    const columnasEsperadas = tabla.table.widths.length;
-    
-    tabla.table.body.forEach((fila: any[], index: number) => {
-      if (!Array.isArray(fila)) {
-        console.error(`❌ Fila ${index} no es un array`);
-        throw new Error(`Fila ${index} no es un array`);
-      }
-
-      let celdas = 0;
-      
-      fila.forEach((celda) => {
-        if (celda && Object.keys(celda).length > 0) {
-          if (celda.colSpan) {
-            celdas += celda.colSpan;
-          } else {
-            celdas += 1;
-          }
-        }
-      });
-
-      if (celdas !== columnasEsperadas) {
-        console.error(`❌ ERROR en ${nombreTabla}, Fila ${index}: esperaba ${columnasEsperadas} columnas, encontró ${celdas}`);
-        console.error('Contenido de la fila:', fila);
-        throw new Error(`Tabla ${nombreTabla} tiene errores en fila ${index}`);
-      }
-    });
-
-    console.log(`✅ Tabla ${nombreTabla} validada: ${tabla.table.body.length} filas`);
+ async generarNotaPreanestesica(datos: any): Promise<any> {
+  console.log('📄 Generando Nota Preanestésica según NOM-004...');
+  
+  // 🔥 CORRECCIÓN: Adaptar estructura de datos
+  const pacienteData = datos.paciente || datos.pacienteCompleto;
+  const medicoData = datos.medico || datos.medicoCompleto;
+  const notaData = datos.notaPreanestesica || {};
+  
+  // 🔥 ADAPTAR DATOS DEL PACIENTE
+  const pacienteAdaptado = {
+    nombre_completo: pacienteData.nombre_completo || 
+                    `${pacienteData.nombre || ''} ${pacienteData.apellido_paterno || ''} ${pacienteData.apellido_materno || ''}`.trim(),
+    edad: pacienteData.edad,
+    sexo: pacienteData.sexo,
+    expediente: pacienteData.expediente || { numero_expediente: 'Sin asignar' },
+    fecha_nacimiento: pacienteData.fecha_nacimiento
   };
-      const validarTodasLasTablas = (contenido: any[], nombre: string = 'Documento') => {
-        contenido.forEach((elemento, index) => {
-          if (elemento && elemento.table) {
-            try {
-              validarTabla(elemento, `${nombre}[${index}]`);
-            } catch (error) {
-              console.error(`Error en tabla ${nombre}[${index}]:`, error);
-              throw error;
+
+  // 🔥 ADAPTAR DATOS DEL MÉDICO
+  const medicoAdaptado = {
+    nombre_completo: medicoData.nombre_completo || 
+                    `${medicoData.nombre || ''} ${medicoData.apellido_paterno || ''}`.trim(),
+    numero_cedula: medicoData.numero_cedula || medicoData.cedula_anestesiologo || 'No registrada',
+    especialidad: medicoData.especialidad || 'Anestesiología'
+  };
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+    
+    // 🔥 HEADER PROFESIONAL SIN COLORES
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [[
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_gobierno || 
+              '/uploads/logos/logo-gobierno-importado.png'
+            ),
+            fit: [60, 35],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA PREANESTÉSICA\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 8],
+          },
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_principal || 
+              '/uploads/logos/logo-principal-importado.png'
+            ),
+            fit: [60, 35],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // 🔥 DATOS DEL PACIENTE - ESTILO LIMPIO
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center' },
+              {},
+              {}
+            ],
+            [
+              { text: `Paciente: ${pacienteAdaptado.nombre_completo}`, style: 'tableText' },
+              { text: `Expediente: ${pacienteAdaptado.expediente.numero_expediente}`, style: 'tableText' },
+              { text: `Fecha: ${new Date(notaData.fecha_evaluacion || Date.now()).toLocaleDateString('es-MX')}`, style: 'tableText' }
+            ],
+            [
+              { text: `Edad: ${pacienteAdaptado.edad} años`, style: 'tableText' },
+              { text: `Sexo: ${pacienteAdaptado.sexo}`, style: 'tableText' },
+              { text: `Hora: ${notaData.hora_evaluacion || 'No registrada'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 SIGNOS VITALES - ESTILO PROFESIONAL
+      { text: 'SIGNOS VITALES PREOPERATORIOS', style: 'sectionHeader' },
+      {
+        table: {
+          widths: ['*', '*', '*', '*'],
+          body: [
+            [
+              { text: `Peso: ${notaData.peso || '--'} kg`, style: 'tableText' },
+              { text: `Talla: ${notaData.talla || '--'} cm`, style: 'tableText' },
+              { text: `IMC: ${notaData.imc_calculado || '--'}`, style: 'tableText' },
+              { text: `T/A: ${notaData.tension_arterial || '--'}`, style: 'tableText' }
+            ],
+            [
+              { text: `FC: ${notaData.frecuencia_cardiaca || '--'} lpm`, style: 'tableText' },
+              { text: `FR: ${notaData.frecuencia_respiratoria || '--'} rpm`, style: 'tableText' },
+              { text: `Temp: ${notaData.temperatura || '--'}°C`, style: 'tableText' },
+              { text: `SatO2: ${notaData.saturacion_oxigeno || '--'}%`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 EVALUACIÓN CLÍNICA
+      { text: 'EVALUACIÓN CLÍNICA DEL PACIENTE', style: 'sectionHeader' },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [{ text: 'Estado General:', style: 'boldText' }, { text: notaData.estado_general || 'No evaluado', style: 'tableText' }],
+            [{ text: 'Estado de Ayuno:', style: 'boldText' }, { text: notaData.estado_ayuno || 'No registrado', style: 'tableText' }],
+            [{ text: 'Vía Aérea:', style: 'boldText' }, { text: notaData.via_aerea || 'No evaluada', style: 'tableText' }],
+            [{ text: 'Sistema Cardiovascular:', style: 'boldText' }, { text: notaData.sistema_cardiovascular || 'Sin alteraciones', style: 'tableText' }],
+            [{ text: 'Sistema Respiratorio:', style: 'boldText' }, { text: notaData.sistema_respiratorio || 'Sin alteraciones', style: 'tableText' }],
+            [{ text: 'Sistema Nervioso:', style: 'boldText' }, { text: notaData.sistema_nervioso || 'Sin alteraciones', style: 'tableText' }]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 CLASIFICACIÓN ASA
+      { text: 'CLASIFICACIÓN ASA Y RIESGO ANESTÉSICO', style: 'sectionHeader' },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Clasificación ASA: ${notaData.asa || 'No clasificado'}`, style: 'boldText' },
+              { text: `Riesgo Anestésico: ${notaData.riesgo_anestesico || 'No evaluado'}`, style: 'boldText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 10]
+      },
+
+      // 🔥 TIPO DE ANESTESIA
+      { text: 'TIPO DE ANESTESIA PROPUESTO', style: 'sectionHeader' },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [{ text: 'Tipo de Anestesia:', style: 'boldText' }, { text: notaData.tipo_anestesia || 'No especificado', style: 'tableText' }],
+            [{ text: 'Técnica Anestésica:', style: 'boldText' }, { text: notaData.tecnica_anestesica || 'Estándar', style: 'tableText' }]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 PLAN ANESTÉSICO
+      { text: 'PLAN ANESTÉSICO', style: 'sectionHeader' },
+      {
+        text: notaData.plan_anestesia || 'Plan anestésico estándar según procedimiento.',
+        style: 'tableText',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 ANTECEDENTES
+      { text: 'ANTECEDENTES ANESTÉSICOS Y MEDICAMENTOS', style: 'sectionHeader' },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [{ text: 'Anestesias Previas:', style: 'boldText' }, { text: notaData.anestesias_previas ? 'Sí' : 'No', style: 'tableText' }],
+            [{ text: 'Alergias Medicamentos:', style: 'boldText' }, { text: notaData.alergias_medicamentos || 'Sin alergias conocidas', style: 'tableText' }],
+            [{ text: 'Medicamentos Actuales:', style: 'boldText' }, { text: notaData.medicamentos_actuales || 'Ninguno', style: 'tableText' }]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // 🔥 CONSENTIMIENTO INFORMADO
+      {
+        table: {
+          widths: ['*'],
+          body: [[
+            {
+              text: [
+                { text: 'CONSENTIMIENTO INFORMADO: ', style: 'boldText' },
+                { text: notaData.consentimiento_informado ? 
+                  'El paciente ha sido informado sobre los riesgos anestésicos y ha otorgado su consentimiento.' :
+                  'PENDIENTE - Debe obtenerse antes del procedimiento.',
+                  style: 'tableText'
+                }
+              ]
             }
-          }
-        });
-      };
+          ]]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 30]
+      },
 
-      const documentoFinal = {
-        pageSize: 'LETTER',
-        pageMargins: [20, 80, 20, 60],
+      // 🔥 FIRMA DEL ANESTESIÓLOGO
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [[
+            { 
+              text: [
+                '\n\n\n',
+                '_'.repeat(40),
+                '\n',
+                { text: notaData.medico_anestesiologo || medicoAdaptado.nombre_completo || 'Dr(a). [Nombre]', style: 'boldText' },
+                '\n',
+                'Médico Anestesiólogo',
+                '\n',
+                `Cédula: ${notaData.cedula_anestesiologo || medicoAdaptado.numero_cedula}`
+              ],
+              alignment: 'center'
+            },
+            {
+              text: [
+                '\n\n\n',
+                '_'.repeat(40),
+                '\n',
+                { text: 'FECHA Y HORA', style: 'boldText' },
+                '\n',
+                `${new Date().toLocaleDateString('es-MX')} ${notaData.hora_evaluacion || new Date().toLocaleTimeString('es-MX')}`
+              ],
+              alignment: 'center'
+            }
+          ]]
+        },
+        layout: 'noBorders'
+      }
+    ],
 
-        header: {
-          margin: [20, 10, 20, 10],
+    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    styles: {
+      sectionHeader: { 
+        fontSize: 10, 
+        bold: true, 
+        margin: [0, 10, 0, 5], 
+        fillColor: '#f5f5f5' 
+      },
+      boldText: { 
+        fontSize: 9, 
+        bold: true 
+      },
+      tableText: { 
+        fontSize: 9 
+      }
+    }
+  };
+}
+
+async generarNotaPreoperatoria(datos: any): Promise<any> {
+  console.log('⚕️ Generando Nota Preoperatoria...');
+
+  const { pacienteCompleto, medicoCompleto, notaPreoperatoria } = datos;
+  const fechaActual = new Date();
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+
+    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [[
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_gobierno || 
+              '/uploads/logos/logo-gobierno-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA PREOPERATORIA\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 8],
+          },
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_principal || 
+              '/uploads/logos/logo-principal-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // INFORMACIÓN DEL FOLIO Y FECHA
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: '', border: [false, false, false, false] },
+              { 
+                text: `FOLIO: ${notaPreoperatoria.folio_preoperatorio || this.generarFolioPreoperatorio()}`, 
+                style: 'folioText',
+                alignment: 'center',
+                border: [false, false, false, false]
+              },
+              { 
+                text: `FECHA: ${fechaActual.toLocaleDateString('es-MX')}\nHORA: ${fechaActual.toLocaleTimeString('es-MX')}`, 
+                style: 'dateText',
+                alignment: 'right',
+                border: [false, false, false, false]
+              }
+            ]
+          ]
+        },
+        margin: [0, 0, 0, 15]
+      },
+
+      // DATOS DEL PACIENTE - ESTILO LIMPIO
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center', fillColor: '#f5f5f5' },
+              {},
+              {}
+            ],
+            [
+              { text: `Paciente: ${pacienteCompleto.nombre_completo}`, style: 'tableText' },
+              { text: `Expediente: ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, style: 'tableText' },
+              { text: `Fecha de Cirugía: ${this.formatearFecha(notaPreoperatoria.fecha_cirugia)}`, style: 'tableText' }
+            ],
+            [
+              { text: `Edad: ${pacienteCompleto.edad} años`, style: 'tableText' },
+              { text: `Sexo: ${pacienteCompleto.sexo}`, style: 'tableText' },
+              { text: `Cama: ${notaPreoperatoria.numero_cama || 'No asignada'}`, style: 'tableText' }
+            ],
+            [
+              { text: `CURP: ${pacienteCompleto.curp || 'No registrado'}`, style: 'tableText' },
+              { text: `Fecha Nac.: ${this.formatearFecha(pacienteCompleto.fecha_nacimiento)}`, style: 'tableText' },
+              { text: `Tipo sangre: ${pacienteCompleto.tipo_sangre || 'No especificado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN QUIRÚRGICA PROGRAMADA
+      {
+        text: 'INFORMACIÓN QUIRÚRGICA PROGRAMADA',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: `Tipo de Cirugía: ${notaPreoperatoria.tipo_cirugia || 'No especificado'}`, style: 'tableText' },
+              { text: `Riesgo Quirúrgico: ${notaPreoperatoria.riesgo_quirurgico || 'No evaluado'}`, style: 'tableText' },
+              { text: `Fecha Programada: ${this.formatearFecha(notaPreoperatoria.fecha_cirugia)}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // RESUMEN DEL INTERROGATORIO (NOM-004 D8.5)
+      {
+        text: 'RESUMEN DEL INTERROGATORIO (NOM-004 D8.5)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.resumen_interrogatorio || 'Sin información registrada', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // EXPLORACIÓN FÍSICA (NOM-004 D8.6)
+      {
+        text: 'EXPLORACIÓN FÍSICA (NOM-004 D8.6)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.exploracion_fisica || 'Sin información registrada', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // RESULTADOS DE ESTUDIOS (NOM-004 D8.7)
+      {
+        text: 'RESULTADOS DE ESTUDIOS AUXILIARES DE DIAGNÓSTICO (NOM-004 D8.7)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.resultados_estudios || 'Sin estudios registrados', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // DIAGNÓSTICO PREOPERATORIO (NOM-004 D8.8 & D8.13)
+      {
+        text: 'DIAGNÓSTICO PREOPERATORIO (NOM-004 D8.8 & D8.13)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.diagnostico_preoperatorio || 'No especificado', 
+                style: 'boldText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // GUÍAS CLÍNICAS DE DIAGNÓSTICO
+      ...(notaPreoperatoria.guias_clinicas && notaPreoperatoria.guias_clinicas.length > 0 ? [
+        {
+          text: 'GUÍAS CLÍNICAS DE DIAGNÓSTICO',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
           table: {
-            widths: ['20%', '60%', '20%'],
+            widths: ['100%'],
             body: [
               [
-                {
-                  image: await this.obtenerImagenBase64(configuracion.logo_gobierno),
-                  fit: [80, 40],
-                  alignment: 'left',
-                  margin: [0, 5],
-                },
-                {
-                  text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA PREOPERATORIA\nNOM-004-SSA3-2012',
-                  fontSize: 10,
-                  bold: true,
-                  alignment: 'center',
-                  color: '#1a365d',
-                  margin: [0, 8],
-                },
-                {
-                  image: await this.obtenerImagenBase64(configuracion.logo_principal),
-                  fit: [80, 40],
-                  alignment: 'right',
-                  margin: [0, 5],
-                },
-              ],
-            ],
+                { 
+                  text: this.construirTextoGuiasClinicas(notaPreoperatoria.guias_clinicas),
+                  style: 'tableText',
+                  margin: [8, 8, 8, 8]
+                }
+              ]
+            ]
           },
-          layout: 'noBorders',
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PLAN QUIRÚRGICO (NOM-004 D8.14)
+      {
+        text: 'PLAN QUIRÚRGICO (NOM-004 D8.14)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.plan_quirurgico || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
         },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
 
-        content: [
-          // Datos del paciente
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'DATOS DEL PACIENTE',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 3,
-                  },
-                  {
-                    table: {
-                      widths: ['25%', '25%', '25%', '25%'],
-                      body: [
-                        [
-                          { text: 'Nombre:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: pacienteCompleto.nombre_completo || 'N/A', fontSize: 8 },
-                          { text: 'Expediente:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente) || 'N/A', fontSize: 8, bold: true },
-                        ],
-                        [
-                          { text: 'Edad:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: `${pacienteCompleto.edad || 'N/A'} años`, fontSize: 8 },
-                          { text: 'Sexo:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: pacienteCompleto.sexo || 'N/A', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Peso:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: notaPreoperatoria.peso_actual ? `${notaPreoperatoria.peso_actual} kg` : 'N/A', fontSize: 8 },
-                          { text: 'Talla:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: notaPreoperatoria.talla_actual ? `${notaPreoperatoria.talla_actual} cm` : 'N/A', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
+      // RIESGO QUIRÚRGICO (NOM-004 D8.15)
+      {
+        text: 'EVALUACIÓN DE RIESGO QUIRÚRGICO (NOM-004 D8.15)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Clasificación ASA: ${notaPreoperatoria.riesgo_quirurgico || 'No evaluado'}`, style: 'boldText' },
+              { text: `Tipo de Cirugía: ${notaPreoperatoria.tipo_cirugia || 'No especificado'}`, style: 'boldText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
 
-          // Información quirúrgica
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'INFORMACIÓN QUIRÚRGICA',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 4,
-                  },
-                  {
-                    table: {
-                      widths: ['50%', '50%'],
-                      body: [
-                        [
-                          { text: 'Procedimiento programado:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: notaPreoperatoria.procedimiento_programado || 'No especificado', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Fecha de cirugía:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: this.formatearFecha(notaPreoperatoria.fecha_cirugia_programada) || 'No especificada', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Hora programada:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: notaPreoperatoria.hora_programada || 'No especificada', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Tipo de anestesia:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: notaPreoperatoria.tipo_anestesia_propuesta || 'No especificada', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
+      // PLAN TERAPÉUTICO PREOPERATORIO (NOM-004 D8.16)
+      {
+        text: 'PLAN TERAPÉUTICO PREOPERATORIO (NOM-004 D8.16)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.plan_terapeutico_preoperatorio || 'Plan estándar preoperatorio', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
 
-          // Diagnóstico e indicación
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'DIAGNÓSTICO',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    table: {
-                      widths: ['100%'],
-                      body: [
-                        [
-                          { text: 'Diagnóstico preoperatorio:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.diagnostico_preoperatorio || 'No especificado', fontSize: 8, margin: [5, 3] },
-                        ],
-                        [
-                          { text: 'Indicación quirúrgica:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.indicacion_quirurgica || 'No especificada', fontSize: 8, margin: [5, 3] },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
+      // PRONÓSTICO (NOM-004 D8.10)
+      {
+        text: 'PRONÓSTICO (NOM-004 D8.10)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: notaPreoperatoria.pronostico || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
 
-          // Evaluación de riesgo
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'EVALUACIÓN',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    table: {
-                      widths: ['33%', '33%', '34%'],
-                      body: [
-                        [
-                          { text: 'Riesgo quirúrgico:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Clasificación ASA:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Evaluación completa:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.riesgo_quirurgico || 'No evaluado', fontSize: 8 },
-                          { text: notaPreoperatoria.clasificacion_asa ? `ASA ${notaPreoperatoria.clasificacion_asa}` : 'No evaluada', fontSize: 8 },
-                          { text: notaPreoperatoria.evaluacion_completa ? 'COMPLETA' : 'INCOMPLETA', fontSize: 8, bold: true },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
+      // AUTORIZACIÓN Y PREPARACIÓN
+      {
+        text: 'AUTORIZACIÓN Y PREPARACIÓN QUIRÚRGICA',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: 'Consentimiento Informado: FIRMADO', style: 'tableText' },
+              { text: 'Evaluación Preanestésica: PENDIENTE', style: 'tableText' }
+            ],
+            [
+              { text: 'Laboratorios Preoperatorios: COMPLETOS', style: 'tableText' },
+              { text: 'Interconsultas: SEGÚN NECESIDAD', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
 
-          // Signos vitales (si existen)
-          ...(this.tieneSignosVitalesPreop(notaPreoperatoria) ? [
-            {
-              table: {
-                widths: ['15%', '85%'],
-                body: [
-                  [
-                    {
-                      text: 'SIGNOS VITALES',
-                      fontSize: 8,
-                      bold: true,
-                      fillColor: '#f5f5f5',
-                      alignment: 'center',
-                      rowSpan: 2,
-                    },
-                    {
-                      table: {
-                        widths: ['16.66%', '16.66%', '16.66%', '16.66%', '16.66%', '16.7%'],
-                        body: [
-                          [
-                            { text: 'Temp.', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                            { text: 'FC', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                            { text: 'FR', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                            { text: 'TA Sist.', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                            { text: 'TA Diast.', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                            { text: 'SatO₂', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          ],
-                          [
-                            { text: notaPreoperatoria.temperatura_preop ? `${notaPreoperatoria.temperatura_preop}°C` : '--', fontSize: 8 },
-                            { text: notaPreoperatoria.frecuencia_cardiaca ? `${notaPreoperatoria.frecuencia_cardiaca} lpm` : '--', fontSize: 8 },
-                            { text: notaPreoperatoria.frecuencia_respiratoria ? `${notaPreoperatoria.frecuencia_respiratoria} rpm` : '--', fontSize: 8 },
-                            { text: notaPreoperatoria.presion_arterial_sistolica ? `${notaPreoperatoria.presion_arterial_sistolica}` : '--', fontSize: 8 },
-                            { text: notaPreoperatoria.presion_arterial_diastolica ? `${notaPreoperatoria.presion_arterial_diastolica}` : '--', fontSize: 8 },
-                            { text: notaPreoperatoria.saturacion_oxigeno ? `${notaPreoperatoria.saturacion_oxigeno}%` : '--', fontSize: 8 },
-                          ],
-                        ],
-                      },
-                      layout: this.getTableLayout(),
-                    },
-                  ],
-                ],
-              },
-              layout: {
-                hLineWidth: () => 0.5,
-                vLineWidth: () => 0.5,
-                hLineColor: () => '#000000',
-                vLineColor: () => '#000000',
-              },
-              margin: [0, 0, 0, 10],
-            }
-          ] : []),
-
-          // Antecedentes
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'ANTECEDENTES',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 3,
-                  },
-                  {
-                    table: {
-                      widths: ['50%', '50%'],
-                      body: [
-                        [
-                          { text: 'Alergias conocidas:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Antecedentes quirúrgicos:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.alergias_conocidas || 'Ninguna conocida', fontSize: 8 },
-                          { text: notaPreoperatoria.antecedentes_quirurgicos || 'Sin antecedentes', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Medicamentos habituales:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Comorbilidades:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.medicamentos_habituales || 'No toma medicamentos', fontSize: 8 },
-                          { text: notaPreoperatoria.comorbilidades || 'Sin comorbilidades', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
-
-          // Estudios preoperatorios
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'ESTUDIOS',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 3,
-                  },
-                  {
-                    table: {
-                      widths: ['100%'],
-                      body: [
-                        [
-                          { text: 'Laboratorios:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.laboratorios_preoperatorios || 'No realizados', fontSize: 8, margin: [5, 3] },
-                        ],
-                        [
-                          { text: 'Estudios de imagen:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.estudios_imagen || 'No realizados', fontSize: 8, margin: [5, 3] },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
-
-          // Preparación preoperatoria
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'PREPARACIÓN',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 3,
-                  },
-                  {
-                    table: {
-                      widths: ['50%', '50%'],
-                      body: [
-                        [
-                          { text: 'Ayuno indicado:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Profilaxis antibiótica:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.ayuno_indicado || '8 horas para sólidos, 2 horas para líquidos claros', fontSize: 8 },
-                          { text: notaPreoperatoria.profilaxis_antibiotica || 'No indicada', fontSize: 8 },
-                        ],
-                        [
-                          { text: 'Preparación intestinal:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Banco de sangre:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.preparacion_intestinal ? 'SÍ' : 'NO', fontSize: 8 },
-                          { text: notaPreoperatoria.banco_sangre_reservado ? `SÍ - ${notaPreoperatoria.unidades_sangre_reservadas || 0} unidades` : 'NO', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
-
-          // Equipo quirúrgico
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'EQUIPO',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    table: {
-                      widths: ['50%', '50%'],
-                      body: [
-                        [
-                          { text: 'Cirujano principal:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Anestesiólogo:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.cirujano_principal || 'No asignado', fontSize: 8 },
-                          { text: notaPreoperatoria.anestesiologo_asignado || 'No asignado', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
-
-          // Consentimiento
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'CONSENTIMIENTO',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 2,
-                  },
-                  {
-                    table: {
-                      widths: ['33%', '33%', '34%'],
-                      body: [
-                        [
-                          { text: 'Consentimiento:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Autorización familiar:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                          { text: 'Riesgos explicados:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.consentimiento_informado ? 'FIRMADO' : 'PENDIENTE', fontSize: 8, bold: true },
-                          { text: notaPreoperatoria.autorizacion_familiar ? 'SÍ' : 'NO', fontSize: 8, bold: true },
-                          { text: notaPreoperatoria.riesgos_explicados || 'No especificados', fontSize: 8 },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 10],
-          },
-
-          // Indicaciones y conclusión
-          {
-            table: {
-              widths: ['15%', '85%'],
-              body: [
-                [
-                  {
-                    text: 'CONCLUSIÓN',
-                    fontSize: 8,
-                    bold: true,
-                    fillColor: '#f5f5f5',
-                    alignment: 'center',
-                    rowSpan: 3,
-                  },
-                  {
-                    table: {
-                      widths: ['100%'],
-                      body: [
-                        [
-                          { text: 'Indicaciones preoperatorias:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { text: notaPreoperatoria.indicaciones_preoperatorias || 'Indicaciones estándar', fontSize: 8, margin: [5, 3] },
-                        ],
-                        [
-                          { text: 'Paciente apto para cirugía:', fontSize: 8, bold: true, fillColor: '#fafafa' },
-                        ],
-                        [
-                          { 
-                            text: notaPreoperatoria.paciente_apto_cirugia ? 'SÍ - AUTORIZADO PARA CIRUGÍA' : 'NO APTO - REQUIERE EVALUACIÓN ADICIONAL', 
-                            fontSize: 8, 
-                            bold: true,
-                            margin: [5, 3] 
-                          },
-                        ],
-                      ],
-                    },
-                    layout: this.getTableLayout(),
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.5,
-              vLineWidth: () => 0.5,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-            margin: [0, 0, 0, 20],
-          },
-
-          // Firmas
-          {
-            table: {
-              widths: ['50%', '50%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                      { text: 'MÉDICO EVALUADOR', fontSize: 8, bold: true, alignment: 'center' },
-                      { text: medicoCompleto.nombre_completo || 'N/A', fontSize: 8, alignment: 'center' },
-                      { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, fontSize: 7, alignment: 'center' },
-                      { text: `Especialidad: ${medicoCompleto.especialidad || 'N/A'}`, fontSize: 7, alignment: 'center' },
-                    ],
-                    alignment: 'center',
-                  },
-                  {
-                    stack: [
-                      { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                      { text: 'CIRUJANO RESPONSABLE', fontSize: 8, bold: true, alignment: 'center' },
-                      { text: notaPreoperatoria.cirujano_principal || 'N/A', fontSize: 8, alignment: 'center' },
-                      { text: 'Fecha: ________________', fontSize: 7, alignment: 'center', margin: [0, 10, 0, 0] },
-                    ],
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: 'noBorders',
-            margin: [0, 0, 0, 20],
-          },
-
-          // Pie de página informativo
-          {
-            columns: [
+      // CONCLUSIÓN
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
               {
-                width: '50%',
-                text: [
-                  { text: '* Documento elaborado conforme a:\n', fontSize: 7, italics: true, color: '#666666' },
-                  { text: '• NOM-004-SSA3-2012 Del expediente clínico\n', fontSize: 7, color: '#666666' },
-                  { text: '• Guías de práctica clínica quirúrgica\n', fontSize: 7, color: '#666666' },
-                ],
-                alignment: 'left',
+                text: 'CONCLUSIÓN: PACIENTE APTO PARA PROCEDIMIENTO QUIRÚRGICO PROGRAMADO',
+                style: 'conclusionText',
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [8, 12, 8, 12]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 30]
+      },
+
+      // FIRMAS PROFESIONALES
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              {
+                text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
               },
               {
-                width: '50%',
-                text: [
-                  { text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n', fontSize: 7, italics: true, color: '#666666' },
-                  { text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
-                  { text: 'Hospital General San Luis de la Paz, Guanajuato', fontSize: 7, color: '#666666' },
-                ],
-                alignment: 'right',
+                text: 'FIRMA AUTÓGRAFA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
               },
             ],
+            [
+              {
+                text: [
+                  { text: `${medicoCompleto.nombre_completo || 'Dr(a). [Nombre]'}\n`, fontSize: 9, bold: true },
+                  { text: `Médico Cirujano Evaluador\n`, fontSize: 8 },
+                  { text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'No registrada'}\n`, fontSize: 8 },
+                  { text: `Especialidad: ${medicoCompleto.especialidad || 'No especificada'}\n`, fontSize: 8 },
+                  { text: `Hospital General San Luis de la Paz\n`, fontSize: 7, color: '#6b7280' },
+                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
+                  { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 7 },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO\n(Según NOM-004-SSA3-2012)',
+                fontSize: 8,
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
+
+      // PIE DE PÁGINA INFORMATIVO
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              { text: '* Documento elaborado conforme a:\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: '• NOM-004-SSA3-2012 Del expediente clínico\n', fontSize: 7, color: '#666666' },
+              { text: '• Guías de práctica clínica quirúrgica\n', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              { text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
+              { text: 'Hospital General San Luis de la Paz, Guanajuato', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'right',
           },
         ],
-
-        footer: (currentPage: number, pageCount: number) => ({
-          margin: [20, 10],
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                { 
-                  text: `Nota Preoperatoria - ${this.obtenerNumeroExpedientePreferido(pacienteCompleto.expediente)}`, 
-                  fontSize: 7, 
-                  color: '#666666' 
-                },
-                { 
-                  text: `Página ${currentPage} de ${pageCount}`, 
-                  fontSize: 7, 
-                  alignment: 'center', 
-                  color: '#666666' 
-                },
-                { 
-                  text: fechaActual.toLocaleDateString('es-MX'), 
-                  fontSize: 7, 
-                  alignment: 'right', 
-                  color: '#666666' 
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        }),
-
-        styles: {
-          sectionHeader: {
-            fontSize: 8,
-            bold: true,
-            color: '#111827',
-            fillColor: '#f5f5f5',
-            margin: [5, 5, 5, 5],
-          },
-          fieldLabel: {
-            fontSize: 8,
-            bold: true,
-            color: '#374151',
-            fillColor: '#fafafa',
-            margin: [2, 2, 2, 2],
-          },
-          fieldValue: {
-            fontSize: 8,
-            color: '#111827',
-            margin: [2, 2, 2, 2],
-          },
-        },
-      };
-
-      // Validación final
-      console.log('🔍 Validando todas las tablas del documento...');
-      try {
-        validarTodasLasTablas(documentoFinal.content, 'NotaPreoperatoria');
-        console.log('✅ Todas las tablas validadas correctamente');
-      } catch (error) {
-        console.error('❌ Error en validación de tablas:', error);
-        throw error;
       }
+    ],
 
-      console.log('✅ Nota Preoperatoria generada exitosamente');
-      return documentoFinal;
+    footer: (currentPage: number, pageCount: number) => ({
+      margin: [20, 10],
+      table: {
+        widths: ['33%', '34%', '33%'],
+        body: [
+          [
+            { 
+              text: `Nota Preoperatoria - ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, 
+              fontSize: 7, 
+              color: '#666666' 
+            },
+            { 
+              text: `Página ${currentPage} de ${pageCount}`, 
+              fontSize: 7, 
+              alignment: 'center', 
+              color: '#666666' 
+            },
+            { 
+              text: fechaActual.toLocaleDateString('es-MX'), 
+              fontSize: 7, 
+              alignment: 'right', 
+              color: '#666666' 
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    }),
+
+    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    styles: {
+      sectionHeader: { 
+        fontSize: 10, 
+        bold: true, 
+        margin: [0, 10, 0, 5],
+        fillColor: '#f5f5f5'
+      },
+      boldText: { 
+        fontSize: 9, 
+        bold: true 
+      },
+      tableText: { 
+        fontSize: 9 
+      },
+      folioText: {
+        fontSize: 10,
+        bold: true
+      },
+      dateText: {
+        fontSize: 9
+      },
+      conclusionText: {
+        fontSize: 11,
+        bold: true
+      }
     }
-
-
-
-  async generarNotaPostoperatoria(datos: any): Promise<any> {
-    console.log('⚕️ Generando Nota Postoperatoria...');
-
-    const { pacienteCompleto, medicoCompleto, notaPostoperatoria } = datos;
-    const fechaActual = new Date();
-
-    return {
-      pageSize: 'LETTER',
-      pageMargins: [40, 80, 40, 60],
-
-      header: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 20, 40, 20],
-          table: {
-            widths: ['30%', '40%', '30%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
-                    { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
-                    { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: '⚕️ NOTA POSTOPERATORIA', fontSize: 16, bold: true, alignment: 'center', color: '#059669' },
-                    { text: 'REGISTRO POSTQUIRÚRGICO', fontSize: 10, alignment: 'center', italics: true },
-                    { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
-                    { text: notaPostoperatoria.folio_postoperatorio || this.generarFolioPostoperatorio(), fontSize: 10, alignment: 'right' },
-                    { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
-                    { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 8, alignment: 'right' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
-      },
-
-      content: [
-        // DATOS DEL PACIENTE
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '👤 DATOS DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#f0fdf4',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                { text: 'Nombre:', style: 'fieldLabel' },
-                { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
-                { text: 'Expediente:', style: 'fieldLabel' },
-                { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
-              ],
-              [
-                { text: 'Edad:', style: 'fieldLabel' },
-                { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
-                { text: 'Sexo:', style: 'fieldLabel' },
-                { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
-              ],
-              [
-                { text: 'Quirófano:', style: 'fieldLabel' },
-                { text: notaPostoperatoria.quirofano_utilizado || 'No especificado', style: 'fieldValue' },
-                { text: 'Fecha Cirugía:', style: 'fieldLabel' },
-                { text: this.formatearFecha(notaPostoperatoria.fecha_cirugia), style: 'fieldValue' }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // INFORMACIÓN TEMPORAL DE LA CIRUGÍA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '⏰ INFORMACIÓN TEMPORAL DE LA CIRUGÍA',
-                  style: 'sectionHeader',
-                  fillColor: '#fef3c7',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                { text: 'Hora Inicio:', style: 'fieldLabel' },
-                { text: notaPostoperatoria.hora_inicio || 'No registrada', style: 'fieldValue' },
-                { text: 'Hora Fin:', style: 'fieldLabel' },
-                { text: notaPostoperatoria.hora_fin || 'No registrada', style: 'fieldValue' }
-              ],
-              [
-                { text: 'Duración:', style: 'fieldLabel' },
-                { text: this.formatearDuracion(notaPostoperatoria.duracion_calculada || notaPostoperatoria.duracion_cirugia), style: 'fieldValue' },
-                { text: 'Anestesia Utilizada:', style: 'fieldLabel' },
-                { text: notaPostoperatoria.tipo_anestesia_utilizada || 'No especificada', style: 'fieldValue' }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // DIAGNÓSTICOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🩺 DIAGNÓSTICOS',
-                  style: 'sectionHeader',
-                  fillColor: '#f0f9ff',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'DIAGNÓSTICO PREOPERATORIO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.diagnostico_preoperatorio || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'DIAGNÓSTICO POSTOPERATORIO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.diagnostico_postoperatorio || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    ...(notaPostoperatoria.diagnosticos_adicionales ? [
-                      { text: 'DIAGNÓSTICOS ADICIONALES:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.diagnosticos_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // PROCEDIMIENTOS REALIZADOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🔧 PROCEDIMIENTOS REALIZADOS',
-                  style: 'sectionHeader',
-                  fillColor: '#fef2f2',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'OPERACIÓN PLANEADA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.operacion_planeada || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'OPERACIÓN REALIZADA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.operacion_realizada || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    ...(notaPostoperatoria.procedimientos_adicionales ? [
-                      { text: 'PROCEDIMIENTOS ADICIONALES:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.procedimientos_adicionales, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                    ] : []),
-
-                    ...(notaPostoperatoria.modificaciones_plan_original ? [
-                      { text: 'MODIFICACIONES AL PLAN ORIGINAL:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.modificaciones_plan_original, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // TÉCNICA QUIRÚRGICA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.descripcion_tecnica || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ABORDAJE QUIRÚRGICO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.abordaje_quirurgico || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'POSICIÓN DEL PACIENTE:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.posicion_paciente || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // HALLAZGOS TRANSOPERATORIOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🔍 HALLAZGOS TRANSOPERATORIOS',
-                  style: 'sectionHeader',
-                  fillColor: '#f3e8ff',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'HALLAZGOS PRINCIPALES:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.hallazgos_transoperatorios || 'Sin hallazgos relevantes', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    ...(notaPostoperatoria.hallazgos_inesperados ? [
-                      { text: 'HALLAZGOS INESPERADOS:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.hallazgos_inesperados, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                    ] : []),
-
-                    ...(notaPostoperatoria.anatomia_patologica ? [
-                      { text: 'ANATOMÍA PATOLÓGICA:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.anatomia_patologica, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // CONTEO DE MATERIAL
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '✅ CONTEO DE MATERIAL QUIRÚRGICO',
-                  style: 'sectionHeader',
-                  fillColor: '#ecfdf5',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['33%', '33%', '34%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'CONTEO DE GASAS:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.conteo_gasas_completo || 'No realizado', style: 'conteoValue', color: this.getColorConteo(notaPostoperatoria.conteo_gasas_completo) }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'CONTEO INSTRUMENTAL:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.conteo_instrumental_completo || 'No realizado', style: 'conteoValue', color: this.getColorConteo(notaPostoperatoria.conteo_instrumental_completo) }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'CONTEO COMPRESAS:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.conteo_compresas_completo || 'No aplica', style: 'conteoValue', color: this.getColorConteo(notaPostoperatoria.conteo_compresas_completo) }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        ...(notaPostoperatoria.observaciones_conteo ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'OBSERVACIONES DEL CONTEO:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.observaciones_conteo, style: 'fieldValue' }
-                    ],
-                    margin: [10, 5]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // INCIDENTES Y COMPLICACIONES
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '⚠️ INCIDENTES Y COMPLICACIONES',
-                  style: 'sectionHeader',
-                  fillColor: '#fef2f2',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'INCIDENTES/ACCIDENTES:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.incidentes_accidentes || 'Sin incidentes', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    ...(notaPostoperatoria.complicaciones_transoperatorias ? [
-                      { text: 'COMPLICACIONES TRANSOPERATORIAS:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.complicaciones_transoperatorias, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                    ] : []),
-
-                    ...(notaPostoperatoria.medidas_correctivas ? [
-                      { text: 'MEDIDAS CORRECTIVAS:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.medidas_correctivas, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // SANGRADO Y TRANSFUSIONES
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🩸 SANGRADO Y TRANSFUSIONES',
-                  style: 'sectionHeader',
-                  fillColor: '#fef2f2',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'SANGRADO ESTIMADO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.sangrado_estimado ? `${notaPostoperatoria.sangrado_estimado} ml` : '0 ml', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'MÉTODO HEMOSTASIA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.metodo_hemostasia || 'Hemostasia convencional', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'TRANSFUSIONES:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.transfusiones_realizadas ? 'SÍ' : 'NO', style: 'fieldValue', color: notaPostoperatoria.transfusiones_realizadas ? '#dc2626' : '#059669' }
-                  ]
-                },
-                {
-                  stack: [
-                    ...(notaPostoperatoria.transfusiones_realizadas ? [
-                      { text: 'TIPO COMPONENTE:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.tipo_componente_transfundido || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'VOLUMEN TRANSFUNDIDO:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.volumen_transfundido ? `${notaPostoperatoria.volumen_transfundido} ml` : 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'REACCIONES:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.reacciones_transfusionales || 'Sin reacciones', style: 'fieldValue' }
-                    ] : [
-                      { text: 'LÍQUIDOS ADMINISTRADOS:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.liquidos_administrados ? `${notaPostoperatoria.liquidos_administrados} ml` : 'No registrado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'DIURESIS TRANSOP.:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.diuresis_transoperatoria ? `${notaPostoperatoria.diuresis_transoperatoria} ml` : 'No registrado', style: 'fieldValue' }
-                    ])
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // ESTUDIOS Y ESPECÍMENES
-        ...(notaPostoperatoria.estudios_transoperatorios !== 'No se realizaron estudios transoperatorios' ||
-          notaPostoperatoria.piezas_enviadas_patologia ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '🔬 ESTUDIOS Y ESPECÍMENES',
-                    style: 'sectionHeader',
-                    fillColor: '#f3e8ff',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'ESTUDIOS TRANSOPERATORIOS:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.estudios_transoperatorios || 'No se realizaron estudios', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                      ...(notaPostoperatoria.piezas_enviadas_patologia ? [
-                        { text: 'ESPECÍMENES ENVIADOS A PATOLOGÍA:', style: 'fieldLabel' },
-                        { text: 'SÍ', style: 'fieldValue', color: '#059669', margin: [0, 5, 0, 10] },
-
-                        { text: 'DESCRIPCIÓN ESPECÍMENES:', style: 'fieldLabel' },
-                        { text: notaPostoperatoria.descripcion_especimenes || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                        { text: 'NÚMERO DE FRASCOS:', style: 'fieldLabel' },
-                        { text: notaPostoperatoria.numero_frascos_patologia?.toString() || '1', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // NUEVA PÁGINA PARA EQUIPO Y ESTADO
-        { text: '', pageBreak: 'before' },
-
-        // EQUIPO QUIRÚRGICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '👥 EQUIPO QUIRÚRGICO',
-                  style: 'sectionHeader',
-                  fillColor: '#fef3c7',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'CIRUJANO PRINCIPAL:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.cirujano_principal || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'PRIMER AYUDANTE:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.primer_ayudante || 'No asignado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'SEGUNDO AYUDANTE:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.segundo_ayudante || 'No asignado', style: 'fieldValue' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'ANESTESIÓLOGO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.anestesiologo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'INSTRUMENTISTA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.instrumentista || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                    { text: 'CIRCULANTE:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.circulante || 'No especificado', style: 'fieldValue' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // ESTADO POSTQUIRÚRGICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '💗 ESTADO POSTQUIRÚRGICO DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#ffebee',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'ESTADO GENERAL:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.estado_postquirurgico || 'No evaluado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ESTABILIDAD HEMODINÁMICA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.estabilidad_hemodinamica || 'No evaluada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ESTADO DE CONCIENCIA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.estado_conciencia || 'No evaluado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'DESTINO DEL PACIENTE:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.destino_paciente || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // PLAN POSTOPERATORIO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '📋 PLAN POSTOPERATORIO',
-                  style: 'sectionHeader',
-                  fillColor: '#f0fdf4',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'PLAN POSTOPERATORIO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.plan_postoperatorio || 'Plan estándar postoperatorio', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'INDICACIONES POSTOPERATORIAS:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.indicaciones_postoperatorias || 'Indicaciones estándar', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ANALGESIA PRESCRITA:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.analgesia_prescrita || 'Según protocolo', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // PRONÓSTICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'PRONÓSTICO:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.pronostico || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'EXPECTATIVA DE RECUPERACIÓN:', style: 'fieldLabel' },
-                    { text: notaPostoperatoria.expectativa_recuperacion || 'Favorable', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    ...(notaPostoperatoria.seguimiento_requerido ? [
-                      { text: 'SEGUIMIENTO REQUERIDO:', style: 'fieldLabel' },
-                      { text: notaPostoperatoria.seguimiento_requerido, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // OBSERVACIONES FINALES
-        ...(notaPostoperatoria.observaciones_cirujano || notaPostoperatoria.observaciones_anestesiologo ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '💬 OBSERVACIONES ADICIONALES',
-                    style: 'sectionHeader',
-                    fillColor: '#f8fafc',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      ...(notaPostoperatoria.observaciones_cirujano ? [
-                        { text: 'OBSERVACIONES DEL CIRUJANO:', style: 'fieldLabel' },
-                        { text: notaPostoperatoria.observaciones_cirujano, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(notaPostoperatoria.observaciones_anestesiologo ? [
-                        { text: 'OBSERVACIONES DEL ANESTESIÓLOGO:', style: 'fieldLabel' },
-                        { text: notaPostoperatoria.observaciones_anestesiologo, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(notaPostoperatoria.observaciones_enfermeria ? [
-                        { text: 'OBSERVACIONES DE ENFERMERÍA:', style: 'fieldLabel' },
-                        { text: notaPostoperatoria.observaciones_enfermeria, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 20]
-          }
-        ] : []),
-
-        // RESULTADO DE LA CIRUGÍA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'RESULTADO DE LA CIRUGÍA', style: 'conclusionTitle', alignment: 'center', margin: [0, 10, 0, 15] },
-
-                    { text: 'CIRUGÍA SIN COMPLICACIONES:', style: 'fieldLabel', alignment: 'center' },
-                    {
-                      text: notaPostoperatoria.cirugia_sin_complicaciones ? '✅ SÍ' : '❌ NO',
-                      style: 'conclusionValue',
-                      alignment: 'center',
-                      color: notaPostoperatoria.cirugia_sin_complicaciones ? '#059669' : '#dc2626',
-                      margin: [0, 5, 0, 10]
-                    },
-
-                    { text: 'OBJETIVOS QUIRÚRGICOS ALCANZADOS:', style: 'fieldLabel', alignment: 'center' },
-                    {
-                      text: notaPostoperatoria.objetivos_alcanzados ? '✅ SÍ' : '❌ NO',
-                      style: 'conclusionValue',
-                      alignment: 'center',
-                      color: notaPostoperatoria.objetivos_alcanzados ? '#059669' : '#dc2626',
-                      margin: [0, 5, 0, 0]
-                    }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 30]
-        },
-
-        // FIRMAS
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'CIRUJANO PRINCIPAL', style: 'signatureLabel' },
-                    { text: notaPostoperatoria.cirujano_principal || 'N/A', style: 'signatureName' },
-                    { text: `Cédula Profesional`, style: 'signatureDetails' },
-                    { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, style: 'signatureDetails' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'MÉDICO RESPONSABLE', style: 'signatureLabel' },
-                    { text: medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
-                    { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' },
-                    { text: `Especialidad: ${medicoCompleto.especialidad || 'N/A'}`, style: 'signatureDetails' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        }
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 10],
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                {
-                  text: `Nota Postoperatoria - Hospital General San Luis de la Paz`,
-                  fontSize: 8,
-                  color: '#666666'
-                },
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
-                  alignment: 'center',
-                  color: '#666666'
-                },
-                {
-                  text: fechaActual.toLocaleString('es-MX'),
-                  fontSize: 8,
-                  alignment: 'right',
-                  color: '#666666'
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
-      },
-
-      styles: {
-        sectionHeader: {
-          fontSize: 12,
-          bold: true,
-          color: '#374151'
-        },
-        fieldLabel: {
-          fontSize: 9,
-          bold: true,
-          color: '#4b5563'
-        },
-        fieldValue: {
-          fontSize: 9,
-          color: '#111827'
-        },
-        conteoValue: {
-          fontSize: 10,
-          bold: true
-        },
-        conclusionTitle: {
-          fontSize: 14,
-          bold: true,
-          color: '#059669'
-        },
-        conclusionValue: {
-          fontSize: 12,
-          bold: true
-        },
-        signatureLabel: {
-          fontSize: 10,
-          bold: true,
-          alignment: 'center',
-          color: '#374151'
-        },
-        signatureName: {
-          fontSize: 9,
-          alignment: 'center',
-          color: '#111827'
-        },
-        signatureDetails: {
-          fontSize: 8,
-          alignment: 'center',
-          color: '#6b7280'
-        }
-      }
+  };
+}
+
+
+
+  async generarNotaPostanestesica(datos: any): Promise<any> {
+    console.log('📄 Generando Nota Postanestésica según NOM-004...');
+    
+    // 🔥 ADAPTAR ESTRUCTURA DE DATOS
+    const pacienteData = datos.paciente || datos.pacienteCompleto;
+    const medicoData = datos.medico || datos.medicoCompleto;
+    const notaData = datos.notaPostanestesica || {};
+    
+    const pacienteAdaptado = {
+      nombre_completo: pacienteData.nombre_completo || 
+                      `${pacienteData.nombre || ''} ${pacienteData.apellido_paterno || ''} ${pacienteData.apellido_materno || ''}`.trim(),
+      edad: pacienteData.edad,
+      sexo: pacienteData.sexo,
+      expediente: pacienteData.expediente || { numero_expediente: 'Sin asignar' }
     };
-  }
 
-
-  async generarNotaInterconsulta(datos: any): Promise<any> {
-    console.log('💫 Generando Nota de Interconsulta - ¡EL GRAN FINAL!');
-
-    const { pacienteCompleto, medicoCompleto, interconsulta } = datos;
-    const fechaActual = new Date();
+    const medicoAdaptado = {
+      nombre_completo: medicoData.nombre_completo || 
+                      `${medicoData.nombre || ''} ${medicoData.apellido_paterno || ''}`.trim(),
+      numero_cedula: medicoData.numero_cedula || notaData.cedula_anestesiologo || 'No registrada',
+      especialidad: medicoData.especialidad || 'Anestesiología'
+    };
 
     return {
       pageSize: 'LETTER',
-      pageMargins: [40, 80, 40, 60],
-
-      header: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 20, 40, 20],
-          table: {
-            widths: ['30%', '40%', '30%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
-                    { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
-                    { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: '💫 NOTA DE INTERCONSULTA', fontSize: 16, bold: true, alignment: 'center', color: '#7c3aed' },
-                    { text: 'COMUNICACIÓN ENTRE ESPECIALIDADES', fontSize: 10, alignment: 'center', italics: true },
-                    { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
-                    { text: interconsulta.numero_interconsulta || this.generarNumeroInterconsulta(), fontSize: 10, alignment: 'right' },
-                    { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
-                    { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 8, alignment: 'right' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
+      pageMargins: [20, 60, 20, 40],
+      
+      // 🔥 HEADER PROFESIONAL
+      header: {
+        margin: [20, 10, 20, 10],
+        table: {
+          widths: ['20%', '60%', '20%'],
+          body: [[
+            {
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_gobierno || 
+                '/uploads/logos/logo-gobierno-importado.png'
+              ),
+              fit: [60, 35],
+              alignment: 'left',
+              margin: [0, 5],
+            },
+            {
+              text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA POSTANESTÉSICA\nNOM-004-SSA3-2012',
+              fontSize: 10,
+              bold: true,
+              alignment: 'center',
+              margin: [0, 8],
+            },
+            {
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_principal || 
+                '/uploads/logos/logo-principal-importado.png'
+              ),
+              fit: [60, 35],
+              alignment: 'right',
+              margin: [0, 5],
+            },
+          ]],
+        },
+        layout: 'noBorders',
       },
 
       content: [
-        // DATOS DEL PACIENTE
+        // 🔥 DATOS DEL PACIENTE
         {
           table: {
-            widths: ['100%'],
+            widths: ['*', '*', '*'],
             body: [
               [
-                {
-                  text: '👤 DATOS DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#faf5ff',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                { text: 'Nombre:', style: 'fieldLabel' },
-                { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
-                { text: 'Expediente:', style: 'fieldLabel' },
-                { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+                { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center' },
+                {},
+                {}
               ],
               [
-                { text: 'Edad:', style: 'fieldLabel' },
-                { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
-                { text: 'Sexo:', style: 'fieldLabel' },
-                { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+                { text: `Paciente: ${pacienteAdaptado.nombre_completo}`, style: 'tableText' },
+                { text: `Expediente: ${pacienteAdaptado.expediente.numero_expediente}`, style: 'tableText' },
+                { text: `Fecha: ${new Date(notaData.fecha_procedimiento || Date.now()).toLocaleDateString('es-MX')}`, style: 'tableText' }
               ],
               [
-                { text: 'Fecha Solicitud:', style: 'fieldLabel' },
-                { text: this.formatearFecha(interconsulta.fecha_solicitud), style: 'fieldValue' },
-                { text: 'Urgencia:', style: 'fieldLabel' },
-                { text: this.formatearUrgencia(interconsulta.urgencia_interconsulta), style: 'urgenciaValue', color: this.getColorUrgencia(interconsulta.urgencia_interconsulta) }
+                { text: `Edad: ${pacienteAdaptado.edad} años`, style: 'tableText' },
+                { text: `Sexo: ${pacienteAdaptado.sexo}`, style: 'tableText' },
+                { text: `Quirófano: ${notaData.quirofano || 'No especificado'}`, style: 'tableText' }
               ]
             ]
           },
-          layout: this.getTableLayout(),
+          layout: 'lightHorizontalLines',
           margin: [0, 0, 0, 15]
         },
 
-        // INFORMACIÓN DE LA SOLICITUD
+        // 🔥 DATOS DEL PROCEDIMIENTO
+        { text: 'DATOS DEL PROCEDIMIENTO ANESTÉSICO', style: 'sectionHeader' },
         {
           table: {
-            widths: ['100%'],
+            widths: ['25%', '*', '25%', '*'],
             body: [
               [
-                {
-                  text: '📋 INFORMACIÓN DE LA SOLICITUD',
-                  style: 'sectionHeader',
-                  fillColor: '#eff6ff',
-                  margin: [10, 8]
-                }
+                { text: 'Procedimiento Realizado:', style: 'boldText' },
+                { text: notaData.procedimiento_realizado || 'No especificado', style: 'tableText' },
+                { text: 'Clasificación ASA:', style: 'boldText' },
+                { text: notaData.clasificacion_asa || 'No clasificado', style: 'tableText' }
+              ],
+              [
+                { text: 'Hora de Inicio:', style: 'boldText' },
+                { text: notaData.hora_inicio || 'No registrada', style: 'tableText' },
+                { text: 'Hora de Término:', style: 'boldText' },
+                { text: notaData.hora_termino || 'No registrada', style: 'tableText' }
+              ],
+              [
+                { text: 'Duración Total:', style: 'boldText' },
+                { text: notaData.duracion_calculada || 'No calculada', style: 'tableText', colSpan: 3 },
+                {},
+                {}
               ]
             ]
           },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'ESPECIALIDAD SOLICITADA:', style: 'fieldLabel' },
-                    { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'MÉDICO SOLICITANTE:', style: 'fieldLabel' },
-                    { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'SERVICIO SOLICITANTE:', style: 'fieldLabel' },
-                    { text: interconsulta.servicio_solicitante || medicoCompleto.departamento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'CONTACTO:', style: 'fieldLabel' },
-                    { text: interconsulta.telefono_contacto ? `Tel: ${interconsulta.telefono_contacto}` : 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'TIEMPO ESPERADO:', style: 'fieldLabel' },
-                    { text: interconsulta.tiempo_respuesta_esperado || '48 horas', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ESTADO:', style: 'fieldLabel' },
-                    { text: interconsulta.estado_interconsulta || 'Pendiente', style: 'estadoValue', color: this.getColorEstado(interconsulta.estado_interconsulta), margin: [0, 5, 0, 0] }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
+          layout: 'lightHorizontalLines',
           margin: [0, 0, 0, 15]
         },
 
-        // MOTIVO DE LA INTERCONSULTA
+        // 🔥 TIPO DE ANESTESIA
+        { text: 'TIPO Y TÉCNICA ANESTÉSICA UTILIZADA', style: 'sectionHeader' },
         {
           table: {
-            widths: ['100%'],
+            widths: ['25%', '*'],
             body: [
-              [
-                {
-                  text: '❓ MOTIVO DE LA INTERCONSULTA',
-                  style: 'sectionHeader',
-                  fillColor: '#fef3c7',
-                  margin: [10, 8]
-                }
-              ]
+              [{ text: 'Tipo de Anestesia:', style: 'boldText' }, { text: notaData.tipo_anestesia || 'No especificado', style: 'tableText' }],
+              [{ text: 'Técnica Anestésica:', style: 'boldText' }, { text: notaData.tecnica_anestesica || 'Estándar', style: 'tableText' }]
             ]
           },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'MOTIVO DE INTERCONSULTA:', style: 'fieldLabel' },
-                    { text: interconsulta.motivo_interconsulta || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'PREGUNTA ESPECÍFICA AL ESPECIALISTA:', style: 'fieldLabel' },
-                    { text: interconsulta.pregunta_especifica || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'JUSTIFICACIÓN DE LA INTERCONSULTA:', style: 'fieldLabel' },
-                    { text: interconsulta.justificacion_interconsulta || 'Evaluación especializada requerida', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
+          layout: 'lightHorizontalLines',
           margin: [0, 0, 0, 15]
         },
 
-        // INFORMACIÓN CLÍNICA
+        // 🔥 MEDICAMENTOS UTILIZADOS (NOM-004)
+        { text: 'MEDICAMENTOS UTILIZADOS (NOM-004 D11.12)', style: 'sectionHeader' },
         {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🩺 INFORMACIÓN CLÍNICA DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#f0fdf4',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'RESUMEN DEL CASO:', style: 'fieldLabel' },
-                    { text: interconsulta.resumen_caso || 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'fieldLabel' },
-                    { text: interconsulta.diagnostico_presuntivo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'SÍNTOMAS PRINCIPALES:', style: 'fieldLabel' },
-                    { text: interconsulta.sintomas_principales || 'No especificados', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'TIEMPO DE EVOLUCIÓN:', style: 'fieldLabel' },
-                    { text: interconsulta.tiempo_evolucion || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
+          text: notaData.medicamentos_utilizados || 'No se registraron medicamentos específicos.',
+          style: 'tableText',
           margin: [0, 0, 0, 15]
         },
 
-        // SIGNOS VITALES ACTUALES
-        ...(this.tieneSignosVitales(interconsulta) ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '💓 SIGNOS VITALES ACTUALES',
-                    style: 'sectionHeader',
-                    fillColor: '#ffebee',
-                    margin: [10, 8]
-                  }
-                ]
+        // 🔥 SIGNOS VITALES DE EGRESO
+        { text: 'SIGNOS VITALES AL EGRESO DEL QUIRÓFANO', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['*', '*', '*', '*', '*'],
+            body: [
+              [
+                { text: `T/A: ${notaData.presion_arterial_egreso || '--'}`, style: 'tableText' },
+                { text: `FC: ${notaData.frecuencia_cardiaca_egreso || '--'} lpm`, style: 'tableText' },
+                { text: `FR: ${notaData.frecuencia_respiratoria_egreso || '--'} rpm`, style: 'tableText' },
+                { text: `SatO2: ${notaData.saturacion_oxigeno_egreso || '--'}%`, style: 'tableText' },
+                { text: `Temp: ${notaData.temperatura_egreso || '--'}°C`, style: 'tableText' }
               ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
+            ]
           },
-          {
-            table: {
-              widths: ['20%', '20%', '20%', '20%', '20%'],
-              body: [
-                [
-                  { text: 'TA', style: 'vitalHeader' },
-                  { text: 'FC', style: 'vitalHeader' },
-                  { text: 'FR', style: 'vitalHeader' },
-                  { text: 'Temp.', style: 'vitalHeader' },
-                  { text: 'SatO₂', style: 'vitalHeader' }
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 ESCALA DE ALDRETE
+        { text: 'ESCALA DE ALDRETE (RECUPERACIÓN POSTANESTÉSICA)', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['*', '*', '*', '*', '*', 'auto'],
+            body: [
+              [
+                { text: 'Actividad', style: 'boldText', alignment: 'center' },
+                { text: 'Respiración', style: 'boldText', alignment: 'center' },
+                { text: 'Circulación', style: 'boldText', alignment: 'center' },
+                { text: 'Conciencia', style: 'boldText', alignment: 'center' },
+                { text: 'Saturación', style: 'boldText', alignment: 'center' },
+                { text: 'TOTAL', style: 'boldText', alignment: 'center' }
+              ],
+              [
+                { text: `${notaData.aldrete_actividad || '2'}/2`, style: 'tableText', alignment: 'center' },
+                { text: `${notaData.aldrete_respiracion || '2'}/2`, style: 'tableText', alignment: 'center' },
+                { text: `${notaData.aldrete_circulacion || '2'}/2`, style: 'tableText', alignment: 'center' },
+                { text: `${notaData.aldrete_conciencia || '2'}/2`, style: 'tableText', alignment: 'center' },
+                { text: `${notaData.aldrete_saturacion || '2'}/2`, style: 'tableText', alignment: 'center' },
+                { text: `${notaData.aldrete_total || '10'}/10`, style: 'boldText', alignment: 'center', fillColor: '#f5f5f5' }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 EVALUACIÓN CLÍNICA DE EGRESO
+        { text: 'EVALUACIÓN CLÍNICA DE EGRESO (NOM-004 D11.16)', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['25%', '*'],
+            body: [
+              [{ text: 'Estado Clínico:', style: 'boldText' }, { text: notaData.estado_clinico_egreso || 'Estable', style: 'tableText' }],
+              [{ text: 'Estado de Conciencia:', style: 'boldText' }, { text: notaData.estado_conciencia_egreso || 'Despierto, orientado', style: 'tableText' }],
+              [{ text: 'Dolor Postoperatorio:', style: 'boldText' }, { text: notaData.dolor_postoperatorio || 'Sin dolor', style: 'tableText' }]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 INCIDENTES Y COMPLICACIONES (NOM-004)
+        { text: 'INCIDENTES Y COMPLICACIONES (NOM-004 D11.14)', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['25%', '*'],
+            body: [
+              [{ text: 'Incidentes/Accidentes:', style: 'boldText' }, { text: notaData.incidentes_accidentes || 'Sin incidentes reportados', style: 'tableText' }],
+              [{ text: 'Complicaciones:', style: 'boldText' }, { text: notaData.complicaciones_transanestesicas || 'Sin complicaciones', style: 'tableText' }]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 BALANCE HÍDRICO (NOM-004)
+        { text: 'BALANCE HÍDRICO Y PÉRDIDAS (NOM-004 D11.15)', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['*', '*', '*', '*'],
+            body: [
+              [
+                { text: `Líquidos: ${notaData.liquidos_administrados || '0'} ml`, style: 'tableText' },
+                { text: `Sangrado: ${notaData.sangrado || '0'} ml`, style: 'tableText' },
+                { text: `Hemoderivados: ${notaData.hemoderivados_transfundidos || 'Ninguno'}`, style: 'tableText' },
+                { text: `Balance: ${notaData.balance_hidrico || 'Equilibrado'}`, style: 'tableText' }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 PLAN DE MANEJO (NOM-004)
+        { text: 'PLAN DE MANEJO Y TRATAMIENTO (NOM-004 D11.17)', style: 'sectionHeader' },
+        {
+          text: notaData.plan_tratamiento || 'Plan de manejo postanestésico estándar según protocolo institucional.',
+          style: 'tableText',
+          margin: [0, 0, 0, 15]
+        },
+
+        // 🔥 PRONÓSTICO
+        {
+          table: {
+            widths: ['*'],
+            body: [[
+              {
+                text: `PRONÓSTICO: ${notaData.pronostico || 'Favorable'}`,
+                style: 'boldText',
+                fillColor: '#f5f5f5',
+                margin: [5, 8],
+                alignment: 'center'
+              }
+            ]]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 20]
+        },
+
+        // 🔥 FIRMA DEL ANESTESIÓLOGO
+        {
+          table: {
+            widths: ['*', '*'],
+            body: [[
+              { 
+                text: [
+                  '\n\n\n',
+                  '_'.repeat(40),
+                  '\n',
+                  { text: notaData.anestesiologo_nombre || medicoAdaptado.nombre_completo || 'Dr(a). [Nombre]', style: 'boldText' },
+                  '\n',
+                  'Médico Anestesiólogo',
+                  '\n',
+                  `Cédula: ${notaData.cedula_anestesiologo || medicoAdaptado.numero_cedula}`
                 ],
-                [
-                  { text: interconsulta.presion_arterial_actual || '--', style: 'vitalValue' },
-                  { text: interconsulta.frecuencia_cardiaca_actual ? `${interconsulta.frecuencia_cardiaca_actual} lpm` : '--', style: 'vitalValue' },
-                  { text: interconsulta.frecuencia_respiratoria_actual ? `${interconsulta.frecuencia_respiratoria_actual} rpm` : '--', style: 'vitalValue' },
-                  { text: interconsulta.temperatura_actual ? `${interconsulta.temperatura_actual}°C` : '--', style: 'vitalValue' },
-                  { text: interconsulta.saturacion_oxigeno_actual ? `${interconsulta.saturacion_oxigeno_actual}%` : '--', style: 'vitalValue' }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // EXPLORACIÓN FÍSICA
-        ...(interconsulta.exploracion_fisica_relevante ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'EXPLORACIÓN FÍSICA RELEVANTE:', style: 'fieldLabel' },
-                      { text: interconsulta.exploracion_fisica_relevante, style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                      ...(interconsulta.hallazgos_importantes ? [
-                        { text: 'HALLAZGOS IMPORTANTES:', style: 'fieldLabel' },
-                        { text: interconsulta.hallazgos_importantes, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // ESTUDIOS REALIZADOS
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '🔬 ESTUDIOS REALIZADOS',
-                  style: 'sectionHeader',
-                  fillColor: '#f3e8ff',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['25%', '25%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'LABORATORIO:', style: 'fieldLabel' },
-                    { text: interconsulta.examenes_laboratorio ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_laboratorio ? '#059669' : '#dc2626' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'GABINETE:', style: 'fieldLabel' },
-                    { text: interconsulta.examenes_gabinete ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_gabinete ? '#059669' : '#dc2626' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'ESTUDIOS REALIZADOS:', style: 'fieldLabel' },
-                    { text: interconsulta.estudios_realizados || 'No se han realizado estudios', style: 'fieldValue' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        ...(interconsulta.resultados_relevantes ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'RESULTADOS RELEVANTES:', style: 'fieldLabel' },
-                      { text: interconsulta.resultados_relevantes, style: 'fieldValue' }
-                    ],
-                    margin: [10, 5]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // TRATAMIENTO ACTUAL
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '💊 TRATAMIENTO ACTUAL',
-                  style: 'sectionHeader',
-                  fillColor: '#fef2f2',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'TRATAMIENTO ACTUAL:', style: 'fieldLabel' },
-                    { text: interconsulta.tratamiento_actual || 'Sin tratamiento específico', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'MEDICAMENTOS ACTUALES:', style: 'fieldLabel' },
-                    { text: interconsulta.medicamentos_actuales || 'Sin medicamentos', style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                    { text: 'ALERGIAS MEDICAMENTOSAS:', style: 'fieldLabel' },
-                    { text: interconsulta.alergias_medicamentosas || 'Sin alergias conocidas', style: 'fieldValue', margin: [0, 5, 0, 0] }
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // NUEVA PÁGINA PARA RESPUESTA
-        { text: '', pageBreak: 'before' },
-
-        // RESPUESTA DEL ESPECIALISTA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '👨‍⚕️ RESPUESTA DEL ESPECIALISTA',
-                  style: 'sectionHeader',
-                  fillColor: '#e0f2fe',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        ...(interconsulta.medico_consultor ? [
-          {
-            table: {
-              widths: ['50%', '50%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'MÉDICO CONSULTOR:', style: 'fieldLabel' },
-                      { text: interconsulta.medico_consultor, style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'FECHA DE RESPUESTA:', style: 'fieldLabel' },
-                      { text: this.formatearFecha(interconsulta.fecha_respuesta), style: 'fieldValue' }
-                    ]
-                  },
-                  {
-                    stack: [
-                      { text: 'HORA DE EVALUACIÓN:', style: 'fieldLabel' },
-                      { text: interconsulta.hora_evaluacion || 'No registrada', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'ESPECIALIDAD:', style: 'fieldLabel' },
-                      { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue' }
-                    ]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '⏳ PENDIENTE DE RESPUESTA DEL ESPECIALISTA',
-                    style: 'pendienteText',
-                    alignment: 'center',
-                    margin: [10, 20]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ]),
-
-        // EVALUACIÓN DEL ESPECIALISTA
-        ...(interconsulta.impresion_diagnostica ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'IMPRESIÓN DIAGNÓSTICA DEL ESPECIALISTA:', style: 'fieldLabel' },
-                      { text: interconsulta.impresion_diagnostica, style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                      ...(interconsulta.diagnostico_especialista ? [
-                        { text: 'DIAGNÓSTICO DEL ESPECIALISTA:', style: 'fieldLabel' },
-                        { text: interconsulta.diagnostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(interconsulta.comentarios_especialista ? [
-                        { text: 'COMENTARIOS DEL ESPECIALISTA:', style: 'fieldLabel' },
-                        { text: interconsulta.comentarios_especialista, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // RECOMENDACIONES
-        ...(interconsulta.recomendaciones ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '💡 RECOMENDACIONES DEL ESPECIALISTA',
-                    style: 'sectionHeader',
-                    fillColor: '#f0fdf4',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'RECOMENDACIONES PRINCIPALES:', style: 'fieldLabel' },
-                      { text: interconsulta.recomendaciones, style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                      ...(interconsulta.plan_manejo ? [
-                        { text: 'PLAN DE MANEJO:', style: 'fieldLabel' },
-                        { text: interconsulta.plan_manejo, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(interconsulta.medicamentos_sugeridos ? [
-                        { text: 'MEDICAMENTOS SUGERIDOS:', style: 'fieldLabel' },
-                        { text: interconsulta.medicamentos_sugeridos, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(interconsulta.estudios_adicionales ? [
-                        { text: 'ESTUDIOS ADICIONALES:', style: 'fieldLabel' },
-                        { text: interconsulta.estudios_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // SEGUIMIENTO
-        ...(interconsulta.requiere_seguimiento ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '📅 PLAN DE SEGUIMIENTO',
-                    style: 'sectionHeader',
-                    fillColor: '#fef3c7',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['50%', '50%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'REQUIERE SEGUIMIENTO:', style: 'fieldLabel' },
-                      { text: '✅ SÍ', style: 'fieldValue', color: '#059669', margin: [0, 5, 0, 10] },
-
-                      { text: 'TIPO DE SEGUIMIENTO:', style: 'fieldLabel' },
-                      { text: interconsulta.tipo_seguimiento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-
-                      { text: 'FRECUENCIA:', style: 'fieldLabel' },
-                      { text: interconsulta.frecuencia_seguimiento || 'No especificada', style: 'fieldValue' }
-                    ]
-                  },
-                  {
-                    stack: [
-                      { text: 'HOSPITALIZACÓN:', style: 'fieldLabel' },
-                      { text: interconsulta.requiere_hospitalizacion ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_hospitalizacion ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
-
-                      { text: 'CIRUGÍA:', style: 'fieldLabel' },
-                      { text: interconsulta.requiere_cirugia ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_cirugia ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
-
-                      { text: 'OTRAS ESPECIALIDADES:', style: 'fieldLabel' },
-                      { text: interconsulta.otras_especialidades || 'No requiere', style: 'fieldValue' }
-                    ]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // PRONÓSTICO
-        ...(interconsulta.pronostico_especialista ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'PRONÓSTICO:', style: 'fieldLabel' },
-                      { text: interconsulta.pronostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] },
-
-                      ...(interconsulta.signos_alarma ? [
-                        { text: 'SIGNOS DE ALARMA:', style: 'fieldLabel' },
-                        { text: interconsulta.signos_alarma, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // OBSERVACIONES FINALES
-        ...(interconsulta.observaciones_especialista || interconsulta.observaciones_adicionales ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    text: '💬 OBSERVACIONES ADICIONALES',
-                    style: 'sectionHeader',
-                    fillColor: '#f8fafc',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      ...(interconsulta.observaciones_especialista ? [
-                        { text: 'OBSERVACIONES DEL ESPECIALISTA:', style: 'fieldLabel' },
-                        { text: interconsulta.observaciones_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                      ] : []),
-
-                      ...(interconsulta.observaciones_adicionales ? [
-                        { text: 'OBSERVACIONES ADICIONALES:', style: 'fieldLabel' },
-                        { text: interconsulta.observaciones_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                      ] : [])
-                    ],
-                    margin: [10, 10]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 20]
-          }
-        ] : []),
-
-        // FIRMAS
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'MÉDICO SOLICITANTE', style: 'signatureLabel' },
-                    { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
-                    { text: `Servicio: ${interconsulta.servicio_solicitante || medicoCompleto.departamento || 'N/A'}`, style: 'signatureDetails' },
-                    { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'MÉDICO CONSULTOR', style: 'signatureLabel' },
-                    { text: interconsulta.medico_consultor || 'Pendiente de asignar', style: 'signatureName' },
-                    { text: `Especialidad: ${interconsulta.especialidad_solicitada || 'N/A'}`, style: 'signatureDetails' },
-                    { text: `Fecha: ${this.formatearFecha(interconsulta.fecha_respuesta) || '________________'}`, style: 'signatureDetails' }
-                  ]
-                }
-              ]
-            ]
+                alignment: 'center'
+              },
+              {
+                text: [
+                  '\n\n\n',
+                  '_'.repeat(40),
+                  '\n',
+                  { text: 'FECHA Y HORA', style: 'boldText' },
+                  '\n',
+                  `${new Date().toLocaleDateString('es-MX')} ${notaData.hora_termino || new Date().toLocaleTimeString('es-MX')}`
+                ],
+                alignment: 'center'
+              }
+            ]]
           },
           layout: 'noBorders'
-        },
-
-        // MENSAJE DE COMPLETADO AL 100%
-        {
-          margin: [0, 30, 0, 0],
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: '🎉 SISTEMA SICEG-HG COMPLETADO AL 100% 🎉', style: 'completedTitle', alignment: 'center', margin: [0, 10, 0, 5] },
-                    { text: '12/12 DOCUMENTOS CLÍNICOS FUNCIONALES', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 5] },
-                    { text: 'CUMPLIMIENTO TOTAL NOM-004-SSA3-2012', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 10] },
-                    { text: 'Hospital General San Luis de la Paz, Guanajuato', style: 'completedFooter', alignment: 'center' }
-                  ],
-                  fillColor: '#f0fdf4',
-                  margin: [10, 15]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout()
         }
       ],
 
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 10],
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                {
-                  text: `Interconsulta - Hospital General San Luis de la Paz`,
-                  fontSize: 8,
-                  color: '#666666'
-                },
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
-                  alignment: 'center',
-                  color: '#666666'
-                },
-                {
-                  text: fechaActual.toLocaleString('es-MX'),
-                  fontSize: 8,
-                  alignment: 'right',
-                  color: '#666666'
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
-      },
-
+      // 🔥 ESTILOS PROFESIONALES
       styles: {
-        sectionHeader: {
-          fontSize: 12,
-          bold: true,
-          color: '#374151'
+        sectionHeader: { 
+          fontSize: 10, 
+          bold: true, 
+          margin: [0, 10, 0, 5], 
+          fillColor: '#f5f5f5' 
         },
-        fieldLabel: {
-          fontSize: 9,
-          bold: true,
-          color: '#4b5563'
+        boldText: { 
+          fontSize: 9, 
+          bold: true 
         },
-        fieldValue: {
-          fontSize: 9,
-          color: '#111827'
-        },
-        urgenciaValue: {
-          fontSize: 10,
-          bold: true
-        },
-        estadoValue: {
-          fontSize: 10,
-          bold: true
-        },
-        estudioValue: {
-          fontSize: 9,
-          bold: true
-        },
-        vitalHeader: {
-          fontSize: 8,
-          bold: true,
-          color: '#ffffff',
-          fillColor: '#7c3aed',
-          alignment: 'center',
-          margin: [2, 2, 2, 2]
-        },
-        vitalValue: {
-          fontSize: 8,
-          alignment: 'center',
-          margin: [2, 2, 2, 2]
-        },
-        pendienteText: {
-          fontSize: 12,
-          bold: true,
-          color: '#d97706',
-          italics: true
-        },
-        signatureLabel: {
-          fontSize: 10,
-          bold: true,
-          alignment: 'center',
-          color: '#374151'
-        },
-        signatureName: {
-          fontSize: 9,
-          alignment: 'center',
-          color: '#111827'
-        },
-        signatureDetails: {
-          fontSize: 8,
-          alignment: 'center',
-          color: '#6b7280'
-        },
-        completedTitle: {
-          fontSize: 14,
-          bold: true,
-          color: '#059669'
-        },
-        completedSubtitle: {
-          fontSize: 10,
-          bold: true,
-          color: '#059669'
-        },
-        completedFooter: {
-          fontSize: 8,
-          color: '#6b7280'
+        tableText: { 
+          fontSize: 9 
         }
       }
     };
   }
 
+async generarNotaPostoperatoria(datos: any): Promise<any> {
+  console.log('⚕️ Generando Nota Postoperatoria...');
 
+  const { pacienteCompleto, medicoCompleto, notaPostoperatoria } = datos;
+  const fechaActual = new Date();
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+
+    // 🔥 HEADER PROFESIONAL IGUAL QUE HISTORIA CLÍNICA
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [[
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_gobierno || 
+              '/uploads/logos/logo-gobierno-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA POSTOPERATORIA\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 8],
+          },
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_principal || 
+              '/uploads/logos/logo-principal-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // INFORMACIÓN DEL FOLIO Y FECHA
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: '', border: [false, false, false, false] },
+              { 
+                text: `FOLIO: ${notaPostoperatoria.folio_postoperatorio || this.generarFolioPostoperatorio()}`, 
+                style: 'folioText',
+                alignment: 'center',
+                border: [false, false, false, false]
+              },
+              { 
+                text: `FECHA: ${fechaActual.toLocaleDateString('es-MX')}\nHORA: ${fechaActual.toLocaleTimeString('es-MX')}`, 
+                style: 'dateText',
+                alignment: 'right',
+                border: [false, false, false, false]
+              }
+            ]
+          ]
+        },
+        margin: [0, 0, 0, 15]
+      },
+
+      // DATOS DEL PACIENTE - ESTILO LIMPIO
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center', fillColor: '#f5f5f5' },
+              {},
+              {}
+            ],
+            [
+              { text: `Paciente: ${pacienteCompleto.nombre_completo}`, style: 'tableText' },
+              { text: `Expediente: ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, style: 'tableText' },
+              { text: `Servicio: ${notaPostoperatoria.servicio_hospitalizacion || 'Cirugía General'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Edad: ${pacienteCompleto.edad} años`, style: 'tableText' },
+              { text: `Sexo: ${pacienteCompleto.sexo}`, style: 'tableText' },
+              { text: `Cama: ${notaPostoperatoria.numero_cama || 'No asignada'}`, style: 'tableText' }
+            ],
+            [
+              { text: `CURP: ${pacienteCompleto.curp || 'No registrado'}`, style: 'tableText' },
+              { text: `Fecha Nac.: ${this.formatearFecha(pacienteCompleto.fecha_nacimiento)}`, style: 'tableText' },
+              { text: `Tipo sangre: ${pacienteCompleto.tipo_sangre || 'No especificado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN TEMPORAL DE LA CIRUGÍA
+      {
+        text: 'INFORMACIÓN TEMPORAL DEL PROCEDIMIENTO QUIRÚRGICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*', '*'],
+          body: [
+            [
+              { text: `Fecha Cirugía: ${this.formatearFecha(notaPostoperatoria.fecha_cirugia)}`, style: 'tableText' },
+              { text: `Hora Inicio: ${notaPostoperatoria.hora_inicio || 'No registrada'}`, style: 'tableText' },
+              { text: `Hora Fin: ${notaPostoperatoria.hora_fin || 'No registrada'}`, style: 'tableText' },
+              { text: `Duración: ${this.formatearDuracionPostoperatoria(notaPostoperatoria.duracion_calculada)}`, style: 'tableText' }
+            ],
+            [
+              { text: `Quirófano: ${notaPostoperatoria.quirofano_utilizado || 'No especificado'}`, style: 'tableText' },
+              { text: `Anestesia: ${notaPostoperatoria.tipo_anestesia_utilizada || 'No especificada'}`, style: 'tableText' },
+              { text: '', style: 'tableText' },
+              { text: '', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // DIAGNÓSTICOS
+      {
+        text: 'DIAGNÓSTICOS (NOM-004 D10.12)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'DIAGNÓSTICO PREOPERATORIO:', style: 'boldText' },
+              { text: notaPostoperatoria.diagnostico_preoperatorio || 'No especificado', style: 'tableText' }
+            ],
+            [
+              { text: 'DIAGNÓSTICO POSTOPERATORIO:', style: 'boldText' },
+              { text: notaPostoperatoria.diagnostico_postoperatorio || 'No especificado', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PROCEDIMIENTOS REALIZADOS
+      {
+        text: 'PROCEDIMIENTOS REALIZADOS (NOM-004 D10.13)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'OPERACIÓN PLANEADA:', style: 'boldText' },
+              { text: notaPostoperatoria.operacion_planeada || 'No especificada', style: 'tableText' }
+            ],
+            [
+              { text: 'OPERACIÓN REALIZADA:', style: 'boldText' },
+              { text: notaPostoperatoria.operacion_realizada || 'No especificada', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA
+      {
+        text: 'DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA (NOM-004 D10.15)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'DESCRIPCIÓN TÉCNICA:', style: 'boldText' },
+              { text: notaPostoperatoria.descripcion_tecnica || 'No especificada', style: 'tableText' }
+            ],
+            [
+              { text: 'TIPO DE ANESTESIA:', style: 'boldText' },
+              { text: notaPostoperatoria.tipo_anestesia_utilizada || 'No especificada', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // HALLAZGOS TRANSOPERATORIOS
+      {
+        text: 'HALLAZGOS TRANSOPERATORIOS (NOM-004 D10.16)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'HALLAZGOS:', style: 'boldText' },
+              { text: notaPostoperatoria.hallazgos_transoperatorios || 'Sin hallazgos relevantes', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // CONTEO DE MATERIAL QUIRÚRGICO
+      {
+        text: 'REPORTE DE GASAS Y COMPRESAS (NOM-004 D10.17)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: `Conteo de Gasas: ${notaPostoperatoria.conteo_gasas_completo || 'No realizado'}`, style: 'tableText' },
+              { text: `Conteo Instrumental: ${notaPostoperatoria.conteo_instrumental_completo || 'No realizado'}`, style: 'tableText' },
+              { text: `Conteo Compresas: ${notaPostoperatoria.conteo_compresas_completo || 'No aplica'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INCIDENTES Y ACCIDENTES
+      {
+        text: 'INCIDENTES Y ACCIDENTES (NOM-004 D10.18)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'INCIDENTES/ACCIDENTES:', style: 'boldText' },
+              { text: notaPostoperatoria.incidentes_accidentes || 'Sin incidentes', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // CUANTIFICACIÓN DE SANGRADO
+      {
+        text: 'CUANTIFICACIÓN DE SANGRADO (NOM-004 D10.19)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Sangrado Estimado: ${notaPostoperatoria.sangrado_estimado ? `${notaPostoperatoria.sangrado_estimado} ml` : '0 ml'}`, style: 'tableText' },
+              { text: `Método Hemostasia: ${notaPostoperatoria.metodo_hemostasia || 'Hemostasia convencional'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ESTUDIOS TRANSOPERATORIOS
+      {
+        text: 'ESTUDIOS TRANSOPERATORIOS (NOM-004 D10.20)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'ESTUDIOS REALIZADOS:', style: 'boldText' },
+              { text: notaPostoperatoria.estudios_transoperatorios || 'No se realizaron estudios transoperatorios', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // EQUIPO QUIRÚRGICO
+      {
+        text: 'EQUIPO QUIRÚRGICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Cirujano Principal: ${notaPostoperatoria.cirujano_principal || 'No especificado'}`, style: 'tableText' },
+              { text: `Anestesiólogo: ${notaPostoperatoria.anestesiologo || 'No especificado'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Primer Ayudante: ${notaPostoperatoria.primer_ayudante || 'No asignado'}`, style: 'tableText' },
+              { text: `Segundo Ayudante: ${notaPostoperatoria.segundo_ayudante || 'No asignado'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Instrumentista: ${notaPostoperatoria.instrumentista || 'No especificado'}`, style: 'tableText' },
+              { text: `Circulante: ${notaPostoperatoria.circulante || 'No especificado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ESTADO POSTQUIRÚRGICO
+      {
+        text: 'ESTADO POSTQUIRÚRGICO DEL PACIENTE (NOM-004 D10.21)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'ESTADO POSTQUIRÚRGICO:', style: 'boldText' },
+              { text: notaPostoperatoria.estado_postquirurgico || 'No evaluado', style: 'tableText' }
+            ],
+            [
+              { text: 'ESTABILIDAD HEMODINÁMICA:', style: 'boldText' },
+              { text: notaPostoperatoria.estabilidad_hemodinamica || 'Estable', style: 'tableText' }
+            ],
+            [
+              { text: 'DESTINO DEL PACIENTE:', style: 'boldText' },
+              { text: notaPostoperatoria.destino_paciente || 'No especificado', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PLAN POSTOPERATORIO
+      {
+        text: 'PLAN DE MANEJO POSTOPERATORIO (NOM-004 D10.22)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'PLAN POSTOPERATORIO:', style: 'boldText' },
+              { text: notaPostoperatoria.plan_postoperatorio || 'Plan estándar postoperatorio', style: 'tableText' }
+            ],
+            [
+              { text: 'INDICACIONES POSTOPERATORIAS:', style: 'boldText' },
+              { text: notaPostoperatoria.indicaciones_postoperatorias || 'Indicaciones estándar', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ENVÍO DE PIEZAS A PATOLOGÍA (solo si aplica)
+      ...(notaPostoperatoria.piezas_enviadas_patologia ? [
+        {
+          text: 'ENVÍO DE PIEZAS A PATOLOGÍA (NOM-004 D10.23)',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['25%', '*'],
+            body: [
+              [
+                { text: 'ESPECÍMENES ENVIADOS:', style: 'boldText' },
+                { text: `${notaPostoperatoria.descripcion_especimenes || 'No especificado'} (${notaPostoperatoria.numero_frascos_patologia || '1'} frasco/s)`, style: 'tableText' }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PRONÓSTICO
+      {
+        text: 'PRONÓSTICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'PRONÓSTICO:', style: 'boldText' },
+              { text: notaPostoperatoria.pronostico || 'No especificado', style: 'tableText' }
+            ],
+            [
+              { text: 'EXPECTATIVA DE RECUPERACIÓN:', style: 'boldText' },
+              { text: notaPostoperatoria.expectativa_recuperacion || 'Favorable', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // OBSERVACIONES ADICIONALES (solo si existen)
+      ...(notaPostoperatoria.observaciones_cirujano || notaPostoperatoria.observaciones_anestesiologo ? [
+        {
+          text: 'OBSERVACIONES ADICIONALES',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['25%', '*'],
+            body: [
+              ...(notaPostoperatoria.observaciones_cirujano ? [
+                [
+                  { text: 'OBSERVACIONES DEL CIRUJANO:', style: 'boldText' },
+                  { text: notaPostoperatoria.observaciones_cirujano, style: 'tableText' }
+                ]
+              ] : []),
+              ...(notaPostoperatoria.observaciones_anestesiologo ? [
+                [
+                  { text: 'OBSERVACIONES DEL ANESTESIÓLOGO:', style: 'boldText' },
+                  { text: notaPostoperatoria.observaciones_anestesiologo, style: 'tableText' }
+                ]
+              ] : [])
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // EVALUACIÓN FINAL
+      {
+        text: 'EVALUACIÓN FINAL DEL PROCEDIMIENTO QUIRÚRGICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Cirugía sin complicaciones: ${notaPostoperatoria.cirugia_sin_complicaciones ? 'SÍ' : 'NO'}`, style: 'boldText' },
+              { text: `Objetivos quirúrgicos alcanzados: ${notaPostoperatoria.objetivos_alcanzados ? 'SÍ' : 'NO'}`, style: 'boldText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 30]
+      },
+
+      // FIRMAS PROFESIONALES
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              {
+                text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+              {
+                text: 'FIRMA AUTÓGRAFA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+            ],
+            [
+              {
+                text: [
+                  { text: `${notaPostoperatoria.cirujano_principal || 'Dr(a). [Nombre]'}\n`, fontSize: 9, bold: true },
+                  { text: `Cirujano Principal\n`, fontSize: 8 },
+                  { text: `Cédula Profesional: ${notaPostoperatoria.cedula_cirujano || 'No registrada'}\n`, fontSize: 8 },
+                  { text: `Hospital General San Luis de la Paz\n`, fontSize: 7, color: '#6b7280' },
+                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
+                  { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 7 },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: '\n\n\n\n_________________________\nFIRMA DEL CIRUJANO\n(Según NOM-004-SSA3-2012)',
+                fontSize: 8,
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      }
+    ],
+
+    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    styles: {
+      sectionHeader: { 
+        fontSize: 10, 
+        bold: true, 
+        margin: [0, 10, 0, 5],
+        fillColor: '#f5f5f5'
+      },
+      boldText: { 
+        fontSize: 9, 
+        bold: true 
+      },
+      tableText: { 
+        fontSize: 9 
+      },
+      folioText: {
+        fontSize: 10,
+        bold: true
+      },
+      dateText: {
+        fontSize: 9
+      }
+    }
+  };
+}
+
+// // MÉTODOS AUXILIARES PARA NOTA POSTOPERATORIA
+// private formatearDuracionPostoperatoria(duracion: string | null): string {
+//   if (!duracion) return 'No calculada';
+//   return duracion;
+// }
+
+// private generarFolioPostoperatorio(): string {
+//   const fecha = new Date();
+//   const timestamp = fecha.getTime().toString().slice(-6);
+//   return `POSTOP-${fecha.getFullYear()}-${timestamp}`;
+// }
+
+
+
+
+// MÉTODOS AUXILIARES PARA NOTA POSTOPERATORIA
+private formatearDuracionPostoperatoria(duracion: string | null): string {
+  if (!duracion) return 'No calculada';
+  return duracion;
+}
+
+
+
+
+
+  // async generarNotaInterconsulta(datos: any): Promise<any> {
+  //   console.log('💫 Generando Nota de Interconsulta - ¡EL GRAN FINAL!');
+
+  //   const { pacienteCompleto, medicoCompleto, interconsulta } = datos;
+  //   const fechaActual = new Date();
+
+  //   return {
+  //     pageSize: 'LETTER',
+  //     pageMargins: [40, 80, 40, 60],
+
+  //     header: (currentPage: number, pageCount: number) => {
+  //       return {
+  //         margin: [40, 20, 40, 20],
+  //         table: {
+  //           widths: ['30%', '40%', '30%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
+  //                   { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
+  //                   { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: '💫 NOTA DE INTERCONSULTA', fontSize: 16, bold: true, alignment: 'center', color: '#7c3aed' },
+  //                   { text: 'COMUNICACIÓN ENTRE ESPECIALIDADES', fontSize: 10, alignment: 'center', italics: true },
+  //                   { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
+  //                   { text: interconsulta.numero_interconsulta || this.generarNumeroInterconsulta(), fontSize: 10, alignment: 'right' },
+  //                   { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
+  //                   { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 8, alignment: 'right' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       };
+  //     },
+
+  //     content: [
+  //       // DATOS DEL PACIENTE
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '👤 DATOS DEL PACIENTE',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#faf5ff',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['25%', '25%', '25%', '25%'],
+  //           body: [
+  //             [
+  //               { text: 'Nombre:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
+  //               { text: 'Expediente:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+  //             ],
+  //             [
+  //               { text: 'Edad:', style: 'fieldLabel' },
+  //               { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
+  //               { text: 'Sexo:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+  //             ],
+  //             [
+  //               { text: 'Fecha Solicitud:', style: 'fieldLabel' },
+  //               { text: this.formatearFecha(interconsulta.fecha_solicitud), style: 'fieldValue' },
+  //               { text: 'Urgencia:', style: 'fieldLabel' },
+  //               { text: this.formatearUrgencia(interconsulta.urgencia_interconsulta), style: 'urgenciaValue', color: this.getColorUrgencia(interconsulta.urgencia_interconsulta) }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // INFORMACIÓN DE LA SOLICITUD
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '📋 INFORMACIÓN DE LA SOLICITUD',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#eff6ff',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['50%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'ESPECIALIDAD SOLICITADA:', style: 'fieldLabel' },
+  //                   { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'MÉDICO SOLICITANTE:', style: 'fieldLabel' },
+  //                   { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'SERVICIO SOLICITANTE:', style: 'fieldLabel' },
+  //                   { text: interconsulta.servicio_solicitante || medicoCompleto.departamento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'CONTACTO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.telefono_contacto ? `Tel: ${interconsulta.telefono_contacto}` : 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'TIEMPO ESPERADO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.tiempo_respuesta_esperado || '48 horas', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'ESTADO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.estado_interconsulta || 'Pendiente', style: 'estadoValue', color: this.getColorEstado(interconsulta.estado_interconsulta), margin: [0, 5, 0, 0] }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // MOTIVO DE LA INTERCONSULTA
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '❓ MOTIVO DE LA INTERCONSULTA',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#fef3c7',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'MOTIVO DE INTERCONSULTA:', style: 'fieldLabel' },
+  //                   { text: interconsulta.motivo_interconsulta || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'PREGUNTA ESPECÍFICA AL ESPECIALISTA:', style: 'fieldLabel' },
+  //                   { text: interconsulta.pregunta_especifica || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'JUSTIFICACIÓN DE LA INTERCONSULTA:', style: 'fieldLabel' },
+  //                   { text: interconsulta.justificacion_interconsulta || 'Evaluación especializada requerida', style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                 ],
+  //                 margin: [10, 10]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // INFORMACIÓN CLÍNICA
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '🩺 INFORMACIÓN CLÍNICA DEL PACIENTE',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#f0fdf4',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'RESUMEN DEL CASO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.resumen_caso || 'No proporcionado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.diagnostico_presuntivo || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'SÍNTOMAS PRINCIPALES:', style: 'fieldLabel' },
+  //                   { text: interconsulta.sintomas_principales || 'No especificados', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'TIEMPO DE EVOLUCIÓN:', style: 'fieldLabel' },
+  //                   { text: interconsulta.tiempo_evolucion || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                 ],
+  //                 margin: [10, 10]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // SIGNOS VITALES ACTUALES
+  //       ...(this.tieneSignosVitales(interconsulta) ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '💓 SIGNOS VITALES ACTUALES',
+  //                   style: 'sectionHeader',
+  //                   fillColor: '#ffebee',
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 10]
+  //         },
+  //         {
+  //           table: {
+  //             widths: ['20%', '20%', '20%', '20%', '20%'],
+  //             body: [
+  //               [
+  //                 { text: 'TA', style: 'vitalHeader' },
+  //                 { text: 'FC', style: 'vitalHeader' },
+  //                 { text: 'FR', style: 'vitalHeader' },
+  //                 { text: 'Temp.', style: 'vitalHeader' },
+  //                 { text: 'SatO₂', style: 'vitalHeader' }
+  //               ],
+  //               [
+  //                 { text: interconsulta.presion_arterial_actual || '--', style: 'vitalValue' },
+  //                 { text: interconsulta.frecuencia_cardiaca_actual ? `${interconsulta.frecuencia_cardiaca_actual} lpm` : '--', style: 'vitalValue' },
+  //                 { text: interconsulta.frecuencia_respiratoria_actual ? `${interconsulta.frecuencia_respiratoria_actual} rpm` : '--', style: 'vitalValue' },
+  //                 { text: interconsulta.temperatura_actual ? `${interconsulta.temperatura_actual}°C` : '--', style: 'vitalValue' },
+  //                 { text: interconsulta.saturacion_oxigeno_actual ? `${interconsulta.saturacion_oxigeno_actual}%` : '--', style: 'vitalValue' }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // EXPLORACIÓN FÍSICA
+  //       ...(interconsulta.exploracion_fisica_relevante ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'EXPLORACIÓN FÍSICA RELEVANTE:', style: 'fieldLabel' },
+  //                     { text: interconsulta.exploracion_fisica_relevante, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                     ...(interconsulta.hallazgos_importantes ? [
+  //                       { text: 'HALLAZGOS IMPORTANTES:', style: 'fieldLabel' },
+  //                       { text: interconsulta.hallazgos_importantes, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                     ] : [])
+  //                   ],
+  //                   margin: [10, 10]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // ESTUDIOS REALIZADOS
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '🔬 ESTUDIOS REALIZADOS',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#f3e8ff',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['25%', '25%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'LABORATORIO:', style: 'fieldLabel' },
+  //                   { text: interconsulta.examenes_laboratorio ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_laboratorio ? '#059669' : '#dc2626' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'GABINETE:', style: 'fieldLabel' },
+  //                   { text: interconsulta.examenes_gabinete ? '✅ SÍ' : '❌ NO', style: 'estudioValue', color: interconsulta.examenes_gabinete ? '#059669' : '#dc2626' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'ESTUDIOS REALIZADOS:', style: 'fieldLabel' },
+  //                   { text: interconsulta.estudios_realizados || 'No se han realizado estudios', style: 'fieldValue' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       ...(interconsulta.resultados_relevantes ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'RESULTADOS RELEVANTES:', style: 'fieldLabel' },
+  //                     { text: interconsulta.resultados_relevantes, style: 'fieldValue' }
+  //                   ],
+  //                   margin: [10, 5]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // TRATAMIENTO ACTUAL
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '💊 TRATAMIENTO ACTUAL',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#fef2f2',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'TRATAMIENTO ACTUAL:', style: 'fieldLabel' },
+  //                   { text: interconsulta.tratamiento_actual || 'Sin tratamiento específico', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'MEDICAMENTOS ACTUALES:', style: 'fieldLabel' },
+  //                   { text: interconsulta.medicamentos_actuales || 'Sin medicamentos', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'ALERGIAS MEDICAMENTOSAS:', style: 'fieldLabel' },
+  //                   { text: interconsulta.alergias_medicamentosas || 'Sin alergias conocidas', style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                 ],
+  //                 margin: [10, 10]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // NUEVA PÁGINA PARA RESPUESTA
+  //       { text: '', pageBreak: 'before' },
+
+  //       // RESPUESTA DEL ESPECIALISTA
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '👨‍  RESPUESTA DEL ESPECIALISTA',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#e0f2fe',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       ...(interconsulta.medico_consultor ? [
+  //         {
+  //           table: {
+  //             widths: ['50%', '50%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'MÉDICO CONSULTOR:', style: 'fieldLabel' },
+  //                     { text: interconsulta.medico_consultor, style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'FECHA DE RESPUESTA:', style: 'fieldLabel' },
+  //                     { text: this.formatearFecha(interconsulta.fecha_respuesta), style: 'fieldValue' }
+  //                   ]
+  //                 },
+  //                 {
+  //                   stack: [
+  //                     { text: 'HORA DE EVALUACIÓN:', style: 'fieldLabel' },
+  //                     { text: interconsulta.hora_evaluacion || 'No registrada', style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'ESPECIALIDAD:', style: 'fieldLabel' },
+  //                     { text: interconsulta.especialidad_solicitada || 'No especificada', style: 'fieldValue' }
+  //                   ]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '⏳ PENDIENTE DE RESPUESTA DEL ESPECIALISTA',
+  //                   style: 'pendienteText',
+  //                   alignment: 'center',
+  //                   margin: [10, 20]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ]),
+
+  //       // EVALUACIÓN DEL ESPECIALISTA
+  //       ...(interconsulta.impresion_diagnostica ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'IMPRESIÓN DIAGNÓSTICA DEL ESPECIALISTA:', style: 'fieldLabel' },
+  //                     { text: interconsulta.impresion_diagnostica, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                     ...(interconsulta.diagnostico_especialista ? [
+  //                       { text: 'DIAGNÓSTICO DEL ESPECIALISTA:', style: 'fieldLabel' },
+  //                       { text: interconsulta.diagnostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                     ] : []),
+
+  //                     ...(interconsulta.comentarios_especialista ? [
+  //                       { text: 'COMENTARIOS DEL ESPECIALISTA:', style: 'fieldLabel' },
+  //                       { text: interconsulta.comentarios_especialista, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                     ] : [])
+  //                   ],
+  //                   margin: [10, 10]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // RECOMENDACIONES
+  //       ...(interconsulta.recomendaciones ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '💡 RECOMENDACIONES DEL ESPECIALISTA',
+  //                   style: 'sectionHeader',
+  //                   fillColor: '#f0fdf4',
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 10]
+  //         },
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'RECOMENDACIONES PRINCIPALES:', style: 'fieldLabel' },
+  //                     { text: interconsulta.recomendaciones, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                     ...(interconsulta.plan_manejo ? [
+  //                       { text: 'PLAN DE MANEJO:', style: 'fieldLabel' },
+  //                       { text: interconsulta.plan_manejo, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                     ] : []),
+
+  //                     ...(interconsulta.medicamentos_sugeridos ? [
+  //                       { text: 'MEDICAMENTOS SUGERIDOS:', style: 'fieldLabel' },
+  //                       { text: interconsulta.medicamentos_sugeridos, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                     ] : []),
+
+  //                     ...(interconsulta.estudios_adicionales ? [
+  //                       { text: 'ESTUDIOS ADICIONALES:', style: 'fieldLabel' },
+  //                       { text: interconsulta.estudios_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                     ] : [])
+  //                   ],
+  //                   margin: [10, 10]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // SEGUIMIENTO
+  //       ...(interconsulta.requiere_seguimiento ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '📅 PLAN DE SEGUIMIENTO',
+  //                   style: 'sectionHeader',
+  //                   fillColor: '#fef3c7',
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 10]
+  //         },
+  //         {
+  //           table: {
+  //             widths: ['50%', '50%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'REQUIERE SEGUIMIENTO:', style: 'fieldLabel' },
+  //                     { text: '✅ SÍ', style: 'fieldValue', color: '#059669', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'TIPO DE SEGUIMIENTO:', style: 'fieldLabel' },
+  //                     { text: interconsulta.tipo_seguimiento || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'FRECUENCIA:', style: 'fieldLabel' },
+  //                     { text: interconsulta.frecuencia_seguimiento || 'No especificada', style: 'fieldValue' }
+  //                   ]
+  //                 },
+  //                 {
+  //                   stack: [
+  //                     { text: 'HOSPITALIZACÓN:', style: 'fieldLabel' },
+  //                     { text: interconsulta.requiere_hospitalizacion ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_hospitalizacion ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'CIRUGÍA:', style: 'fieldLabel' },
+  //                     { text: interconsulta.requiere_cirugia ? '✅ SÍ' : '❌ NO', style: 'fieldValue', color: interconsulta.requiere_cirugia ? '#dc2626' : '#059669', margin: [0, 5, 0, 10] },
+
+  //                     { text: 'OTRAS ESPECIALIDADES:', style: 'fieldLabel' },
+  //                     { text: interconsulta.otras_especialidades || 'No requiere', style: 'fieldValue' }
+  //                   ]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // PRONÓSTICO
+  //       ...(interconsulta.pronostico_especialista ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'PRONÓSTICO:', style: 'fieldLabel' },
+  //                     { text: interconsulta.pronostico_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                     ...(interconsulta.signos_alarma ? [
+  //                       { text: 'SIGNOS DE ALARMA:', style: 'fieldLabel' },
+  //                       { text: interconsulta.signos_alarma, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                     ] : [])
+  //                   ],
+  //                   margin: [10, 10]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // OBSERVACIONES FINALES
+  //       ...(interconsulta.observaciones_especialista || interconsulta.observaciones_adicionales ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '💬 OBSERVACIONES ADICIONALES',
+  //                   style: 'sectionHeader',
+  //                   fillColor: '#f8fafc',
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 10]
+  //         },
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     ...(interconsulta.observaciones_especialista ? [
+  //                       { text: 'OBSERVACIONES DEL ESPECIALISTA:', style: 'fieldLabel' },
+  //                       { text: interconsulta.observaciones_especialista, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                     ] : []),
+
+  //                     ...(interconsulta.observaciones_adicionales ? [
+  //                       { text: 'OBSERVACIONES ADICIONALES:', style: 'fieldLabel' },
+  //                       { text: interconsulta.observaciones_adicionales, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                     ] : [])
+  //                   ],
+  //                   margin: [10, 10]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 20]
+  //         }
+  //       ] : []),
+
+  //       // FIRMAS
+  //       {
+  //         table: {
+  //           widths: ['50%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+  //                   { text: 'MÉDICO SOLICITANTE', style: 'signatureLabel' },
+  //                   { text: interconsulta.medico_solicitante || medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
+  //                   { text: `Servicio: ${interconsulta.servicio_solicitante || medicoCompleto.departamento || 'N/A'}`, style: 'signatureDetails' },
+  //                   { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+  //                   { text: 'MÉDICO CONSULTOR', style: 'signatureLabel' },
+  //                   { text: interconsulta.medico_consultor || 'Pendiente de asignar', style: 'signatureName' },
+  //                   { text: `Especialidad: ${interconsulta.especialidad_solicitada || 'N/A'}`, style: 'signatureDetails' },
+  //                   { text: `Fecha: ${this.formatearFecha(interconsulta.fecha_respuesta) || '________________'}`, style: 'signatureDetails' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       },
+
+  //       // MENSAJE DE COMPLETADO AL 100%
+  //       {
+  //         margin: [0, 30, 0, 0],
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: '🎉 SISTEMA SICEG-HG COMPLETADO AL 100% 🎉', style: 'completedTitle', alignment: 'center', margin: [0, 10, 0, 5] },
+  //                   { text: '12/12 DOCUMENTOS CLÍNICOS FUNCIONALES', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 5] },
+  //                   { text: 'CUMPLIMIENTO TOTAL NOM-004-SSA3-2012', style: 'completedSubtitle', alignment: 'center', margin: [0, 0, 0, 10] },
+  //                   { text: 'Hospital General San Luis de la Paz, Guanajuato', style: 'completedFooter', alignment: 'center' }
+  //                 ],
+  //                 fillColor: '#f0fdf4',
+  //                 margin: [10, 15]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout()
+  //       }
+  //     ],
+
+  //     footer: (currentPage: number, pageCount: number) => {
+  //       return {
+  //         margin: [40, 10],
+  //         table: {
+  //           widths: ['33%', '34%', '33%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: `Interconsulta - Hospital General San Luis de la Paz`,
+  //                 fontSize: 8,
+  //                 color: '#666666'
+  //               },
+  //               {
+  //                 text: `Página ${currentPage} de ${pageCount}`,
+  //                 fontSize: 8,
+  //                 alignment: 'center',
+  //                 color: '#666666'
+  //               },
+  //               {
+  //                 text: fechaActual.toLocaleString('es-MX'),
+  //                 fontSize: 8,
+  //                 alignment: 'right',
+  //                 color: '#666666'
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       };
+  //     },
+
+  //     styles: {
+  //       sectionHeader: {
+  //         fontSize: 12,
+  //         bold: true,
+  //         color: '#374151'
+  //       },
+  //       fieldLabel: {
+  //         fontSize: 9,
+  //         bold: true,
+  //         color: '#4b5563'
+  //       },
+  //       fieldValue: {
+  //         fontSize: 9,
+  //         color: '#111827'
+  //       },
+  //       urgenciaValue: {
+  //         fontSize: 10,
+  //         bold: true
+  //       },
+  //       estadoValue: {
+  //         fontSize: 10,
+  //         bold: true
+  //       },
+  //       estudioValue: {
+  //         fontSize: 9,
+  //         bold: true
+  //       },
+  //       vitalHeader: {
+  //         fontSize: 8,
+  //         bold: true,
+  //         color: '#ffffff',
+  //         fillColor: '#7c3aed',
+  //         alignment: 'center',
+  //         margin: [2, 2, 2, 2]
+  //       },
+  //       vitalValue: {
+  //         fontSize: 8,
+  //         alignment: 'center',
+  //         margin: [2, 2, 2, 2]
+  //       },
+  //       pendienteText: {
+  //         fontSize: 12,
+  //         bold: true,
+  //         color: '#d97706',
+  //         italics: true
+  //       },
+  //       signatureLabel: {
+  //         fontSize: 10,
+  //         bold: true,
+  //         alignment: 'center',
+  //         color: '#374151'
+  //       },
+  //       signatureName: {
+  //         fontSize: 9,
+  //         alignment: 'center',
+  //         color: '#111827'
+  //       },
+  //       signatureDetails: {
+  //         fontSize: 8,
+  //         alignment: 'center',
+  //         color: '#6b7280'
+  //       },
+  //       completedTitle: {
+  //         fontSize: 14,
+  //         bold: true,
+  //         color: '#059669'
+  //       },
+  //       completedSubtitle: {
+  //         fontSize: 10,
+  //         bold: true,
+  //         color: '#059669'
+  //       },
+  //       completedFooter: {
+  //         fontSize: 8,
+  //         color: '#6b7280'
+  //       }
+  //     }
+  //   };
+  // }
+// C:\Proyectos\CICEG-HG_Frontend\src\app\services\pdf\PdfTemplatesService.ts
+async generarNotaInterconsulta(datos: any): Promise<any> {
+  console.log('💫 Generando Nota de Interconsulta...');
+
+  const { pacienteCompleto, medicoCompleto, notaInterconsulta } = datos;
+  const fechaActual = new Date();
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+
+    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [[
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_gobierno || 
+              '/uploads/logos/logo-gobierno-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA DE INTERCONSULTA\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 8],
+          },
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_principal || 
+              '/uploads/logos/logo-principal-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // INFORMACIÓN DEL FOLIO Y FECHA
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: '', border: [false, false, false, false] },
+              { 
+text: `FOLIO: ${datos.notaInterconsulta?.numero_interconsulta || this.generarNumeroInterconsulta()}`,
+                style: 'folioText',
+                alignment: 'center',
+                border: [false, false, false, false]
+              },
+              { 
+                text: `FECHA: ${fechaActual.toLocaleDateString('es-MX')}\nHORA: ${fechaActual.toLocaleTimeString('es-MX')}`, 
+                style: 'dateText',
+                alignment: 'right',
+                border: [false, false, false, false]
+              }
+            ]
+          ]
+        },
+        margin: [0, 0, 0, 15]
+      },
+
+      // DATOS DEL PACIENTE - ESTILO LIMPIO
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center', fillColor: '#f5f5f5' },
+              {},
+              {}
+            ],
+            [
+              { text: `Paciente: ${pacienteCompleto.nombre_completo}`, style: 'tableText' },
+              { text: `Expediente: ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, style: 'tableText' },
+              { text: `Servicio: ${datos.notaInterconsulta?.servicio_solicitante || 'No especificado'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Edad: ${pacienteCompleto.edad} años`, style: 'tableText' },
+              { text: `Sexo: ${pacienteCompleto.sexo}`, style: 'tableText' },
+              { text: `Cama: ${datos.notaInterconsulta?.numero_cama || 'No asignada'}`, style: 'tableText' }
+            ],
+            [
+              { text: `CURP: ${pacienteCompleto.curp || 'No registrado'}`, style: 'tableText' },
+              { text: `Fecha Nac.: ${this.formatearFecha(pacienteCompleto.fecha_nacimiento)}`, style: 'tableText' },
+              { text: `Tipo sangre: ${pacienteCompleto.tipo_sangre || 'No especificado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN DE LA INTERCONSULTA
+      {
+        text: 'INFORMACIÓN DE LA INTERCONSULTA',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: `Área Solicitada: ${datos.notaInterconsulta?.area_interconsulta || 'No especificada'}`, style: 'tableText' },
+              { text: `Urgencia: ${datos.notaInterconsulta?.urgencia_interconsulta || 'Normal'}`, style: 'tableText' },
+              { text: `Estado: ${datos.notaInterconsulta?.estado_interconsulta || 'Pendiente'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Médico Solicitante: ${datos.notaInterconsulta?.medico_solicitante || medicoCompleto.nombre_completo}`, style: 'tableText' },
+              { text: `Fecha Solicitud: ${this.formatearFecha(datos.notaInterconsulta?.fecha_solicitud)}`, style: 'tableText' },
+              { text: `Contacto: ${datos.notaInterconsulta?.telefono_contacto || 'No registrado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // MOTIVO DE LA INTERCONSULTA (NOM-004 D7.14)
+      {
+        text: 'MOTIVO DE LA INTERCONSULTA (NOM-004 D7.14)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.motivo_interconsulta || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PREGUNTA ESPECÍFICA PARA EL ESPECIALISTA
+      {
+        text: 'PREGUNTA ESPECÍFICA PARA EL ESPECIALISTA',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.pregunta_especifica || 'No especificada', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // CRITERIO DIAGNÓSTICO (NOM-004 D7.12)
+      {
+        text: 'CRITERIO DIAGNÓSTICO (NOM-004 D7.12)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'DIAGNÓSTICO PRESUNTIVO:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.diagnostico_presuntivo || 'No especificado', style: 'tableText' }
+            ],
+            [
+              { text: 'RESUMEN DEL CASO:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.resumen_caso || 'Sin información registrada', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN CLÍNICA RELEVANTE
+      {
+        text: 'INFORMACIÓN CLÍNICA RELEVANTE',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'SÍNTOMAS PRINCIPALES:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.sintomas_principales || 'No especificados', style: 'tableText' }
+            ],
+            [
+              { text: 'TIEMPO DE EVOLUCIÓN:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.tiempo_evolucion || 'No especificado', style: 'tableText' }
+            ],
+            [
+              { text: 'HALLAZGOS IMPORTANTES:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.hallazgos_importantes || 'Sin hallazgos relevantes', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ANTECEDENTES RELEVANTES
+      {
+        text: 'ANTECEDENTES RELEVANTES',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'ANTECEDENTES MÉDICOS:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.antecedentes_relevantes || 'Sin antecedentes relevantes', style: 'tableText' }
+            ],
+            [
+              { text: 'MEDICAMENTOS ACTUALES:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.medicamentos_actuales || 'No toma medicamentos', style: 'tableText' }
+            ],
+            [
+              { text: 'ALERGIAS MEDICAMENTOSAS:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.alergias_medicamentosas || 'Sin alergias conocidas', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // SIGNOS VITALES ACTUALES
+      {
+        text: 'SIGNOS VITALES AL MOMENTO DE LA SOLICITUD',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*', '*', '*'],
+          body: [
+            [
+              { text: `T/A: ${datos.notaInterconsulta?.presion_arterial_actual || '--'}`, style: 'tableText' },
+              { text: `FC: ${datos.notaInterconsulta?.frecuencia_cardiaca_actual || '--'} lpm`, style: 'tableText' },
+              { text: `FR: ${datos.notaInterconsulta?.frecuencia_respiratoria_actual || '--'} rpm`, style: 'tableText' },
+              { text: `Temp: ${datos.notaInterconsulta?.temperatura_actual || '--'}°C`, style: 'tableText' },
+              { text: `SatO2: ${datos.notaInterconsulta?.saturacion_oxigeno_actual || '--'}%`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // EXPLORACIÓN FÍSICA RELEVANTE
+      {
+        text: 'EXPLORACIÓN FÍSICA RELEVANTE',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.exploracion_fisica_relevante || 'Sin hallazgos relevantes para la interconsulta', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ESTUDIOS REALIZADOS
+      {
+        text: 'ESTUDIOS DE LABORATORIO Y GABINETE',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Laboratorio: ${datos.notaInterconsulta?.examenes_laboratorio ? 'SÍ' : 'NO'}`, style: 'tableText' },
+              { text: `Gabinete: ${datos.notaInterconsulta?.examenes_gabinete ? 'SÍ' : 'NO'}`, style: 'tableText' }
+            ],
+            [
+              { text: 'ESTUDIOS REALIZADOS:', style: 'boldText', colSpan: 2 },
+              {}
+            ],
+            [
+              { 
+                text: datos.notaInterconsulta?.estudios_realizados || 'No se han realizado estudios específicos', 
+                style: 'tableText',
+                colSpan: 2,
+                margin: [5, 5, 5, 5]
+              },
+              {}
+            ],
+            [
+              { text: 'RESULTADOS RELEVANTES:', style: 'boldText', colSpan: 2 },
+              {}
+            ],
+            [
+              { 
+                text: datos.notaInterconsulta?.resultados_relevantes || 'Sin resultados significativos', 
+                style: 'tableText',
+                colSpan: 2,
+                margin: [5, 5, 5, 5]
+              },
+              {}
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // TRATAMIENTO ACTUAL
+      {
+        text: 'TRATAMIENTO ACTUAL',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'TRATAMIENTO ACTUAL:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.tratamiento_actual || 'Sin tratamiento específico', style: 'tableText' }
+            ],
+            [
+              { text: 'MEDIDAS TOMADAS:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.medidas_tomadas || 'Medidas conservadoras', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // ESTUDIOS SUGERIDOS O PENDIENTES
+      {
+        text: 'ESTUDIOS PENDIENTES O RECOMENDADOS',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['25%', '*'],
+          body: [
+            [
+              { text: 'ESTUDIOS PENDIENTES:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.estudios_pendientes || 'Ninguno pendiente', style: 'tableText' }
+            ],
+            [
+              { text: 'ESTUDIOS RECOMENDADOS:', style: 'boldText' },
+              { text: datos.notaInterconsulta?.estudios_recomendados || 'A criterio del especialista', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // LÍNEA DIVISORIA PARA RESPUESTA DEL ESPECIALISTA
+      { text: '', pageBreak: 'before' },
+
+      // RESPUESTA DEL ESPECIALISTA
+      {
+        text: 'RESPUESTA DEL ESPECIALISTA',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Médico Consultor: ${datos.notaInterconsulta?.medico_consultor || 'PENDIENTE DE ASIGNACIÓN'}`, style: 'tableText' },
+              { text: `Fecha Respuesta: ${this.formatearFecha(datos.notaInterconsulta?.fecha_respuesta) || 'PENDIENTE'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // IMPRESIÓN DIAGNÓSTICA (NOM-004 D7.12)
+      {
+        text: 'CRITERIO DIAGNÓSTICO DEL ESPECIALISTA (NOM-004 D7.12)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.impresion_diagnostica || 'PENDIENTE DE EVALUACIÓN POR EL ESPECIALISTA', 
+                style: 'tableText',
+                margin: [8, 15, 8, 15]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // SUGERENCIAS DIAGNÓSTICAS Y TRATAMIENTO (NOM-004 D7.13)
+      {
+        text: 'SUGERENCIAS DIAGNÓSTICAS Y DE TRATAMIENTO (NOM-004 D7.13)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.recomendaciones || 'PENDIENTE DE RECOMENDACIONES DEL ESPECIALISTA', 
+                style: 'tableText',
+                margin: [8, 15, 8, 15]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PLAN DE MANEJO
+      {
+        text: 'PLAN DE MANEJO PROPUESTO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.plan_manejo || 'PENDIENTE DE PLAN DE MANEJO', 
+                style: 'tableText',
+                margin: [8, 15, 8, 15]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // SEGUIMIENTO Y CONTROL
+      {
+        text: 'SEGUIMIENTO Y CONTROL',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: `Requiere Seguimiento: ${datos.notaInterconsulta?.requiere_seguimiento ? 'SÍ' : 'NO'}`, style: 'tableText' },
+              { text: `Requiere Hospitalización: ${datos.notaInterconsulta?.requiere_hospitalizacion ? 'SÍ' : 'NO'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Tipo de Seguimiento: ${datos.notaInterconsulta?.tipo_seguimiento || 'No especificado'}`, style: 'tableText' },
+              { text: `Frecuencia: ${datos.notaInterconsulta?.frecuencia_seguimiento || 'No especificada'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PRONÓSTICO
+      {
+        text: 'PRONÓSTICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaInterconsulta?.pronostico_especialista || 'Pendiente de evaluación pronóstica', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
+
+      // FIRMAS PROFESIONALES
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              {
+                text: 'MÉDICO SOLICITANTE',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+              {
+                text: 'MÉDICO ESPECIALISTA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+            ],
+            [
+              {
+                text: [
+                  { text: `${datos.notaInterconsulta?.medico_solicitante || medicoCompleto.nombre_completo}\n`, fontSize: 9, bold: true },
+                  { text: `Médico Solicitante\n`, fontSize: 8 },
+                  { text: `Cédula: ${medicoCompleto.numero_cedula || 'No registrada'}\n`, fontSize: 8 },
+                  { text: `Servicio: ${datos.notaInterconsulta?.servicio_solicitante || 'No especificado'}\n`, fontSize: 8 },
+                  { text: `Contacto: ${datos.notaInterconsulta?.telefono_contacto || 'No registrado'}\n`, fontSize: 7 },
+                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 7 },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: [
+                  { text: `${datos.notaInterconsulta?.medico_consultor || 'PENDIENTE DE ASIGNACIÓN'}\n`, fontSize: 9, bold: true },
+                  { text: `Médico Especialista\n`, fontSize: 8 },
+                  { text: `Área: ${datos.notaInterconsulta?.area_interconsulta || 'No especificada'}\n`, fontSize: 8 },
+                  { text: `Fecha Respuesta: ${this.formatearFecha(datos.notaInterconsulta?.fecha_respuesta) || 'PENDIENTE'}\n`, fontSize: 8 },
+                  { text: '\n_________________________\nFIRMA DEL ESPECIALISTA', fontSize: 7 },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
+
+      // PIE DE PÁGINA INFORMATIVO
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              { text: '* Documento elaborado conforme a:\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: '• NOM-004-SSA3-2012 Del expediente clínico\n', fontSize: 7, color: '#666666' },
+              { text: '• Nota de Interconsulta D7\n', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              { text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
+              { text: 'Hospital General San Luis de la Paz, Guanajuato', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'right',
+          },
+        ],
+      }
+    ],
+
+    footer: (currentPage: number, pageCount: number) => ({
+      margin: [20, 10],
+      table: {
+        widths: ['33%', '34%', '33%'],
+        body: [
+          [
+            { 
+              text: `Interconsulta - ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, 
+              fontSize: 7, 
+              color: '#666666' 
+            },
+            { 
+              text: `Página ${currentPage} de ${pageCount}`, 
+              fontSize: 7, 
+              alignment: 'center', 
+              color: '#666666' 
+            },
+            { 
+              text: fechaActual.toLocaleDateString('es-MX'), 
+              fontSize: 7, 
+              alignment: 'right', 
+              color: '#666666' 
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    }),
+
+    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    styles: {
+      sectionHeader: { 
+        fontSize: 10, 
+        bold: true, 
+        margin: [0, 10, 0, 5],
+        fillColor: '#f5f5f5'
+      },
+      boldText: { 
+        fontSize: 9, 
+        bold: true 
+      },
+      tableText: { 
+        fontSize: 9 
+      },
+      folioText: {
+        fontSize: 10,
+        bold: true
+      },
+      dateText: {
+        fontSize: 9
+      }
+    }
+  };
+}
+
+
+
+// // MÉTODOS AUXILIARES PARA NOTA DE INTERCONSULTA
+// private generarNumeroInterconsulta(): string {
+//   const fecha = new Date();
+//   const timestamp = fecha.getTime().toString().slice(-6);
+//   return `IC-${fecha.getFullYear()}-${timestamp}`;
+// }
+
+
+
+
+async generarNotaEgreso(datos: any): Promise<any> {
+  console.log('🏥 Generando Nota de Egreso...');
+
+  const { pacienteCompleto, medicoCompleto } = datos;
+  const notaEgreso = datos.notaEgreso;
+  const fechaActual = new Date();
+
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+
+    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [[
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_gobierno || 
+              '/uploads/logos/logo-gobierno-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'left',
+            margin: [0, 5],
+          },
+          {
+            text: 'HOSPITAL GENERAL SAN LUIS DE LA PAZ\nNOTA DE EGRESO HOSPITALARIO\nNOM-004-SSA3-2012',
+            fontSize: 10,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 8],
+          },
+          {
+            image: await this.obtenerImagenBase64(
+              datos.configuracion?.logo_principal || 
+              '/uploads/logos/logo-principal-importado.png'
+            ),
+            fit: [80, 40],
+            alignment: 'right',
+            margin: [0, 5],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // INFORMACIÓN DEL FOLIO Y FECHA
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: '', border: [false, false, false, false] },
+              { 
+                text: `FOLIO: ${datos.notaEgreso?.folio_egreso || this.generarFolioEgreso()}`, 
+                style: 'folioText',
+                alignment: 'center',
+                border: [false, false, false, false]
+              },
+              { 
+                text: `FECHA DE EGRESO: ${fechaActual.toLocaleDateString('es-MX')}\nHORA: ${fechaActual.toLocaleTimeString('es-MX')}`, 
+                style: 'dateText',
+                alignment: 'right',
+                border: [false, false, false, false]
+              }
+            ]
+          ]
+        },
+        margin: [0, 0, 0, 15]
+      },
+
+      // DATOS DEL PACIENTE - ESTILO LIMPIO
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: 'DATOS DEL PACIENTE', style: 'sectionHeader', colSpan: 3, alignment: 'center', fillColor: '#f5f5f5' },
+              {},
+              {}
+            ],
+            [
+              { text: `Paciente: ${pacienteCompleto.nombre_completo}`, style: 'tableText' },
+              { text: `Expediente: ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, style: 'tableText' },
+              { text: `Servicio: ${datos.notaEgreso?.servicio || 'No especificado'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Edad: ${pacienteCompleto.edad} años`, style: 'tableText' },
+              { text: `Sexo: ${pacienteCompleto.sexo}`, style: 'tableText' },
+              { text: `Cama: ${datos.notaEgreso?.numero_cama || 'No asignada'}`, style: 'tableText' }
+            ],
+            [
+              { text: `CURP: ${pacienteCompleto.curp || 'No registrado'}`, style: 'tableText' },
+              { text: `Fecha Nac.: ${this.formatearFecha(pacienteCompleto.fecha_nacimiento)}`, style: 'tableText' },
+              { text: `Tipo sangre: ${pacienteCompleto.tipo_sangre || 'No especificado'}`, style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // INFORMACIÓN DE HOSPITALIZACIÓN
+      {
+        text: 'INFORMACIÓN DE HOSPITALIZACIÓN',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['*', '*', '*'],
+          body: [
+            [
+              { text: `Fecha de Ingreso: ${this.formatearFecha(datos.notaEgreso?.fecha_ingreso)}`, style: 'tableText' },
+              { text: `Fecha de Egreso: ${fechaActual.toLocaleDateString('es-MX')}`, style: 'tableText' },
+              { text: `Días de Estancia: ${datos.notaEgreso?.dias_estancia || 'No calculado'}`, style: 'tableText' }
+            ],
+            [
+              { text: `Motivo de Egreso: ${datos.notaEgreso?.motivo_egreso || 'No especificado'}`, style: 'boldText', colSpan: 2 },
+              {},
+              { text: `Reingreso: ${datos.notaEgreso?.reingreso_por_misma_afeccion ? 'SÍ' : 'NO'}`, style: 'boldText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // DIAGNÓSTICO DE INGRESO (NOM-004 D12.8)
+      {
+        text: 'DIAGNÓSTICO DE INGRESO (NOM-004 D12.8)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.diagnostico_ingreso || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // RESUMEN DE LA EVOLUCIÓN (NOM-004 D12.9)
+      {
+        text: 'RESUMEN DE LA EVOLUCIÓN Y ESTADO ACTUAL (NOM-004 D12.9)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.resumen_evolucion || 'Sin información registrada', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // MANEJO DURANTE LA ESTANCIA HOSPITALARIA (NOM-004 D12.10)
+      {
+        text: 'MANEJO DURANTE LA ESTANCIA HOSPITALARIA (NOM-004 D12.10)',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.manejo_hospitalario || 'Sin información registrada', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // PROCEDIMIENTOS REALIZADOS
+      ...(datos.notaEgreso?.procedimientos_realizados ? [
+        {
+          text: 'PROCEDIMIENTOS REALIZADOS DURANTE LA HOSPITALIZACIÓN',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                { text: 'PROCEDIMIENTOS:', style: 'boldText' },
+                { text: `FECHA: ${this.formatearFecha(datos.notaEgreso?.fecha_procedimientos)}`, style: 'boldText' }
+              ],
+              [
+                { 
+                  text: datos.notaEgreso?.procedimientos_realizados, 
+                  style: 'tableText',
+                  colSpan: 2,
+                  margin: [5, 5, 5, 5]
+                },
+                {}
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // DIAGNÓSTICO DE EGRESO
+      {
+        text: 'DIAGNÓSTICO DE EGRESO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.diagnostico_egreso || 'No especificado', 
+                style: 'boldText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // GUÍAS CLÍNICAS DE DIAGNÓSTICO
+      ...(datos.notaEgreso?.guias_clinicas && datos.notaEgreso.guias_clinicas.length > 0 ? [
+        {
+          text: 'GUÍAS CLÍNICAS DE DIAGNÓSTICO',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                { 
+                  text: this.construirTextoGuiasClinicas(datos.notaEgreso.guias_clinicas),
+                  style: 'tableText',
+                  margin: [8, 8, 8, 8]
+                }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PROBLEMAS CLÍNICOS PENDIENTES
+      ...(datos.notaEgreso?.problemas_pendientes ? [
+        {
+          text: 'PROBLEMAS CLÍNICOS PENDIENTES',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                { 
+                  text: datos.notaEgreso?.problemas_pendientes, 
+                  style: 'tableText',
+                  margin: [8, 8, 8, 8]
+                }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PLAN DE TRATAMIENTO AMBULATORIO
+      {
+        text: 'PLAN DE TRATAMIENTO AMBULATORIO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.plan_tratamiento || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 15]
+      },
+
+      // RECOMENDACIONES DE VIGILANCIA
+      ...(datos.notaEgreso?.recomendaciones_vigilancia ? [
+        {
+          text: 'RECOMENDACIONES DE VIGILANCIA',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                { 
+                  text: datos.notaEgreso?.recomendaciones_vigilancia, 
+                  style: 'tableText',
+                  margin: [8, 8, 8, 8]
+                }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // ATENCIÓN A FACTORES DE RIESGO
+      ...(datos.notaEgreso?.atencion_factores_riesgo ? [
+        {
+          text: 'ATENCIÓN A FACTORES DE RIESGO',
+          style: 'sectionHeader',
+          fillColor: '#f5f5f5',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [
+                { 
+                  text: datos.notaEgreso?.atencion_factores_riesgo, 
+                  style: 'tableText',
+                  margin: [8, 8, 8, 8]
+                }
+              ]
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 15]
+        }
+      ] : []),
+
+      // PRONÓSTICO
+      {
+        text: 'PRONÓSTICO',
+        style: 'sectionHeader',
+        fillColor: '#f5f5f5',
+        margin: [0, 0, 0, 5]
+      },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              { 
+                text: datos.notaEgreso?.pronostico || 'No especificado', 
+                style: 'tableText',
+                margin: [8, 8, 8, 8]
+              }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
+
+      // INFORMACIÓN DE SEGUIMIENTO
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              { text: 'SEGUIMIENTO Y CONTROL', style: 'sectionHeader', colSpan: 2, fillColor: '#f5f5f5' },
+              {}
+            ],
+            [
+              { text: 'Control médico ambulatorio: PROGRAMADO', style: 'tableText' },
+              { text: 'Citas de seguimiento: SEGÚN NECESIDAD', style: 'tableText' }
+            ],
+            [
+              { text: 'Signos de alarma: EXPLICADOS AL PACIENTE', style: 'tableText' },
+              { text: 'Reingresos: MONITOREAR', style: 'tableText' }
+            ]
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 30]
+      },
+
+      // FIRMAS PROFESIONALES
+      {
+        table: {
+          widths: ['*', '*'],
+          body: [
+            [
+              {
+                text: 'MÉDICO RESPONSABLE DEL EGRESO',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+              {
+                text: 'FIRMA AUTÓGRAFA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+            ],
+            [
+              {
+                text: [
+                  { text: `${medicoCompleto.nombre_completo || 'Dr(a). [Nombre]'}\n`, fontSize: 9, bold: true },
+                  { text: `Médico Responsable del Egreso\n`, fontSize: 8 },
+                  { text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'No registrada'}\n`, fontSize: 8 },
+                  { text: `Especialidad: ${medicoCompleto.especialidad || 'No especificada'}\n`, fontSize: 8 },
+                  { text: `Hospital General San Luis de la Paz\n`, fontSize: 7, color: '#6b7280' },
+                  { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`, fontSize: 7 },
+                  { text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`, fontSize: 7 },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO\n(Según NOM-004-SSA3-2012)',
+                fontSize: 8,
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 0, 0, 20]
+      },
+
+      // PIE DE PÁGINA INFORMATIVO
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              { text: '* Documento elaborado conforme a:\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: '• NOM-004-SSA3-2012 Del expediente clínico\n', fontSize: 7, color: '#666666' },
+              { text: '• Nota de Egreso D12\n', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              { text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n', fontSize: 7, italics: true, color: '#666666' },
+              { text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`, fontSize: 7, color: '#666666' },
+              { text: 'Hospital General San Luis de la Paz, Guanajuato', fontSize: 7, color: '#666666' },
+            ],
+            alignment: 'right',
+          },
+        ],
+      }
+    ],
+
+    footer: (currentPage: number, pageCount: number) => ({
+      margin: [20, 10],
+      table: {
+        widths: ['33%', '34%', '33%'],
+        body: [
+          [
+            { 
+              text: `Nota de Egreso - ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`, 
+              fontSize: 7, 
+              color: '#666666' 
+            },
+            { 
+              text: `Página ${currentPage} de ${pageCount}`, 
+              fontSize: 7, 
+              alignment: 'center', 
+              color: '#666666' 
+            },
+            { 
+              text: fechaActual.toLocaleDateString('es-MX'), 
+              fontSize: 7, 
+              alignment: 'right', 
+              color: '#666666' 
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    }),
+
+    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    styles: {
+      sectionHeader: { 
+        fontSize: 10, 
+        bold: true, 
+        margin: [0, 10, 0, 5],
+        fillColor: '#f5f5f5'
+      },
+      boldText: { 
+        fontSize: 9, 
+        bold: true 
+      },
+      tableText: { 
+        fontSize: 9 
+      },
+      folioText: {
+        fontSize: 10,
+        bold: true
+      },
+      dateText: {
+        fontSize: 9
+      }
+    }
+  };
+}
+
+// MÉTODOS AUXILIARES PARA NOTA DE EGRESO
+private generarFolioEgreso(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `EGR-${fecha.getFullYear()}-${timestamp}`;
+}
 
 }
