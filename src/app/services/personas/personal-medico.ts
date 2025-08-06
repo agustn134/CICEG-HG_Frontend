@@ -10,6 +10,7 @@ import {
   ApiResponse,
   Genero
 } from '../../models';
+import { environment } from '../../../environments/environments';
 
 // ==========================================
 // INTERFACES ESPECÍFICAS PARA EL SERVICIO
@@ -127,7 +128,7 @@ export interface PacienteAtendido {
   providedIn: 'root'
 })
 export class PersonalMedicoService {
-  private readonly API_URL = 'http://localhost:3000/api/personas/personal-medico';
+  private readonly API_URL = `${environment.apiUrl}/personas/personal-medico`;
 
   // Estado del servicio
   private personalMedicoSubject = new BehaviorSubject<PersonalMedico[]>([]);

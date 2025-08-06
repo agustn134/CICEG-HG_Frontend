@@ -1983,292 +1983,467 @@
       </div>
 
       <!-- FORMULARIO DE SOLICITUD DE ESTUDIO (DINÁMICO) -->
-      <div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-microscope mr-2 text-blue-500"></i>
-            Solicitud de Estudio
-          </h3>
-          <p class="text-sm text-gray-600 mt-1">Seleccione el tipo de estudio y los exámenes requeridos</p>
+<!-- FORMULARIO DE SOLICITUD DE ESTUDIO MEJORADO -->
+<div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
+  <!-- ENCABEZADO -->
+  <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-microscope mr-2 text-blue-500"></i>
+      Solicitud de Estudio
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Solicitud de estudios auxiliares de diagnóstico según NOM-004-SSA3-2012</p>
+  </div>
+
+  <form [formGroup]="solicitudEstudioForm" class="px-4 sm:px-6 py-4">
+
+    <!-- SECCIÓN 1: TIPO DE ESTUDIO -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>Tipo de Estudio Solicitado
+      </h4>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Seleccione el Tipo de Estudio *</label>
+        <select formControlName="tipo_estudio"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Seleccionar tipo...</option>
+          <option value="laboratorio">Estudios de Laboratorio</option>
+          <option value="imagen">Estudios de Imagenología</option>
+          <option value="otros">Otros Estudios Especiales</option>
+        </select>
+        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio según NOM-004</div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: ESTUDIOS DE LABORATORIO -->
+    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-vial mr-2 text-green-500"></i>Estudios de Laboratorio Solicitados
+      </h4>
+
+      <!-- Química Sanguínea -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-blue-700 mb-3">Química Sanguínea</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="quimica_sanguinea" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Química sanguínea completa</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="glucosa" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Glucosa sérica</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="urea" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Urea</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="creatinina" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Creatinina sérica</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="acido_urico" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ácido úrico</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="transaminasas" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Transaminasas (ALT/AST)</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="bilirrubinas" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Bilirrubinas</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="proteinas_totales" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Proteínas totales</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="albumina" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Albúmina</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Perfil Lipídico -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-red-700 mb-3">Perfil Lipídico</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="colesterol_total" 
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>Colesterol total</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="trigliceridos" 
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>Triglicéridos</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="hdl" 
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>HDL colesterol</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ldl" 
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>LDL colesterol</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Hematología -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-purple-700 mb-3">Hematología</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="biometria_hematica" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>Biometría hemática completa</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tiempo_protrombina" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>Tiempo de protrombina</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tiempo_tromboplastina" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>Tiempo de tromboplastina</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="inr" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>INR</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Estudios de Orina -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-cyan-700 mb-3">Estudios de Orina</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="examen_general_orina" 
+              class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+            <span>Examen general de orina</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="urocultivo" 
+              class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+            <span>Urocultivo</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Electrolitos -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-indigo-700 mb-3">Electrolitos Séricos</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="sodio" 
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+            <span>Sodio sérico</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="potasio" 
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+            <span>Potasio sérico</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="cloro" 
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+            <span>Cloro sérico</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: ESTUDIOS DE IMAGENOLOGÍA -->
+    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-x-ray mr-2 text-orange-500"></i>Estudios de Imagenología Solicitados
+      </h4>
+
+      <!-- Radiografías -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-green-700 mb-3">Radiografías</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="radiografia_torax" 
+              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span>Radiografía de tórax</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="radiografia_abdomen" 
+              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span>Radiografía de abdomen</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="radiografia_columna" 
+              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span>Radiografía de columna</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="radiografia_extremidades" 
+              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span>Radiografía de extremidades</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Ultrasonidos -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-blue-700 mb-3">Ultrasonidos</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ultrasonido_abdominal" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ultrasonido abdominal</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ultrasonido_pelvico" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ultrasonido pélvico</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ecocardiograma" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ecocardiograma</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ultrasonido_renal" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ultrasonido renal</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="ultrasonido_tiroideo" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Ultrasonido tiroideo</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Tomografías -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-orange-700 mb-3">Tomografías Computadas</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tomografia_cerebral" 
+              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+            <span>TAC cerebral simple</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tomografia_torax" 
+              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+            <span>TAC de tórax</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tomografia_abdomen" 
+              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+            <span>TAC abdominal</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="tomografia_contrastada" 
+              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+            <span>TAC con medio de contraste</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Resonancias -->
+      <div class="mb-4">
+        <h5 class="text-sm font-semibold text-purple-700 mb-3">Resonancia Magnética</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="resonancia_cerebral" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>RM cerebral</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="resonancia_columna" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>RM de columna</span>
+          </label>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" formControlName="resonancia_articular" 
+              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+            <span>RM articular</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: OTROS ESTUDIOS -->
+    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-flask mr-2 text-teal-500"></i>Otros Estudios Especiales
+      </h4>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del Estudio Requerido *</label>
+        <textarea formControlName="otros_estudios" rows="4"
+          placeholder="Especifique detalladamente el estudio especial que se requiere, incluyendo técnica y parámetros específicos..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        <div *ngIf="solicitudEstudioForm.get('otros_estudios')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+          Campo obligatorio cuando se selecciona "Otros estudios"</div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: INFORMACIÓN CLÍNICA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-stethoscope mr-2 text-red-500"></i>Información Clínica del Paciente *
+      </h4>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Indicación Clínica *</label>
+          <textarea formControlName="indicacion_clinica" rows="4"
+            placeholder="Motivo clínico de la solicitud, síntomas relevantes, evolución del cuadro..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <div *ngIf="solicitudEstudioForm.get('indicacion_clinica')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
         </div>
 
-        <form [formGroup]="solicitudEstudioForm" class="px-6 py-4">
-
-          <!-- SELECTOR DE TIPO DE ESTUDIO -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Estudio *</label>
-            <select formControlName="tipo_estudio"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium">
-              <option value="laboratorio">🧪 Laboratorio</option>
-              <option value="imagen">📷 Imagenología</option>
-              <option value="otros">🔬 Otros Estudios</option>
-            </select>
-          </div>
-
-          <!-- ===================================
-                    SECCIÓN LABORATORIO
-                    =================================== -->
-          <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-4">📊 Estudios de Laboratorio Solicitados</h4>
-
-            <!-- Química Sanguínea -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-blue-700 mb-3">🩸 Química Sanguínea</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-blue-50 p-2 rounded">
-                  <input type="checkbox" formControlName="quimica_sanguinea" class="text-blue-600">
-                  <span class="text-sm">Química sanguínea completa</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-blue-50 p-2 rounded">
-                  <input type="checkbox" formControlName="glucosa" class="text-blue-600">
-                  <span class="text-sm">Glucosa</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-blue-50 p-2 rounded">
-                  <input type="checkbox" formControlName="urea" class="text-blue-600">
-                  <span class="text-sm">Urea</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-blue-50 p-2 rounded">
-                  <input type="checkbox" formControlName="creatinina" class="text-blue-600">
-                  <span class="text-sm">Creatinina</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-blue-50 p-2 rounded">
-                  <input type="checkbox" formControlName="acido_urico" class="text-blue-600">
-                  <span class="text-sm">Ácido úrico</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Perfil Lipídico -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-red-700 mb-3">❤️ Perfil Lipídico</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-red-50 p-2 rounded">
-                  <input type="checkbox" formControlName="colesterol_total" class="text-red-600">
-                  <span class="text-sm">Colesterol total</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-red-50 p-2 rounded">
-                  <input type="checkbox" formControlName="trigliceridos" class="text-red-600">
-                  <span class="text-sm">Triglicéridos</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-red-50 p-2 rounded">
-                  <input type="checkbox" formControlName="hdl" class="text-red-600">
-                  <span class="text-sm">HDL</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-red-50 p-2 rounded">
-                  <input type="checkbox" formControlName="ldl" class="text-red-600">
-                  <span class="text-sm">LDL</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Biometría Hemática -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-purple-700 mb-3">🔬 Hematología</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-2 rounded">
-                  <input type="checkbox" formControlName="biometria_hematica" class="text-purple-600">
-                  <span class="text-sm">Biometría hemática</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Estudios de Orina -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-cyan-700 mb-3">💧 Estudios de Orina</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-cyan-50 p-2 rounded">
-                  <input type="checkbox" formControlName="examen_general_orina" class="text-cyan-600">
-                  <span class="text-sm">Examen general de orina</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-cyan-50 p-2 rounded">
-                  <input type="checkbox" formControlName="urocultivo" class="text-cyan-600">
-                  <span class="text-sm">Urocultivo</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===================================
-                    SECCIÓN IMAGENOLOGÍA
-                    =================================== -->
-          <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-4">📷 Estudios de Imagenología Solicitados</h4>
-
-            <!-- Radiografías -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-green-700 mb-3">📸 Radiografías</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-green-50 p-2 rounded">
-                  <input type="checkbox" formControlName="radiografia_torax" class="text-green-600">
-                  <span class="text-sm">Radiografía de tórax</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-green-50 p-2 rounded">
-                  <input type="checkbox" formControlName="radiografia_abdomen" class="text-green-600">
-                  <span class="text-sm">Radiografía de abdomen</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-green-50 p-2 rounded">
-                  <input type="checkbox" formControlName="radiografia_columna" class="text-green-600">
-                  <span class="text-sm">Radiografía de columna</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-green-50 p-2 rounded">
-                  <input type="checkbox" formControlName="radiografia_extremidades" class="text-green-600">
-                  <span class="text-sm">Radiografía de extremidades</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Ultrasonidos -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-indigo-700 mb-3">🔊 Ultrasonidos</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-indigo-50 p-2 rounded">
-                  <input type="checkbox" formControlName="ultrasonido_abdominal" class="text-indigo-600">
-                  <span class="text-sm">Ultrasonido abdominal</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-indigo-50 p-2 rounded">
-                  <input type="checkbox" formControlName="ultrasonido_pelvico" class="text-indigo-600">
-                  <span class="text-sm">Ultrasonido pélvico</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-indigo-50 p-2 rounded">
-                  <input type="checkbox" formControlName="ecocardiograma" class="text-indigo-600">
-                  <span class="text-sm">Ecocardiograma</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-indigo-50 p-2 rounded">
-                  <input type="checkbox" formControlName="ultrasonido_renal" class="text-indigo-600">
-                  <span class="text-sm">Ultrasonido renal</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Tomografías -->
-            <div class="mb-6">
-              <h5 class="text-sm font-semibold text-orange-700 mb-3">🖥️ Tomografías</h5>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-orange-50 p-2 rounded">
-                  <input type="checkbox" formControlName="tomografia_cerebral" class="text-orange-600">
-                  <span class="text-sm">TAC cerebral</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-orange-50 p-2 rounded">
-                  <input type="checkbox" formControlName="tomografia_torax" class="text-orange-600">
-                  <span class="text-sm">TAC de tórax</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-orange-50 p-2 rounded">
-                  <input type="checkbox" formControlName="tomografia_abdomen" class="text-orange-600">
-                  <span class="text-sm">TAC abdominal</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:bg-orange-50 p-2 rounded">
-                  <input type="checkbox" formControlName="tomografia_contrastada" class="text-orange-600">
-                  <span class="text-sm">TAC con contraste</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===================================
-                      SECCIÓN OTROS ESTUDIOS
-                      =================================== -->
-          <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-4">🔬 Otros Estudios Especiales</h4>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Descripción del estudio requerido *</label>
-              <textarea formControlName="otros_estudios" rows="4"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Especifique detalladamente el estudio requerido..."></textarea>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN CLÍNICA -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-4">📋 Información Clínica</h4>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Indicación Clínica *</label>
-                <textarea formControlName="indicacion_clinica" rows="4"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Motivo de la solicitud, síntomas relevantes..."></textarea>
-                <div *ngIf="solicitudEstudioForm.get('indicacion_clinica')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Presuntivo *</label>
-                <textarea formControlName="diagnostico_presuntivo" rows="4"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Diagnóstico(s) presuntivo(s)..."></textarea>
-                <div *ngIf="solicitudEstudioForm.get('diagnostico_presuntivo')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">
-                  Campo obligatorio
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CONFIGURACIÓN DEL ESTUDIO -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-4">⚙️ Configuración del Estudio</h4>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Urgencia</label>
-                <select formControlName="urgencia"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="normal">Normal</option>
-                  <option value="urgente">Urgente</option>
-                  <option value="stat">STAT (Inmediato)</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada</label>
-                <input type="date" formControlName="fecha_programada"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              </div>
-
-              <div class="space-y-2">
-                <label class="flex items-center cursor-pointer">
-                  <input type="checkbox" formControlName="ayuno_requerido" class="text-blue-600 mr-2">
-                  <span class="text-sm font-medium text-gray-700">Requiere ayuno</span>
-                </label>
-                <label class="flex items-center cursor-pointer"
-                  *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'">
-                  <input type="checkbox" formControlName="contraste_requerido" class="text-blue-600 mr-2">
-                  <span class="text-sm font-medium text-gray-700">Requiere contraste</span>
-                </label>
-                <label class="flex items-center cursor-pointer"
-                  *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'">
-                  <input type="checkbox" formControlName="sedacion_requerida" class="text-blue-600 mr-2">
-                  <span class="text-sm font-medium text-gray-700">Requiere sedación</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- OBSERVACIONES -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-            <textarea formControlName="observaciones" rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Observaciones adicionales para el estudio..."></textarea>
-          </div>
-
-          <!-- BOTONES -->
-          <div class="flex justify-end space-x-3 pt-4 border-t">
-            <button type="button" (click)="resetearFormularioActual()"
-              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
-              Limpiar
-            </button>
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!solicitudEstudioForm.valid || isCreatingDocument"
-              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-              {{ isCreatingDocument ? 'Guardando...' : 'Guardar y Generar PDF' }}
-            </button>
-          </div>
-
-        </form>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Presuntivo *</label>
+          <textarea formControlName="diagnostico_presuntivo" rows="4"
+            placeholder="Diagnóstico principal y diferenciales que justifican la solicitud del estudio..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <div *ngIf="solicitudEstudioForm.get('diagnostico_presuntivo')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
       </div>
+    </div>
+
+    <!-- SECCIÓN 6: CONFIGURACIÓN DEL ESTUDIO -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-cogs mr-2 text-gray-500"></i>Configuración y Urgencia del Estudio
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad del Estudio</label>
+          <select formControlName="urgencia"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="normal">Programado (Normal)</option>
+            <option value="urgente">Urgente (24-48 hrs)</option>
+            <option value="stat">STAT (Inmediato)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada</label>
+          <input type="date" formControlName="fecha_programada"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="space-y-3">
+          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="ayuno_requerido" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Requiere ayuno previo</span>
+          </label>
+          
+          <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
+            class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="contraste_requerido" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Requiere medio de contraste</span>
+          </label>
+          
+          <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
+            class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="sedacion_requerida" 
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Requiere sedación</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 7: OBSERVACIONES -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Adicionales
+      </h4>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Especiales</label>
+        <textarea formControlName="observaciones" rows="3"
+          placeholder="Indicaciones especiales para el estudio, alergias conocidas, consideraciones técnicas..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="mt-6 flex justify-between">
+      <div class="flex space-x-3">
+        <button type="button" (click)="limpiarFormulario('solicitudEstudio')"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-eraser mr-2"></i>
+          Limpiar
+        </button>
+
+        <button type="button" (click)="guardarBorrador()"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-save mr-2"></i>
+          Guardar Borrador
+        </button>
+      </div>
+
+      <div class="flex space-x-3">
+        <button type="button" (click)="guardarFormularioActivo()"
+          [disabled]="!solicitudEstudioForm.valid || isCreatingDocument"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+          <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+          <i *ngIf="!isCreatingDocument" class="fas fa-microscope mr-2"></i>
+          {{ isCreatingDocument ? 'Guardando...' : 'Guardar Solicitud' }}
+        </button>
+
+        <button type="button" (click)="generarPDF('Solicitud de Estudio')" 
+          [disabled]="!formularioEstado.solicitudEstudio"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          {{ formularioEstado.solicitudEstudio ? 'Generar PDF' : 'Guardar primero' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- INFORMACIÓN NORMATIVA -->
+    <div class="mt-6 pt-4 border-t border-gray-200">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex items-start space-x-3">
+          <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+          <div>
+            <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
+            <div class="text-xs text-gray-600 space-y-1">
+              <p><strong>Solicitud de Estudios:</strong> Justificación clínica adecuada para cada estudio ✓</p>
+              <p><strong>Información Completa:</strong> Diagnóstico presuntivo e indicación clínica ✓</p>
+              <p><strong>Priorización:</strong> Clasificación según urgencia clínica ✓</p>
+              <p><strong>Seguridad:</strong> Consideración de contraindicaciones y alergias ✓</p>
+              <p><strong>Eficiencia:</strong> Selección apropiada de estudios según caso clínico ✓</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center">
+        <div class="text-sm text-gray-500">
+          <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+          Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
 
       <!-- FORMULARIO DE PRESCRIPCIÓN DE MEDICAMENTOS -->
       <div *ngIf="formularioActivo === 'prescripcionMedicamento'" class="space-y-6">
@@ -3680,424 +3855,369 @@
       </div>
     
       <!-- FORMULARIO DE REFERENCIA Y CONTRARREFERENCIA -->
-      <div *ngIf="formularioActivo === 'referenciaTraslado'" class="space-y-6">
+<!-- FORMULARIO DE REFERENCIA Y CONTRARREFERENCIA MEJORADO -->
+<div *ngIf="formularioActivo === 'referenciaTraslado'" class="bg-white shadow rounded-lg mb-6">
+  <!-- ENCABEZADO -->
+  <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-share mr-2 text-green-500"></i>
+      Referencia y Contrarreferencia
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Sistema de referencia médica según NOM-004-SSA3-2012</p>
+  </div>
 
-        <!-- ENCABEZADO -->
-        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-          <div class="flex items-center space-x-3">
-            <i class="fas fa-share text-2xl"></i>
-            <div>
-              <h3 class="text-xl font-bold">🔄 Referencia y Contrarreferencia</h3>
-              <p class="text-green-100 text-sm">NOM-004-SSA3-2012 | Sistema de referencia médica</p>
-            </div>
+  <form [formGroup]="referenciaForm" class="px-4 sm:px-6 py-4">
+
+    <!-- SECCIÓN 1: INFORMACIÓN BÁSICA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-info-circle mr-2 text-green-500"></i>Información Básica de la Referencia
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Referencia *</label>
+          <select formControlName="tipo_referencia"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="referencia">Referencia (Envío)</option>
+            <option value="contrarreferencia">Contrarreferencia (Respuesta)</option>
+          </select>
+          <div *ngIf="referenciaForm.get('tipo_referencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Urgencia de la Referencia *</label>
+          <select formControlName="urgencia_referencia"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="programada">Programada</option>
+            <option value="urgente">Urgente</option>
+          </select>
+          <div *ngIf="referenciaForm.get('urgencia_referencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Referencia *</label>
+          <input type="date" formControlName="fecha_referencia"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          <div *ngIf="referenciaForm.get('fecha_referencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada para Cita</label>
+          <input type="date" formControlName="fecha_programada_cita"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: INSTITUCIÓN DESTINO -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-hospital mr-2 text-blue-500"></i>Institución de Destino *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Institución *</label>
+          <input type="text" formControlName="institucion_destino"
+            placeholder="Ej: Hospital Regional León, IMSS Unidad 47, Hospital General..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          <div *ngIf="referenciaForm.get('institucion_destino')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de Atención *</label>
+            <select formControlName="nivel_atencion_destino"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="primer_nivel">Primer Nivel (Atención Primaria)</option>
+              <option value="segundo_nivel">Segundo Nivel (Especialidades)</option>
+              <option value="tercer_nivel">Tercer Nivel (Alta Especialidad)</option>
+            </select>
+            <div *ngIf="referenciaForm.get('nivel_atencion_destino')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004</div>
           </div>
 
-          <!-- INDICADOR DE VALIDEZ -->
-          <div class="mt-4 flex items-center space-x-2 text-sm">
-            <div class="flex items-center space-x-1">
-              <i class="fas fa-check-circle" [class]="referenciaForm.valid ? 'text-green-300' : 'text-gray-400'"></i>
-              <span>Formulario {{ referenciaForm.valid ? 'válido' : 'pendiente' }}</span>
-            </div>
-            <div class="flex items-center space-x-1">
-              <i class="fas fa-hospital"
-                [class]="referenciaForm.get('institucion_destino')?.value ? 'text-green-300' : 'text-gray-400'"></i>
-              <span>{{ referenciaForm.get('institucion_destino')?.value ? 'Destino definido' : 'Sin destino' }}</span>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono de Contacto</label>
+            <input type="tel" formControlName="telefono_institucion" 
+              placeholder="Ej: 442-123-4567"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
           </div>
         </div>
 
-        <form [formGroup]="referenciaForm" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dirección de la Institución</label>
+          <textarea formControlName="direccion_institucion" rows="2"
+            placeholder="Dirección completa de la institución destino..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
 
-          <!-- INFORMACIÓN BÁSICA DE LA REFERENCIA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-info-circle text-green-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Básica</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Tipo de Referencia -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo de Referencia *
-                </label>
-                <select formControlName="tipo_referencia"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  [class.border-red-500]="referenciaForm.get('tipo_referencia')?.invalid && referenciaForm.get('tipo_referencia')?.touched">
-                  <option value="referencia">Referencia (Envío)</option>
-                  <option value="contrarreferencia">Contrarreferencia (Respuesta)</option>
-                </select>
-              </div>
-
-              <!-- Urgencia -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Urgencia *
-                </label>
-                <select formControlName="urgencia_referencia"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="programada">Programada</option>
-                  <option value="urgente">Urgente</option>
-                </select>
-              </div>
-
-              <!-- Fecha de Referencia -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de Referencia *
-                </label>
-                <input type="date" formControlName="fecha_referencia"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  [class.border-red-500]="referenciaForm.get('fecha_referencia')?.invalid && referenciaForm.get('fecha_referencia')?.touched">
-              </div>
-
-              <!-- Fecha Programada para Cita -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha Programada para Cita
-                </label>
-                <input type="date" formControlName="fecha_programada_cita"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- INSTITUCIÓN DESTINO -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-hospital text-blue-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Institución Destino</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Institución Destino -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre de la Institución *
-                </label>
-                <input type="text" formControlName="institucion_destino"
-                  placeholder="Ej: Hospital Regional León, IMSS Unidad 47..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  [class.border-red-500]="referenciaForm.get('institucion_destino')?.invalid && referenciaForm.get('institucion_destino')?.touched">
-              </div>
-
-              <!-- Nivel de Atención -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Nivel de Atención *
-                </label>
-                <select formControlName="nivel_atencion_destino"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="primer_nivel">Primer Nivel (Atención Primaria)</option>
-                  <option value="segundo_nivel">Segundo Nivel (Especialidades)</option>
-                  <option value="tercer_nivel">Tercer Nivel (Alta Especialidad)</option>
-                </select>
-              </div>
-
-              <!-- Teléfono de la Institución -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Teléfono de Contacto
-                </label>
-                <input type="tel" formControlName="telefono_institucion" placeholder="Ej: 442-123-4567"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-
-              <!-- Dirección -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Dirección de la Institución
-                </label>
-                <textarea formControlName="direccion_institucion" rows="2"
-                  placeholder="Dirección completa de la institución destino..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-
-              <!-- Contacto -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Persona de Contacto
-                </label>
-                <input type="text" formControlName="contacto_institucion"
-                  placeholder="Nombre del contacto en la institución"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- MÉDICO RECEPTOR -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-user-md text-purple-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Médico Receptor (Opcional)</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Médico Destino -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre del Médico
-                </label>
-                <input type="text" formControlName="medico_destino" placeholder="Dr. Juan Pérez García"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-
-              <!-- Especialidad -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Especialidad
-                </label>
-                <input type="text" formControlName="especialidad_destino"
-                  placeholder="Ej: Cardiología, Neurología, Pediatría..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN CLÍNICA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-stethoscope text-red-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Clínica</h4>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-              <!-- Motivo de Referencia -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Motivo de Referencia *
-                </label>
-                <textarea formControlName="motivo_referencia" rows="3"
-                  placeholder="Describa detalladamente el motivo por el cual se refiere al paciente..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                  [class.border-red-500]="referenciaForm.get('motivo_referencia')?.invalid && referenciaForm.get('motivo_referencia')?.touched"></textarea>
-                <div *ngIf="referenciaForm.get('motivo_referencia')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-                <div *ngIf="referenciaForm.get('motivo_referencia')?.errors?.['minlength']"
-                  class="text-red-500 text-xs mt-1">Mínimo 20 caracteres</div>
-              </div>
-
-              <!-- Diagnóstico -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Diagnóstico *
-                </label>
-                <textarea formControlName="diagnostico_referencia" rows="2"
-                  placeholder="Diagnóstico principal y secundarios..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                  [class.border-red-500]="referenciaForm.get('diagnostico_referencia')?.invalid && referenciaForm.get('diagnostico_referencia')?.touched"></textarea>
-                <div *ngIf="referenciaForm.get('diagnostico_referencia')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Resumen Clínico -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Resumen Clínico *
-                </label>
-                <textarea formControlName="resumen_clinico" rows="4"
-                  placeholder="Resumen del cuadro clínico, evolución y estado actual del paciente..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                  [class.border-red-500]="referenciaForm.get('resumen_clinico')?.invalid && referenciaForm.get('resumen_clinico')?.touched"></textarea>
-                <div *ngIf="referenciaForm.get('resumen_clinico')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-                <div *ngIf="referenciaForm.get('resumen_clinico')?.errors?.['minlength']"
-                  class="text-red-500 text-xs mt-1">Mínimo 30 caracteres</div>
-              </div>
-
-              <!-- Estado del Paciente -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Estado Actual del Paciente *
-                </label>
-                <textarea formControlName="estado_paciente" rows="3"
-                  placeholder="Estado general, signos vitales, estado de conciencia..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                  [class.border-red-500]="referenciaForm.get('estado_paciente')?.invalid && referenciaForm.get('estado_paciente')?.touched"></textarea>
-                <div *ngIf="referenciaForm.get('estado_paciente')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-                <div *ngIf="referenciaForm.get('estado_paciente')?.errors?.['minlength']"
-                  class="text-red-500 text-xs mt-1">Mínimo 10 caracteres</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN MÉDICA ADICIONAL -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-clipboard-list text-orange-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Médica Adicional</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Estudios Realizados -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Estudios Realizados
-                </label>
-                <textarea formControlName="estudios_realizados" rows="3"
-                  placeholder="Laboratorios, imagenología, otros estudios..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-
-              <!-- Tratamiento Actual -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tratamiento Actual
-                </label>
-                <textarea formControlName="tratamiento_actual" rows="3"
-                  placeholder="Tratamientos en curso, procedimientos..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-
-              <!-- Medicamentos Actuales -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Medicamentos Actuales
-                </label>
-                <textarea formControlName="medicamentos_actuales" rows="3"
-                  placeholder="Lista de medicamentos con dosis y frecuencia..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-
-              <!-- Datos Clínicos Relevantes -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Datos Clínicos Relevantes
-                </label>
-                <textarea formControlName="datos_clinicos_relevantes" rows="3"
-                  placeholder="Información adicional relevante para la atención..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN DE TRASLADO -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-ambulance text-red-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información de Traslado</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Requiere Ambulancia -->
-              <div>
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" formControlName="requiere_ambulancia"
-                    class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                  <span class="text-sm font-medium text-gray-700">Requiere ambulancia para traslado</span>
-                </label>
-              </div>
-
-              <!-- Acompañante Autorizado -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Acompañante Autorizado
-                </label>
-                <input type="text" formControlName="acompañante_autorizado"
-                  placeholder="Nombre del familiar o acompañante"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-
-              <!-- Observaciones del Traslado -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Observaciones del Traslado
-                </label>
-                <textarea formControlName="observaciones_traslado" rows="2"
-                  placeholder="Instrucciones especiales para el traslado..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- SEGUIMIENTO Y CONTRARREFERENCIA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-calendar-check text-indigo-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Seguimiento y Contrarreferencia</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Requiere Contrarreferencia -->
-              <div>
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" formControlName="requiere_contrarreferencia"
-                    class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                  <span class="text-sm font-medium text-gray-700">Requiere contrarreferencia</span>
-                </label>
-              </div>
-
-              <!-- Tiempo Esperado de Respuesta -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tiempo Esperado de Respuesta
-                </label>
-                <select formControlName="tiempo_esperado_respuesta"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="7_dias">7 días</option>
-                  <option value="15_dias">15 días</option>
-                  <option value="30_dias">30 días</option>
-                  <option value="60_dias">60 días</option>
-                </select>
-              </div>
-
-              <!-- Autorizado Por -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Autorizado Por
-                </label>
-                <input type="text" formControlName="autorizado_por"
-                  placeholder="Nombre del jefe de servicio o autoridad"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-
-              <!-- Número de Autorización -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Número de Autorización
-                </label>
-                <input type="text" formControlName="numero_autorizacion" placeholder="Número de folio o autorización"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- OBSERVACIONES GENERALES -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-comment-alt text-gray-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Observaciones Generales</h4>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Observaciones
-              </label>
-              <textarea formControlName="observaciones" rows="4"
-                placeholder="Observaciones adicionales, instrucciones especiales..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
-            </div>
-          </div>
-
-          <!-- BOTONES DE ACCIÓN -->
-          <div class="flex justify-end space-x-3 pt-4 border-t">
-            <button type="button" (click)="resetearFormularioActual()"
-              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-              <i class="fas fa-eraser mr-2"></i>
-              Limpiar
-            </button>
-
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!referenciaForm.valid || isCreatingDocument"
-              class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-share mr-2"></i>
-              {{ isCreatingDocument ? 'Guardando...' : 'Guardar y Generar PDF' }}
-            </button>
-          </div>
-        </form>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Persona de Contacto</label>
+          <input type="text" formControlName="contacto_institucion"
+            placeholder="Nombre del contacto en la institución"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
       </div>
+    </div>
+
+    <!-- SECCIÓN 3: MÉDICO RECEPTOR (OPCIONAL) -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-user-md mr-2 text-purple-500"></i>Médico Receptor (Opcional)
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Médico</label>
+          <input type="text" formControlName="medico_destino" 
+            placeholder="Dr. Juan Pérez García"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+          <input type="text" formControlName="especialidad_destino"
+            placeholder="Ej: Cardiología, Neurología, Pediatría..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: INFORMACIÓN CLÍNICA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-stethoscope mr-2 text-red-500"></i>Información Clínica del Paciente *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Referencia *</label>
+          <textarea formControlName="motivo_referencia" rows="3"
+            placeholder="Describa detalladamente el motivo por el cual se refiere al paciente (NOM-004)..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+          <div *ngIf="referenciaForm.get('motivo_referencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+          <div *ngIf="referenciaForm.get('motivo_referencia')?.errors?.['minlength']" class="text-red-500 text-xs mt-1">
+            Mínimo 20 caracteres requeridos</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Principal *</label>
+          <textarea formControlName="diagnostico_referencia" rows="2"
+            placeholder="Diagnóstico principal y diagnósticos secundarios..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+          <div *ngIf="referenciaForm.get('diagnostico_referencia')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Estado Actual del Paciente *</label>
+          <textarea formControlName="estado_paciente" rows="3"
+            placeholder="Estado general, signos vitales actuales, estado de conciencia..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+          <div *ngIf="referenciaForm.get('estado_paciente')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Resumen Clínico Completo *</label>
+          <textarea formControlName="resumen_clinico" rows="4"
+            placeholder="Resumen del cuadro clínico, evolución, antecedentes relevantes y estado actual del paciente..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+          <div *ngIf="referenciaForm.get('resumen_clinico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+          <div *ngIf="referenciaForm.get('resumen_clinico')?.errors?.['minlength']" class="text-red-500 text-xs mt-1">
+            Mínimo 30 caracteres requeridos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: INFORMACIÓN MÉDICA ADICIONAL -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-clipboard-list mr-2 text-orange-500"></i>Información Médica Adicional
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Estudios Realizados</label>
+          <textarea formControlName="estudios_realizados" rows="3"
+            placeholder="Laboratorios, imagenología, estudios especiales realizados..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento Actual</label>
+          <textarea formControlName="tratamiento_actual" rows="3"
+            placeholder="Tratamientos en curso, procedimientos realizados..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Medicamentos Actuales</label>
+          <textarea formControlName="medicamentos_actuales" rows="3"
+            placeholder="Lista detallada de medicamentos con dosis, vía de administración y frecuencia..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Datos Clínicos Relevantes</label>
+          <textarea formControlName="datos_clinicos_relevantes" rows="3"
+            placeholder="Información adicional relevante para la atención en la institución de destino..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: INFORMACIÓN DE TRASLADO -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-ambulance mr-2 text-red-500"></i>Información de Traslado
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <input type="checkbox" formControlName="requiere_ambulancia"
+                class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+              <span>Requiere ambulancia para traslado</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Acompañante Autorizado</label>
+            <input type="text" formControlName="acompañante_autorizado"
+              placeholder="Nombre del familiar o acompañante autorizado"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones del Traslado</label>
+          <textarea formControlName="observaciones_traslado" rows="2"
+            placeholder="Instrucciones especiales para el traslado, cuidados durante el transporte..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 7: SEGUIMIENTO Y CONTRARREFERENCIA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-calendar-check mr-2 text-indigo-500"></i>Seguimiento y Contrarreferencia
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="requiere_contrarreferencia"
+              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span>Requiere contrarreferencia</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo Esperado de Respuesta</label>
+          <select formControlName="tiempo_esperado_respuesta"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="7_dias">7 días</option>
+            <option value="15_dias">15 días</option>
+            <option value="30_dias">30 días</option>
+            <option value="60_dias">60 días</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Autorizado Por</label>
+          <input type="text" formControlName="autorizado_por"
+            placeholder="Nombre del jefe de servicio o autoridad que autoriza"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Número de Autorización</label>
+          <input type="text" formControlName="numero_autorizacion" 
+            placeholder="Número de folio o autorización administrativa"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 8: OBSERVACIONES GENERALES -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Generales
+      </h4>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Adicionales</label>
+        <textarea formControlName="observaciones" rows="4"
+          placeholder="Observaciones adicionales, instrucciones especiales, recomendaciones..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="mt-6 flex justify-between">
+      <div class="flex space-x-3">
+        <button type="button" (click)="limpiarFormulario('referenciaTraslado')"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-eraser mr-2"></i>
+          Limpiar
+        </button>
+
+        <button type="button" (click)="guardarBorrador()"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+          <i class="fas fa-save mr-2"></i>
+          Guardar Borrador
+        </button>
+      </div>
+
+      <div class="flex space-x-3">
+        <button type="button" (click)="guardarFormularioActivo()"
+          [disabled]="!referenciaForm.valid || isCreatingDocument"
+          class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+          <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+          <i *ngIf="!isCreatingDocument" class="fas fa-share mr-2"></i>
+          {{ isCreatingDocument ? 'Guardando...' : 'Guardar Referencia' }}
+        </button>
+
+        <button type="button" (click)="generarPDF('Referencia y Contrarreferencia')" 
+          [disabled]="!formularioEstado.referenciaTraslado"
+          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          {{ formularioEstado.referenciaTraslado ? 'Generar PDF' : 'Guardar primero' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- INFORMACIÓN NORMATIVA -->
+    <div class="mt-6 pt-4 border-t border-gray-200">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex items-start space-x-3">
+          <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+          <div>
+            <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
+            <div class="text-xs text-gray-600 space-y-1">
+              <p><strong>Sistema de Referencia:</strong> Transferencia de pacientes entre unidades médicas ✓</p>
+              <p><strong>Información Clínica:</strong> Diagnóstico, tratamiento y evolución completos ✓</p>
+              <p><strong>Continuidad:</strong> Garantizar continuidad de la atención médica ✓</p>
+              <p><strong>Responsabilidad:</strong> Médico referente responsable hasta la aceptación ✓</p>
+              <p><strong>Contrarreferencia:</strong> Respuesta de la unidad receptora obligatoria ✓</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center">
+        <div class="text-sm text-gray-500">
+          <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+          Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
 
       <!-- FORMULARIO DE CONSENTIMIENTO INFORMADO -->
       <div *ngIf="formularioActivo === 'consentimiento'" class="bg-white shadow rounded-lg mb-6">
@@ -4179,702 +4299,563 @@
       </div>
 
       <!-- FORMULARIO DE ALTA VOLUNTARIA -->
-      <div *ngIf="formularioActivo === 'altaVoluntaria'" class="space-y-6">
+<!-- FORMULARIO DE ALTA VOLUNTARIA MEJORADO -->
+<div *ngIf="formularioActivo === 'altaVoluntaria'" class="bg-white shadow rounded-lg mb-6">
+  <!-- ENCABEZADO -->
+  <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-door-open mr-2 text-red-500"></i>
+      Alta Voluntaria
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Egreso por voluntad propia según NOM-004-SSA3-2012</p>
+  </div>
 
-        <!-- ENCABEZADO -->
-        <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-6 text-white">
-          <div class="flex items-center space-x-3">
-            <i class="fas fa-door-open text-2xl"></i>
-            <div>
-              <h3 class="text-xl font-bold">🚪 Alta Voluntaria</h3>
-              <p class="text-red-100 text-sm">NOM-004-SSA3-2012 | Egreso por voluntad propia</p>
-            </div>
+  <form [formGroup]="altaVoluntariaForm" class="px-4 sm:px-6 py-4">
+
+    <!-- SECCIÓN 1: INFORMACIÓN BÁSICA DEL ALTA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-calendar-alt mr-2 text-red-500"></i>Información Básica del Alta
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Egreso *</label>
+          <input type="date" formControlName="fecha_egreso"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+          <div *ngIf="altaVoluntariaForm.get('fecha_egreso')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Egreso *</label>
+          <input type="time" formControlName="hora_egreso"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+          <div *ngIf="altaVoluntariaForm.get('hora_egreso')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alta *</label>
+          <select formControlName="tipo_alta"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+            <option value="CONTRA_OPINION_MEDICA">Contra opinión médica</option>
+            <option value="POR_MEJORIA_SUBJETIVA">Por mejoría subjetiva</option>
+            <option value="MOTIVOS_FAMILIARES">Motivos familiares</option>
+            <option value="MOTIVOS_ECONOMICOS">Motivos económicos</option>
+            <option value="TRASLADO_PRIVADO">Traslado a institución privada</option>
+            <option value="SEGUNDA_OPINION">Búsqueda de segunda opinión</option>
+            <option value="OTROS">Otros motivos</option>
+          </select>
+          <div *ngIf="altaVoluntariaForm.get('tipo_alta')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Número de Cama</label>
+          <input type="text" formControlName="numero_cama" placeholder="Ej: 101, 205A..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Servicio Médico</label>
+          <input type="text" formControlName="servicio_medico" placeholder="Ej: Medicina Interna, Cirugía..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: MOTIVO DEL ALTA VOLUNTARIA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-question-circle mr-2 text-orange-500"></i>Motivo del Alta Voluntaria *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo Principal del Alta Voluntaria *</label>
+          <textarea formControlName="motivo_alta_voluntaria" rows="3"
+            placeholder="Describa detalladamente el motivo por el cual solicita el alta voluntaria (NOM-004)..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('motivo_alta_voluntaria')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+          <div *ngIf="altaVoluntariaForm.get('motivo_alta_voluntaria')?.errors?.['minlength']" class="text-red-500 text-xs mt-1">
+            Mínimo 20 caracteres requeridos</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Información Adicional del Egreso</label>
+          <textarea formControlName="motivo_egreso" rows="2"
+            placeholder="Información adicional sobre las circunstancias del egreso..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: INFORMACIÓN MÉDICA ACTUAL -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-stethoscope mr-2 text-blue-500"></i>Estado Médico Actual del Paciente *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Actual *</label>
+          <textarea formControlName="diagnostico_actual" rows="2"
+            placeholder="Diagnóstico principal y diagnósticos secundarios actuales..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('diagnostico_actual')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Estado Clínico Actual *</label>
+          <textarea formControlName="estado_clinico_actual" rows="2"
+            placeholder="Estado general del paciente, signos vitales, nivel de conciencia al momento del alta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('estado_clinico_actual')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Resumen Clínico Completo *</label>
+          <textarea formControlName="resumen_clinico" rows="4"
+            placeholder="Resumen del cuadro clínico, evolución durante la hospitalización y estado actual del paciente..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('resumen_clinico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: TRATAMIENTO Y RIESGOS -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>Tratamiento Recomendado y Riesgos *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento Médico Recomendado *</label>
+          <textarea formControlName="tratamiento_recomendado" rows="3"
+            placeholder="Tratamiento que el médico recomienda continuar para la recuperación del paciente..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('tratamiento_recomendado')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Riesgos Explicados al Paciente *</label>
+          <textarea formControlName="riesgos_explicados" rows="3"
+            placeholder="Riesgos médicos específicos de abandonar o interrumpir el tratamiento hospitalario..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('riesgos_explicados')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Consecuencias de No Continuar Tratamiento *</label>
+          <textarea formControlName="consecuencias_informadas" rows="3"
+            placeholder="Consecuencias médicas esperadas si no se sigue el tratamiento recomendado..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('consecuencias_informadas')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Recomendaciones Médicas *</label>
+          <textarea formControlName="recomendaciones_medicas" rows="3"
+            placeholder="Recomendaciones específicas para el cuidado del paciente después del alta..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+          <div *ngIf="altaVoluntariaForm.get('recomendaciones_medicas')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: CUIDADOS POSTERIORES AL ALTA -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-clipboard-list mr-2 text-green-500"></i>Cuidados y Seguimiento Posterior
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cuidados en Casa</label>
+          <textarea formControlName="cuidados_domiciliarios" rows="3"
+            placeholder="Cuidados específicos que debe recibir el paciente en casa..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Medicamentos Prescritos</label>
+          <textarea formControlName="medicamentos_prescritos" rows="3"
+            placeholder="Medicamentos que debe continuar tomando, dosis y frecuencia..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Signos de Alarma</label>
+          <textarea formControlName="signos_alarma" rows="3"
+            placeholder="Signos y síntomas que indican necesidad de atención médica inmediata..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cuándo Regresar al Hospital</label>
+          <input type="text" formControlName="cuando_regresar"
+            placeholder="Ej: Ante cualquier complicación o deterioro del estado general"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cita de Control</label>
+          <input type="text" formControlName="cita_control" 
+            placeholder="Fecha y hora de próxima cita médica recomendada"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pronóstico sin Tratamiento</label>
+          <textarea formControlName="pronostico_sin_tratamiento" rows="2"
+            placeholder="Pronóstico médico esperado si no continúa el tratamiento hospitalario..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: RESPONSABLE DE LA DECISIÓN -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-user-check mr-2 text-purple-500"></i>Responsable de la Decisión *
+      </h4>
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="paciente_decide"
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>El paciente decide por sí mismo</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Responsable *</label>
+            <input type="text" formControlName="nombre_responsable" 
+              placeholder="Nombre completo del responsable de la decisión"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+            <div *ngIf="altaVoluntariaForm.get('nombre_responsable')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004</div>
           </div>
 
-          <!-- INDICADOR DE VALIDEZ -->
-          <div class="mt-4 flex items-center space-x-2 text-sm">
-            <div class="flex items-center space-x-1">
-              <i class="fas fa-check-circle"
-                [class]="altaVoluntariaForm.valid ? 'text-green-300' : 'text-gray-400'"></i>
-              <span>Formulario {{ altaVoluntariaForm.valid ? 'válido' : 'pendiente' }}</span>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco *</label>
+            <select formControlName="parentesco_responsable"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+              <option value="paciente">Paciente</option>
+              <option value="padre">Padre</option>
+              <option value="madre">Madre</option>
+              <option value="tutor">Tutor legal</option>
+              <option value="representante">Representante legal</option>
+              <option value="esposo">Esposo(a)</option>
+              <option value="hijo">Hijo(a)</option>
+              <option value="hermano">Hermano(a)</option>
+            </select>
+            <div *ngIf="altaVoluntariaForm.get('parentesco_responsable')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004</div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Identificación del Responsable</label>
+            <input type="text" formControlName="identificacion_responsable" 
+              placeholder="CURP, INE, Pasaporte, etc."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Edad del Responsable</label>
+            <input type="number" formControlName="edad_responsable" min="18" max="120" 
+              placeholder="Edad en años"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 7: TESTIGOS -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-users mr-2 text-indigo-500"></i>Testigos Requeridos *
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Testigo 1 -->
+        <div>
+          <h5 class="text-sm font-semibold text-gray-700 mb-3">Testigo 1</h5>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+              <input type="text" formControlName="testigo1_nombre" 
+                placeholder="Nombre completo del primer testigo"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+              <div *ngIf="altaVoluntariaForm.get('testigo1_nombre')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004</div>
             </div>
-            <div class="flex items-center space-x-1">
-              <i class="fas fa-exclamation-triangle"
-                [class]="altaVoluntariaForm.get('confirma_decision_voluntaria')?.value ? 'text-yellow-300' : 'text-gray-400'"></i>
-              <span>{{ altaVoluntariaForm.get('confirma_decision_voluntaria')?.value ? 'Decisión confirmada' : 'Sin
-                confirmar' }}</span>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Identificación</label>
+              <input type="text" formControlName="testigo1_identificacion" 
+                placeholder="CURP, INE, etc."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono de Contacto</label>
+              <input type="tel" formControlName="testigo1_telefono" 
+                placeholder="Número de teléfono"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
             </div>
           </div>
         </div>
 
-        <form [formGroup]="altaVoluntariaForm" class="space-y-6">
-
-          <!-- INFORMACIÓN BÁSICA DEL ALTA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-calendar-alt text-red-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Básica del Alta</h4>
+        <!-- Testigo 2 -->
+        <div>
+          <h5 class="text-sm font-semibold text-gray-700 mb-3">Testigo 2</h5>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+              <input type="text" formControlName="testigo2_nombre" 
+                placeholder="Nombre completo del segundo testigo"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+              <div *ngIf="altaVoluntariaForm.get('testigo2_nombre')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004</div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Fecha de Egreso -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de Egreso *
-                </label>
-                <input type="date" formControlName="fecha_egreso"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  [class.border-red-500]="altaVoluntariaForm.get('fecha_egreso')?.invalid && altaVoluntariaForm.get('fecha_egreso')?.touched">
-              </div>
-
-              <!-- Hora de Egreso -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Hora de Egreso *
-                </label>
-                <input type="time" formControlName="hora_egreso"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  [class.border-red-500]="altaVoluntariaForm.get('hora_egreso')?.invalid && altaVoluntariaForm.get('hora_egreso')?.touched">
-              </div>
-
-              <!-- Tipo de Alta -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo de Alta *
-                </label>
-                <select formControlName="tipo_alta"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                  <option value="CONTRA_OPINION_MEDICA">Contra opinión médica</option>
-                  <option value="POR_MEJORIA_SUBJETIVA">Por mejoría subjetiva</option>
-                  <option value="MOTIVOS_FAMILIARES">Motivos familiares</option>
-                  <option value="MOTIVOS_ECONOMICOS">Motivos económicos</option>
-                  <option value="TRASLADO_PRIVADO">Traslado a institución privada</option>
-                  <option value="SEGUNDA_OPINION">Búsqueda de segunda opinión</option>
-                  <option value="OTROS">Otros motivos</option>
-                </select>
-              </div>
-
-              <!-- Número de Cama -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Número de Cama
-                </label>
-                <input type="text" formControlName="numero_cama" placeholder="Ej: 101, 205A..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Servicio Médico -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Servicio Médico
-                </label>
-                <input type="text" formControlName="servicio_medico" placeholder="Ej: Medicina Interna, Cirugía..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Identificación</label>
+              <input type="text" formControlName="testigo2_identificacion" 
+                placeholder="CURP, INE, etc."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono de Contacto</label>
+              <input type="tel" formControlName="testigo2_telefono" 
+                placeholder="Número de teléfono"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
             </div>
           </div>
-
-          <!-- MOTIVO DEL ALTA VOLUNTARIA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-question-circle text-orange-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Motivo del Alta Voluntaria</h4>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-              <!-- Motivo Principal -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Motivo Principal del Alta Voluntaria *
-                </label>
-                <textarea formControlName="motivo_alta_voluntaria" rows="3"
-                  placeholder="Describa detalladamente el motivo por el cual solicita el alta voluntaria..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('motivo_alta_voluntaria')?.invalid && altaVoluntariaForm.get('motivo_alta_voluntaria')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('motivo_alta_voluntaria')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-                <div *ngIf="altaVoluntariaForm.get('motivo_alta_voluntaria')?.errors?.['minlength']"
-                  class="text-red-500 text-xs mt-1">Mínimo 20 caracteres</div>
-              </div>
-
-              <!-- Motivo Adicional -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Información Adicional
-                </label>
-                <textarea formControlName="motivo_egreso" rows="2"
-                  placeholder="Información adicional sobre las circunstancias del egreso..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN MÉDICA ACTUAL -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-stethoscope text-blue-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Médica Actual</h4>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-              <!-- Diagnóstico Actual -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Diagnóstico Actual *
-                </label>
-                <textarea formControlName="diagnostico_actual" rows="2"
-                  placeholder="Diagnóstico principal y secundarios..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('diagnostico_actual')?.invalid && altaVoluntariaForm.get('diagnostico_actual')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('diagnostico_actual')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Estado Clínico Actual -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Estado Clínico Actual *
-                </label>
-                <textarea formControlName="estado_clinico_actual" rows="2"
-                  placeholder="Estado general del paciente al momento del alta..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('estado_clinico_actual')?.invalid && altaVoluntariaForm.get('estado_clinico_actual')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('estado_clinico_actual')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Resumen Clínico -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Resumen Clínico *
-                </label>
-                <textarea formControlName="resumen_clinico" rows="3"
-                  placeholder="Resumen del estado clínico y evolución del paciente..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('resumen_clinico')?.invalid && altaVoluntariaForm.get('resumen_clinico')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('resumen_clinico')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TRATAMIENTO Y RIESGOS -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Tratamiento Recomendado y Riesgos</h4>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-              <!-- Tratamiento Recomendado -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tratamiento Médico Recomendado *
-                </label>
-                <textarea formControlName="tratamiento_recomendado" rows="3"
-                  placeholder="Tratamiento que el médico recomienda continuar..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('tratamiento_recomendado')?.invalid && altaVoluntariaForm.get('tratamiento_recomendado')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('tratamiento_recomendado')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Riesgos Explicados -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Riesgos Explicados al Paciente *
-                </label>
-                <textarea formControlName="riesgos_explicados" rows="3"
-                  placeholder="Riesgos de abandonar el tratamiento médico..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('riesgos_explicados')?.invalid && altaVoluntariaForm.get('riesgos_explicados')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('riesgos_explicados')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Consecuencias -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Consecuencias de No Continuar Tratamiento *
-                </label>
-                <textarea formControlName="consecuencias_informadas" rows="3"
-                  placeholder="Consecuencias médicas de no seguir el tratamiento..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('consecuencias_informadas')?.invalid && altaVoluntariaForm.get('consecuencias_informadas')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('consecuencias_informadas')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Pronóstico sin Tratamiento -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Pronóstico sin Tratamiento
-                </label>
-                <textarea formControlName="pronostico_sin_tratamiento" rows="2"
-                  placeholder="Pronóstico esperado si no continúa el tratamiento..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- RECOMENDACIONES PARA EL ALTA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-clipboard-list text-green-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Recomendaciones para el Alta</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Recomendaciones Médicas -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Recomendaciones Médicas *
-                </label>
-                <textarea formControlName="recomendaciones_medicas" rows="3"
-                  placeholder="Recomendaciones para el cuidado del paciente..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  [class.border-red-500]="altaVoluntariaForm.get('recomendaciones_medicas')?.invalid && altaVoluntariaForm.get('recomendaciones_medicas')?.touched"></textarea>
-                <div *ngIf="altaVoluntariaForm.get('recomendaciones_medicas')?.errors?.['required']"
-                  class="text-red-500 text-xs mt-1">Campo obligatorio</div>
-              </div>
-
-              <!-- Cuidados Domiciliarios -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Cuidados en Casa
-                </label>
-                <textarea formControlName="cuidados_domiciliarios" rows="3"
-                  placeholder="Cuidados que debe recibir en casa..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-
-              <!-- Medicamentos Prescritos -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Medicamentos Prescritos
-                </label>
-                <textarea formControlName="medicamentos_prescritos" rows="3"
-                  placeholder="Medicamentos que debe continuar tomando..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-
-              <!-- Signos de Alarma -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Signos de Alarma
-                </label>
-                <textarea formControlName="signos_alarma" rows="3"
-                  placeholder="Signos que indican necesidad de atención inmediata..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-
-              <!-- Cuándo Regresar -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Cuándo Regresar al Hospital
-                </label>
-                <input type="text" formControlName="cuando_regresar"
-                  placeholder="Ej: Ante cualquier complicación o deterioro"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Cita de Control -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Cita de Control
-                </label>
-                <input type="text" formControlName="cita_control" placeholder="Fecha y hora de próxima cita"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- RESPONSABLE DE LA DECISIÓN -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-user-check text-purple-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Responsable de la Decisión</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- El Paciente Decide -->
-              <div class="md:col-span-2">
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" formControlName="paciente_decide"
-                    class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                  <span class="text-sm font-medium text-gray-700">El paciente decide por sí mismo</span>
-                </label>
-              </div>
-
-              <!-- Nombre del Responsable -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre del Responsable *
-                </label>
-                <input type="text" formControlName="nombre_responsable" placeholder="Nombre completo del responsable"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  [class.border-red-500]="altaVoluntariaForm.get('nombre_responsable')?.invalid && altaVoluntariaForm.get('nombre_responsable')?.touched">
-              </div>
-
-              <!-- Parentesco -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Parentesco *
-                </label>
-                <select formControlName="parentesco_responsable"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  [class.border-red-500]="altaVoluntariaForm.get('parentesco_responsable')?.invalid && altaVoluntariaForm.get('parentesco_responsable')?.touched">
-                  <option value="paciente">Paciente</option>
-                  <option value="padre">Padre</option>
-                  <option value="madre">Madre</option>
-                  <option value="tutor">Tutor legal</option>
-                  <option value="representante">Representante legal</option>
-                  <option value="esposo">Esposo(a)</option>
-                  <option value="hijo">Hijo(a)</option>
-                  <option value="hermano">Hermano(a)</option>
-                </select>
-              </div>
-
-              <!-- Identificación -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Identificación del Responsable
-                </label>
-                <input type="text" formControlName="identificacion_responsable" placeholder="CURP, INE, Pasaporte..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Edad del Responsable -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Edad del Responsable
-                </label>
-                <input type="number" formControlName="edad_responsable" min="18" max="120" placeholder="Edad en años"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- TESTIGOS -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-users text-indigo-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Testigos</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Testigo 1 -->
-              <div>
-                <h5 class="text-md font-semibold text-gray-700 mb-3">Testigo 1</h5>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre Completo *
-                    </label>
-                    <input type="text" formControlName="testigo1_nombre" placeholder="Nombre completo del testigo"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      [class.border-red-500]="altaVoluntariaForm.get('testigo1_nombre')?.invalid && altaVoluntariaForm.get('testigo1_nombre')?.touched">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Identificación
-                    </label>
-                    <input type="text" formControlName="testigo1_identificacion" placeholder="CURP, INE, etc."
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <input type="tel" formControlName="testigo1_telefono" placeholder="Número de teléfono"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Testigo 2 -->
-              <div>
-                <h5 class="text-md font-semibold text-gray-700 mb-3">Testigo 2</h5>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre Completo *
-                    </label>
-                    <input type="text" formControlName="testigo2_nombre" placeholder="Nombre completo del testigo"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      [class.border-red-500]="altaVoluntariaForm.get('testigo2_nombre')?.invalid && altaVoluntariaForm.get('testigo2_nombre')?.touched">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Identificación
-                    </label>
-                    <input type="text" formControlName="testigo2_identificacion" placeholder="CURP, INE, etc."
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <input type="tel" formControlName="testigo2_telefono" placeholder="Número de teléfono"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN ADICIONAL -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-info-circle text-gray-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Adicional</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Médico que Autoriza -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Médico que Autoriza *
-                </label>
-                <input type="text" formControlName="medico_autoriza" placeholder="Nombre del médico responsable"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  [class.border-red-500]="altaVoluntariaForm.get('medico_autoriza')?.invalid && altaVoluntariaForm.get('medico_autoriza')?.touched">
-              </div>
-
-              <!-- Medio de Transporte -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Medio de Transporte
-                </label>
-                <input type="text" formControlName="medio_transporte"
-                  placeholder="Ambulancia, vehículo particular, etc."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Acompañado Por -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Acompañado Por
-                </label>
-                <input type="text" formControlName="acompañado_por" placeholder="Nombre de quien acompaña al paciente"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Continuidad de Tratamiento -->
-              <div>
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" formControlName="continua_tratamiento_externo"
-                    class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                  <span class="text-sm font-medium text-gray-700">Continuará tratamiento en otra institución</span>
-                </label>
-              </div>
-
-              <!-- Establecimiento Destino (solo si continúa tratamiento) -->
-              <div *ngIf="altaVoluntariaForm.get('continua_tratamiento_externo')?.value" class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Establecimiento de Destino
-                </label>
-                <input type="text" formControlName="establecimiento_destino"
-                  placeholder="Nombre de la institución donde continuará tratamiento"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Condiciones del Egreso -->
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Condiciones del Egreso
-                </label>
-                <textarea formControlName="condiciones_egreso" rows="2"
-                  placeholder="Condiciones especiales para el egreso..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN ADMINISTRATIVA -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-calculator text-green-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Información Administrativa</h4>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Pendiente de Pago -->
-              <div>
-                <label class="flex items-center space-x-2">
-                  <input type="checkbox" formControlName="pendiente_pago"
-                    class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                  <span class="text-sm font-medium text-gray-700">Tiene adeudo pendiente</span>
-                </label>
-              </div>
-
-              <!-- Monto Pendiente (solo si hay adeudo) -->
-              <div *ngIf="altaVoluntariaForm.get('pendiente_pago')?.value">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Monto Pendiente ($)
-                </label>
-                <input type="number" formControlName="monto_pendiente" min="0" step="0.01" placeholder="0.00"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-
-              <!-- Convenio de Pago -->
-              <div *ngIf="altaVoluntariaForm.get('pendiente_pago')?.value">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Convenio de Pago
-                </label>
-                <input type="text" formControlName="convenio_pago" placeholder="Detalles del convenio de pago"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- CONFIRMACIONES OBLIGATORIAS -->
-          <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-exclamation-triangle text-red-500"></i>
-              <h4 class="text-lg font-semibold text-red-800">Confirmaciones Obligatorias</h4>
-            </div>
-
-            <div class="space-y-3">
-              <label class="flex items-start space-x-3">
-                <input type="checkbox" formControlName="confirma_riesgos_entendidos"
-                  class="rounded border-red-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50 mt-1"
-                  [class.border-red-500]="altaVoluntariaForm.get('confirma_riesgos_entendidos')?.invalid && altaVoluntariaForm.get('confirma_riesgos_entendidos')?.touched">
-                <span class="text-sm text-red-800">
-                  <strong>Confirmo que se me han explicado y entiendo completamente los riesgos</strong> de abandonar el
-                  tratamiento médico y las posibles consecuencias para mi salud.
-                </span>
-              </label>
-
-              <label class="flex items-start space-x-3">
-                <input type="checkbox" formControlName="confirma_consecuencias_claras"
-                  class="rounded border-red-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50 mt-1"
-                  [class.border-red-500]="altaVoluntariaForm.get('confirma_consecuencias_claras')?.invalid && altaVoluntariaForm.get('confirma_consecuencias_claras')?.touched">
-                <span class="text-sm text-red-800">
-                  <strong>Las consecuencias me han sido explicadas claramente</strong> y entiendo que mi estado de salud
-                  puede empeorar sin el tratamiento recomendado.
-                </span>
-              </label>
-
-              <label class="flex items-start space-x-3">
-                <input type="checkbox" formControlName="confirma_decision_voluntaria"
-                  class="rounded border-red-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50 mt-1"
-                  [class.border-red-500]="altaVoluntariaForm.get('confirma_decision_voluntaria')?.invalid && altaVoluntariaForm.get('confirma_decision_voluntaria')?.touched">
-                <span class="text-sm text-red-800">
-                  <strong>Esta decisión es completamente voluntaria</strong> y libre, sin coerción por parte de
-                  terceros, y me hago responsable de las consecuencias.
-                </span>
-              </label>
-
-              <label class="flex items-start space-x-3">
-                <input type="checkbox" formControlName="confirma_recomendaciones_recibidas"
-                  class="rounded border-red-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50 mt-1"
-                  [class.border-red-500]="altaVoluntariaForm.get('confirma_recomendaciones_recibidas')?.invalid && altaVoluntariaForm.get('confirma_recomendaciones_recibidas')?.touched">
-                <span class="text-sm text-red-800">
-                  <strong>He recibido las recomendaciones médicas</strong> para el cuidado posterior y las indicaciones
-                  de cuándo buscar atención médica urgente.
-                </span>
-              </label>
-
-              <!-- Mensaje de error si faltan confirmaciones -->
-              <div *ngIf="(altaVoluntariaForm.get('confirma_riesgos_entendidos')?.invalid ||
-                    altaVoluntariaForm.get('confirma_consecuencias_claras')?.invalid ||
-                    altaVoluntariaForm.get('confirma_decision_voluntaria')?.invalid ||
-                    altaVoluntariaForm.get('confirma_recomendaciones_recibidas')?.invalid) &&
-                   (altaVoluntariaForm.get('confirma_riesgos_entendidos')?.touched ||
-                    altaVoluntariaForm.get('confirma_consecuencias_claras')?.touched ||
-                    altaVoluntariaForm.get('confirma_decision_voluntaria')?.touched ||
-                    altaVoluntariaForm.get('confirma_recomendaciones_recibidas')?.touched)"
-                class="text-red-600 text-sm font-medium bg-red-100 p-3 rounded-md">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                Todas las confirmaciones son obligatorias para proceder con el alta voluntaria.
-              </div>
-            </div>
-          </div>
-
-          <!-- OBSERVACIONES -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center space-x-2 mb-4">
-              <i class="fas fa-comment-alt text-gray-500"></i>
-              <h4 class="text-lg font-semibold text-gray-800">Observaciones</h4>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4">
-              <!-- Observaciones Médicas -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Observaciones Médicas
-                </label>
-                <textarea formControlName="observaciones_medicas" rows="3"
-                  placeholder="Observaciones adicionales del médico..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-
-              <!-- Observaciones de Enfermería -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Observaciones de Enfermería
-                </label>
-                <textarea formControlName="observaciones_enfermeria" rows="2"
-                  placeholder="Observaciones del personal de enfermería..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-
-              <!-- Observaciones Adicionales -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Observaciones Adicionales
-                </label>
-                <textarea formControlName="observaciones_adicionales" rows="2"
-                  placeholder="Otras observaciones relevantes..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- AVISO LEGAL -->
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <div class="flex items-start space-x-3">
-              <i class="fas fa-balance-scale text-yellow-600 text-xl mt-1"></i>
-              <div>
-                <h4 class="text-lg font-semibold text-yellow-800 mb-2">Aviso Legal Importante</h4>
-                <div class="text-sm text-yellow-800 space-y-2">
-                  <p><strong>RESPONSABILIDAD LEGAL:</strong> Al firmar este documento, el paciente/responsable asume
-                    toda la responsabilidad por las consecuencias derivadas de abandonar el tratamiento médico.</p>
-                  <p><strong>EXENCIÓN DE RESPONSABILIDAD:</strong> El hospital y su personal médico quedan exentos de
-                    cualquier responsabilidad legal por complicaciones posteriores relacionadas con la interrupción del
-                    tratamiento.</p>
-                  <p><strong>VALIDEZ LEGAL:</strong> Este documento tiene validez legal según la NOM-004-SSA3-2012 y
-                    debe ser firmado por el paciente/responsable, dos testigos y el médico tratante.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- BOTONES DE ACCIÓN -->
-          <div class="flex justify-end space-x-3 pt-4 border-t">
-            <button type="button" (click)="resetearFormularioActual()"
-              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-              <i class="fas fa-eraser mr-2"></i>
-              Limpiar
-            </button>
-
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!altaVoluntariaForm.valid || isCreatingDocument"
-              class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-door-open mr-2"></i>
-              {{ isCreatingDocument ? 'Procesando...' : 'Procesar Alta Voluntaria' }}
-            </button>
-          </div>
-
-          <!-- Mensaje de estado del formulario -->
-          <div class="text-center text-sm text-gray-500 pt-2">
-            <i class="fas fa-info-circle mr-1"></i>
-            Campos marcados con * son obligatorios según NOM-004-SSA3-2012
-          </div>
-        </form>
+        </div>
       </div>
+    </div>
+
+    <!-- SECCIÓN 8: INFORMACIÓN ADICIONAL -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-info-circle mr-2 text-gray-500"></i>Información Adicional
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Médico que Autoriza *</label>
+          <input type="text" formControlName="medico_autoriza" 
+            placeholder="Nombre del médico responsable que autoriza el alta"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+          <div *ngIf="altaVoluntariaForm.get('medico_autoriza')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+            Campo obligatorio según NOM-004</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Medio de Transporte</label>
+          <input type="text" formControlName="medio_transporte"
+            placeholder="Ambulancia particular, vehículo propio, etc."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Acompañado Por</label>
+          <input type="text" formControlName="acompañado_por" 
+            placeholder="Nombre de la persona que acompaña al paciente"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" formControlName="continua_tratamiento_externo"
+              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+            <span>Continuará tratamiento en otra institución</span>
+          </label>
+        </div>
+
+        <!-- Campo condicional para establecimiento destino -->
+        <div *ngIf="altaVoluntariaForm.get('continua_tratamiento_externo')?.value" class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Establecimiento de Destino</label>
+          <input type="text" formControlName="establecimiento_destino"
+            placeholder="Nombre de la institución donde continuará el tratamiento"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Condiciones del Egreso</label>
+          <textarea formControlName="condiciones_egreso" rows="2"
+            placeholder="Condiciones especiales o consideraciones para el egreso del paciente..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 9: CONFIRMACIONES OBLIGATORIAS -->
+    <div class="mb-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-3">
+        <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Confirmaciones Obligatorias *
+      </h4>
+      <div class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="space-y-3">
+          <label class="flex items-start space-x-3">
+            <input type="checkbox" formControlName="confirma_riesgos_entendidos"
+              class="rounded border-red-300 text-red-600 focus:ring-red-500 mt-1">
+            <span class="text-sm text-red-800">
+              <strong>Confirmo que se me han explicado y entiendo completamente los riesgos</strong> de abandonar el 
+              tratamiento médico y las posibles consecuencias para mi salud.
+            </span>
+          </label>
+
+          <label class="flex items-start space-x-3">
+            <input type="checkbox" formControlName="confirma_consecuencias_claras"
+              class="rounded border-red-300 text-red-600 focus:ring-red-500 mt-1">
+            <span class="text-sm text-red-800">
+              <strong>Las consecuencias me han sido explicadas claramente</strong> y entiendo que mi estado de salud 
+              puede empeorar sin el tratamiento recomendado.
+            </span>
+          </label>
+
+          <label class="flex items-start space-x-3">
+            <input type="checkbox" formControlName="confirma_decision_voluntaria"
+              class="rounded border-red-300 text-red-600 focus:ring-red-500 mt-1">
+            <span class="text-sm text-red-800">
+              <strong>Esta decisión es completamente voluntaria</strong> y libre, sin coerción por parte de terceros, 
+              y me hago responsable de las consecuencias.
+            </span>
+          </label>
+
+          <label class="flex items-start space-x-3">
+            <input type="checkbox" formControlName="confirma_recomendaciones_recibidas"
+              class="rounded border-red-300 text-red-600 focus:ring-red-500 mt-1">
+            <span class="text-sm text-red-800">
+              <strong>He recibido las recomendaciones médicas</strong> para el cuidado posterior y las indicaciones 
+              de cuándo buscar atención médica urgente.
+            </span>
+          </label>
+
+          <!-- Mensaje de error para confirmaciones -->
+          <div *ngIf="(altaVoluntariaForm.get('confirma_riesgos_entendidos')?.invalid ||
+                altaVoluntariaForm.get('confirma_consecuencias_claras')?.invalid ||
+                altaVoluntariaForm.get('confirma_decision_voluntaria')?.invalid ||
+                altaVoluntariaForm.get('confirma_recomendaciones_recibidas')?.invalid) &&
+               (altaVoluntariaForm.touched)"
+               class="text-red-600 text-sm font-medium bg-red-100 p-3 rounded-md">
+           <i class="fas fa-exclamation-circle mr-2"></i>
+           Todas las confirmaciones son obligatorias para proceder con el alta voluntaria según NOM-004.
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- SECCIÓN 10: OBSERVACIONES -->
+   <div class="mb-6">
+     <h4 class="text-md font-semibold text-gray-800 mb-3">
+       <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Adicionales
+     </h4>
+     <div class="grid grid-cols-1 gap-4">
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Médicas</label>
+         <textarea formControlName="observaciones_medicas" rows="3"
+           placeholder="Observaciones adicionales del médico tratante..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+       </div>
+
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones de Enfermería</label>
+         <textarea formControlName="observaciones_enfermeria" rows="2"
+           placeholder="Observaciones del personal de enfermería..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+       </div>
+
+       <div>
+         <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Adicionales</label>
+         <textarea formControlName="observaciones_adicionales" rows="2"
+           placeholder="Otras observaciones relevantes para el alta voluntaria..."
+           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+       </div>
+     </div>
+   </div>
+
+   <!-- BOTONES DE ACCIÓN -->
+   <div class="mt-6 flex justify-between">
+     <div class="flex space-x-3">
+       <button type="button" (click)="limpiarFormulario('altaVoluntaria')"
+         class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+         <i class="fas fa-eraser mr-2"></i>
+         Limpiar
+       </button>
+
+       <button type="button" (click)="guardarBorrador()"
+         class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+         <i class="fas fa-save mr-2"></i>
+         Guardar Borrador
+       </button>
+     </div>
+
+     <div class="flex space-x-3">
+       <button type="button" (click)="guardarFormularioActivo()"
+         [disabled]="!altaVoluntariaForm.valid || isCreatingDocument"
+         class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+         <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+         <i *ngIf="!isCreatingDocument" class="fas fa-door-open mr-2"></i>
+         {{ isCreatingDocument ? 'Procesando...' : 'Procesar Alta Voluntaria' }}
+       </button>
+
+       <button type="button" (click)="generarPDF('Alta Voluntaria')" 
+         [disabled]="!formularioEstado.altaVoluntaria"
+         class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:bg-gray-300 transition-colors">
+         <i class="fas fa-file-pdf mr-2"></i>
+         {{ formularioEstado.altaVoluntaria ? 'Generar PDF' : 'Guardar primero' }}
+       </button>
+     </div>
+   </div>
+
+   <!-- INFORMACIÓN NORMATIVA -->
+   <div class="mt-6 pt-4 border-t border-gray-200">
+     <div class="bg-gray-50 rounded-lg p-4">
+       <div class="flex items-start space-x-3">
+         <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+         <div>
+           <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
+           <div class="text-xs text-gray-600 space-y-1">
+             <p><strong>Alta Voluntaria:</strong> Egreso por decisión del paciente contra opinión médica ✓</p>
+             <p><strong>Información Completa:</strong> Riesgos, consecuencias y recomendaciones explicadas ✓</p>
+             <p><strong>Consentimiento:</strong> Decisión libre y voluntaria debidamente documentada ✓</p>
+             <p><strong>Responsabilidad:</strong> El paciente asume todas las consecuencias médicas ✓</p>
+             <p><strong>Testigos:</strong> Dos testigos y médico tratante como validación legal ✓</p>
+           </div>
+         </div>
+       </div>
+     </div>
+
+     <!-- Aviso Legal -->
+     <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+       <div class="flex items-start space-x-3">
+         <i class="fas fa-balance-scale text-yellow-600 text-lg mt-1"></i>
+         <div>
+           <h5 class="text-sm font-semibold text-yellow-800 mb-2">Aviso Legal Importante</h5>
+           <div class="text-xs text-yellow-800 space-y-1">
+             <p><strong>RESPONSABILIDAD LEGAL:</strong> El paciente/responsable asume toda responsabilidad por las consecuencias de abandonar el tratamiento.</p>
+             <p><strong>EXENCIÓN MÉDICA:</strong> El hospital y personal médico quedan exentos de responsabilidad por complicaciones posteriores.</p>
+             <p><strong>VALIDEZ LEGAL:</strong> Documento con validez legal que requiere firmas del paciente/responsable, testigos y médico.</p>
+           </div>
+         </div>
+       </div>
+     </div>
+
+     <div class="mt-3 text-center">
+       <div class="text-sm text-gray-500">
+         <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+         Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
+       </div>
+     </div>
+   </div>
+
+ </form>
+</div>
 
 
       <!-- FORMULARIO DE NOTA PREANESTÉSICA -->

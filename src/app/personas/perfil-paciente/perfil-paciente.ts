@@ -279,50 +279,150 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   filtroActivo: FiltroCategoria = 'todos';
   formulariosVisibles: string[] = [];
 
+  modoPresentacion = false;
+  // Método para activar modo presentación
+activarModoPresentacion(): void {
+  this.modoPresentacion = true;
+  console.log('🎯 Modo presentación activado - Solo documentos completos');
+}
 
-  gruposFormularios = {
-    basicos: {
-      nombre: 'Documentos Básicos',
-      icono: 'fas fa-file-medical',
-      color: 'blue',
-      formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
-    },
-    quirurgicos: {
-      nombre: 'Documentos Quirúrgicos',
-      icono: 'fas fa-procedures',
-      color: 'orange',
-      formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
-    },
-    solicitudes: {
-      nombre: 'Solicitudes de Estudios',
-      icono: 'fas fa-vial',
-      color: 'green',
-      formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria'],
-    },
-    pediatricos: {
-      nombre: 'Documentos Pediátricos',
-      icono: 'fas fa-baby',
-      color: 'pink',
-      formularios: [
-        'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
-        'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
-        'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-      ],
-      condition: () => this.esPacientePediatrico,
-    },
-    prescripciones: {
-      nombre: 'Prescripciones',
-      icono: 'fas fa-pills',
-      color: 'purple',
-      formularios: ['prescripcionMedicamento', 'registroTransfusion'],
-    },
-    especiales: {
-      nombre: 'Documentos Especiales',
-      icono: 'fas fa-folder-open',
-      color: 'gray',
-      formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
-    },
-  };
+// Método para desactivar modo presentación
+desactivarModoPresentacion(): void {
+  this.modoPresentacion = false;
+  console.log('🔧 Modo desarrollo activado - Todos los documentos');
+}
+
+  // gruposFormularios = {
+  //   basicos: {
+  //     nombre: 'Documentos Básicos',
+  //     icono: 'fas fa-file-medical',
+  //     color: 'blue',
+  //     formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
+  //   },
+  //   quirurgicos: {
+  //     nombre: 'Documentos Quirúrgicos',
+  //     icono: 'fas fa-procedures',
+  //     color: 'orange',
+  //     formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
+  //   },
+  //   solicitudes: {
+  //     nombre: 'Solicitudes de Estudios',
+  //     icono: 'fas fa-vial',
+  //     color: 'green',
+  //     formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria'],
+  //   },
+  //   pediatricos: {
+  //     nombre: 'Documentos Pediátricos',
+  //     icono: 'fas fa-baby',
+  //     color: 'pink',
+  //     formularios: [
+  //       'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
+  //       'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
+  //       'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
+  //     ],
+  //     condition: () => this.esPacientePediatrico,
+  //   },
+  //   prescripciones: {
+  //     nombre: 'Prescripciones',
+  //     icono: 'fas fa-pills',
+  //     color: 'purple',
+  //     formularios: ['prescripcionMedicamento', 'registroTransfusion'],
+  //   },
+  //   especiales: {
+  //     nombre: 'Documentos Especiales',
+  //     icono: 'fas fa-folder-open',
+  //     color: 'gray',
+  //     formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
+  //   },
+  // };
+
+//   gruposFormularios = {
+//   basicos: {
+//     nombre: 'Documentos Básicos',
+//     icono: 'fas fa-file-medical',
+//     color: 'blue',
+//     formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
+//   },
+//   quirurgicos: {
+//     nombre: 'Documentos Quirúrgicos',
+//     icono: 'fas fa-procedures',
+//     color: 'orange',
+//     formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
+//   },
+//   solicitudes: {
+//     nombre: 'Solicitudes de Estudios',
+//     icono: 'fas fa-vial',
+//     color: 'green',
+//     formularios: ['solicitudEstudio'], // ✅ SOLO SOLICITUD ESTUDIO (quitamos cultivo y gasometría)
+//   },
+//   pediatricos: {
+//     nombre: 'Documentos Pediátricos',
+//     icono: 'fas fa-baby',
+//     color: 'pink',
+//     formularios: [
+//       'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
+//       'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
+//       'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
+//     ],
+//     condition: () => this.esPacientePediatrico,
+//   },
+//   // ✅ PRESCRIPCIONES COMENTADO COMPLETAMENTE
+//   /*
+//   prescripciones: {
+//     nombre: 'Prescripciones',
+//     icono: 'fas fa-pills',
+//     color: 'purple',
+//     formularios: ['prescripcionMedicamento', 'registroTransfusion'],
+//   },
+//   */
+//   especiales: {
+//     nombre: 'Documentos Especiales',
+//     icono: 'fas fa-folder-open',
+//     color: 'gray',
+//     formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
+//   },
+// };
+
+gruposFormularios = {
+  basicos: {
+    nombre: 'Documentos Básicos',
+    icono: 'fas fa-file-medical',
+    color: 'blue', // ✅ Mantiene azul - se ve bien
+    formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
+  },
+  quirurgicos: {
+    nombre: 'Documentos Quirúrgicos',
+    icono: 'fas fa-procedures',
+    color: 'red', // ✅ CAMBIADO de orange a red - más impactante para documentos quirúrgicos
+    formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
+  },
+  solicitudes: {
+    nombre: 'Solicitudes de Estudios',
+    icono: 'fas fa-vial',
+    color: 'teal', // ✅ CAMBIADO de green a teal - color único y profesional
+    formularios: ['solicitudEstudio'],
+  },
+  // ✅ PEDIÁTRICOS COMENTADO COMPLETAMENTE
+  /*
+  pediatricos: {
+    nombre: 'Documentos Pediátricos',
+    icono: 'fas fa-baby',
+    color: 'pink',
+    formularios: [
+      'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
+      'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
+      'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
+    ],
+    condition: () => this.esPacientePediatrico,
+  },
+  */
+  especiales: {
+    nombre: 'Documentos Especiales',
+    icono: 'fas fa-folder-open',
+    color: 'indigo', // ✅ CAMBIADO de gray a indigo - más elegante y distintivo
+    formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
+  },
+};
 
 //   gruposFormularios = {
 //   basicos: {
@@ -392,8 +492,8 @@ export class PerfilPaciente implements OnInit, OnDestroy {
     controlCrecimiento: { nombre: 'Control Crecimiento', icono: 'fas fa-child', obligatorio: false, frecuente: false, completado: false },
     esquemaVacunacion: { nombre: 'Vacunas', icono: 'fas fa-shield-alt', obligatorio: false, frecuente: false, completado: false },
     desarrolloPsicomotriz: { nombre: 'Desarrollo', icono: 'fas fa-brain', obligatorio: false, frecuente: false, completado: false },
-    prescripcionMedicamento: { nombre: 'Prescripción', icono: 'fas fa-prescription-bottle-alt', obligatorio: false, frecuente: true, completado: false },
-    registroTransfusion: { nombre: 'Transfusión', icono: 'fas fa-tint', obligatorio: false, frecuente: false, completado: false },
+    // prescripcionMedicamento: { nombre: 'Prescripción', icono: 'fas fa-prescription-bottle-alt', obligatorio: false, frecuente: true, completado: false },
+    // registroTransfusion: { nombre: 'Transfusión', icono: 'fas fa-tint', obligatorio: false, frecuente: false, completado: false },
     hojaFrontal: { nombre: 'Hoja Frontal', icono: 'fas fa-file-alt', obligatorio: true, frecuente: false, completado: false },
     altaVoluntaria: { nombre: 'Alta Voluntaria', icono: 'fas fa-door-open', obligatorio: false, frecuente: true, completado: false },
     referenciaTraslado: { nombre: 'Referencia y Contrarreferencia', icono: 'fas fa-share', obligatorio: false, frecuente: true, completado: false },
@@ -6098,65 +6198,55 @@ sincronizarSignosVitales(): void {
     this.mostrarTodosFormularios = !this.mostrarTodosFormularios;
   }
 
-  getGruposVisibles(): any[] {
-    // Retornar grupos básicos actualizados
-    return [
-      {
-        key: 'principales',
-        data: {
-          nombre: 'Documentos Principales',
-          icono: 'fas fa-star',
-          color: 'blue',
-          formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal', 'notaInterconsulta', 'notaEgreso']
-        }
-      },
-      {
-        key: 'clinicos',
-        data: {
-          nombre: 'Documentos Clínicos',
-          icono: 'fas fa-file-medical',
-          color: 'green',
-          formularios: ['notaUrgencias', 'notaEvolucion']
-        }
-      },
-      {
-        key: 'quirurgicos',  // ✅ NUEVO GRUPO
-        data: {
-          nombre: 'Documentos Quirúrgicos',
-          icono: 'fas fa-user-md',
-          color: 'orange',
-          formularios: ['notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica']
-        }
-      },
-      {
-        key: 'solicitudes',
-        data: {
-          nombre: 'Solicitudes de Estudios',
-          icono: 'fas fa-microscope',
-          color: 'teal',  // ✅ CAMBIADO de green a teal para diferencia
-          formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria']
-        }
-      },
-      {
-        key: 'prescripciones',
-        data: {
-          nombre: 'Prescripciones y Medicamentos',
-          icono: 'fas fa-pills',
-          color: 'purple',
-          formularios: ['prescripcionMedicamento', 'registroTransfusion']
-        }
-      },
-      {
-        key: 'administrativos',
-        data: {
-          nombre: 'Documentos Administrativos',
-          icono: 'fas fa-folder-open',
-          color: 'gray',
-          formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento']
-        }
+getGruposVisibles(): any[] {
+  return [
+    {
+      key: 'principales',
+      data: {
+        nombre: 'Documentos Principales',
+        icono: 'fas fa-star',
+        color: 'blue', // ✅ Azul - color principal
+        formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal', 'notaInterconsulta', 'notaEgreso']
       }
-    ];
-  }
+    },
+    {
+      key: 'clinicos',
+      data: {
+        nombre: 'Documentos Clínicos',
+        icono: 'fas fa-file-medical',
+        color: 'green', // ✅ Verde - color médico clásico
+        formularios: ['notaUrgencias', 'notaEvolucion']
+      }
+    },
+    {
+      key: 'quirurgicos',
+      data: {
+        nombre: 'Documentos Quirúrgicos',
+        icono: 'fas fa-user-md',
+        color: 'red', // ✅ CAMBIADO - rojo para quirúrgicos (más impactante)
+        formularios: ['notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica']
+      }
+    },
+    {
+      key: 'solicitudes',
+      data: {
+        nombre: 'Solicitudes de Estudios',
+        icono: 'fas fa-microscope',
+        color: 'teal', // ✅ CAMBIADO - teal para diferenciarlo
+        formularios: ['solicitudEstudio']
+      }
+    },
+    {
+      key: 'administrativos',
+      data: {
+        nombre: 'Documentos Administrativos',
+        icono: 'fas fa-folder-open',
+        color: 'indigo', // ✅ CAMBIADO - indigo para documentos administrativos
+        formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento']
+      }
+    }
+  ];
+}
 
   getFormulariosVisiblesEnGrupo(formularios: string[]): any[] {
     if (!formularios || !Array.isArray(formularios)) {

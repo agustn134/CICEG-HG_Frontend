@@ -5,6 +5,6 @@ import { environment } from '../../../environments/environments';
   providedIn: 'root'
 })
 export class NotasNutricion {
-private readonly API_URL = `${environment.apiUrl}/api/notas-especializadas/notas-psicologia`;
+private readonly API_URL = `${environment.apiUrl}/notas-especializadas/notas-psicologia`;
   constructor() { }
 }

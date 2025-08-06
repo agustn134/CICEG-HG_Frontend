@@ -152,7 +152,7 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
 
       // 🔥 NUEVOS CAMPOS DE CREDENCIALES
       usuario: ['', [Validators.required, Validators.minLength(3)]],
-      password_texto: ['', [Validators.required, Validators.minLength(6)]],
+      password_texto: ['', [Validators.minLength(6)]],
     });
 
     this.credencialesForm = this.fb.group({
