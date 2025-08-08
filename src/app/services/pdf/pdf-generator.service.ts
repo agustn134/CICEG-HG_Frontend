@@ -210,10 +210,6 @@ export class PdfGeneratorService {
         case 'Nota Preanestésica': 
         documentDefinition = await this.pdfTemplatesService.generarNotaPreanestesica(datosParaTemplate);
           break;
-        // case 'Nota Preoperatoria':
-        // case 'Preoperatoria':
-        //   documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
-        //   break;
       case 'Nota Preoperatoria':
       case 'Preoperatoria':
         documentDefinition = await this.pdfTemplatesService.generarNotaPreoperatoria(datosParaTemplate);
@@ -1467,7 +1463,7 @@ private formatearDireccionMejorada(paciente: any): string {
   // //////////////////////////////  GENERACION DE DOCUMENTOS ////////////////////////////////
 
 
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\services\PDF\pdf-generator.service.ts
   async generarHistoriaClinica(datos: any): Promise<void> {
     console.log('🩺 Generando Historia Clínica NOM-004...');
     try {
@@ -1487,15 +1483,19 @@ private formatearDireccionMejorada(paciente: any): string {
 
       // 2. Preparar datos para el template
       const datosParaTemplate = {
-        ...datos,
-        medicoCompleto,
-        pacienteCompleto,
-        signosVitales: signosVitalesReales, // ✅ AHORA FUNCIONA
-        guiaClinica: guiaClinicaData,
-        guiasClinicas: datos.guiasClinicas || [],
-        datosPadres,
-        configuracion,
-      };
+  ...datos,
+  medicoCompleto,
+  pacienteCompleto,
+  signosVitales: signosVitalesReales,
+  historiaClinica: {
+    ...datos.historiaClinica,
+    codigo_cie10: datos.historiaClinica?.codigo_cie10, // 🔥 ASEGURAR QUE PASE
+  },
+  guiaClinica: guiaClinicaData,
+  guiasClinicas: datos.guiasClinicas || [],
+  datosPadres,
+  configuracion,
+};
 
       // ✅ DEBUG: Verificar que los datos llegan correctamente
       console.log('  Datos del paciente que van al template:', pacienteCompleto);
@@ -1604,7 +1604,7 @@ private formatearDireccionMejorada(paciente: any): string {
     }
   }
 
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\services\PDF\pdf-generator.service.ts
   async generarNotaUrgenciasMedicas(datos: any): Promise<void> {
     console.log('  Generando PDF de Nota de Urgencias...');
 
@@ -1639,6 +1639,41 @@ private formatearDireccionMejorada(paciente: any): string {
       throw error;
     }
   }
+
+  async generarNotaEvolucion(datos: any): Promise<void> {
+  console.log('📈 Generando PDF de Nota de Evolución...');
+
+  try {
+    await this.ensurePdfMakeLoaded();
+
+    // 1. Procesar datos
+    const medicoCompleto = await this.obtenerDatosMedicoActual();
+    const pacienteCompleto = this.validarYFormatearDatosPaciente(datos.paciente);
+
+    // 2. Preparar datos para template
+    const datosParaTemplate = {
+      ...datos,
+      medicoCompleto,
+      pacienteCompleto
+    };
+
+    // 3. Obtener definición del template
+    const documentDefinition = await this.pdfTemplatesService.generarNotaEvolucion(datosParaTemplate);
+
+    // 4. Generar y descargar
+    const fechaActual = new Date();
+    const nombreArchivo = `nota-evolucion-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
+
+    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
+    pdfDocGenerator.download(nombreArchivo);
+
+    console.log('✅ PDF de Nota de Evolución generado exitosamente');
+
+  } catch (error) {
+    console.error('❌ Error al generar PDF de Nota de Evolución:', error);
+    throw error;
+  }
+}
 
 
 }

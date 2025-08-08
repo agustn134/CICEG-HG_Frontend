@@ -567,7 +567,7 @@
       <!-- ==========================================
           FORMULARIOS
           ========================================== -->
-
+<!-- C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.html -->
       <!-- FORMULARIO DE SIGNOS VITALES -->
       <div *ngIf="formularioActivo === 'signosVitales'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -690,7 +690,6 @@
 
         </form>
       </div>
-
          <!-- FORMULARIO DE HISTORIA CLÍNICA        LISTO--> 
       <div *ngIf="formularioActivo === 'historiaClinica'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -1247,10 +1246,119 @@
                 <textarea formControlName="impresion_diagnostica" rows="3"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Diagnóstico principal y diferenciales..."></textarea>
+                  
                 <div *ngIf="historiaClinicaForm.get('impresion_diagnostica')?.errors?.['required']"
                   class="text-red-500 text-xs mt-1">
                   Campo obligatorio
                 </div>
+
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-code-branch mr-2 text-blue-600"></i>
+    Clasificación Internacional de Enfermedades (CIE-10)
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="historiaClinicaForm.get('codigo_cie10')?.value" class="mb-3">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+          <div>
+            <div class="font-medium text-blue-900">
+              {{ historiaClinicaForm.get('codigo_cie10')?.value?.split(' - ')[0] }}
+            </div>
+            <div class="text-sm text-blue-700">
+              {{ historiaClinicaForm.get('codigo_cie10')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="historiaClinicaForm.get('codigo_cie10')?.setValue('')"
+          class="text-blue-600 hover:text-blue-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-search mr-1 text-blue-500"></i>
+      Buscar Código CIE-10 *
+      <span class="text-blue-500 ml-1 cursor-help" 
+        title="Clasificación Internacional de Enfermedades - 10ª Revisión">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10"
+          (input)="buscarCodigosCie10($any($event.target).value, 'historiaClinica')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Escriba código o descripción del diagnóstico..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-blue-500 text-white border border-blue-500 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <i class="fas fa-code"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-blue-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-blue-50 border-b border-blue-200">
+          <div class="text-xs font-semibold text-blue-800 uppercase tracking-wide">
+            Códigos CIE-10 Encontrados ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'historiaClinica')"
+          class="px-3 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-blue-700 text-sm">
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-plus-circle text-blue-400 mt-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validación -->
+    <div *ngIf="historiaClinicaForm.get('codigo_cie10')?.errors?.['required'] && historiaClinicaForm.get('codigo_cie10')?.touched"
+      class="flex items-center mt-2 text-red-600 text-sm">
+      <i class="fas fa-exclamation-circle mr-1"></i>
+      Código CIE-10 obligatorio según NOM-004
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-gray-500 flex items-center">
+      <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+      Escriba al menos 2 caracteres para buscar códigos CIE-10
+    </div>
+  </div>
+
+
+</div>
               </div>
 
               <div class="mb-6">
@@ -1407,7 +1515,6 @@
 </div>
         </form>
       </div>
-
       <!-- FORMULARIO DE HOJA FRONTAL         LISTO -->
       <div *ngIf="formularioActivo === 'hojaFrontal'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -1981,470 +2088,467 @@
           </div>
         </form>
       </div>
-
-      <!-- FORMULARIO DE SOLICITUD DE ESTUDIO (DINÁMICO) -->
-<!-- FORMULARIO DE SOLICITUD DE ESTUDIO MEJORADO -->
-<div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
-  <!-- ENCABEZADO -->
-  <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-    <h3 class="text-lg font-semibold text-gray-900">
-      <i class="fas fa-microscope mr-2 text-blue-500"></i>
-      Solicitud de Estudio
-    </h3>
-    <p class="text-sm text-gray-600 mt-1">Solicitud de estudios auxiliares de diagnóstico según NOM-004-SSA3-2012</p>
-  </div>
-
-  <form [formGroup]="solicitudEstudioForm" class="px-4 sm:px-6 py-4">
-
-    <!-- SECCIÓN 1: TIPO DE ESTUDIO -->
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>Tipo de Estudio Solicitado
-      </h4>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Seleccione el Tipo de Estudio *</label>
-        <select formControlName="tipo_estudio"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">Seleccionar tipo...</option>
-          <option value="laboratorio">Estudios de Laboratorio</option>
-          <option value="imagen">Estudios de Imagenología</option>
-          <option value="otros">Otros Estudios Especiales</option>
-        </select>
-        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-          Campo obligatorio según NOM-004</div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 2: ESTUDIOS DE LABORATORIO -->
-    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-vial mr-2 text-green-500"></i>Estudios de Laboratorio Solicitados
-      </h4>
-
-      <!-- Química Sanguínea -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-blue-700 mb-3">Química Sanguínea</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="quimica_sanguinea" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Química sanguínea completa</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="glucosa" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Glucosa sérica</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="urea" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Urea</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="creatinina" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Creatinina sérica</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="acido_urico" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ácido úrico</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="transaminasas" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Transaminasas (ALT/AST)</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="bilirrubinas" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Bilirrubinas</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="proteinas_totales" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Proteínas totales</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="albumina" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Albúmina</span>
-          </label>
-        </div>
+    <!-- FORMULARIO DE SOLICITUD DE ESTUDIO MEJORADO -->
+    <div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
+      <!-- ENCABEZADO -->
+      <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-microscope mr-2 text-blue-500"></i>
+          Solicitud de Estudio
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">Solicitud de estudios auxiliares de diagnóstico según NOM-004-SSA3-2012</p>
       </div>
 
-      <!-- Perfil Lipídico -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-red-700 mb-3">Perfil Lipídico</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="colesterol_total" 
-              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-            <span>Colesterol total</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="trigliceridos" 
-              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-            <span>Triglicéridos</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="hdl" 
-              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-            <span>HDL colesterol</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ldl" 
-              class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-            <span>LDL colesterol</span>
-          </label>
-        </div>
-      </div>
+      <form [formGroup]="solicitudEstudioForm" class="px-4 sm:px-6 py-4">
 
-      <!-- Hematología -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-purple-700 mb-3">Hematología</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="biometria_hematica" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>Biometría hemática completa</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tiempo_protrombina" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>Tiempo de protrombina</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tiempo_tromboplastina" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>Tiempo de tromboplastina</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="inr" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>INR</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Estudios de Orina -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-cyan-700 mb-3">Estudios de Orina</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="examen_general_orina" 
-              class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
-            <span>Examen general de orina</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="urocultivo" 
-              class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
-            <span>Urocultivo</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Electrolitos -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-indigo-700 mb-3">Electrolitos Séricos</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="sodio" 
-              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-            <span>Sodio sérico</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="potasio" 
-              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-            <span>Potasio sérico</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="cloro" 
-              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-            <span>Cloro sérico</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 3: ESTUDIOS DE IMAGENOLOGÍA -->
-    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-x-ray mr-2 text-orange-500"></i>Estudios de Imagenología Solicitados
-      </h4>
-
-      <!-- Radiografías -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-green-700 mb-3">Radiografías</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="radiografia_torax" 
-              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-            <span>Radiografía de tórax</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="radiografia_abdomen" 
-              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-            <span>Radiografía de abdomen</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="radiografia_columna" 
-              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-            <span>Radiografía de columna</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="radiografia_extremidades" 
-              class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-            <span>Radiografía de extremidades</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Ultrasonidos -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-blue-700 mb-3">Ultrasonidos</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ultrasonido_abdominal" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ultrasonido abdominal</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ultrasonido_pelvico" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ultrasonido pélvico</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ecocardiograma" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ecocardiograma</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ultrasonido_renal" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ultrasonido renal</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="ultrasonido_tiroideo" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Ultrasonido tiroideo</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Tomografías -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-orange-700 mb-3">Tomografías Computadas</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tomografia_cerebral" 
-              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-            <span>TAC cerebral simple</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tomografia_torax" 
-              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-            <span>TAC de tórax</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tomografia_abdomen" 
-              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-            <span>TAC abdominal</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="tomografia_contrastada" 
-              class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-            <span>TAC con medio de contraste</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Resonancias -->
-      <div class="mb-4">
-        <h5 class="text-sm font-semibold text-purple-700 mb-3">Resonancia Magnética</h5>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="resonancia_cerebral" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>RM cerebral</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="resonancia_columna" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>RM de columna</span>
-          </label>
-          <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" formControlName="resonancia_articular" 
-              class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-            <span>RM articular</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 4: OTROS ESTUDIOS -->
-    <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-flask mr-2 text-teal-500"></i>Otros Estudios Especiales
-      </h4>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del Estudio Requerido *</label>
-        <textarea formControlName="otros_estudios" rows="4"
-          placeholder="Especifique detalladamente el estudio especial que se requiere, incluyendo técnica y parámetros específicos..."
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        <div *ngIf="solicitudEstudioForm.get('otros_estudios')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-          Campo obligatorio cuando se selecciona "Otros estudios"</div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 5: INFORMACIÓN CLÍNICA -->
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-stethoscope mr-2 text-red-500"></i>Información Clínica del Paciente *
-      </h4>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Indicación Clínica *</label>
-          <textarea formControlName="indicacion_clinica" rows="4"
-            placeholder="Motivo clínico de la solicitud, síntomas relevantes, evolución del cuadro..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-          <div *ngIf="solicitudEstudioForm.get('indicacion_clinica')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-            Campo obligatorio según NOM-004</div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Presuntivo *</label>
-          <textarea formControlName="diagnostico_presuntivo" rows="4"
-            placeholder="Diagnóstico principal y diferenciales que justifican la solicitud del estudio..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-          <div *ngIf="solicitudEstudioForm.get('diagnostico_presuntivo')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-            Campo obligatorio según NOM-004</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 6: CONFIGURACIÓN DEL ESTUDIO -->
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-cogs mr-2 text-gray-500"></i>Configuración y Urgencia del Estudio
-      </h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad del Estudio</label>
-          <select formControlName="urgencia"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="normal">Programado (Normal)</option>
-            <option value="urgente">Urgente (24-48 hrs)</option>
-            <option value="stat">STAT (Inmediato)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada</label>
-          <input type="date" formControlName="fecha_programada"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-
-        <div class="space-y-3">
-          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" formControlName="ayuno_requerido" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Requiere ayuno previo</span>
-          </label>
-          
-          <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
-            class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" formControlName="contraste_requerido" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Requiere medio de contraste</span>
-          </label>
-          
-          <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
-            class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" formControlName="sedacion_requerida" 
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-            <span>Requiere sedación</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 7: OBSERVACIONES -->
-    <div class="mb-6">
-      <h4 class="text-md font-semibold text-gray-800 mb-3">
-        <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Adicionales
-      </h4>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Especiales</label>
-        <textarea formControlName="observaciones" rows="3"
-          placeholder="Indicaciones especiales para el estudio, alergias conocidas, consideraciones técnicas..."
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-      </div>
-    </div>
-
-    <!-- BOTONES DE ACCIÓN -->
-    <div class="mt-6 flex justify-between">
-      <div class="flex space-x-3">
-        <button type="button" (click)="limpiarFormulario('solicitudEstudio')"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-          <i class="fas fa-eraser mr-2"></i>
-          Limpiar
-        </button>
-
-        <button type="button" (click)="guardarBorrador()"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-          <i class="fas fa-save mr-2"></i>
-          Guardar Borrador
-        </button>
-      </div>
-
-      <div class="flex space-x-3">
-        <button type="button" (click)="guardarFormularioActivo()"
-          [disabled]="!solicitudEstudioForm.valid || isCreatingDocument"
-          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-          <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-          <i *ngIf="!isCreatingDocument" class="fas fa-microscope mr-2"></i>
-          {{ isCreatingDocument ? 'Guardando...' : 'Guardar Solicitud' }}
-        </button>
-
-        <button type="button" (click)="generarPDF('Solicitud de Estudio')" 
-          [disabled]="!formularioEstado.solicitudEstudio"
-          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 transition-colors">
-          <i class="fas fa-file-pdf mr-2"></i>
-          {{ formularioEstado.solicitudEstudio ? 'Generar PDF' : 'Guardar primero' }}
-        </button>
-      </div>
-    </div>
-
-    <!-- INFORMACIÓN NORMATIVA -->
-    <div class="mt-6 pt-4 border-t border-gray-200">
-      <div class="bg-gray-50 rounded-lg p-4">
-        <div class="flex items-start space-x-3">
-          <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+        <!-- SECCIÓN 1: TIPO DE ESTUDIO -->
+        <div class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>Tipo de Estudio Solicitado
+          </h4>
           <div>
-            <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
-            <div class="text-xs text-gray-600 space-y-1">
-              <p><strong>Solicitud de Estudios:</strong> Justificación clínica adecuada para cada estudio ✓</p>
-              <p><strong>Información Completa:</strong> Diagnóstico presuntivo e indicación clínica ✓</p>
-              <p><strong>Priorización:</strong> Clasificación según urgencia clínica ✓</p>
-              <p><strong>Seguridad:</strong> Consideración de contraindicaciones y alergias ✓</p>
-              <p><strong>Eficiencia:</strong> Selección apropiada de estudios según caso clínico ✓</p>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Seleccione el Tipo de Estudio *</label>
+            <select formControlName="tipo_estudio"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Seleccionar tipo...</option>
+              <option value="laboratorio">Estudios de Laboratorio</option>
+              <option value="imagen">Estudios de Imagenología</option>
+              <option value="otros">Otros Estudios Especiales</option>
+            </select>
+            <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio según NOM-004</div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: ESTUDIOS DE LABORATORIO -->
+        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-vial mr-2 text-green-500"></i>Estudios de Laboratorio Solicitados
+          </h4>
+
+          <!-- Química Sanguínea -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-blue-700 mb-3">Química Sanguínea</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="quimica_sanguinea" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Química sanguínea completa</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="glucosa" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Glucosa sérica</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="urea" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Urea</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="creatinina" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Creatinina sérica</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="acido_urico" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ácido úrico</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="transaminasas" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Transaminasas (ALT/AST)</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="bilirrubinas" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Bilirrubinas</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="proteinas_totales" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Proteínas totales</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="albumina" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Albúmina</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Perfil Lipídico -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-red-700 mb-3">Perfil Lipídico</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="colesterol_total" 
+                  class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                <span>Colesterol total</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="trigliceridos" 
+                  class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                <span>Triglicéridos</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="hdl" 
+                  class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                <span>HDL colesterol</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ldl" 
+                  class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                <span>LDL colesterol</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Hematología -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-purple-700 mb-3">Hematología</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="biometria_hematica" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>Biometría hemática completa</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tiempo_protrombina" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>Tiempo de protrombina</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tiempo_tromboplastina" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>Tiempo de tromboplastina</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="inr" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>INR</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Estudios de Orina -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-cyan-700 mb-3">Estudios de Orina</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="examen_general_orina" 
+                  class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+                <span>Examen general de orina</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="urocultivo" 
+                  class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+                <span>Urocultivo</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Electrolitos -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-indigo-700 mb-3">Electrolitos Séricos</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="sodio" 
+                  class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                <span>Sodio sérico</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="potasio" 
+                  class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                <span>Potasio sérico</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="cloro" 
+                  class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                <span>Cloro sérico</span>
+              </label>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="mt-3 text-center">
-        <div class="text-sm text-gray-500">
-          <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
-          Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
+        <!-- SECCIÓN 3: ESTUDIOS DE IMAGENOLOGÍA -->
+        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-x-ray mr-2 text-orange-500"></i>Estudios de Imagenología Solicitados
+          </h4>
+
+          <!-- Radiografías -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-green-700 mb-3">Radiografías</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="radiografia_torax" 
+                  class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span>Radiografía de tórax</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="radiografia_abdomen" 
+                  class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span>Radiografía de abdomen</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="radiografia_columna" 
+                  class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span>Radiografía de columna</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="radiografia_extremidades" 
+                  class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                <span>Radiografía de extremidades</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ultrasonidos -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-blue-700 mb-3">Ultrasonidos</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ultrasonido_abdominal" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ultrasonido abdominal</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ultrasonido_pelvico" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ultrasonido pélvico</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ecocardiograma" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ecocardiograma</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ultrasonido_renal" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ultrasonido renal</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="ultrasonido_tiroideo" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Ultrasonido tiroideo</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Tomografías -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-orange-700 mb-3">Tomografías Computadas</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tomografia_cerebral" 
+                  class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <span>TAC cerebral simple</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tomografia_torax" 
+                  class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <span>TAC de tórax</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tomografia_abdomen" 
+                  class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <span>TAC abdominal</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="tomografia_contrastada" 
+                  class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <span>TAC con medio de contraste</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Resonancias -->
+          <div class="mb-4">
+            <h5 class="text-sm font-semibold text-purple-700 mb-3">Resonancia Magnética</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="resonancia_cerebral" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>RM cerebral</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="resonancia_columna" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>RM de columna</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <input type="checkbox" formControlName="resonancia_articular" 
+                  class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                <span>RM articular</span>
+              </label>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <!-- SECCIÓN 4: OTROS ESTUDIOS -->
+        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-flask mr-2 text-teal-500"></i>Otros Estudios Especiales
+          </h4>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del Estudio Requerido *</label>
+            <textarea formControlName="otros_estudios" rows="4"
+              placeholder="Especifique detalladamente el estudio especial que se requiere, incluyendo técnica y parámetros específicos..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <div *ngIf="solicitudEstudioForm.get('otros_estudios')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+              Campo obligatorio cuando se selecciona "Otros estudios"</div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: INFORMACIÓN CLÍNICA -->
+        <div class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-stethoscope mr-2 text-red-500"></i>Información Clínica del Paciente *
+          </h4>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Indicación Clínica *</label>
+              <textarea formControlName="indicacion_clinica" rows="4"
+                placeholder="Motivo clínico de la solicitud, síntomas relevantes, evolución del cuadro..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <div *ngIf="solicitudEstudioForm.get('indicacion_clinica')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004</div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico Presuntivo *</label>
+              <textarea formControlName="diagnostico_presuntivo" rows="4"
+                placeholder="Diagnóstico principal y diferenciales que justifican la solicitud del estudio..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <div *ngIf="solicitudEstudioForm.get('diagnostico_presuntivo')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 6: CONFIGURACIÓN DEL ESTUDIO -->
+        <div class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-cogs mr-2 text-gray-500"></i>Configuración y Urgencia del Estudio
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Prioridad del Estudio</label>
+              <select formControlName="urgencia"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="normal">Programado (Normal)</option>
+                <option value="urgente">Urgente (24-48 hrs)</option>
+                <option value="stat">STAT (Inmediato)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Programada</label>
+              <input type="date" formControlName="fecha_programada"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="space-y-3">
+              <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <input type="checkbox" formControlName="ayuno_requerido" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Requiere ayuno previo</span>
+              </label>
+              
+              <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
+                class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <input type="checkbox" formControlName="contraste_requerido" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Requiere medio de contraste</span>
+              </label>
+              
+              <label *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" 
+                class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <input type="checkbox" formControlName="sedacion_requerida" 
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span>Requiere sedación</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 7: OBSERVACIONES -->
+        <div class="mb-6">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">
+            <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Adicionales
+          </h4>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones Especiales</label>
+            <textarea formControlName="observaciones" rows="3"
+              placeholder="Indicaciones especiales para el estudio, alergias conocidas, consideraciones técnicas..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="mt-6 flex justify-between">
+          <div class="flex space-x-3">
+            <button type="button" (click)="limpiarFormulario('solicitudEstudio')"
+              class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+              <i class="fas fa-eraser mr-2"></i>
+              Limpiar
+            </button>
+
+            <button type="button" (click)="guardarBorrador()"
+              class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
+              <i class="fas fa-save mr-2"></i>
+              Guardar Borrador
+            </button>
+          </div>
+
+          <div class="flex space-x-3">
+            <button type="button" (click)="guardarFormularioActivo()"
+              [disabled]="!solicitudEstudioForm.valid || isCreatingDocument"
+              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+              <i *ngIf="!isCreatingDocument" class="fas fa-microscope mr-2"></i>
+              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Solicitud' }}
+            </button>
+
+            <button type="button" (click)="generarPDF('Solicitud de Estudio')" 
+              [disabled]="!formularioEstado.solicitudEstudio"
+              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 transition-colors">
+              <i class="fas fa-file-pdf mr-2"></i>
+              {{ formularioEstado.solicitudEstudio ? 'Generar PDF' : 'Guardar primero' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN NORMATIVA -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex items-start space-x-3">
+              <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+              <div>
+                <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
+                <div class="text-xs text-gray-600 space-y-1">
+                  <p><strong>Solicitud de Estudios:</strong> Justificación clínica adecuada para cada estudio ✓</p>
+                  <p><strong>Información Completa:</strong> Diagnóstico presuntivo e indicación clínica ✓</p>
+                  <p><strong>Priorización:</strong> Clasificación según urgencia clínica ✓</p>
+                  <p><strong>Seguridad:</strong> Consideración de contraindicaciones y alergias ✓</p>
+                  <p><strong>Eficiencia:</strong> Selección apropiada de estudios según caso clínico ✓</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-center">
+            <div class="text-sm text-gray-500">
+              <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+              Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
+            </div>
+          </div>
+        </div>
+
+      </form>
     </div>
-
-  </form>
-</div>
-
       <!-- FORMULARIO DE PRESCRIPCIÓN DE MEDICAMENTOS -->
       <div *ngIf="formularioActivo === 'prescripcionMedicamento'" class="space-y-6">
 
@@ -2783,7 +2887,6 @@
           </div>
         </form>
       </div>
-
       <!-- FORMULARIO DE NOTA DE EVOLUCIÓN MEJORADO -->
       <div *ngIf="formularioActivo === 'notaEvolucion'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -3138,6 +3241,106 @@
                   placeholder="Diagnóstico principal y secundarios actualizados según la evolución..."></textarea>
                 <div *ngIf="notaEvolucionForm.get('diagnosticos')?.errors?.['required']"
                   class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-chart-line mr-2 text-green-600"></i>
+    Código CIE-10 Principal - Evolución
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="notaEvolucionForm.get('codigo_cie10')?.value" class="mb-3">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+          <div>
+            <div class="font-medium text-green-900">
+              {{ notaEvolucionForm.get('codigo_cie10')?.value?.split(' - ')[0] }}
+            </div>
+            <div class="text-sm text-green-700">
+              {{ notaEvolucionForm.get('codigo_cie10')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="notaEvolucionForm.get('codigo_cie10')?.setValue('')"
+          class="text-green-600 hover:text-green-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-stethoscope mr-1 text-green-500"></i>
+      Código del Diagnóstico Actualizado
+      <span class="text-green-500 ml-1 cursor-help" 
+        title="Código CIE-10 según evolución del paciente">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10"
+          (input)="buscarCodigosCie10($any($event.target).value, 'notaEvolucion')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Buscar código según evolución clínica..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-green-500 text-white border border-green-500 rounded-r-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+          <i class="fas fa-heartbeat"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-green-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-green-50 border-b border-green-200">
+          <div class="text-xs font-semibold text-green-800 uppercase tracking-wide flex items-center">
+            <i class="fas fa-chart-bar mr-1"></i>
+            Diagnósticos de Evolución ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'notaEvolucion')"
+          class="px-3 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-green-700 text-sm">
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-arrow-right text-green-400 mt-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-green-600 flex items-center">
+      <i class="fas fa-info mr-1"></i>
+      Código del diagnóstico principal actualizado según evolución
+    </div>
+  </div>
+</div>
+
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Diagnósticos según Guías Clínicas</label>
@@ -3231,9 +3434,6 @@
                 </div>
               </form>
             </div>
-
-
-
       <!-- FORMULARIO DE NOTA DE URGENCIAS         LISTO -->
       <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
@@ -3726,6 +3926,108 @@
                   placeholder="Diagnóstico principal y diagnósticos diferenciales (NOM-004 7.1.6)..."></textarea>
                 <div *ngIf="notaUrgenciasForm.get('diagnostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
                   Campo obligatorio según NOM-004 numeral 7.1.6</div>
+
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-ambulance mr-2 text-red-600"></i>
+    Código CIE-10 de Urgencias
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="notaUrgenciasForm.get('codigo_cie10')?.value" class="mb-3">
+    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-red-500 rounded-full mr-3 animate-pulse"></div>
+          <div>
+            <div class="font-medium text-red-900 flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1 text-red-600"></i>
+              {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[0] }}
+            </div>
+            <div class="text-sm text-red-700">
+              {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="notaUrgenciasForm.get('codigo_cie10')?.setValue('')"
+          class="text-red-600 hover:text-red-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-user-injured mr-1 text-red-500"></i>
+      Clasificación de Urgencia
+      <span class="text-red-500 ml-1 cursor-help" 
+        title="Código CIE-10 para categorización de urgencias médicas">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10"
+          (input)="buscarCodigosCie10($any($event.target).value, 'notaUrgencias')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-500"
+          placeholder="Buscar código para caso de urgencia..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-red-500 text-white border border-red-500 rounded-r-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <i class="fas fa-plus-square"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-red-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-red-50 border-b border-red-200">
+          <div class="text-xs font-semibold text-red-800 uppercase tracking-wide flex items-center">
+            <i class="fas fa-triage mr-1"></i>
+            Códigos de Urgencias ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'notaUrgencias')"
+          class="px-3 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-red-500 rounded-full mt-2 animate-pulse"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-red-700 text-sm flex items-center">
+                <i class="fas fa-exclamation mr-1 text-red-500"></i>
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-plus-circle text-red-400 mt-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-red-600 flex items-center">
+      <i class="fas fa-clock mr-1"></i>
+      Clasificación para priorización de urgencias médicas
+    </div>
+  </div>
+</div>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento y Pronóstico *</label>
@@ -3853,8 +4155,6 @@
 
         </form>
       </div>
-    
-      <!-- FORMULARIO DE REFERENCIA Y CONTRARREFERENCIA -->
 <!-- FORMULARIO DE REFERENCIA Y CONTRARREFERENCIA MEJORADO -->
 <div *ngIf="formularioActivo === 'referenciaTraslado'" class="bg-white shadow rounded-lg mb-6">
   <!-- ENCABEZADO -->
@@ -4218,7 +4518,6 @@
 
   </form>
 </div>
-
       <!-- FORMULARIO DE CONSENTIMIENTO INFORMADO -->
       <div *ngIf="formularioActivo === 'consentimiento'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -4297,7 +4596,6 @@
           </div>
         </form>
       </div>
-
       <!-- FORMULARIO DE ALTA VOLUNTARIA -->
 <!-- FORMULARIO DE ALTA VOLUNTARIA MEJORADO -->
 <div *ngIf="formularioActivo === 'altaVoluntaria'" class="bg-white shadow rounded-lg mb-6">
@@ -4856,8 +5154,6 @@
 
  </form>
 </div>
-
-
       <!-- FORMULARIO DE NOTA PREANESTÉSICA -->
       <div *ngIf="formularioActivo === 'notaPreanestesica'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -5340,7 +5636,6 @@
 
       </form>
       </div>
-
       <!-- FORMULARIO DE NOTA PREOPERATORIA -->
       <div *ngIf="formularioActivo === 'notaPreoperatoria'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -5590,6 +5885,108 @@
                   placeholder="Diagnóstico principal que justifica el procedimiento quirúrgico..."></textarea>
                 <div *ngIf="notaPreoperatoriaForm.get('diagnostico_preoperatorio')?.errors?.['required'] && notaPreoperatoriaForm.get('diagnostico_preoperatorio')?.touched"
                   class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
+
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-scalpel mr-2 text-orange-600"></i>
+    Código CIE-10 Preoperatorio
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="notaPreoperatoriaForm.get('codigo_cie10_preoperatorio')?.value" class="mb-3">
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-orange-500 rounded-full mr-3"></div>
+          <div>
+            <div class="font-medium text-orange-900 flex items-center">
+              <i class="fas fa-surgical-tools mr-1 text-orange-600"></i>
+              {{ notaPreoperatoriaForm.get('codigo_cie10_preoperatorio')?.value?.split(' - ')[0] }}
+            </div>
+            <div class="text-sm text-orange-700">
+              {{ notaPreoperatoriaForm.get('codigo_cie10_preoperatorio')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="notaPreoperatoriaForm.get('codigo_cie10_preoperatorio')?.setValue('')"
+          class="text-orange-600 hover:text-orange-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-clipboard-check mr-1 text-orange-500"></i>
+      Diagnóstico que Justifica la Cirugía
+      <span class="text-orange-500 ml-1 cursor-help" 
+        title="Código CIE-10 del diagnóstico preoperatorio que justifica el procedimiento quirúrgico">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10_preoperatorio"
+          (input)="buscarCodigosCie10($any($event.target).value, 'notaPreoperatoria')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+          placeholder="Buscar diagnóstico que justifica la cirugía..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-orange-500 text-white border border-orange-500 rounded-r-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <i class="fas fa-search-plus"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-orange-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-orange-50 border-b border-orange-200">
+          <div class="text-xs font-semibold text-orange-800 uppercase tracking-wide flex items-center">
+            <i class="fas fa-procedures mr-1"></i>
+            Diagnósticos Quirúrgicos ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'notaPreoperatoria')"
+          class="px-3 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-orange-700 text-sm flex items-center">
+                <i class="fas fa-scalpel mr-1 text-orange-500 text-xs"></i>
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-arrow-circle-right text-orange-400 mt-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-orange-600 flex items-center">
+      <i class="fas fa-hospital-user mr-1"></i>
+      Código que justifica la necesidad del procedimiento quirúrgico
+    </div>
+  </div>
+</div>
               </div>
 
               <div>
@@ -5640,7 +6037,6 @@
           </div>
         </form>
       </div>
-
       <!-- FORMULARIO DE NOTA POSTOPERATORIA -->
     <div *ngIf="formularioActivo === 'notaPostoperatoria'" class="bg-white shadow rounded-lg mb-6">
       <div class="px-6 py-4 border-b border-gray-200">
@@ -5743,7 +6139,110 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
               <div *ngIf="notaPostoperatoriaForm.get('diagnostico_postoperatorio')?.errors?.['required'] && notaPostoperatoriaForm.get('diagnostico_postoperatorio')?.touched"
                 class="text-red-500 text-xs mt-1">Campo obligatorio</div>
+
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-band-aid mr-2 text-amber-700"></i>
+    Código CIE-10 Postoperatorio
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.value" class="mb-3">
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-amber-600 rounded-full mr-3"></div>
+          <div>
+            <div class="font-medium text-amber-900 flex items-center">
+              <i class="fas fa-check-circle mr-1 text-amber-600"></i>
+              {{ notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.value?.split(' - ')[0] }}
             </div>
+            <div class="text-sm text-amber-700">
+              {{ notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.setValue('')"
+          class="text-amber-600 hover:text-amber-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-clipboard-list mr-1 text-amber-600"></i>
+      Diagnóstico Final Postoperatorio
+      <span class="text-amber-600 ml-1 cursor-help" 
+        title="Código CIE-10 del diagnóstico definitivo posterior al procedimiento quirúrgico">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10_postoperatorio"
+          (input)="buscarCodigosCie10($any($event.target).value, 'notaPostoperatoria')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+          placeholder="Buscar diagnóstico final tras cirugía..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-amber-600 text-white border border-amber-600 rounded-r-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          <i class="fas fa-stethoscope"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-amber-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-amber-50 border-b border-amber-200">
+          <div class="text-xs font-semibold text-amber-800 uppercase tracking-wide flex items-center">
+            <i class="fas fa-clipboard-check mr-1"></i>
+            Diagnósticos Postquirúrgicos ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'notaPostoperatoria')"
+          class="px-3 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-amber-600 rounded-full mt-2"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-amber-700 text-sm flex items-center">
+                <i class="fas fa-check mr-1 text-amber-600 text-xs"></i>
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-check-double text-amber-500 mt-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-amber-700 flex items-center">
+      <i class="fas fa-notes-medical mr-1"></i>
+      Diagnóstico definitivo posterior al procedimiento quirúrgico
+    </div>
+  </div>
+</div>
+            </div>
+            
           </div>
         </div>
 
@@ -6222,7 +6721,6 @@
 
       </form>
     </div>
-    
       <!-- FORMULARIO DE NOTA POSTANESTÉSICA -->
     <div *ngIf="formularioActivo === 'notaPostanestesica'" class="bg-white shadow rounded-lg mb-6">
       <div class="px-6 py-4 border-b border-gray-200">
@@ -6716,7 +7214,6 @@
 
     </form>
     </div>
-
       <!-- FORMULARIO DE NOTA DE INTERCONSULTA -->
     <div *ngIf="formularioActivo === 'notaInterconsulta'" class="bg-white shadow rounded-lg mb-6">
       <div class="px-6 py-4 border-b border-gray-200">
@@ -7334,8 +7831,6 @@
         </div>
       </form>
     </div>
-
-
     <!-- FORMULARIO DE NOTA DE EGRESO -->
 <div *ngIf="formularioActivo === 'notaEgreso'" class="bg-white shadow rounded-lg mb-6">
   <div class="px-6 py-4 border-b border-gray-200">
@@ -7440,6 +7935,116 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
           <div *ngIf="notaEgresoForm.get('diagnostico_egreso')?.errors?.['required'] && notaEgresoForm.get('diagnostico_egreso')?.touched"
             class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
+
+
+<div class="mb-4">
+  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+    <i class="fas fa-door-open mr-2 text-emerald-600"></i>
+    Código CIE-10 de Egreso Hospitalario
+  </h5>
+
+  <!-- CIE-10 seleccionado -->
+  <div *ngIf="notaEgresoForm.get('codigo_cie10_egreso')?.value" class="mb-3">
+    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-emerald-500 rounded-full mr-3"></div>
+          <div>
+            <div class="font-medium text-emerald-900 flex items-center">
+              <i class="fas fa-home mr-1 text-emerald-600"></i>
+              {{ notaEgresoForm.get('codigo_cie10_egreso')?.value?.split(' - ')[0] }}
+            </div>
+            <div class="text-sm text-emerald-700">
+              {{ notaEgresoForm.get('codigo_cie10_egreso')?.value?.split(' - ')[1] }}
+            </div>
+          </div>
+        </div>
+        <button type="button" 
+          (click)="notaEgresoForm.get('codigo_cie10_egreso')?.setValue('')"
+          class="text-emerald-600 hover:text-emerald-800 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador CIE-10 -->
+  <div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      <i class="fas fa-clipboard-list mr-1 text-emerald-500"></i>
+      Diagnóstico Final de Egreso
+      <span class="text-emerald-500 ml-1 cursor-help" 
+        title="Código CIE-10 del diagnóstico definitivo al momento del alta hospitalaria">
+        <i class="fas fa-info-circle"></i>
+      </span>
+    </label>
+
+    <div class="relative">
+      <div class="flex">
+        <input type="text" 
+          formControlName="codigo_cie10_egreso"
+          (input)="buscarCodigosCie10($any($event.target).value, 'notaEgreso')"
+          (focus)="mostrarDropdownCie10 = true"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          placeholder="Buscar diagnóstico final para el alta..."
+          autocomplete="off">
+        <button type="button" 
+          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+          class="px-3 py-2 bg-emerald-500 text-white border border-emerald-500 rounded-r-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+
+      <!-- Dropdown mejorado -->
+      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+        class="absolute z-50 w-full mt-1 bg-white border border-emerald-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        
+        <div class="px-3 py-2 bg-emerald-50 border-b border-emerald-200">
+          <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wide flex items-center">
+            <i class="fas fa-hospital mr-1"></i>
+            Diagnósticos de Alta ({{ codigosCie10Filtrados.length }})
+          </div>
+        </div>
+
+        <div *ngFor="let codigo of codigosCie10Filtrados"
+          (click)="seleccionarCie10(codigo, 'notaEgreso')"
+          class="px-3 py-3 hover:bg-emerald-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+          
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-2 h-2 bg-emerald-500 rounded-full mt-2"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-emerald-700 text-sm flex items-center">
+                <i class="fas fa-check-circle mr-1 text-emerald-600 text-xs"></i>
+                {{ codigo.codigo }}
+              </div>
+              <div class="text-sm text-gray-600 mt-1">
+                {{ codigo.descripcion }}
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-arrow-alt-circle-right text-emerald-400 mt-1"></i>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="codigosCie10Filtrados.length === 0" 
+          class="px-3 py-4 text-center text-gray-500 text-sm">
+          <i class="fas fa-search mb-2 text-gray-400"></i>
+          <div>No se encontraron códigos</div>
+          <div class="text-xs text-gray-400 mt-1">Intente con otros términos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="mt-2 text-xs text-emerald-700 flex items-center">
+      <i class="fas fa-user-check mr-1"></i>
+      Diagnóstico definitivo al momento del alta hospitalaria
+    </div>
+  </div>
+</div>
         </div>
 
         <!-- Guías Clínicas (igual que otros formularios) -->
@@ -7647,8 +8252,6 @@
     </div>
   </form>
 </div>
-
-
       <!-- Modal para editar número administrativo -->
       <div *ngIf="mostrarModalEditarExpediente"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">

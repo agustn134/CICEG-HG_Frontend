@@ -189,10 +189,7 @@ type FormularioActivo =
   | 'tamizajeNeonatal' | 'antecedentesHeredoFamiliares' | 'antecedentesPerinatales'
   | 'estadoNutricionalPediatrico' | 'inmunizaciones' | 'vacunasAdicionales' | 'solicitudCultivo'
   | 'solicitudGasometria' | 'altaVoluntaria' | null;
-
-// ✅ AGREGAR AQUÍ
 type FiltroCategoria = 'todos' | 'frecuentes' | 'obligatorios' | 'pediatricos';
-
 @Component({
   selector: 'app-perfil-paciente',
   standalone: true,
@@ -280,6 +277,371 @@ export class PerfilPaciente implements OnInit, OnDestroy {
   formulariosVisibles: string[] = [];
 
   modoPresentacion = false;
+
+  codigosCie10: any[] = [];
+codigosCie10Filtrados: any[] = [];
+mostrarDropdownCie10 = false;
+
+// MÉTODO BÚSQUEDA:
+buscarCodigosCie10(termino: string, formulario: string): void {
+  if (!termino || termino.length < 2) {
+    this.codigosCie10Filtrados = [];
+    return;
+  }
+  const codigosComunes = [
+  { codigo: 'A000', descripcion: 'Colera debida a Vibrio cholerae O1, biotipo clásico' },
+  { codigo: 'A001', descripcion: 'Colera debida a Vibrio cholerae O1, biotipo El Tor' },
+  { codigo: 'A009', descripcion: 'Colera no especificada' },
+  { codigo: 'A010', descripcion: 'Fiebre tifoidea' },
+  { codigo: 'A011', descripcion: 'Fiebre paratifoidea A' },
+  { codigo: 'A012', descripcion: 'Fiebre paratifoidea B' },
+  { codigo: 'A013', descripcion: 'Fiebre paratifoidea C' },
+  { codigo: 'A014', descripcion: 'Fiebre paratifoidea, no especificada' },
+  { codigo: 'A020', descripcion: 'Enteritis debida a Salmonella' },
+  { codigo: 'A021', descripcion: 'Septicemia debida a Salmonella' },
+  { codigo: 'A022', descripcion: 'Infecciones localizadas debidas a Salmonella' },
+  { codigo: 'A028', descripcion: 'Otras infecciones especificadas como debidas a Salmonella' },
+  { codigo: 'A029', descripcion: 'Infección debida a Salmonella no especificada' },
+  { codigo: 'A030', descripcion: 'Shigelosis debida a Shigella dysenteriae' },
+  { codigo: 'A031', descripcion: 'Shigelosis debida a Shigella flexneri' },
+  { codigo: 'A032', descripcion: 'Shigelosis debida a Shigella boydii' },
+  { codigo: 'A033', descripcion: 'Shigelosis debida a Shigella sonnei' },
+  { codigo: 'A038', descripcion: 'Otras shigelosis' },
+  { codigo: 'A039', descripcion: 'Shigelosis, no especificada' },
+  { codigo: 'A040', descripcion: 'Infección debida a Escherichia coli enteropatógena' },
+  { codigo: 'A041', descripcion: 'Infección debida a Escherichia coli enteroxigena' },
+  { codigo: 'A042', descripcion: 'Infección debida a Escherichia coli enteroinvasiva' },
+  { codigo: 'A043', descripcion: 'Infección debida a Escherichia coli enterohemorrágica' },
+  { codigo: 'A044', descripcion: 'Otras infecciones intestinales debidas a Escherichia coli' },
+  { codigo: 'A045', descripcion: 'Enteritis debida a Campylobacter' },
+  { codigo: 'A046', descripcion: 'Enteritis debida a Yersinia enterocolítica' },
+  { codigo: 'A047', descripcion: 'Enterocolitis debida a Clostridium difficile' },
+  { codigo: 'A048', descripcion: 'Otras infecciones intestinales bacterianas especificadas' },
+  { codigo: 'A049', descripcion: 'Infección intestinal bacteriana, no especificada' },
+  { codigo: 'A050', descripcion: 'Intoxicación alimentaria estafilocócica' },
+  { codigo: 'A051', descripcion: 'Botulismo' },
+  { codigo: 'A052', descripcion: 'Intoxicación alimentaria debida a Clostridium perfringens [Clostridium welchii]' },
+  { codigo: 'A053', descripcion: 'Intoxicación alimentaria debida a Vibrio parahaemolyticus' },
+  { codigo: 'A054', descripcion: 'Intoxicación alimentaria debida a Bacillus cereus' },
+  { codigo: 'A058', descripcion: 'Otras intoxicaciones alimentarias debidas a bacterias especificadas' },
+  { codigo: 'A059', descripcion: 'Intoxicación alimentaria bacteriana, no especificada' },
+  { codigo: 'A060', descripcion: 'Disentería amebiana aguda' },
+  { codigo: 'A061', descripcion: 'Amibiasis intestinal crónica' },
+  { codigo: 'A062', descripcion: 'Colitis amebiana no disentérica' },
+  { codigo: 'A063', descripcion: 'Ameboma intestinal' },
+  { codigo: 'A064', descripcion: 'Absceso amebiano del hígado' },
+  { codigo: 'A065†', descripcion: 'Absceso amebiano del pulmón (J99.8*)' },
+  { codigo: 'A066†', descripcion: 'Absceso amebiano del cerebro (G07*)' },
+  { codigo: 'A067', descripcion: 'Amibiasis cutánea' },
+  { codigo: 'A068', descripcion: 'Infección amebiana de otras localizaciones' },
+  { codigo: 'A069', descripcion: 'Amibiasis, no especificada' },
+  { codigo: 'A070', descripcion: 'Balantidiasis' },
+  { codigo: 'A071', descripcion: 'Giardiasis [lambliosis]' },
+  { codigo: 'A072', descripcion: 'Criptosporidiosis' },
+  { codigo: 'A073', descripcion: 'Isosporiasis' },
+  { codigo: 'A078', descripcion: 'Otras enfermedades intestinales especificadas debidas a protozoarios' },
+  { codigo: 'A079', descripcion: 'Enfermedad intestinal debida a protozoarios, no especificada' },
+  { codigo: 'A080', descripcion: 'Enteritis debida a rotavirus' },
+  { codigo: 'A081', descripcion: 'Gastroenteropatía aguda debida al agente de Norwalk' },
+  { codigo: 'A082', descripcion: 'Enteritis debida a adenovirus' },
+  { codigo: 'A083', descripcion: 'Otras enteritis virales' },
+  { codigo: 'A084', descripcion: 'Infección intestinal viral, sin otra especificación' },
+  { codigo: 'A085', descripcion: 'Otras infecciones intestinales especificadas' },
+  { codigo: 'A09', descripcion: 'Diarrea y gastroenteritis de presunto origen infeccioso' },
+  { codigo: 'A150', descripcion: 'Tuberculosis del pulmón, confirmada por hallazgo microscópico del bacilo tuberculoso en esputo, con o sin cultivo' },
+  { codigo: 'A151', descripcion: 'Tuberculosis del pulmón, confirmada únicamente por cultivo' },
+  { codigo: 'A152', descripcion: 'Tuberculosis del pulmón, confirmada histológicamente' },
+  { codigo: 'A153', descripcion: 'Tuberculosis del pulmón, confirmada por medios no especificados' },
+  { codigo: 'A154', descripcion: 'Tuberculosis de ganglios linfáticos intratorácicos, confirmada bacteriológica e histológicamente' },
+  { codigo: 'A155', descripcion: 'Tuberculosis de laringe, tráquea y bronquios, confirmada bacteriológica e histológicamente' },
+  { codigo: 'A156', descripcion: 'Pleuresía tuberculosa, confirmada bacteriológica e histológicamente' },
+  { codigo: 'A157', descripcion: 'Tuberculosis respiratoria primaria, confirmada bacteriológica e histológicamente' },
+  { codigo: 'A158', descripcion: 'Otras tuberculosis respiratorias, confirmadas bacteriológica e histológicamente' },
+  { codigo: 'A159', descripcion: 'Tuberculosis respiratoria no especificada, confirmada bacteriológicamente e histológicamente' },
+  { codigo: 'A160', descripcion: 'Tuberculosis del pulmón, con examen bacteriológico e histológico negativos' },
+  { codigo: 'A161', descripcion: 'Tuberculosis del pulmón, sin examen bacteriológico e histológico' },
+  { codigo: 'A162', descripcion: 'Tuberculosis del pulmón, sin mención de confirmación bacteriológica o histológica' },
+  { codigo: 'A163', descripcion: 'Tuberculosis de ganglios linfáticos intratorácicos, sin mención de confirmación bacteriológica o histológica' },
+  { codigo: 'A164', descripcion: 'Tuberculosis de laringe, tráquea y bronquios, sin mención de confirmación bacteriológica o histológica' },
+  { codigo: 'A165', descripcion: 'Pleuresía tuberculosa, sin mención de confirmación bacteriológica e histológica' },
+  { codigo: 'A167', descripcion: 'Tuberculosis respiratoria primaria, sin mención de confirmación bacteriológica e histológica' },
+  { codigo: 'A168', descripcion: 'Otras tuberculosis respiratorias, sin mención de confirmación' },
+  { codigo: 'A169', descripcion: 'Tuberculosis respiratoria no especificada, sin mención de confirmación bacteriológica o histológica' },
+  { codigo: 'A170†', descripcion: 'Meningitis tuberculosa (G01*)' },
+  { codigo: 'A171†', descripcion: 'Tuberculoma meníngeo (G07*)' },
+  { codigo: 'A178†', descripcion: 'Otras tuberculosis del sistema nervioso' },
+  { codigo: 'A179†', descripcion: 'Tuberculosis del sistema nervioso, no especificada (G99.8*)' },
+  { codigo: 'A180†', descripcion: 'Tuberculosis de huesos y articulaciones' },
+  { codigo: 'A181', descripcion: 'Tuberculosis del aparato genitourinario' },
+  { codigo: 'A182', descripcion: 'Linfadenopatía periférica tuberculosa' },
+  { codigo: 'A183', descripcion: 'Tuberculosis de intestinos, peritoneo y ganglios mesentéricos' },
+  { codigo: 'A184', descripcion: 'Tuberculosis de piel y tejido subcutáneo' },
+  { codigo: 'A185', descripcion: 'Tuberculosis del ojo' },
+  { codigo: 'A186', descripcion: 'Tuberculosis del oído' },
+  { codigo: 'A187†', descripcion: 'Tuberculosis de glándulas suprarrenales (E35.1*)' },
+  { codigo: 'A188', descripcion: 'Tuberculosis de otros órganos especificados' },
+  { codigo: 'A190', descripcion: 'Tuberculosis miliar aguda de un solo sitio especificado' },
+  { codigo: 'A191', descripcion: 'Tuberculosis miliar aguda de sitios múltiples' },
+  { codigo: 'A192', descripcion: 'Tuberculosis miliar aguda, no especificada' },
+  { codigo: 'A198', descripcion: 'Otras tuberculosis milares' },
+  { codigo: 'A199', descripcion: 'Tuberculosis miliar, sin otra especificación' },
+  { codigo: 'A200', descripcion: 'Peste bubónica' },
+  { codigo: 'A201', descripcion: 'Peste celulocutánea' },
+  { codigo: 'A202', descripcion: 'Peste neumónica' },
+  { codigo: 'A203', descripcion: 'Meningitis por peste' },
+  { codigo: 'A207', descripcion: 'Peste septicémica' },
+  { codigo: 'A208', descripcion: 'Otras formas de peste' },
+  { codigo: 'A209', descripcion: 'Peste, no especificada' },
+  { codigo: 'A210', descripcion: 'Tularemia ulceroglandular' },
+  { codigo: 'A211', descripcion: 'Tularemia oculoglandular' },
+  { codigo: 'A212', descripcion: 'Tularemia pulmonar' },
+  { codigo: 'A213', descripcion: 'Tularemia gastrointestinal' },
+  { codigo: 'A217', descripcion: 'Tularemia generalizada' },
+  { codigo: 'A218', descripcion: 'Otras formas de tularemia' },
+  { codigo: 'A219', descripcion: 'Tularemia, no especificada' },
+  { codigo: 'A220', descripcion: 'Carbúnculo cutáneo' },
+  { codigo: 'A221', descripcion: 'Carbúnculo pulmonar' },
+  { codigo: 'A222', descripcion: 'Carbúnculo gastrointestinal' },
+  { codigo: 'A227', descripcion: 'Carbúnculo septicémico' },
+  { codigo: 'A228', descripcion: 'Otras formas de carbúnculo' },
+  { codigo: 'A229', descripcion: 'Carbúnculo, no especificado' },
+  { codigo: 'A230', descripcion: 'Brucelosis debida a Brucella melitensis' },
+  { codigo: 'A231', descripcion: 'Brucelosis debida a Brucella abortus' },
+  { codigo: 'A232', descripcion: 'Brucelosis debida a Brucella suis' },
+  { codigo: 'A233', descripcion: 'Brucelosis debida a Brucella canis' },
+  { codigo: 'A238', descripcion: 'Otras brucelosis' },
+  { codigo: 'A239', descripcion: 'Brucelosis, no especificada' },
+  { codigo: 'A240', descripcion: 'Muermo' },
+  { codigo: 'A241', descripcion: 'Meliodosis aguda y fulminante' },
+  { codigo: 'A242', descripcion: 'Meliodosis subaguda y crónica' },
+  { codigo: 'A243', descripcion: 'Otras meliodosis' },
+  { codigo: 'A244', descripcion: 'Meliodosis, no especificada' },
+  { codigo: 'A250', descripcion: 'Espiritillosis' },
+  { codigo: 'A251', descripcion: 'Estreptobacilosis' },
+  { codigo: 'A259', descripcion: 'Fiebre por mordedura de rata, no especificada' },
+  { codigo: 'A260', descripcion: 'Erisipeloides cutáneo' },
+  { codigo: 'A267', descripcion: 'Septicemia por Erysipelothrix' },
+  { codigo: 'A268', descripcion: 'Otras formas de erisipeloides' },
+  { codigo: 'A269', descripcion: 'Erisipeloides, no especificada' },
+  { codigo: 'A270', descripcion: 'Leptospirosis ictero-hemorrágica' },
+  { codigo: 'A278', descripcion: 'Otras formas de leptospirosis' },
+  { codigo: 'A279', descripcion: 'Leptospirosis, no especificada' },
+  { codigo: 'A280', descripcion: 'Pasteurelosis' },
+  { codigo: 'A281', descripcion: 'Enfermedad por rasguño de gato' },
+  { codigo: 'A282', descripcion: 'Yersiniosis extraintestinal' },
+  { codigo: 'A288', descripcion: 'Otras enfermedades zoonóticas bacterianas especificadas, no clasificadas en otra parte' },
+  { codigo: 'A289', descripcion: 'Enfermedad zoonótica bacteriana, sin otra especificación' },
+  { codigo: 'A300', descripcion: 'Lepra indeterminada' },
+  { codigo: 'A301', descripcion: 'Lepra tuberculoides' },
+  { codigo: 'A302', descripcion: 'Lepra tuberculoides limitrofa' },
+  { codigo: 'A303', descripcion: 'Lepra limitrofa' },
+  { codigo: 'A304', descripcion: 'Lepra lepromatosa limitrofa' },
+  { codigo: 'A305', descripcion: 'Lepra lepromatosa' },
+  { codigo: 'A308', descripcion: 'Otras formas de lepra' },
+  { codigo: 'A309', descripcion: 'Lepra, no especificada' },
+  { codigo: 'A310', descripcion: 'Infecciones por micobacterias pulmonares' },
+  { codigo: 'A311', descripcion: 'Infección cutánea por micobacterias' },
+  { codigo: 'A318', descripcion: 'Otras infecciones por micobacterias' },
+  { codigo: 'A319', descripcion: 'Infección por micobacteria, no especificada' },
+  { codigo: 'A320', descripcion: 'Listeriosis cutánea' },
+  { codigo: 'A321†', descripcion: 'Meningitis y meningoencefalitis listeriana' },
+  { codigo: 'A327', descripcion: 'Septicemia listerial' },
+  { codigo: 'A328', descripcion: 'Otras formas de listeriosis' },
+  { codigo: 'A329', descripcion: 'Listeriosis, no especificada' },
+  { codigo: 'A33', descripcion: 'Tetanos neonatal' },
+  { codigo: 'A34', descripcion: 'Tetanos obstétrico' },
+  { codigo: 'A35', descripcion: 'Otros tetanos' },
+  { codigo: 'A360', descripcion: 'Difteria faríngea' },
+  { codigo: 'A361', descripcion: 'Difteria nasofaríngea' },
+  { codigo: 'A362', descripcion: 'Difteria laríngea' },
+  { codigo: 'A363', descripcion: 'Difteria cutánea' },
+  { codigo: 'A368', descripcion: 'Otras difterias' },
+  { codigo: 'A369', descripcion: 'Difteria, no especificada' },
+  { codigo: 'A370', descripcion: 'Tos ferina debida a Bordetella pertussis' },
+  { codigo: 'A371', descripcion: 'Tos ferina debida a Bordetella parapertussis' },
+  { codigo: 'A378', descripcion: 'Tos ferina debida a otras especies de Bordetella' },
+  { codigo: 'A379', descripcion: 'Tos ferina, no especificada' },
+  { codigo: 'A38', descripcion: 'Escarlatina' },
+  { codigo: 'A390†', descripcion: 'Meningitis meningocócica (G01*)' },
+  { codigo: 'A391†', descripcion: 'Síndrome de Waterhouse-Friderichsen (E35.1*)' },
+  { codigo: 'A392', descripcion: 'Meningococcemia aguda' },
+  { codigo: 'A393', descripcion: 'Meningococcemia crónica' },
+  { codigo: 'A394', descripcion: 'Meningococcemia, no especificada' },
+  { codigo: 'A395†', descripcion: 'Enfermedad cardíaca debida a meningococo' },
+  { codigo: 'A398', descripcion: 'Otras infecciones meningocócicas' },
+  { codigo: 'A399', descripcion: 'Infección meningocócica, no especificada' },
+  { codigo: 'A400', descripcion: 'Septicemia debida a estreptococo, grupo A' },
+  { codigo: 'A401', descripcion: 'Septicemia debida a estreptococo, grupo B' },
+  { codigo: 'A402', descripcion: 'Septicemia debida a estreptococo, grupo D' },
+  { codigo: 'A403', descripcion: 'Septicemia debida a Streptococcus pneumoniae' },
+  { codigo: 'A408', descripcion: 'Otras septicemias estreptocócicas' },
+  { codigo: 'A409', descripcion: 'Septicemia estreptocócica, no especificada' },
+  { codigo: 'A410', descripcion: 'Septicemia debida a Staphylococcus aureus' },
+  { codigo: 'A411', descripcion: 'Septicemia debida a otro estafilococo especificado' },
+  { codigo: 'A412', descripcion: 'Septicemia debida a estafilococo no especificado' },
+  { codigo: 'A413', descripcion: 'Septicemia debida a Haemophilus influenzae' },
+  { codigo: 'A414', descripcion: 'Septicemia debida a anaerobios' },
+  { codigo: 'A415', descripcion: 'Septicemia debida a otros organismos gramnegativos' },
+  { codigo: 'A418', descripcion: 'Otras septicemias especificadas' },
+  { codigo: 'A419', descripcion: 'Septicemia, no especificada' },
+  { codigo: 'A420', descripcion: 'Actinomicosis pulmonar' },
+  { codigo: 'A421', descripcion: 'Actinomicosis abdominal' },
+  { codigo: 'A422', descripcion: 'Actinomicosis cervicofacial' },
+  { codigo: 'A427', descripcion: 'Septicemia actinomicótica' },
+  { codigo: 'A428', descripcion: 'Otras formas de actinomicosis' },
+  { codigo: 'A429', descripcion: 'Actinomicosis, sin otra especificación' },
+  { codigo: 'A430', descripcion: 'Nocardiosis pulmonar' },
+  { codigo: 'A431', descripcion: 'Nocardiosis cutánea' },
+  { codigo: 'A438', descripcion: 'Otras formas de nocardiosis' },
+  { codigo: 'A439', descripcion: 'Nocardiosis, no especificada' },
+  { codigo: 'A440', descripcion: 'Bartonelosis sistémica' },
+  { codigo: 'A441', descripcion: 'Bartonelosis cutánea y mucocutánea' },
+  { codigo: 'A448', descripcion: 'Otras formas de bartonelosis' },
+  { codigo: 'A449', descripcion: 'Bartonelosis, no especificada' },
+  { codigo: 'A46', descripcion: 'Erisipela' },
+  { codigo: 'A480', descripcion: 'Gangrena gaseosa' },
+  { codigo: 'A481', descripcion: 'Enfermedad de los legionarios' },
+  { codigo: 'A482', descripcion: 'Enfermedad de los legionarios no neumónica [fiebre de Pontiac]' },
+  { codigo: 'A483', descripcion: 'Síndrome de choque tóxico' },
+  { codigo: 'A484', descripcion: 'Fiebre púrpura brasileña' },
+  { codigo: 'A488', descripcion: 'Otras enfermedades bacterianas especificadas' },
+  { codigo: 'A490', descripcion: 'Infección estafilocócica, sin otra especificación' },
+  { codigo: 'A491', descripcion: 'Infección estreptocócica, sin otra especificación' },
+  { codigo: 'A492', descripcion: 'Infección por Haemophilus influenzae, sin otra especificación' },
+  { codigo: 'A493', descripcion: 'Infección por Micoplasma, sin otra especificación' },
+  { codigo: 'A498', descripcion: 'Otras infecciones bacterianas de sitio no especificado' },
+  { codigo: 'A499', descripcion: 'Infección bacteriana, no especificada' },
+  { codigo: 'A500', descripcion: 'Sifilis congénita precoz, sintomática' },
+  { codigo: 'A501', descripcion: 'Sifilis congénita precoz, latente' },
+  { codigo: 'A502', descripcion: 'Sifilis congénita precoz, sin otra especificación' },
+  { codigo: 'A503', descripcion: 'Oculopatía sifilítica congénita tardía' },
+  { codigo: 'A504', descripcion: 'Neurosifilis congénita tardía [neurosifilis juvenil]' },
+  { codigo: 'A505', descripcion: 'Otras formas de sifilis congénita tardía, sintomática' },
+  { codigo: 'A506', descripcion: 'Sifilis congénita tardía, latente' },
+  { codigo: 'A507', descripcion: 'Sifilis congénita tardía, sin otra especificación' },
+  { codigo: 'A509', descripcion: 'Sifilis congénita, sin otra especificación' },
+  { codigo: 'A510', descripcion: 'Sifilis genital primaria' },
+  { codigo: 'A511', descripcion: 'Sifilis primaria anal' },
+  { codigo: 'A512', descripcion: 'Sifilis primaria en otros sitios' },
+  { codigo: 'A513', descripcion: 'Sifilis secundaria de piel y membranas mucosas' },
+  { codigo: 'A514', descripcion: 'Otras sifilis secundarias' },
+  { codigo: 'A515', descripcion: 'Sifilis precoz, latente' },
+  { codigo: 'A519', descripcion: 'Sifilis precoz, sin otra especificación' },
+  { codigo: 'A520†', descripcion: 'Sifilis cardiovascular' },
+  { codigo: 'A521', descripcion: 'Neurosifilis sintomática' },
+  { codigo: 'A522', descripcion: 'Neurosifilis asintomática' },
+  { codigo: 'A523', descripcion: 'Neurosifilis no especificada' },
+  { codigo: 'A527', descripcion: 'Otras sifilis tardías sintomáticas' },
+  { codigo: 'A528', descripcion: 'Sifilis tardía, latente' },
+  { codigo: 'A529', descripcion: 'Sifilis tardía, no especificada' },
+  { codigo: 'A530', descripcion: 'Sifilis latente, no especificada como precoz o tardía' },
+  { codigo: 'A539', descripcion: 'Sifilis, no especificada' },
+  { codigo: 'A540', descripcion: 'Infección gonocócica del tracto genitourinario inferior sin absceso periuretral o de glándula accesoria' },
+  { codigo: 'A541', descripcion: 'Infección gonocócica del tracto genitourinario inferior con absceso periuretral y de glándulas accesorias' },
+  { codigo: 'A542†', descripcion: 'Pelvipérinonitis gonocócica y otras infecciones gonocócicas genitourinarias' },
+  { codigo: 'A543', descripcion: 'Infección gonocócica del ojo' },
+  { codigo: 'A544†', descripcion: 'Infección gonocócica del sistema osteomuscular' },
+  { codigo: 'A545', descripcion: 'Faringitis gonocócica' },
+  { codigo: 'A546', descripcion: 'Infección gonocócica del ano y del recto' },
+  { codigo: 'A548', descripcion: 'Otras infecciones gonocócicas' },
+  { codigo: 'A549', descripcion: 'Infección, gonocócica, no especificada' },
+  { codigo: 'A55', descripcion: 'Linfogranuloma (venéreo) por clamidias' },
+  { codigo: 'A560', descripcion: 'Infección del tracto genitourinario inferior debida a clamidias' },
+  { codigo: 'A561†', descripcion: 'Infección del pelvipérinoneo y otros órganos genitourinarios debida a clamidias' },
+  { codigo: 'A562', descripcion: 'Infecciones del tracto genitourinario debidas a clamidias, sin otra especificación' },
+  { codigo: 'A563', descripcion: 'Infección del ano y del recto debida a clamidias' },
+  { codigo: 'A564', descripcion: 'Infección de faringe debida a clamidias' },
+  { codigo: 'A568', descripcion: 'Infección de transmisión sexual de otros sitios debida a clamidias' },
+  { codigo: 'A57', descripcion: 'Chancro blando' },
+  { codigo: 'A58', descripcion: 'Granuloma inguinal' },
+  { codigo: 'A590', descripcion: 'Tricomoniasis urogenital' },
+  { codigo: 'A598', descripcion: 'Tricomoniasis de otros sitios' },
+  { codigo: 'A599', descripcion: 'Tricomoniasis, no especificada' },
+  { codigo: 'A600', descripcion: 'Infección debida a Chlamydia psittaci' },
+  { codigo: 'A601', descripcion: 'Infección de genitales y trayecto urogenital y debida a virus del herpes [herpes simple]' },
+  { codigo: 'A609', descripcion: 'Infección anogenital por virus del herpes simple, sin otra especificación' },
+  { codigo: 'A630', descripcion: 'Verrugas (venéreas) anogenitales' },
+  { codigo: 'A638', descripcion: 'Otras enfermedades de transmisión predominantemente sexual, especificadas' },
+  { codigo: 'A64', descripcion: 'Enfermedad de transmisión sexual no especificada' },
+  { codigo: 'A65', descripcion: 'Sifilis no venérea' },
+  { codigo: 'A660', descripcion: 'Lesiones iniciales de framboesia' },
+  { codigo: 'A661', descripcion: 'Lesiones papulosas múltiples y framboesia con paso de cangrejo' },
+  { codigo: 'A662', descripcion: 'Otras lesiones precoces de la piel en la framboesia' },
+  { codigo: 'A663', descripcion: 'Hiperqueratosis de framboesia' },
+  { codigo: 'A664', descripcion: 'Goma y úlceras de framboesia' },
+  { codigo: 'A665', descripcion: 'Gangosa' },
+  { codigo: 'A666', descripcion: 'Lesiones óseas y de las articulaciones de la framboesia' },
+  { codigo: 'A667', descripcion: 'Otras manifestaciones de framboesia' },
+  { codigo: 'A668', descripcion: 'Framboesia latente' },
+  { codigo: 'A669', descripcion: 'Framboesia, no especificada' },
+  { codigo: 'A670', descripcion: 'Lesiones primarias de la pinta' },
+  { codigo: 'A671', descripcion: 'Lesiones intermedias de la pinta' },
+  { codigo: 'A672', descripcion: 'Lesiones tardías de la pinta' },
+  { codigo: 'A673', descripcion: 'Lesiones mixtas de la pinta' },
+  { codigo: 'A679', descripcion: 'Pinta, no especificada' },
+  { codigo: 'A680', descripcion: 'Fiebre recurrente transmitida por piojos' },
+  { codigo: 'A681', descripcion: 'Fiebre recurrente transmitida por garrapatas' },
+  { codigo: 'A689', descripcion: 'Fiebre recurrente, no especificada' },
+  { codigo: 'A690', descripcion: 'Estomatitis ulcerativa necrotizante' },
+  { codigo: 'A691', descripcion: 'Otras infecciones de Vincent' },
+  { codigo: 'A692', descripcion: 'Enfermedad de Lyme' },
+  { codigo: 'A698', descripcion: 'Otras infecciones especificadas por espiroquetas' },
+  { codigo: 'A699', descripcion: 'Infección por espiroqueta, no especificada' },
+  { codigo: 'A70', descripcion: 'Infección debida a Chlamydia psittaci' },
+  { codigo: 'A710', descripcion: 'Estado inicial de tracoma' },
+  { codigo: 'A711', descripcion: 'Estado activo de tracoma' },
+  { codigo: 'A719', descripcion: 'Tracoma, no especificado' },
+  { codigo: 'A740†', descripcion: 'Conjuntivitis por clamidias (H13.1*)' },
+  { codigo: 'A748', descripcion: 'Otras enfermedades por clamidias' },
+  { codigo: 'A749', descripcion: 'Infección por clamidias, no especificada' },
+  { codigo: 'A750', descripcion: 'Tifus epidémico debido a Rickettsia prowazekii transmitido por piojos' },
+  { codigo: 'A751', descripcion: 'Tifus recrudecente [enfermedad de Brill]' },
+  { codigo: 'A752', descripcion: 'Tifus debido a Rickettsia typhi' },
+  { codigo: 'A753', descripcion: 'Tifus debido a Rickettsia tsutsugamushi' },
+  { codigo: 'A759', descripcion: 'Tifus, no especificado' },
+  { codigo: 'A770', descripcion: 'Fiebre maculosa debida a Rickettsia rickettsii' },
+    { codigo: 'E11.9', descripcion: 'Diabetes mellitus tipo 2 sin complicaciones' }
+  ];
+
+  this.codigosCie10Filtrados = codigosComunes.filter(codigo =>
+    codigo.codigo.toLowerCase().includes(termino.toLowerCase()) ||
+    codigo.descripcion.toLowerCase().includes(termino.toLowerCase())
+  );
+}
+
+trackByCie10Id(index: number, codigo: any): string {
+  return codigo.codigo || index;
+}
+
+// MÉTODO SELECCIÓN:
+seleccionarCie10(codigo: any, formulario: string): void {
+  const valorCompleto = `${codigo.codigo} - ${codigo.descripcion}`;
+  
+  switch(formulario) {
+    case 'historiaClinica':
+      this.historiaClinicaForm.get('codigo_cie10')?.setValue(valorCompleto);
+      break;
+    case 'notaEvolucion':
+      this.notaEvolucionForm.get('codigo_cie10')?.setValue(valorCompleto);
+      break;
+    case 'notaUrgencias':
+      this.notaUrgenciasForm.get('codigo_cie10')?.setValue(valorCompleto);
+      break;
+    case 'notaPreoperatoria':
+      this.notaPreoperatoriaForm.get('codigo_cie10_preoperatorio')?.setValue(valorCompleto);
+      break;
+    case 'notaPostoperatoria':
+      this.notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.setValue(valorCompleto);
+      break;
+    case 'notaEgreso':
+      this.notaEgresoForm.get('codigo_cie10_egreso')?.setValue(valorCompleto);
+      break;
+  }
+  this.codigosCie10Filtrados = [];
+  this.mostrarDropdownCie10 = false;
+}
+
+
   // Método para activar modo presentación
 activarModoPresentacion(): void {
   this.modoPresentacion = true;
@@ -291,97 +653,6 @@ desactivarModoPresentacion(): void {
   this.modoPresentacion = false;
   console.log('🔧 Modo desarrollo activado - Todos los documentos');
 }
-
-  // gruposFormularios = {
-  //   basicos: {
-  //     nombre: 'Documentos Básicos',
-  //     icono: 'fas fa-file-medical',
-  //     color: 'blue',
-  //     formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
-  //   },
-  //   quirurgicos: {
-  //     nombre: 'Documentos Quirúrgicos',
-  //     icono: 'fas fa-procedures',
-  //     color: 'orange',
-  //     formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
-  //   },
-  //   solicitudes: {
-  //     nombre: 'Solicitudes de Estudios',
-  //     icono: 'fas fa-vial',
-  //     color: 'green',
-  //     formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria'],
-  //   },
-  //   pediatricos: {
-  //     nombre: 'Documentos Pediátricos',
-  //     icono: 'fas fa-baby',
-  //     color: 'pink',
-  //     formularios: [
-  //       'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
-  //       'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
-  //       'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-  //     ],
-  //     condition: () => this.esPacientePediatrico,
-  //   },
-  //   prescripciones: {
-  //     nombre: 'Prescripciones',
-  //     icono: 'fas fa-pills',
-  //     color: 'purple',
-  //     formularios: ['prescripcionMedicamento', 'registroTransfusion'],
-  //   },
-  //   especiales: {
-  //     nombre: 'Documentos Especiales',
-  //     icono: 'fas fa-folder-open',
-  //     color: 'gray',
-  //     formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
-  //   },
-  // };
-
-//   gruposFormularios = {
-//   basicos: {
-//     nombre: 'Documentos Básicos',
-//     icono: 'fas fa-file-medical',
-//     color: 'blue',
-//     formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
-//   },
-//   quirurgicos: {
-//     nombre: 'Documentos Quirúrgicos',
-//     icono: 'fas fa-procedures',
-//     color: 'orange',
-//     formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
-//   },
-//   solicitudes: {
-//     nombre: 'Solicitudes de Estudios',
-//     icono: 'fas fa-vial',
-//     color: 'green',
-//     formularios: ['solicitudEstudio'], // ✅ SOLO SOLICITUD ESTUDIO (quitamos cultivo y gasometría)
-//   },
-//   pediatricos: {
-//     nombre: 'Documentos Pediátricos',
-//     icono: 'fas fa-baby',
-//     color: 'pink',
-//     formularios: [
-//       'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
-//       'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
-//       'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-//     ],
-//     condition: () => this.esPacientePediatrico,
-//   },
-//   // ✅ PRESCRIPCIONES COMENTADO COMPLETAMENTE
-//   /*
-//   prescripciones: {
-//     nombre: 'Prescripciones',
-//     icono: 'fas fa-pills',
-//     color: 'purple',
-//     formularios: ['prescripcionMedicamento', 'registroTransfusion'],
-//   },
-//   */
-//   especiales: {
-//     nombre: 'Documentos Especiales',
-//     icono: 'fas fa-folder-open',
-//     color: 'gray',
-//     formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
-//   },
-// };
 
 gruposFormularios = {
   basicos: {
@@ -402,20 +673,6 @@ gruposFormularios = {
     color: 'teal', // ✅ CAMBIADO de green a teal - color único y profesional
     formularios: ['solicitudEstudio'],
   },
-  // ✅ PEDIÁTRICOS COMENTADO COMPLETAMENTE
-  /*
-  pediatricos: {
-    nombre: 'Documentos Pediátricos',
-    icono: 'fas fa-baby',
-    color: 'pink',
-    formularios: [
-      'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
-      'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
-      'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-    ],
-    condition: () => this.esPacientePediatrico,
-  },
-  */
   especiales: {
     nombre: 'Documentos Especiales',
     icono: 'fas fa-folder-open',
@@ -423,56 +680,6 @@ gruposFormularios = {
     formularios: ['hojaFrontal', 'altaVoluntaria', 'consentimiento', 'referenciaTraslado'],
   },
 };
-
-//   gruposFormularios = {
-//   basicos: {
-//     nombre: 'Documentos Básicos',
-//     icono: 'fas fa-file-medical',
-//     color: 'blue',
-//     formularios: ['signosVitales', 'historiaClinica', 'notaUrgencias', 'notaEvolucion', 'notaInterconsulta'],
-//   },
-//   quirurgicos: {
-//     nombre: 'Documentos Quirúrgicos',
-//     icono: 'fas fa-procedures',
-//     color: 'orange',
-//     formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
-//   },
-//   hospitalarios: {
-//     nombre: 'Hospitalización y Egresos',
-//     icono: 'fas fa-hospital',
-//     color: 'red',
-//     formularios: ['notaEgreso', 'referenciaTraslado', 'altaVoluntaria'],
-//   },
-//   solicitudes: {
-//     nombre: 'Solicitudes de Estudios',
-//     icono: 'fas fa-vial',
-//     color: 'green',
-//     formularios: ['solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria'],
-//   },
-//   pediatricos: {
-//     nombre: 'Documentos Pediátricos',
-//     icono: 'fas fa-baby',
-//     color: 'pink',
-//     formularios: [
-//       'historiaClinicaPediatrica', 'controlCrecimiento', 'esquemaVacunacion', 'desarrolloPsicomotriz',
-//       'antecedentesHeredoFamiliares', 'antecedentesPerinatales', 'estadoNutricionalPediatrico',
-//       'inmunizaciones', 'vacunasAdicionales', 'alimentacionPediatrica', 'tamizajeNeonatal'
-//     ],
-//     condition: () => this.esPacientePediatrico,
-//   },
-//   prescripciones: {
-//     nombre: 'Prescripciones y Transfusiones',
-//     icono: 'fas fa-pills',
-//     color: 'purple',
-//     formularios: ['prescripcionMedicamento', 'registroTransfusion'],
-//   },
-//   especiales: {
-//     nombre: 'Documentos Especiales',
-//     icono: 'fas fa-folder-open',
-//     color: 'gray',
-//     formularios: ['hojaFrontal', 'consentimiento'],
-//   },
-// };
 
 
 
@@ -527,7 +734,7 @@ gruposFormularios = {
   formularios: { [key: string]: FormGroup } = {};
   mostrarModalEditarExpediente = false;
   numeroAdministrativoTemporal = '';
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
@@ -574,7 +781,6 @@ gruposFormularios = {
      private validacionesService: ValidacionesComunesService,
      private logoResolverService: LogoResolverService
   ) {
-    // ✅ INICIALIZACIÓN CORREGIDA
     this.signosVitalesForm = this.initializeSignosVitalesForm();
     this.historiaClinicaForm = this.initializeHistoriaClinicaForm();
     this.notaUrgenciasForm = this.initializeNotaUrgenciasForm();
@@ -755,6 +961,7 @@ private initializeHojaFrontalForm(): FormGroup {
       // Impresión diagnóstica y plan
       impresion_diagnostica: ['', [Validators.required]],
       id_guia_diagnostico: [null],
+      codigo_cie10: ['', [Validators.required]], // ← NUEVA LÍNEA CIE-10
       plan_diagnostico: [''],
       plan_terapeutico: ['', [Validators.required]],
       pronostico: ['', [Validators.required]],
@@ -807,6 +1014,7 @@ private initializeHojaFrontalForm(): FormGroup {
     estudios_laboratorio_gabinete: ['', [Validators.required]],
     evolucion_analisis: ['', [Validators.required]],
     diagnosticos: ['', [Validators.required]],
+    codigo_cie10: [''], // ← NUEVA LÍNEA CIE-10
     plan_estudios_tratamiento: ['', [Validators.required]],
     pronostico: ['', [Validators.required]],
 
@@ -1004,18 +1212,17 @@ private initializeHojaFrontalForm(): FormGroup {
 
 private initializeNotaPreoperatoriaForm(): FormGroup {
   return this.fb.group({
-    // Campos según la estructura de BD real
+   
     fecha_cirugia: ['', [Validators.required]],
-    
-    // 🔥 QUITAR minLength de estos campos:
-    resumen_interrogatorio: ['', [Validators.required]], // ← SIN minLength(50)
-    exploracion_fisica: ['', [Validators.required]], // ← SIN minLength(50)
+        resumen_interrogatorio: ['', [Validators.required]], 
+    exploracion_fisica: ['', [Validators.required]], 
     resultados_estudios: [''],
-    diagnostico_preoperatorio: ['', [Validators.required]], // ← SIN minLength(20)
+    diagnostico_preoperatorio: ['', [Validators.required]], 
     id_guia_diagnostico: [null],
-    plan_quirurgico: ['', [Validators.required]], // ← SIN minLength(30)
+    plan_quirurgico: ['', [Validators.required]], 
+    codigo_cie10_preoperatorio: [''], // ← NUEVA LÍNEA CIE-10
     plan_terapeutico_preoperatorio: [''],
-    pronostico: ['', [Validators.required]], // ← SIN minLength(20)
+    pronostico: ['', [Validators.required]], 
     
     tipo_cirugia: ['', [Validators.required]],
     riesgo_quirurgico: ['', [Validators.required]]
@@ -1094,31 +1301,6 @@ getFormErrors(): any[] {
     }
   }
 
-private async generarPDFNotaPreoperatoria(): Promise<void> {
-  try {
-    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
-
-    // 🔥 CORRECCIÓN: Usar la estructura correcta de datos
-    await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
-      // ✅ Pasar el pacienteCompleto directamente (ya tiene la estructura correcta)
-      paciente: this.pacienteCompleto,
-      medico: medicoCompleto,
-      expediente: this.pacienteCompleto?.expediente,
-      notaPreoperatoria: {
-        ...this.notaPreoperatoriaForm.value,
-        folio_preoperatorio: this.generarFolioPreoperatorio(),
-        numero_cama: this.camaSeleccionada?.numero || null,
-        guias_clinicas: this.guiasClinicasSeleccionadas
-      }
-    });
-
-    console.log('✅ PDF de Nota Preoperatoria generado correctamente');
-  } catch (error) {
-    console.error('❌ Error al generar PDF:', error);
-    this.error = 'Error al generar el PDF de la nota preoperatoria';
-  }
-}
-
   private generarFolioPreoperatorio(): string {
     const fecha = new Date();
     const timestamp = fecha.getTime().toString().slice(-6);
@@ -1147,7 +1329,7 @@ ngAfterViewInit(): void {
   this.notaPreanestesicaForm.get('peso')?.valueChanges.subscribe(() => this.actualizarIMC());
   this.notaPreanestesicaForm.get('talla')?.valueChanges.subscribe(() => this.actualizarIMC());
 }
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
  private initializeNotaPostoperatoriaForm(): FormGroup {
   return this.fb.group({
     // INFORMACIÓN TEMPORAL DE LA CIRUGÍA (NOM-004 Numeral 8.8)
@@ -1160,6 +1342,7 @@ servicio_hospitalizacion: ['Cirugía General'],
     // DIAGNÓSTICOS (NOM-004 D10.12)
     diagnostico_preoperatorio: ['', [Validators.required]],
     diagnostico_postoperatorio: ['', [Validators.required]],
+    codigo_cie10_postoperatorio: [''],
     
     // PROCEDIMIENTOS REALIZADOS (NOM-004 D10.13)
     operacion_planeada: ['', [Validators.required]],
@@ -1221,86 +1404,55 @@ servicio_hospitalizacion: ['Cirugía General'],
     revision_cirujano: [false, [Validators.requiredTrue]]
   });
 }
-// Método temporal para debug
-debugNotaPreoperatoria(): void {
-  console.log('🔍 DEBUG NOTA PREOPERATORIA:');
-  console.log('✅ Formulario válido:', this.notaPreoperatoriaForm.valid);
-  console.log('📋 Errores encontrados:', this.getFormErrors());
-
-  const obligatorios = [
-    'fecha_cirugia', 'resumen_interrogatorio', 'exploracion_fisica',
-    'diagnostico_preoperatorio', 'plan_quirurgico', 'pronostico',
-    'tipo_cirugia', 'riesgo_quirurgico'
-  ];
-
-  obligatorios.forEach(campo => {
-    const control = this.notaPreoperatoriaForm.get(campo);
-    const valor = control?.value || '';
-    const esValido = control?.valid;
-    const errores = control?.errors;
-
-    console.log(`📋 ${campo}:`, {
-      valor: `"${valor}" (${typeof valor === 'string' ? valor.length : 'N/A'} caracteres)`,
-      válido: esValido,
-      errores: errores
-    });
-
-    if (!esValido) {
-      console.log(`❌ ${campo} NO VÁLIDO:`, errores);
-    }
-  });
-}
   // ===================================
   // NOTA POSTOPERATORIA
   // ===================================
-
-async guardarNotaPostoperatoria(): Promise<void> {
-  if (!this.notaPostoperatoriaForm.valid) {
-    this.marcarCamposInvalidos(this.notaPostoperatoriaForm);
-    this.error = 'Complete todos los campos obligatorios del registro postoperatorio según NOM-004.';
-    return;
-  }
-
-  this.isCreatingDocument = true;
-  this.error = null;
-
-  try {
-    if (!this.pacienteCompleto?.expediente.id_expediente) {
-      throw new Error('No hay expediente disponible');
+  async guardarNotaPostoperatoria(): Promise<void> {
+    if (!this.notaPostoperatoriaForm.valid) {
+      this.marcarCamposInvalidos(this.notaPostoperatoriaForm);
+      this.error = 'Complete todos los campos obligatorios del registro postoperatorio según NOM-004.';
+      return;
     }
 
-    if (!this.documentoClinicoActual) {
-      await this.crearDocumentoClinicoPadre('Nota Postoperatoria');
+    this.isCreatingDocument = true;
+    this.error = null;
+
+    try {
+      if (!this.pacienteCompleto?.expediente.id_expediente) {
+        throw new Error('No hay expediente disponible');
+      }
+
+      if (!this.documentoClinicoActual) {
+        await this.crearDocumentoClinicoPadre('Nota Postoperatoria');
+      }
+
+      // Calcular duración de la cirugía
+      const duracionCalculada = this.calcularDuracionCirugia();
+
+      const notaPostoperatoriaData = {
+        id_documento: this.documentoClinicoActual!,
+        ...this.notaPostoperatoriaForm.value,
+        duracion_calculada: duracionCalculada,
+        folio_postoperatorio: this.generarFolioPostoperatorio(),
+        fecha_elaboracion: new Date().toISOString(),
+        medico_responsable: this.medicoActual
+      };
+
+      console.log('📄 Nota Postoperatoria preparada:', notaPostoperatoriaData);
+      
+      this.success = '⚕️ Nota Postoperatoria guardada correctamente';
+      this.formularioEstado.notaPostoperatoria = true;
+
+      // Generar PDF automáticamente
+      await this.generarPDF('Nota Postoperatoria');
+
+    } catch (error: any) {
+      console.error('❌ Error:', error);
+      this.error = 'Error al guardar la nota postoperatoria. Por favor intente nuevamente.';
+    } finally {
+      this.isCreatingDocument = false;
     }
-
-    // Calcular duración de la cirugía
-    const duracionCalculada = this.calcularDuracionCirugia();
-
-    const notaPostoperatoriaData = {
-      id_documento: this.documentoClinicoActual!,
-      ...this.notaPostoperatoriaForm.value,
-      duracion_calculada: duracionCalculada,
-      folio_postoperatorio: this.generarFolioPostoperatorio(),
-      fecha_elaboracion: new Date().toISOString(),
-      medico_responsable: this.medicoActual
-    };
-
-    console.log('📄 Nota Postoperatoria preparada:', notaPostoperatoriaData);
-    
-    this.success = '⚕️ Nota Postoperatoria guardada correctamente';
-    this.formularioEstado.notaPostoperatoria = true;
-
-    // Generar PDF automáticamente
-    await this.generarPDF('Nota Postoperatoria');
-
-  } catch (error: any) {
-    console.error('❌ Error:', error);
-    this.error = 'Error al guardar la nota postoperatoria. Por favor intente nuevamente.';
-  } finally {
-    this.isCreatingDocument = false;
   }
-}
-
 
 
   private async generarPDFNotaPostoperatoria(): Promise<void> {
@@ -1548,31 +1700,6 @@ private initializeNotaPostanestesicaForm(): FormGroup {
   });
 }
 
-debugFormularioPostanestesica(): void {
-  console.log('🔍 DEBUG - Formulario Postanestésica:');
-  console.log('- Válido:', this.notaPostanestesicaForm.valid);
-  console.log('- Errores:', this.getFormErrorsPostanestecia());
-  console.log('- Valores:', this.notaPostanestesicaForm.value);
-  
-  // Mostrar campos específicos que están fallando
-  const camposObligatorios = [
-    'fecha_procedimiento', 'hora_inicio', 'hora_termino', 'procedimiento_realizado',
-    'clasificacion_asa', 'tipo_anestesia', 'medicamentos_utilizados',
-    'presion_arterial_egreso', 'frecuencia_cardiaca_egreso', 'frecuencia_respiratoria_egreso',
-    'saturacion_oxigeno_egreso', 'temperatura_egreso', 'estado_clinico_egreso',
-    'estado_conciencia_egreso', 'plan_tratamiento', 'pronostico',
-    'anestesiologo_nombre', 'cedula_anestesiologo'
-  ];
-  
-  camposObligatorios.forEach(campo => {
-    const control = this.notaPostanestesicaForm.get(campo);
-    if (control?.invalid) {
-      console.log(`❌ ${campo}:`, control.errors, '| Valor:', control.value);
-    } else {
-      console.log(`✅ ${campo}: OK`);
-    }
-  });
-}
 
 getFormErrorsPostanestecia(): any {
   const formErrors: any = {};
@@ -2628,6 +2755,7 @@ private generarFolioPostanestesico(): string {
     resumen_interrogatorio: ['', [Validators.required, Validators.minLength(20)]],
     exploracion_fisica: ['', [Validators.required, Validators.minLength(20)]],
     diagnostico: ['', [Validators.required, Validators.minLength(10)]],
+    codigo_cie10: [''], // ← NUEVA LÍNEA CIE-10
     plan_tratamiento: ['', [Validators.required, Validators.minLength(20)]],
     pronostico: ['', [Validators.required]],
 
@@ -2887,6 +3015,7 @@ private generarFolioPostanestesico(): string {
   return this.fb.group({
     // Información del ingreso
     diagnostico_ingreso: ['', [Validators.required]],
+    codigo_cie10_egreso: [''],
     fecha_ingreso: [''],
     dias_estancia: [null, [Validators.min(1)]],
 
@@ -3717,6 +3846,17 @@ const configuracionLogos = this.pdfTemplatesService.obtenerConfiguracionLogosInt
           }
         });
         break;
+        case 'Nota de Evolución':
+case 'Evolución':
+  await this.pdfGeneratorService.generarNotaEvolucion({
+    ...datosBase,
+    notaEvolucion: {
+      ...this.notaEvolucionForm.value,
+      // 🔥 ASEGURAR QUE PASE EL CIE-10
+      codigo_cie10: this.notaEvolucionForm.value.codigo_cie10
+    }
+  });
+  break;
 
       // ✅ AGREGAR CASOS PARA HOJA FRONTAL
       case 'hojaFrontal':
@@ -3764,22 +3904,22 @@ const configuracionLogos = this.pdfTemplatesService.obtenerConfiguracionLogosInt
         break;
 
        case 'Nota Preoperatoria':
-        // 🔥 MÁS DEBUG
-        console.log('📋 Datos que se envían al PDF:');
-        console.log('- paciente:', this.pacienteCompleto);
-        console.log('- notaPreoperatoria:', this.notaPreoperatoriaForm.value);
-        
-        await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
-          paciente: this.pacienteCompleto,
-          medico: medicoCompleto,
-          expediente: this.pacienteCompleto?.expediente,
-          notaPreoperatoria: {
-            ...this.notaPreoperatoriaForm.value,
-            numero_cama: this.camaSeleccionada?.numero || null,
-            guias_clinicas: this.guiasClinicasSeleccionadas
-          }
-        });
-        break;
+  console.log('📋 Datos que se envían al PDF:');
+  console.log('- paciente:', this.pacienteCompleto);
+  console.log('- notaPreoperatoria:', this.notaPreoperatoriaForm.value);
+  
+  await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
+    paciente: this.pacienteCompleto,
+    medico: medicoCompleto,
+    expediente: this.pacienteCompleto?.expediente,
+    notaPreoperatoria: {
+      ...this.notaPreoperatoriaForm.value,
+      codigo_cie10_preoperatorio: this.notaPreoperatoriaForm.value.codigo_cie10_preoperatorio, // ← 🔥 ESTA LÍNEA
+      numero_cama: this.camaSeleccionada?.numero || null,
+      guias_clinicas: this.guiasClinicasSeleccionadas
+    }
+  });
+  break;
       case 'Nota Postanestésica':
         await this.pdfGeneratorService.generarDocumento('Nota Postanestésica', {
           ...datosBase,
@@ -3791,7 +3931,7 @@ const configuracionLogos = this.pdfTemplatesService.obtenerConfiguracionLogosInt
           }
         });
         break;
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
 case 'Nota Postoperatoria':
 case 'Postoperatoria':
   await this.pdfGeneratorService.generarDocumento('Nota Postoperatoria', {
