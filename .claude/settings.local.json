@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ng build)",
+      "Bash(npm run lint)"
+    ],
+    "deny": []
+  }
+}
