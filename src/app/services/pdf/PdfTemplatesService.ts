@@ -3399,8 +3399,8 @@ columns: [
                         { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center' },
                         { text: fechaActual.toLocaleTimeString('es-MX'), fontSize: 7, alignment: 'center' },
                         { text: this.obtenerNumeroExpedienteInteligente(pacienteCompleto) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
-{ text: notaEvolucionData.numero_cama || notaEvolucionData.cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
-{ text: notaEvolucionData.servicio_destino || medicoCompleto.departamento || 'No especificado', fontSize: 7, alignment: 'center' },                    
+{ text: notaEvolucionData.numero_cama || notaEvolucionData.cama || '______', fontSize: 7, alignment: 'center' },
+{ text: notaEvolucionData.servicio_destino || medicoCompleto.departamento || '________', fontSize: 7, alignment: 'center' },                    
 ],
                     ],
                   },
@@ -5186,440 +5186,1139 @@ columns: [
     };
   }
 
+  // async generarReferenciaContrarreferencia(datos: any): Promise<any> {
+  //   console.log('🔄 Generando Referencia y Contrarreferencia...');
+
+  //   const { pacienteCompleto, medicoCompleto, referencia } = datos;
+  //   const fechaActual = new Date();
+  //   const esContrarreferencia = referencia.tipo_referencia === 'contrarreferencia';
+
+  //   return {
+  //     pageSize: 'LETTER',
+  //     pageMargins: [40, 80, 40, 60],
+
+  //     header: (currentPage: number, pageCount: number) => {
+  //       return {
+  //         margin: [40, 20, 40, 20],
+  //         table: {
+  //           widths: ['30%', '40%', '30%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
+  //                   { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
+  //                   { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: `🔄 ${esContrarreferencia ? 'CONTRARREFERENCIA' : 'REFERENCIA'}`, fontSize: 16, bold: true, alignment: 'center', color: '#059669' },
+  //                   { text: 'SISTEMA DE REFERENCIA MÉDICA', fontSize: 10, alignment: 'center', italics: true },
+  //                   { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
+  //                   { text: referencia.folio_referencia || this.generarFolioReferencia(), fontSize: 10, alignment: 'right' },
+  //                   { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
+  //                   { text: `Urgencia: ${this.formatearUrgenciaReferencia(referencia.urgencia_referencia)}`, fontSize: 8, alignment: 'right', color: referencia.urgencia_referencia === 'urgente' ? '#dc2626' : '#059669' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       };
+  //     },
+
+  //     content: [
+  //       // INFORMACIÓN DEL PACIENTE
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '👤 DATOS DEL PACIENTE',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#f0fdf4',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['25%', '25%', '25%', '25%'],
+  //           body: [
+  //             [
+  //               { text: 'Nombre:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
+  //               { text: 'Expediente:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
+  //             ],
+  //             [
+  //               { text: 'Edad:', style: 'fieldLabel' },
+  //               { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
+  //               { text: 'Sexo:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
+  //             ],
+  //             [
+  //               { text: 'Tipo de Sangre:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.tipo_sangre || 'No especificado', style: 'fieldValue' },
+  //               { text: 'Teléfono:', style: 'fieldLabel' },
+  //               { text: pacienteCompleto.telefono || 'No especificado', style: 'fieldValue' }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // INFORMACIÓN DE LA REFERENCIA
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: `🏥 INFORMACIÓN DE ${esContrarreferencia ? 'CONTRARREFERENCIA' : 'REFERENCIA'}`,
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#f0fdf4',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['50%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'INSTITUCIÓN DESTINO:', style: 'fieldLabel' },
+  //                   { text: referencia.institucion_destino || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 10] },
+  //                   { text: 'NIVEL DE ATENCIÓN:', style: 'fieldLabel' },
+  //                   { text: this.formatearNivelAtencion(referencia.nivel_atencion_destino), style: 'fieldValue', margin: [0, 5, 0, 10] }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'MÉDICO DESTINO:', style: 'fieldLabel' },
+  //                   { text: referencia.medico_destino || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
+  //                   { text: 'ESPECIALIDAD:', style: 'fieldLabel' },
+  //                   { text: referencia.especialidad_destino || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 10] }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // MOTIVO Y DIAGNÓSTICO
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'MOTIVO DE REFERENCIA:', style: 'fieldLabel' },
+  //                   { text: referencia.motivo_referencia || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'DIAGNÓSTICO:', style: 'fieldLabel' },
+  //                   { text: referencia.diagnostico_referencia || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   { text: 'RESUMEN CLÍNICO:', style: 'fieldLabel' },
+  //                   { text: referencia.resumen_clinico || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                 ],
+  //                 margin: [10, 10]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // ESTADO ACTUAL DEL PACIENTE
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '🩺 ESTADO ACTUAL DEL PACIENTE',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#fef3c7',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'ESTADO DEL PACIENTE:', style: 'fieldLabel' },
+  //                   { text: referencia.estado_paciente || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+
+  //                   ...(referencia.estudios_realizados ? [
+  //                     { text: 'ESTUDIOS REALIZADOS:', style: 'fieldLabel' },
+  //                     { text: referencia.estudios_realizados, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                   ] : []),
+
+  //                   ...(referencia.tratamiento_actual ? [
+  //                     { text: 'TRATAMIENTO ACTUAL:', style: 'fieldLabel' },
+  //                     { text: referencia.tratamiento_actual, style: 'fieldValue', margin: [0, 5, 0, 15] }
+  //                   ] : []),
+
+  //                   ...(referencia.medicamentos_actuales ? [
+  //                     { text: 'MEDICAMENTOS ACTUALES:', style: 'fieldLabel' },
+  //                     { text: referencia.medicamentos_actuales, style: 'fieldValue', margin: [0, 5, 0, 0] }
+  //                   ] : [])
+  //                 ],
+  //                 margin: [10, 10]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // INFORMACIÓN DE TRASLADO
+  //       ...(referencia.requiere_ambulancia || referencia.acompañante_autorizado ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   text: '🚑 INFORMACIÓN DE TRASLADO',
+  //                   style: 'sectionHeader',
+  //                   fillColor: '#fef2f2',
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 10]
+  //         },
+  //         {
+  //           table: {
+  //             widths: ['50%', '50%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'REQUIERE AMBULANCIA:', style: 'fieldLabel' },
+  //                     { text: referencia.requiere_ambulancia ? 'SÍ' : 'NO', style: 'fieldValue', color: referencia.requiere_ambulancia ? '#dc2626' : '#059669' },
+  //                   ]
+  //                 },
+  //                 {
+  //                   stack: [
+  //                     { text: 'ACOMPAÑANTE AUTORIZADO:', style: 'fieldLabel' },
+  //                     { text: referencia.acompañante_autorizado || 'No especificado', style: 'fieldValue' }
+  //                   ]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 15]
+  //         }
+  //       ] : []),
+
+  //       // SEGUIMIENTO Y CONTRARREFERENCIA
+  //       {
+  //         table: {
+  //           widths: ['100%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: '📋 SEGUIMIENTO Y CONTRARREFERENCIA',
+  //                 style: 'sectionHeader',
+  //                 fillColor: '#f3e8ff',
+  //                 margin: [10, 8]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 10]
+  //       },
+
+  //       {
+  //         table: {
+  //           widths: ['50%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: 'REQUIERE CONTRARREFERENCIA:', style: 'fieldLabel' },
+  //                   { text: referencia.requiere_contrarreferencia ? 'SÍ' : 'NO', style: 'fieldValue' },
+  //                   { text: 'TIEMPO ESPERADO DE RESPUESTA:', style: 'fieldLabel', margin: [0, 10, 0, 0] },
+  //                   { text: this.formatearTiempoRespuesta(referencia.tiempo_esperado_respuesta), style: 'fieldValue' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: 'FECHA PROGRAMADA:', style: 'fieldLabel' },
+  //                   { text: this.formatearFecha(referencia.fecha_programada_cita) || 'A programar', style: 'fieldValue' },
+  //                   { text: 'AUTORIZACIÓN:', style: 'fieldLabel', margin: [0, 10, 0, 0] },
+  //                   { text: referencia.numero_autorizacion || 'No requerida', style: 'fieldValue' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: this.getTableLayout(),
+  //         margin: [0, 0, 0, 15]
+  //       },
+
+  //       // OBSERVACIONES
+  //       ...(referencia.observaciones ? [
+  //         {
+  //           table: {
+  //             widths: ['100%'],
+  //             body: [
+  //               [
+  //                 {
+  //                   stack: [
+  //                     { text: 'OBSERVACIONES:', style: 'fieldLabel' },
+  //                     { text: referencia.observaciones, style: 'fieldValue', margin: [0, 5] }
+  //                   ],
+  //                   margin: [10, 8]
+  //                 }
+  //               ]
+  //             ]
+  //           },
+  //           layout: this.getTableLayout(),
+  //           margin: [0, 0, 0, 20]
+  //         }
+  //       ] : []),
+
+  //       // ESPACIADOR PARA FIRMAS
+  //       { text: '', pageBreak: 'before' },
+
+  //       // SECCIÓN FIRMAS
+  //       {
+  //         margin: [0, 40, 0, 0],
+  //         table: {
+  //           widths: ['50%', '50%'],
+  //           body: [
+  //             [
+  //               {
+  //                 stack: [
+  //                   { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+  //                   { text: 'MÉDICO REFERENTE', style: 'signatureLabel' },
+  //                   { text: medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
+  //                   { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' },
+  //                   { text: `Servicio: ${medicoCompleto.departamento || 'N/A'}`, style: 'signatureDetails' }
+  //                 ]
+  //               },
+  //               {
+  //                 stack: [
+  //                   { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
+  //                   { text: 'RECIBIDO POR', style: 'signatureLabel' },
+  //                   { text: referencia.institucion_destino || 'Institución Destino', style: 'signatureName' },
+  //                   { text: 'Fecha: ________________', style: 'signatureDetails', margin: [0, 10, 0, 0] },
+  //                   { text: 'Sello Institucional', style: 'signatureDetails' }
+  //                 ]
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       }
+  //     ],
+
+  //     footer: (currentPage: number, pageCount: number) => {
+  //       return {
+  //         margin: [40, 10],
+  //         table: {
+  //           widths: ['33%', '34%', '33%'],
+  //           body: [
+  //             [
+  //               {
+  //                 text: `${esContrarreferencia ? 'Contrarreferencia' : 'Referencia'} - Hospital General San Luis de la Paz`,
+  //                 fontSize: 8,
+  //                 color: '#666666'
+  //               },
+  //               {
+  //                 text: `Página ${currentPage} de ${pageCount}`,
+  //                 fontSize: 8,
+  //                 alignment: 'center',
+  //                 color: '#666666'
+  //               },
+  //               {
+  //                 text: fechaActual.toLocaleString('es-MX'),
+  //                 fontSize: 8,
+  //                 alignment: 'right',
+  //                 color: '#666666'
+  //               }
+  //             ]
+  //           ]
+  //         },
+  //         layout: 'noBorders'
+  //       };
+  //     },
+
+  //     styles: {
+  //       sectionHeader: {
+  //         fontSize: 12,
+  //         bold: true,
+  //         color: '#374151'
+  //       },
+  //       fieldLabel: {
+  //         fontSize: 9,
+  //         bold: true,
+  //         color: '#4b5563'
+  //       },
+  //       fieldValue: {
+  //         fontSize: 9,
+  //         color: '#111827'
+  //       },
+  //       signatureLabel: {
+  //         fontSize: 10,
+  //         bold: true,
+  //         alignment: 'center',
+  //         color: '#374151'
+  //       },
+  //       signatureName: {
+  //         fontSize: 9,
+  //         alignment: 'center',
+  //         color: '#111827'
+  //       },
+  //       signatureDetails: {
+  //         fontSize: 8,
+  //         alignment: 'center',
+  //         color: '#6b7280'
+  //       }
+  //     }
+  //   };
+  // }
+
   async generarReferenciaContrarreferencia(datos: any): Promise<any> {
-    console.log('🔄 Generando Referencia y Contrarreferencia...');
+  console.log('🔄 Generando Referencia y Contrarreferencia - Estilo Profesional...');
 
-    const { pacienteCompleto, medicoCompleto, referencia } = datos;
-    const fechaActual = new Date();
-    const esContrarreferencia = referencia.tipo_referencia === 'contrarreferencia';
+  const { pacienteCompleto, medicoCompleto, referencia } = datos;
+  const fechaActual = new Date();
+  const esContrarreferencia = referencia.tipo_referencia === 'contrarreferencia';
+  
+  // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+  const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
-    return {
-      pageSize: 'LETTER',
-      pageMargins: [40, 80, 40, 60],
+  return {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
 
-      header: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 20, 40, 20],
-          table: {
-            widths: ['30%', '40%', '30%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'HOSPITAL GENERAL', fontSize: 12, bold: true },
-                    { text: 'SAN LUIS DE LA PAZ', fontSize: 10, bold: true },
-                    { text: 'GUANAJUATO, MÉXICO', fontSize: 8 }
-                  ]
+    header: {
+      margin: [20, 10, 20, 10],
+      table: {
+        widths: ['20%', '60%', '20%'],
+        body: [
+          [
+            {
+              // Logo de gobierno (izquierda)
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_gobierno ||
+                configuracion.logo_gobierno
+              ),
+              fit: [80, 40],
+              alignment: 'left',
+              margin: [0, 5],
+            },
+            {
+              // Texto central
+              text: esContrarreferencia 
+                ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - CONTRARREFERENCIA MÉDICA'
+                : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - REFERENCIA MÉDICA',
+              fontSize: 10,
+              bold: true,
+              alignment: 'center',
+              color: '#1a365d',
+              margin: [0, 8],
+            },
+            {
+              // Logo del hospital (derecha)
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_principal ||
+                configuracion.logo_principal
+              ),
+              fit: [80, 40],
+              alignment: 'right',
+              margin: [0, 5],
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    },
+
+    content: [
+      // IDENTIFICACIÓN Y DATOS BÁSICOS
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'IDENTIFICACIÓN',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 3,
+              },
+              {
+                table: {
+                  widths: ['20%', '20%', '20%', '20%', '20%'],
+                  body: [
+                    [
+                      { text: 'Fecha referencia', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Folio', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'No. Expediente', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Urgencia', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Tipo', fontSize: 7, bold: true, alignment: 'center' },
+                    ],
+                    [
+                      { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center' },
+                      { text: referencia.folio_referencia || this.generarFolioReferencia(), fontSize: 7, alignment: 'center' },
+                      { text: this.obtenerNumeroExpedienteInteligente(pacienteCompleto) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
+                      { text: this.formatearUrgenciaReferencia(referencia.urgencia_referencia), fontSize: 7, alignment: 'center', color: referencia.urgencia_referencia === 'urgente' ? '#dc2626' : '#059669' },
+                      { text: esContrarreferencia ? 'CONTRARREFERENCIA' : 'REFERENCIA', fontSize: 7, alignment: 'center', bold: true, color: '#059669' },
+                    ],
+                  ],
                 },
-                {
-                  stack: [
-                    { text: `🔄 ${esContrarreferencia ? 'CONTRARREFERENCIA' : 'REFERENCIA'}`, fontSize: 16, bold: true, alignment: 'center', color: '#059669' },
-                    { text: 'SISTEMA DE REFERENCIA MÉDICA', fontSize: 10, alignment: 'center', italics: true },
-                    { text: 'NOM-004-SSA3-2012', fontSize: 8, alignment: 'center', color: '#666666' }
-                  ]
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
                 },
-                {
-                  stack: [
-                    { text: 'FOLIO:', fontSize: 8, bold: true, alignment: 'right' },
-                    { text: referencia.folio_referencia || this.generarFolioReferencia(), fontSize: 10, alignment: 'right' },
-                    { text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}`, fontSize: 8, alignment: 'right', margin: [0, 2] },
-                    { text: `Urgencia: ${this.formatearUrgenciaReferencia(referencia.urgencia_referencia)}`, fontSize: 8, alignment: 'right', color: referencia.urgencia_referencia === 'urgente' ? '#dc2626' : '#059669' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
+              },
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['55%', '15%', '15%', '15%'],
+                  body: [
+                    [
+                      { text: 'Nombre completo del paciente', fontSize: 7, bold: true },
+                      { text: 'Edad', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Sexo', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Tipo de sangre', fontSize: 7, bold: true, alignment: 'center' },
+                    ],
+                    [
+                      { text: pacienteCompleto.nombre_completo, fontSize: 8, bold: true, margin: [2, 3] },
+                      { text: `${pacienteCompleto.edad} años`, fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.sexo, fontSize: 7, alignment: 'center' },
+                      { text: pacienteCompleto.tipo_sangre || 'No especificado', fontSize: 7, alignment: 'center', bold: true, color: '#dc2626' },
+                    ],
+                  ],
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                },
+              },
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['50%', '25%', '25%'],
+                  body: [
+                    [
+                      { text: 'Médico referente', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Cédula profesional', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Especialidad', fontSize: 7, bold: true, alignment: 'center' },
+                    ],
+                    [
+                      { text: medicoCompleto.nombre_completo || 'No especificado', fontSize: 7, alignment: 'center' },
+                      { text: medicoCompleto.numero_cedula || 'No registrada', fontSize: 7, alignment: 'center' },
+                      { text: medicoCompleto.especialidad || 'N/A', fontSize: 7, alignment: 'center' },
+                    ],
+                  ],
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                },
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
       },
 
-      content: [
-        // INFORMACIÓN DEL PACIENTE
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '👤 DATOS DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#f0fdf4',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
+      { text: '', margin: [0, 2] },
 
-        {
-          table: {
-            widths: ['25%', '25%', '25%', '25%'],
-            body: [
-              [
-                { text: 'Nombre:', style: 'fieldLabel' },
-                { text: pacienteCompleto.nombre_completo || 'N/A', style: 'fieldValue' },
-                { text: 'Expediente:', style: 'fieldLabel' },
-                { text: pacienteCompleto.numero_expediente || 'N/A', style: 'fieldValue' }
-              ],
-              [
-                { text: 'Edad:', style: 'fieldLabel' },
-                { text: `${pacienteCompleto.edad || 'N/A'} años`, style: 'fieldValue' },
-                { text: 'Sexo:', style: 'fieldLabel' },
-                { text: pacienteCompleto.sexo || 'N/A', style: 'fieldValue' }
-              ],
-              [
-                { text: 'Tipo de Sangre:', style: 'fieldLabel' },
-                { text: pacienteCompleto.tipo_sangre || 'No especificado', style: 'fieldValue' },
-                { text: 'Teléfono:', style: 'fieldLabel' },
-                { text: pacienteCompleto.telefono || 'No especificado', style: 'fieldValue' }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // INFORMACIÓN DE LA REFERENCIA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: `🏥 INFORMACIÓN DE ${esContrarreferencia ? 'CONTRARREFERENCIA' : 'REFERENCIA'}`,
-                  style: 'sectionHeader',
-                  fillColor: '#f0fdf4',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'INSTITUCIÓN DESTINO:', style: 'fieldLabel' },
-                    { text: referencia.institucion_destino || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 10] },
-                    { text: 'NIVEL DE ATENCIÓN:', style: 'fieldLabel' },
-                    { text: this.formatearNivelAtencion(referencia.nivel_atencion_destino), style: 'fieldValue', margin: [0, 5, 0, 10] }
-                  ]
+      // INFORMACIÓN DEL DESTINO
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'DESTINO',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 2,
+              },
+              {
+                text: 'INFORMACIÓN DE LA INSTITUCIÓN DESTINO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                table: {
+                  widths: ['25%', '25%', '25%', '25%'],
+                  body: [
+                    [
+                      { text: 'Institución destino', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Nivel de atención', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Médico destino', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Especialidad', fontSize: 7, bold: true, alignment: 'center' },
+                    ],
+                    [
+                      { text: referencia.institucion_destino || 'No especificada', fontSize: 7, alignment: 'center' },
+                      { text: this.formatearNivelAtencion(referencia.nivel_atencion_destino), fontSize: 7, alignment: 'center' },
+                      { text: referencia.medico_destino || 'No especificado', fontSize: 7, alignment: 'center' },
+                      { text: referencia.especialidad_destino || 'No especificada', fontSize: 7, alignment: 'center' },
+                    ],
+                  ],
                 },
-                {
-                  stack: [
-                    { text: 'MÉDICO DESTINO:', style: 'fieldLabel' },
-                    { text: referencia.medico_destino || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 10] },
-                    { text: 'ESPECIALIDAD:', style: 'fieldLabel' },
-                    { text: referencia.especialidad_destino || 'No especificada', style: 'fieldValue', margin: [0, 5, 0, 10] }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                },
+              },
+            ],
+          ],
         },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
 
-        // MOTIVO Y DIAGNÓSTICO
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'MOTIVO DE REFERENCIA:', style: 'fieldLabel' },
-                    { text: referencia.motivo_referencia || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+      { text: '', margin: [0, 2] },
 
-                    { text: 'DIAGNÓSTICO:', style: 'fieldLabel' },
-                    { text: referencia.diagnostico_referencia || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+      // MOTIVO Y DIAGNÓSTICO CLÍNICO
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'INFORMACIÓN CLÍNICA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 6,
+              },
+              {
+                text: 'MOTIVO DE LA REFERENCIA',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.motivo_referencia || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+            [
+              {},
+              {
+                text: 'DIAGNÓSTICO CLÍNICO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.diagnostico_referencia || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+            [
+              {},
+              {
+                text: 'RESUMEN CLÍNICO Y EVOLUCIÓN',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.resumen_clinico || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
 
-                    { text: 'RESUMEN CLÍNICO:', style: 'fieldLabel' },
-                    { text: referencia.resumen_clinico || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 0] }
+      { text: '', margin: [0, 2] },
+
+      // ESTADO ACTUAL Y TRATAMIENTO
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'ESTADO ACTUAL',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 6,
+              },
+              {
+                text: 'ESTADO DEL PACIENTE',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.estado_paciente || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+            [
+              {},
+              {
+                text: 'ESTUDIOS REALIZADOS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.estudios_realizados || 'Sin estudios específicos realizados',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+            [
+              {},
+              {
+                text: 'TRATAMIENTO ACTUAL',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: referencia.tratamiento_actual || 'Sin tratamiento específico',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+
+      { text: '', margin: [0, 2] },
+
+      // INFORMACIÓN DE TRASLADO Y SEGUIMIENTO
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'TRASLADO Y SEGUIMIENTO',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                rowSpan: 4,
+              },
+              {
+                table: {
+                  widths: ['25%', '25%', '25%', '25%'],
+                  body: [
+                    [
+                      { text: 'Ambulancia requerida', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Acompañante autorizado', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Contrarreferencia', fontSize: 7, bold: true, alignment: 'center' },
+                      { text: 'Tiempo respuesta', fontSize: 7, bold: true, alignment: 'center' },
+                    ],
+                    [
+                      { text: referencia.requiere_ambulancia ? 'SÍ' : 'NO', fontSize: 7, alignment: 'center', color: referencia.requiere_ambulancia ? '#dc2626' : '#059669', bold: true },
+                      { text: referencia.acompañante_autorizado || 'No especificado', fontSize: 7, alignment: 'center' },
+                      { text: referencia.requiere_contrarreferencia ? 'SÍ' : 'NO', fontSize: 7, alignment: 'center', bold: true },
+                      { text: this.formatearTiempoRespuesta(referencia.tiempo_esperado_respuesta), fontSize: 7, alignment: 'center' },
+                    ],
                   ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
+                },
+                layout: {
+                  hLineWidth: () => 0.3,
+                  vLineWidth: () => 0.3,
+                  hLineColor: () => '#000000',
+                  vLineColor: () => '#000000',
+                },
+              },
+            ],
+            [
+              {},
+              {
+                text: 'FECHA PROGRAMADA Y AUTORIZACIÓN',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+            [
+              {},
+              {
+                text: `Fecha programada: ${this.formatearFecha(referencia.fecha_programada_cita) || 'A programar'}\nNúmero de autorización: ${referencia.numero_autorizacion || 'No requerida'}`,
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.3,
+              },
+            ],
+            [
+              {},
+              {
+                text: 'OBSERVACIONES ADICIONALES',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#fafafa',
+              },
+            ],
+          ],
         },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
 
-        // ESTADO ACTUAL DEL PACIENTE
+      // OBSERVACIONES (solo si existen)
+      ...(referencia.observaciones ? [
+        { text: '', margin: [0, 2] },
         {
           table: {
             widths: ['100%'],
             body: [
               [
                 {
-                  text: '🩺 ESTADO ACTUAL DEL PACIENTE',
-                  style: 'sectionHeader',
-                  fillColor: '#fef3c7',
-                  margin: [10, 8]
-                }
-              ]
-            ]
+                  text: `OBSERVACIONES: ${referencia.observaciones}`,
+                  fontSize: 8,
+                  bold: true,
+                  fillColor: '#f8f8f8',
+                  margin: [5, 8],
+                  alignment: 'center',
+                  lineHeight: 1.1,
+                },
+              ],
+            ],
           },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
         },
+      ] : []),
 
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'ESTADO DEL PACIENTE:', style: 'fieldLabel' },
-                    { text: referencia.estado_paciente || 'No especificado', style: 'fieldValue', margin: [0, 5, 0, 15] },
+      { text: '', margin: [0, 10] },
 
-                    ...(referencia.estudios_realizados ? [
-                      { text: 'ESTUDIOS REALIZADOS:', style: 'fieldLabel' },
-                      { text: referencia.estudios_realizados, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                    ] : []),
-
-                    ...(referencia.tratamiento_actual ? [
-                      { text: 'TRATAMIENTO ACTUAL:', style: 'fieldLabel' },
-                      { text: referencia.tratamiento_actual, style: 'fieldValue', margin: [0, 5, 0, 15] }
-                    ] : []),
-
-                    ...(referencia.medicamentos_actuales ? [
-                      { text: 'MEDICAMENTOS ACTUALES:', style: 'fieldLabel' },
-                      { text: referencia.medicamentos_actuales, style: 'fieldValue', margin: [0, 5, 0, 0] }
-                    ] : [])
-                  ],
-                  margin: [10, 10]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // INFORMACIÓN DE TRASLADO
-        ...(referencia.requiere_ambulancia || referencia.acompañante_autorizado ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
+      // FIRMA MÉDICA COMPLETA SEGÚN NOM-004
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                text: 'MÉDICO REFERENTE',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+              {
+                text: 'INSTITUCIÓN RECEPTORA',
+                fontSize: 8,
+                bold: true,
+                fillColor: '#f5f5f5',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+            ],
+            [
+              {
+                text: [
                   {
-                    text: '🚑 INFORMACIÓN DE TRASLADO',
-                    style: 'sectionHeader',
-                    fillColor: '#fef2f2',
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['50%', '50%'],
-              body: [
-                [
-                  {
-                    stack: [
-                      { text: 'REQUIERE AMBULANCIA:', style: 'fieldLabel' },
-                      { text: referencia.requiere_ambulancia ? 'SÍ' : 'NO', style: 'fieldValue', color: referencia.requiere_ambulancia ? '#dc2626' : '#059669' },
-                    ]
+                    text: `${medicoCompleto.titulo_profesional || 'Dr.'} ${medicoCompleto.nombre_completo}\n`,
+                    fontSize: 9,
+                    bold: true,
                   },
                   {
-                    stack: [
-                      { text: 'ACOMPAÑANTE AUTORIZADO:', style: 'fieldLabel' },
-                      { text: referencia.acompañante_autorizado || 'No especificado', style: 'fieldValue' }
-                    ]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 15]
-          }
-        ] : []),
-
-        // SEGUIMIENTO Y CONTRARREFERENCIA
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-                  text: '📋 SEGUIMIENTO Y CONTRARREFERENCIA',
-                  style: 'sectionHeader',
-                  fillColor: '#f3e8ff',
-                  margin: [10, 8]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 10]
-        },
-
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: 'REQUIERE CONTRARREFERENCIA:', style: 'fieldLabel' },
-                    { text: referencia.requiere_contrarreferencia ? 'SÍ' : 'NO', style: 'fieldValue' },
-                    { text: 'TIEMPO ESPERADO DE RESPUESTA:', style: 'fieldLabel', margin: [0, 10, 0, 0] },
-                    { text: this.formatearTiempoRespuesta(referencia.tiempo_esperado_respuesta), style: 'fieldValue' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: 'FECHA PROGRAMADA:', style: 'fieldLabel' },
-                    { text: this.formatearFecha(referencia.fecha_programada_cita) || 'A programar', style: 'fieldValue' },
-                    { text: 'AUTORIZACIÓN:', style: 'fieldLabel', margin: [0, 10, 0, 0] },
-                    { text: referencia.numero_autorizacion || 'No requerida', style: 'fieldValue' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: this.getTableLayout(),
-          margin: [0, 0, 0, 15]
-        },
-
-        // OBSERVACIONES
-        ...(referencia.observaciones ? [
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [
+                    text: `Cédula Profesional: ${medicoCompleto.numero_cedula || 'No registrada'}\n`,
+                    fontSize: 8,
+                  },
                   {
-                    stack: [
-                      { text: 'OBSERVACIONES:', style: 'fieldLabel' },
-                      { text: referencia.observaciones, style: 'fieldValue', margin: [0, 5] }
-                    ],
-                    margin: [10, 8]
-                  }
-                ]
-              ]
-            },
-            layout: this.getTableLayout(),
-            margin: [0, 0, 0, 20]
-          }
-        ] : []),
-
-        // ESPACIADOR PARA FIRMAS
-        { text: '', pageBreak: 'before' },
-
-        // SECCIÓN FIRMAS
-        {
-          margin: [0, 40, 0, 0],
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'MÉDICO REFERENTE', style: 'signatureLabel' },
-                    { text: medicoCompleto.nombre_completo || 'N/A', style: 'signatureName' },
-                    { text: `Cédula: ${medicoCompleto.numero_cedula || 'N/A'}`, style: 'signatureDetails' },
-                    { text: `Servicio: ${medicoCompleto.departamento || 'N/A'}`, style: 'signatureDetails' }
-                  ]
-                },
-                {
-                  stack: [
-                    { text: '_'.repeat(40), alignment: 'center', margin: [0, 30, 0, 5] },
-                    { text: 'RECIBIDO POR', style: 'signatureLabel' },
-                    { text: referencia.institucion_destino || 'Institución Destino', style: 'signatureName' },
-                    { text: 'Fecha: ________________', style: 'signatureDetails', margin: [0, 10, 0, 0] },
-                    { text: 'Sello Institucional', style: 'signatureDetails' }
-                  ]
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        }
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [40, 10],
-          table: {
-            widths: ['33%', '34%', '33%'],
-            body: [
-              [
-                {
-                  text: `${esContrarreferencia ? 'Contrarreferencia' : 'Referencia'} - Hospital General San Luis de la Paz`,
-                  fontSize: 8,
-                  color: '#666666'
-                },
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
-                  alignment: 'center',
-                  color: '#666666'
-                },
-                {
-                  text: fechaActual.toLocaleString('es-MX'),
-                  fontSize: 8,
-                  alignment: 'right',
-                  color: '#666666'
-                }
-              ]
-            ]
-          },
-          layout: 'noBorders'
-        };
+                    text: `Especialidad: ${medicoCompleto.especialidad || 'N/A'}\n`,
+                    fontSize: 8,
+                  },
+                  {
+                    text: `${medicoCompleto.cargo || 'Médico'} - ${medicoCompleto.departamento || 'N/A'}\n`,
+                    fontSize: 8,
+                  },
+                  {
+                    text: `Hospital General San Luis de la Paz\n`,
+                    fontSize: 7,
+                    color: '#6b7280',
+                  },
+                  {
+                    text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    fontSize: 7,
+                  },
+                  {
+                    text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+                    fontSize: 7,
+                  },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: [
+                  {
+                    text: `${referencia.institucion_destino || 'Institución Destino'}\n`,
+                    fontSize: 9,
+                    bold: true,
+                  },
+                  {
+                    text: `${referencia.medico_destino || 'Médico Receptor'}\n`,
+                    fontSize: 8,
+                  },
+                  {
+                    text: `${referencia.especialidad_destino || 'Especialidad'}\n`,
+                    fontSize: 8,
+                  },
+                  {
+                    text: '\n\n_________________________\n',
+                    fontSize: 8,
+                  },
+                  {
+                    text: 'FIRMA Y SELLO INSTITUCIONAL\n',
+                    fontSize: 7,
+                    bold: true,
+                  },
+                  {
+                    text: `Fecha recepción: _______________\n`,
+                    fontSize: 7,
+                  },
+                  {
+                    text: `(NOM-004-SSA3-2012)`,
+                    fontSize: 6,
+                    italics: true,
+                  },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
       },
 
-      styles: {
-        sectionHeader: {
-          fontSize: 12,
-          bold: true,
-          color: '#374151'
+      { text: '', margin: [0, 5] },
+
+      // NOTAS AL PIE
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              {
+                text: '* Elaborado conforme a:\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '• NOM-004-SSA3-2012 Del expediente clínico\n',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: '• Sistema de referencia y contrarreferencia\n',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: '• Continuidad de la atención médica',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              {
+                text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: `Documento generado: ${fechaActual.toLocaleString('es-MX')}\n`,
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: 'Hospital General San Luis de la Paz, Guanajuato',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'right',
+          },
+        ],
+      },
+    ],
+
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [20, 10],
+        table: {
+          widths: ['25%', '50%', '25%'],
+          body: [
+            [
+              {
+                text: `Página ${currentPage} de ${pageCount}`,
+                fontSize: 7,
+                color: '#666666',
+              },
+              {
+                text: `${esContrarreferencia ? 'Contrarreferencia' : 'Referencia'} Médica - SICEG\nNOM-004-SSA3-2012 • Sistema de Referencia`,
+                fontSize: 7,
+                alignment: 'center',
+                color: '#666666',
+              },
+              {
+                text: [
+                  {
+                    text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    fontSize: 7,
+                  },
+                  {
+                    text: `Exp: ${this.obtenerNumeroExpedienteInteligente(pacienteCompleto)}`,
+                    fontSize: 6,
+                  },
+                ],
+                alignment: 'right',
+                color: '#666666',
+              },
+            ],
+          ],
         },
-        fieldLabel: {
-          fontSize: 9,
-          bold: true,
-          color: '#4b5563'
-        },
-        fieldValue: {
-          fontSize: 9,
-          color: '#111827'
-        },
-        signatureLabel: {
-          fontSize: 10,
-          bold: true,
-          alignment: 'center',
-          color: '#374151'
-        },
-        signatureName: {
-          fontSize: 9,
-          alignment: 'center',
-          color: '#111827'
-        },
-        signatureDetails: {
-          fontSize: 8,
-          alignment: 'center',
-          color: '#6b7280'
-        }
-      }
-    };
-  }
+        layout: 'noBorders',
+      };
+    },
+  };
+}
+
 
   async generarNotaConsentimientoProcedimientos(datos: any): Promise<any> {
     console.log(

@@ -314,54 +314,77 @@ export class PersonalMedicoComponent implements OnInit, OnDestroy {
   // MÉTODOS DEL FORMULARIO
   // ==========================================
 
-  mostrarFormularioCrear(): void {
-    this.isEditMode = false;
-    this.personalEnEdicion = null;
-    this.personalForm.reset();
-    this.personalForm.patchValue({
-      activo: true,
-      sexo: 'M',
-      // Sugerir usuario basado en estructura estándar
-      usuario: '',
-      password_texto: '',
-    });
-    this.mostrarModal = true;
-  }
+mostrarFormularioCrear(): void {
+  this.isEditMode = false;
+  this.personalEnEdicion = null;
+  this.personalForm.reset();
+  
+  // ✅ RESTAURAR VALIDACIONES DE CREDENCIALES EN MODO CREACIÓN
+  this.personalForm.get('usuario')?.setValidators([Validators.required, Validators.minLength(3)]);
+  this.personalForm.get('password_texto')?.setValidators([Validators.required, Validators.minLength(6)]);
+  this.personalForm.get('usuario')?.updateValueAndValidity();
+  this.personalForm.get('password_texto')?.updateValueAndValidity();
+  
+  this.personalForm.patchValue({
+    activo: true,
+    sexo: 'M',
+    usuario: '',
+    password_texto: '',
+  });
+  
+  this.mostrarModal = true;
+}
 
-  mostrarFormularioEditar(personal: PersonalMedico): void {
-    this.isEditMode = true;
-    this.personalEnEdicion = personal;
+mostrarFormularioEditar(personal: PersonalMedico): void {
+  this.isEditMode = true;
+  this.personalEnEdicion = personal;
 
-    this.personalForm.patchValue({
-      numero_cedula: personal.numero_cedula,
-      especialidad: personal.especialidad,
-      cargo: personal.cargo || '',
-      departamento: personal.departamento || '',
-      activo: personal.activo,
-      nombre: personal.nombre || '',
-      apellido_paterno: personal.apellido_paterno || '',
-      apellido_materno: personal.apellido_materno || '',
-      fecha_nacimiento: personal.fecha_nacimiento
-        ? personal.fecha_nacimiento.split('T')[0]
-        : '',
-      sexo: personal.sexo || 'M',
-      telefono: personal.telefono || '',
-      correo_electronico: personal.correo_electronico || '',
-      curp: personal.curp || '',
-      tipo_sangre: personal.tipo_sangre || '',
-    });
+  // ✅ REMOVER VALIDACIONES DE CREDENCIALES EN MODO EDICIÓN
+  this.personalForm.get('usuario')?.clearValidators();
+  this.personalForm.get('password_texto')?.clearValidators();
+  this.personalForm.get('usuario')?.updateValueAndValidity();
+  this.personalForm.get('password_texto')?.updateValueAndValidity();
 
-    this.mostrarModal = true;
-  }
+  this.personalForm.patchValue({
+    numero_cedula: personal.numero_cedula,
+    especialidad: personal.especialidad,
+    cargo: personal.cargo || '',
+    departamento: personal.departamento || '',
+    activo: personal.activo,
+    nombre: personal.nombre || '',
+    apellido_paterno: personal.apellido_paterno || '',
+    apellido_materno: personal.apellido_materno || '',
+    fecha_nacimiento: personal.fecha_nacimiento
+      ? personal.fecha_nacimiento.split('T')[0]
+      : '',
+    sexo: personal.sexo || 'M',
+    telefono: personal.telefono || '',
+    correo_electronico: personal.correo_electronico || '',
+    curp: personal.curp || '',
+    tipo_sangre: personal.tipo_sangre || '',
+    // No establecer valores para credenciales en modo edición
+    usuario: '',
+    password_texto: ''
+  });
 
-  cerrarModal(): void {
-    this.mostrarModal = false;
-    this.isEditMode = false;
-    this.personalEnEdicion = null;
-    this.personalForm.reset();
-    this.procesandoFormulario = false;
-    this.limpiarMensajes();
-  }
+  this.mostrarModal = true;
+}
+
+cerrarModal(): void {
+  this.mostrarModal = false;
+  this.isEditMode = false;
+  this.personalEnEdicion = null;
+  
+  // ✅ RESTAURAR VALIDACIONES ORIGINALES AL CERRAR
+  this.personalForm.get('usuario')?.setValidators([Validators.required, Validators.minLength(3)]);
+  this.personalForm.get('password_texto')?.setValidators([Validators.minLength(6)]); // Sin required para permitir crear sin password si es necesario
+  this.personalForm.get('usuario')?.updateValueAndValidity();
+  this.personalForm.get('password_texto')?.updateValueAndValidity();
+  
+  this.personalForm.reset();
+  this.procesandoFormulario = false;
+  this.limpiarMensajes();
+}
 
   onSubmit(): void {
     if (this.personalForm.invalid) {
@@ -989,4 +1012,27 @@ private calcularFortalezaPassword(password: string): number {
 get tieneConflictos(): boolean {
   return this.usuarioYaExiste || this.correoYaExiste || this.curpYaExiste || this.cedulaYaExiste;
 }
+
+
+// En personal-medico.ts - Agregar este getter
+
+get formularioValido(): boolean {
+  if (this.isEditMode) {
+    // En modo edición, no verificar credenciales
+    const camposRequeridos = [
+      'numero_cedula', 'especialidad', 'nombre', 'apellido_paterno', 
+      'fecha_nacimiento', 'sexo'
+    ];
+    
+    return camposRequeridos.every(campo => {
+      const control = this.personalForm.get(campo);
+      return control && control.valid && control.value?.toString().trim();
+    });
+  } else {
+    // En modo creación, verificar todo incluyendo credenciales
+    return this.personalForm.valid;
+  }
+}
+
+
 }

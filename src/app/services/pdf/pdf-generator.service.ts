@@ -197,6 +197,7 @@ export class PdfGeneratorService {
         case 'Referencia y Contrarreferencia':
         case 'Referencia':
         case 'Contrarreferencia':
+        case 'Referencia y Traslado':
           documentDefinition = await this.pdfTemplatesService.generarReferenciaContrarreferencia(datosParaTemplate);
           break;
         case 'Consentimiento Informado':

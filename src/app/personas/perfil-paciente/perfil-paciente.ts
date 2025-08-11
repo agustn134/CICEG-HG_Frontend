@@ -1941,16 +1941,25 @@ private generarFolioPostanestesico(): string {
       const medicoCompleto = await this.obtenerDatosMedicoCompleto();
       const datosPacienteEstructurados = this.extraerDatosPaciente();
 
-      await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia', {
-        paciente: datosPacienteEstructurados,
-        medico: medicoCompleto,
-        expediente: this.pacienteCompleto?.expediente,
-        referencia: {
-          ...this.referenciaForm.value,
-          folio_referencia: this.generarFolioReferencia()
-        }
-      });
-
+      // await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia', {
+      //   paciente: datosPacienteEstructurados,
+      //   medico: medicoCompleto,
+      //   expediente: this.pacienteCompleto?.expediente,
+      //   referencia: {
+      //     ...this.referenciaForm.value,
+      //     folio_referencia: this.generarFolioReferencia()
+      //   }
+      // });
+await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      referencia: {
+        ...this.referenciaForm.value,
+        folio_referencia: this.generarFolioReferencia()
+      }
+    });
+    
       console.log('✅ PDF de Referencia y Contrarreferencia generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
@@ -4145,6 +4154,21 @@ case 'notaEgreso':
     }
   });
   break;
+
+  case 'Referencia y Contrarreferencia':
+case 'Referencia':
+case 'Contrarreferencia':
+  await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia', {
+    ...datosBase,
+    referencia: {
+      ...this.referenciaForm.value,
+      folio_referencia: this.generarFolioReferencia(),
+      fecha_elaboracion: new Date().toISOString(),
+      estado_referencia: 'pendiente'
+    }
+  });
+  break;
+  
 
       default:
         console.warn('Tipo de documento no soportado:', tipoDocumento);

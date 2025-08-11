@@ -213,73 +213,73 @@ export class Pacientes implements OnInit, OnDestroy {
   // MÉTODOS DE NAVEGACIÓN Y ACCIONES
   // ==========================================
 
-  verDetallePaciente(paciente: Paciente): void {
-    console.log('👤 Navegando al perfil del paciente:', paciente.nombre_completo);
-    this.pacienteSeleccionado = paciente;
-    this.router.navigate(['/app/personas/perfil-paciente', paciente.id_paciente]);
-  }
+  // verDetallePaciente(paciente: Paciente): void {
+  //   console.log('👤 Navegando al perfil del paciente:', paciente.nombre_completo);
+  //   this.pacienteSeleccionado = paciente;
+  //   this.router.navigate(['/app/personas/perfil-paciente', paciente.id_paciente]);
+  // }
 
-  crearNuevoPaciente(): void {
-    console.log('➕ Navegando al wizard de nuevo paciente');
-    this.router.navigate(['/app/nuevo-paciente/inicio']);
-  }
+  // crearNuevoPaciente(): void {
+  //   console.log('➕ Navegando al wizard de nuevo paciente');
+  //   this.router.navigate(['/app/nuevo-paciente/inicio']);
+  // }
 
-  crearExpediente(paciente: Paciente): void {
-    console.log('📄 Creando nuevo expediente para:', paciente.nombre_completo);
-    this.router.navigate(['/app/gestion-expedientes/expedientes'], {
-      queryParams: {
-        nuevo: true,
-        paciente: paciente.id_paciente
-      }
-    });
-  }
+  // crearExpediente(paciente: Paciente): void {
+  //   console.log('📄 Creando nuevo expediente para:', paciente.nombre_completo);
+  //   this.router.navigate(['/app/gestion-expedientes/expedientes'], {
+  //     queryParams: {
+  //       nuevo: true,
+  //       paciente: paciente.id_paciente
+  //     }
+  //   });
+  // }
 
-  verExpedientes(paciente: Paciente): void {
-    console.log('  Ver expedientes de:', paciente.nombre_completo);
-    this.router.navigate(['/app/gestion-expedientes/expedientes'], {
-      queryParams: { paciente: paciente.id_paciente }
-    });
-  }
+  // verExpedientes(paciente: Paciente): void {
+  //   console.log('  Ver expedientes de:', paciente.nombre_completo);
+  //   this.router.navigate(['/app/gestion-expedientes/expedientes'], {
+  //     queryParams: { paciente: paciente.id_paciente }
+  //   });
+  // }
 
   // ==========================================
   // MÉTODOS DE UTILIDAD PARA LA UI
   // ==========================================
 
-  formatearFecha(fecha?: string): string {
-    if (!fecha) return 'No disponible';
-    return new Date(fecha).toLocaleDateString('es-MX', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  }
+  // formatearFecha(fecha?: string): string {
+  //   if (!fecha) return 'No disponible';
+  //   return new Date(fecha).toLocaleDateString('es-MX', {
+  //     day: '2-digit',
+  //     month: '2-digit',
+  //     year: 'numeric'
+  //   });
+  // }
 
-  calcularEdad(fechaNacimiento?: string): number {
-    if (!fechaNacimiento) return 0;
-    const hoy = new Date();
-    const nacimiento = new Date(fechaNacimiento);
-    let edad = hoy.getFullYear() - nacimiento.getFullYear();
-    const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
+  // calcularEdad(fechaNacimiento?: string): number {
+  //   if (!fechaNacimiento) return 0;
+  //   const hoy = new Date();
+  //   const nacimiento = new Date(fechaNacimiento);
+  //   let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  //   const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
 
-    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
-      edad--;
-    }
+  //   if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
+  //     edad--;
+  //   }
 
-    return edad;
-  }
+  //   return edad;
+  // }
 
-  obtenerClasePorGenero(genero?: Genero): string {
-    if (!genero) return 'bg-gray-500';
+  // obtenerClasePorGenero(genero?: Genero): string {
+  //   if (!genero) return 'bg-gray-500';
 
-    switch(genero) {
-      case Genero.MASCULINO:
-        return 'bg-blue-600';
-      case Genero.FEMENINO:
-        return 'bg-emerald-600';
-      default:
-        return 'bg-gray-500';
-    }
-  }
+  //   switch(genero) {
+  //     case Genero.MASCULINO:
+  //       return 'bg-blue-600';
+  //     case Genero.FEMENINO:
+  //       return 'bg-emerald-600';
+  //     default:
+  //       return 'bg-gray-500';
+  //   }
+  // }
 
   obtenerIconoPorGenero(genero?: Genero): string {
     if (!genero) return '○';
@@ -294,26 +294,26 @@ export class Pacientes implements OnInit, OnDestroy {
     }
   }
 
-  obtenerTextoGenero(genero?: Genero): string {
-    if (!genero) return 'No especificado';
+  // obtenerTextoGenero(genero?: Genero): string {
+  //   if (!genero) return 'No especificado';
 
-    switch(genero) {
-      case Genero.MASCULINO:
-        return 'Masculino';
-      case Genero.FEMENINO:
-        return 'Femenino';
-      default:
-        return 'No especificado';
-    }
-  }
+  //   switch(genero) {
+  //     case Genero.MASCULINO:
+  //       return 'Masculino';
+  //     case Genero.FEMENINO:
+  //       return 'Femenino';
+  //     default:
+  //       return 'No especificado';
+  //   }
+  // }
 
-  tieneAlergias(paciente: Paciente): boolean {
-    return !!(paciente.alergias && paciente.alergias.trim().length > 0);
-  }
+  // tieneAlergias(paciente: Paciente): boolean {
+  //   return !!(paciente.alergias && paciente.alergias.trim().length > 0);
+  // }
 
-  tieneFamiliarResponsable(paciente: Paciente): boolean {
-    return !!(paciente.familiar_responsable && paciente.familiar_responsable.trim().length > 0);
-  }
+  // tieneFamiliarResponsable(paciente: Paciente): boolean {
+  //   return !!(paciente.familiar_responsable && paciente.familiar_responsable.trim().length > 0);
+  // }
 
   // ==========================================
   // MÉTODOS DE MANEJO DE ERRORES
@@ -353,4 +353,212 @@ export class Pacientes implements OnInit, OnDestroy {
   trackById(index: number, item: Paciente): number {
     return item.id_paciente;
   }
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Construye el nombre completo del paciente
+ */
+construirNombreCompleto(paciente: Paciente): string {
+  if (!paciente) return 'Sin nombre';
+  
+  const partes = [
+    paciente.nombre,
+    paciente.apellido_paterno,
+    paciente.apellido_materno
+  ].filter(parte => parte && parte.trim().length > 0);
+  
+  return partes.length > 0 ? partes.join(' ') : 'Sin nombre';
+}
+
+/**
+ * Obtiene los pacientes masculinos para estadísticas
+ */
+get pacientesMasculinos(): Paciente[] {
+  return this.pacientes.filter(p => p.sexo === Genero.MASCULINO);
+}
+
+/**
+ * Obtiene los pacientes femeninos para estadísticas  
+ */
+get pacientesFemeninos(): Paciente[] {
+  return this.pacientes.filter(p => p.sexo === Genero.FEMENINO);
+}
+
+/**
+ * Formatea fecha en formato más legible
+ */
+formatearFecha(fecha?: string): string {
+  if (!fecha) return 'No disponible';
+  
+  try {
+    return new Date(fecha).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  } catch (error) {
+    return 'Fecha inválida';
+  }
+}
+
+/**
+ * Calcula edad con manejo de errores mejorado
+ */
+calcularEdad(fechaNacimiento?: string): number {
+  if (!fechaNacimiento) return 0;
+  
+  try {
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    
+    if (nacimiento > hoy) return 0; // Fecha futura
+    
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
+
+    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+
+    return Math.max(0, edad); // No devolver edades negativas
+  } catch (error) {
+    console.warn('Error calculando edad:', error);
+    return 0;
+  }
+}
+
+/**
+ * Verifica si el paciente tiene alergias registradas
+ */
+tieneAlergias(paciente: Paciente): boolean {
+  return !!(paciente.alergias && paciente.alergias.trim().length > 0);
+}
+
+/**
+ * Verifica si el paciente tiene familiar responsable
+ */
+tieneFamiliarResponsable(paciente: Paciente): boolean {
+  return !!(paciente.familiar_responsable && paciente.familiar_responsable.trim().length > 0);
+}
+
+/**
+ * Obtiene clases CSS por género
+ */
+obtenerClasePorGenero(genero?: Genero): string {
+  if (!genero) return 'bg-gray-500';
+
+  switch(genero) {
+    case Genero.MASCULINO:
+      return 'bg-blue-600';
+    case Genero.FEMENINO:
+      return 'bg-pink-600';
+    default:
+      return 'bg-gray-500';
+  }
+}
+
+/**
+ * Obtiene texto legible del género
+ */
+obtenerTextoGenero(genero?: Genero): string {
+  if (!genero) return 'No especificado';
+
+  switch(genero) {
+    case Genero.MASCULINO:
+      return 'Masculino';
+    case Genero.FEMENINO:
+      return 'Femenino';
+    default:
+      return 'No especificado';
+  }
+}
+
+// ==========================================
+// MÉTODOS DE NAVEGACIÓN MEJORADOS
+// ==========================================
+
+/**
+ * Navega al perfil detallado del paciente
+ */
+verDetallePaciente(paciente: Paciente): void {
+  console.log('👤 Abriendo perfil de:', this.construirNombreCompleto(paciente));
+  this.pacienteSeleccionado = paciente;
+  this.router.navigate(['/app/personas/perfil-paciente', paciente.id_paciente]);
+}
+
+/**
+ * Navega a los expedientes del paciente
+ */
+verExpedientes(paciente: Paciente): void {
+  console.log('📋 Ver expedientes de:', this.construirNombreCompleto(paciente));
+  this.router.navigate(['/app/gestion-expedientes/expedientes'], {
+    queryParams: { 
+      paciente: paciente.id_paciente,
+      nombre: this.construirNombreCompleto(paciente)
+    }
+  });
+}
+
+/**
+ * Inicia el proceso de creación de expediente
+ */
+crearExpediente(paciente: Paciente): void {
+  console.log('📄 Creando expediente para:', this.construirNombreCompleto(paciente));
+  this.router.navigate(['/app/gestion-expedientes/expedientes'], {
+    queryParams: {
+      nuevo: true,
+      paciente: paciente.id_paciente,
+      nombre: this.construirNombreCompleto(paciente)
+    }
+  });
+}
+
+/**
+ * Navega al wizard de nuevo paciente
+ */
+crearNuevoPaciente(): void {
+  console.log('➕ Iniciando registro de nuevo paciente');
+  this.router.navigate(['/app/nuevo-paciente']);
+}
+
+
+
+
 }
