@@ -11,21 +11,62 @@ import { environment } from '../../../environments/environments';
 export class PdfTemplatesService {
   constructor(private http: HttpClient) { }
 
-  private obtenerNumeroExpedientePreferido(expediente: any): string {
-    console.log('🔍 DEBUG obtenerNumeroExpedientePreferido:', {
-      expediente_completo: expediente,
-      numero_expediente_administrativo: expediente?.numero_expediente_administrativo,
-      numero_expediente: expediente?.numero_expediente,
-      tipo: typeof expediente
-    });
+//   public obtenerNumeroExpedientePreferido(expediente: any): string {
+//     console.log('🔍 DEBUG obtenerNumeroExpedientePreferido:', {
+//       expediente_completo: expediente,
+//       numero_expediente_administrativo: expediente?.numero_expediente_administrativo,
+//       numero_expediente: expediente?.numero_expediente,
+//       tipo: typeof expediente
+//     });
     
-    const resultado = expediente?.numero_expediente_administrativo ||
-      expediente?.numero_expediente ||
-      'Sin número';
+//     const resultado = expediente?.numero_expediente_administrativo ||
+//       expediente?.numero_expediente ||
+//       'Sin número';
       
-    console.log('📋 Resultado del número de expediente:', resultado);
-    return resultado;
+//     // 🔥 BUSCAR EN RUTA CORRECTA:
+//   const numeroAdministrativo = expediente?.expediente?.numero_expediente_administrativo;
+//   const numeroRegular = expediente?.expediente?.numero_expediente;
+  
+//   if (numeroAdministrativo) {
+//     console.log('✅ Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
+//     return numeroAdministrativo;
+//   }
+  
+//   if (numeroRegular) {
+//     console.log('✅ Número REGULAR encontrado:', numeroRegular);
+//     return numeroRegular;
+//   }
+  
+//   console.log('❌ No se encontró número de expediente');
+//   return 'Sin número';
+// }
+// En PdfTemplatesService.ts - REEMPLAZAR obtenerNumeroExpedientePreferido():
+public obtenerNumeroExpedientePreferido(expediente: any): string {
+  console.log('🔍 DEBUG obtenerNumeroExpedientePreferido - CORREGIDO:', {
+    expediente_completo: expediente,
+    pacienteCompleto_expediente: expediente?.expediente,
+    numero_administrativo: expediente?.expediente?.numero_expediente_administrativo,
+    numero_regular: expediente?.expediente?.numero_expediente
+  });
+  
+  // 🔥 BUSCAR EN RUTA CORRECTA:
+  const numeroAdministrativo = expediente?.expediente?.numero_expediente_administrativo;
+  const numeroRegular = expediente?.expediente?.numero_expediente;
+  
+  if (numeroAdministrativo) {
+    console.log('✅ Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
+    return numeroAdministrativo;
   }
+  
+  if (numeroRegular) {
+    console.log('✅ Número REGULAR encontrado:', numeroRegular);
+    return numeroRegular;
+  }
+  
+  console.log('❌ No se encontró número de expediente');
+  return 'Sin número';
+}
+
 
   private calcularIMC(peso: number, talla: number): string {
     if (!peso || !talla || peso <= 0 || talla <= 0) return '__';
@@ -663,7 +704,7 @@ export class PdfTemplatesService {
     return `POSTOP-${fecha.getFullYear()}-${timestamp}`;
   }
 
-private obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
+public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
   console.log('🔍 Obteniendo número de expediente ADMINISTRATIVO:', pacienteCompleto);
   
   // 🔥 ESTRATEGIA 1: PRIORIZAR SIEMPRE EL ADMINISTRATIVO
@@ -1367,31 +1408,22 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
         [
           {},
           {
-            text:
-              `Alimentación: ${historiaClinicaData.habitos_alimenticios || 'No registrado'
-              }\n` +
-              `Higiene: ${historiaClinicaData.habitos_higienicos || 'Adecuada'
-              }\n` +
-              `Actividad física: ${historiaClinicaData.actividad_fisica ||
-              (esPediatrico ? 'Apropiada para la edad' : 'Regular')
-              }\n` +
-              `Vivienda: ${historiaClinicaData.vivienda ||
-              'Casa habitación con servicios básicos'
-              }\n` +
-              `${esPediatrico
-                ? 'Inmunizaciones: Esquema completo según edad\n'
-                : ''
-              }` +
-              `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''
-              }` +
-              `${!esPediatrico && historiaClinicaData.toxicomanias
-                ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n`
-                : ''
-              }`,
-            fontSize: 7,
-            margin: [3, 2],
-            lineHeight: 1.1,
-          },
+    text:
+      `Alimentación: ${historiaClinicaData.habitos_alimenticios || 'No registrado'}\n` +
+      `Higiene: ${historiaClinicaData.habitos_higienicos || 'Adecuada'}\n` +
+      `Actividad física: ${historiaClinicaData.actividad_fisica || 
+        (esPediatrico ? 'Apropiada para la edad' : 'Regular')}\n` +
+      `Vivienda: ${historiaClinicaData.vivienda || 'Casa habitación con servicios básicos'}\n` +
+      `${esPediatrico ? 'Inmunizaciones: Esquema completo según edad\n' : ''}` +
+      `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''}` +
+      `${!esPediatrico && historiaClinicaData.toxicomanias
+        ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n`
+        : !esPediatrico ? 'Toxicomanías: Negadas\n' : ''
+      }`,
+    fontSize: 7,
+    margin: [3, 2],
+    lineHeight: 1.1,
+  },
         ],
         [
           {},
@@ -1636,29 +1668,29 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
               [
                 {},
                 {
-                  text:
-                    `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
-                    'Sin información registrada'
-                    }\n` +
-                    `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
-                    'Sin información registrada'
-                    }\n` +
-                    `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
-                    'Sin información registrada'
-                    }\n` +
-                    `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
-                    'Sin información registrada'
-                    }\n` +
-                    `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
-                    'Sin información registrada'
-                    }\n` +
-                    `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
-                    'Sin información registrada'
-                    }`,
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
+    text:
+      `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
+      'Sin información registrada'
+      }\n` +
+      `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
+      'Sin información registrada'
+      }\n` +
+      `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
+      'Sin información registrada'
+      }\n` +
+      `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
+      'Sin información registrada'
+      }\n` +
+      `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
+      'Sin información registrada'
+      }\n` +
+      `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
+      'Sin información registrada'
+      }`,
+    fontSize: 7,
+    margin: [3, 2],
+    lineHeight: 1.1,
+  },
               ],
             ],
           },
@@ -1693,33 +1725,43 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
               [
                 {},
                 {
-                  columns: [
-                    {
-                      width: '33%',
-                      text: `Peso: ${signosVitales.peso || '___'} kg\nTalla: ${signosVitales.talla || '___'
-                        } cm\nIMC: ${this.calcularIMC(
-                          signosVitales.peso,
-                          signosVitales.talla
-                        )}`,
-                      fontSize: 7,
-                    },
-                    {
-                      width: '33%',
-                      text: `TA: ${signosVitales.presion_arterial_sistolica || '___'
-                        }/${signosVitales.presion_arterial_diastolica || '___'
-                        } mmHg\nFC: ${signosVitales.frecuencia_cardiaca || '___'
-                        } lpm\nFR: ${signosVitales.frecuencia_respiratoria || '___'
-                        } rpm`,
-                      fontSize: 7,
-                    },
-                    {
-                      width: '34%',
-                      text: `Temperatura: ${signosVitales.temperatura || '___'
-                        } °C\nSaturación O2: ${signosVitales.saturacion_oxigeno || '___'
-                        } %\nGlucosa: ${signosVitales.glucosa || '___'} mg/dL`,
-                      fontSize: 7,
-                    },
-                  ],
+columns: [
+    {
+      width: '33%',
+      text: `Peso: ${signosVitales.peso || 
+             historiaClinicaData.peso || '___'} kg\n` +
+            `Talla: ${signosVitales.talla || 
+             historiaClinicaData.talla || '___'} cm\n` +
+            `IMC: ${this.calcularIMC(
+              signosVitales.peso || historiaClinicaData.peso,
+              signosVitales.talla || historiaClinicaData.talla
+            )}`,
+      fontSize: 7,
+    },
+    {
+      width: '33%',
+      text: `TA: ${signosVitales.presion_arterial_sistolica || 
+             historiaClinicaData.presion_arterial_sistolica || '___'}/${
+             signosVitales.presion_arterial_diastolica || 
+             historiaClinicaData.presion_arterial_diastolica || '___'
+            } mmHg\n` +
+            `FC: ${signosVitales.frecuencia_cardiaca || 
+             historiaClinicaData.frecuencia_cardiaca || '___'} lpm\n` +
+            `FR: ${signosVitales.frecuencia_respiratoria || 
+             historiaClinicaData.frecuencia_respiratoria || '___'} rpm`,
+      fontSize: 7,
+    },
+    {
+      width: '34%',
+      text: `Temperatura: ${signosVitales.temperatura || 
+             historiaClinicaData.temperatura || '___'} °C\n` +
+            `Saturación O2: ${signosVitales.saturacion_oxigeno || 
+             historiaClinicaData.saturacion_oxigeno || '___'} %\n` +
+            `Glucosa: ${signosVitales.glucosa || 
+             historiaClinicaData.glucosa || '___'} mg/dL`,
+      fontSize: 7,
+    },
+  ],
                   margin: [5, 3],
                 },
               ],
@@ -3274,7 +3316,12 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
     
     // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
     const configuracion = await this.obtenerConfiguracionLogosInteligente();
-
+ // 🔥 DEBUG ADICIONAL:
+  console.log('🔧 DEBUG PDF - Datos recibidos:');
+  console.log('- servicio_destino en notaEvolucionData:', notaEvolucionData.servicio_destino);
+  console.log('- numero_cama en notaEvolucionData:', notaEvolucionData.numero_cama);
+  console.log('- cama en notaEvolucionData:', notaEvolucionData.cama);
+  console.log('- pacienteCompleto expediente:', pacienteCompleto?.expediente);
     return {
       pageSize: 'LETTER',
       pageMargins: [20, 60, 20, 40],
@@ -3352,9 +3399,9 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                         { text: fechaActual.toLocaleDateString('es-MX'), fontSize: 7, alignment: 'center' },
                         { text: fechaActual.toLocaleTimeString('es-MX'), fontSize: 7, alignment: 'center' },
                         { text: this.obtenerNumeroExpedienteInteligente(pacienteCompleto) || 'N/A', fontSize: 7, alignment: 'center', bold: true },
-                        { text: notaEvolucionData.numero_cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
-                        { text: medicoCompleto.departamento || 'No especificado', fontSize: 7, alignment: 'center' },
-                      ],
+{ text: notaEvolucionData.numero_cama || notaEvolucionData.cama || 'NO ASIGNADO', fontSize: 7, alignment: 'center' },
+{ text: notaEvolucionData.servicio_destino || medicoCompleto.departamento || 'No especificado', fontSize: 7, alignment: 'center' },                    
+],
                     ],
                   },
                   layout: {
@@ -4022,7 +4069,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
       },
     };
   }
-
+// C:\Proyectos\CICEG-HG_Frontend\src\app\services\PDF\PdfTemplatesService.ts
     async generarNotaUrgencias(datos: any): Promise<any> {
     console.log('  Generando Nota de Urgencias - Estilo Profesional...');
 

@@ -450,54 +450,125 @@ export class PdfGeneratorService {
     }
   }
 
-  private obtenerSignosVitalesReales(datos: any): any {
-    console.log('  Buscando signos vitales en los datos recibidos...');
+  // private obtenerSignosVitalesReales(datos: any): any {
+  //   console.log('  Buscando signos vitales en los datos recibidos...');
 
-    let signosVitales = {
-      peso: null as number | null,
-      talla: null as number | null,
-      temperatura: null as number | null,
-      presion_arterial_sistolica: null as number | null,
-      presion_arterial_diastolica: null as number | null,
-      frecuencia_cardiaca: null as number | null,
-      frecuencia_respiratoria: null as number | null,
-      saturacion_oxigeno: null as number | null,
-      glucosa: null as number | null,
+  //   let signosVitales = {
+  //     peso: null as number | null,
+  //     talla: null as number | null,
+  //     temperatura: null as number | null,
+  //     presion_arterial_sistolica: null as number | null,
+  //     presion_arterial_diastolica: null as number | null,
+  //     frecuencia_cardiaca: null as number | null,
+  //     frecuencia_respiratoria: null as number | null,
+  //     saturacion_oxigeno: null as number | null,
+  //     glucosa: null as number | null,
+  //   };
+  //   if (datos.signosVitales) {
+  //     console.log('Encontrados signos vitales en datos.signosVitales');
+  //     signosVitales = {
+  //       ...signosVitales,
+  //       ...Object.fromEntries(
+  //         Object.entries(datos.signosVitales).map(([key, value]) => [
+  //           key,
+  //           value !== null && value !== undefined ? Number(value) : null,
+  //         ])
+  //       ),
+  //     };
+  //   }
+  //   if (
+  //     datos.paciente?.signosVitales &&
+  //     Array.isArray(datos.paciente.signosVitales) &&
+  //     datos.paciente.signosVitales.length > 0
+  //   ) {
+  //     console.log(
+  //       'Encontrados signos vitales históricos en datos.paciente.signosVitales'
+  //     );
+  //     const ultimosSignos = datos.paciente.signosVitales[0]; // El más reciente
+  //     signosVitales = {
+  //       ...signosVitales,
+  //       ...Object.fromEntries(
+  //         Object.entries(ultimosSignos).map(([key, value]) => [
+  //           key,
+  //           value !== null && value !== undefined ? Number(value) : null,
+  //         ])
+  //       ),
+  //     };
+  //   }
+  //   console.log('🩺 Signos vitales finales para el PDF:', signosVitales);
+  //   return signosVitales;
+  // }
+
+  // src/app/services/PDF/pdf-generator.service.ts
+private obtenerSignosVitalesReales(datos: any): any {
+  console.log('🩺 Buscando signos vitales en los datos recibidos...');
+
+  let signosVitales = {
+    peso: null as number | null,
+    talla: null as number | null,
+    temperatura: null as number | null,
+    presion_arterial_sistolica: null as number | null,
+    presion_arterial_diastolica: null as number | null,
+    frecuencia_cardiaca: null as number | null,
+    frecuencia_respiratoria: null as number | null,
+    saturacion_oxigeno: null as number | null,
+    glucosa: null as number | null,
+    observaciones: null as string | null,
+  };
+
+  // 🔥 NUEVA PRIORIDAD 1: Buscar en Historia Clínica PRIMERO (datos propagados)
+  if (datos.historiaClinica) {
+    console.log('✅ Encontrados signos vitales en Historia Clínica (datos propagados)');
+    signosVitales = {
+      ...signosVitales,
+      peso: datos.historiaClinica.peso || null,
+      talla: datos.historiaClinica.talla || null,
+      temperatura: datos.historiaClinica.temperatura || null,
+      presion_arterial_sistolica: datos.historiaClinica.presion_arterial_sistolica || null,
+      presion_arterial_diastolica: datos.historiaClinica.presion_arterial_diastolica || null,
+      frecuencia_cardiaca: datos.historiaClinica.frecuencia_cardiaca || null,
+      frecuencia_respiratoria: datos.historiaClinica.frecuencia_respiratoria || null,
+      saturacion_oxigeno: datos.historiaClinica.saturacion_oxigeno || null,
+      glucosa: datos.historiaClinica.glucosa || null,
+      observaciones: datos.historiaClinica.observaciones_signos_vitales || null,
     };
-    if (datos.signosVitales) {
-      console.log('Encontrados signos vitales en datos.signosVitales');
-      signosVitales = {
-        ...signosVitales,
-        ...Object.fromEntries(
-          Object.entries(datos.signosVitales).map(([key, value]) => [
-            key,
-            value !== null && value !== undefined ? Number(value) : null,
-          ])
-        ),
-      };
-    }
-    if (
-      datos.paciente?.signosVitales &&
-      Array.isArray(datos.paciente.signosVitales) &&
-      datos.paciente.signosVitales.length > 0
-    ) {
-      console.log(
-        'Encontrados signos vitales históricos en datos.paciente.signosVitales'
-      );
-      const ultimosSignos = datos.paciente.signosVitales[0]; // El más reciente
-      signosVitales = {
-        ...signosVitales,
-        ...Object.fromEntries(
-          Object.entries(ultimosSignos).map(([key, value]) => [
-            key,
-            value !== null && value !== undefined ? Number(value) : null,
-          ])
-        ),
-      };
-    }
-    console.log('🩺 Signos vitales finales para el PDF:', signosVitales);
-    return signosVitales;
   }
+
+  // 🔥 PRIORIDAD 2: Si no hay en Historia Clínica, buscar en signosVitales
+  if (datos.signosVitales && Object.values(signosVitales).every(v => v === null)) {
+    console.log('✅ Usando signos vitales de datos.signosVitales');
+    signosVitales = {
+      ...signosVitales,
+      ...Object.fromEntries(
+        Object.entries(datos.signosVitales).map(([key, value]) => [
+          key,
+          value !== null && value !== undefined ? Number(value) : null,
+        ])
+      ),
+    };
+  }
+
+  // 🔥 PRIORIDAD 3: Buscar en datos históricos del paciente
+  if (datos.paciente?.signosVitales && Array.isArray(datos.paciente.signosVitales) && 
+      datos.paciente.signosVitales.length > 0 && 
+      Object.values(signosVitales).every(v => v === null)) {
+    console.log('✅ Usando signos vitales históricos del paciente');
+    const ultimosSignos = datos.paciente.signosVitales[0];
+    signosVitales = {
+      ...signosVitales,
+      ...Object.fromEntries(
+        Object.entries(ultimosSignos).map(([key, value]) => [
+          key,
+          value !== null && value !== undefined ? Number(value) : null,
+        ])
+      ),
+    };
+  }
+
+  console.log('🩺 Signos vitales finales para el PDF:', signosVitales);
+  return signosVitales;
+}
+
 
   private formatearDireccion(paciente: any): string {
     if (!paciente) return 'Sin dirección registrada';
