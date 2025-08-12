@@ -200,10 +200,16 @@ export class PdfGeneratorService {
         case 'Referencia y Traslado':
           documentDefinition = await this.pdfTemplatesService.generarReferenciaContrarreferencia(datosParaTemplate);
           break;
+        // case 'Consentimiento Informado':
+        // case 'Consentimiento':
+        //   documentDefinition = await this.pdfTemplatesService.generarNotaConsentimientoProcedimientos(datosParaTemplate);
+        //   break;
+
         case 'Consentimiento Informado':
-        case 'Consentimiento':
-          documentDefinition = await this.pdfTemplatesService.generarNotaConsentimientoProcedimientos(datosParaTemplate);
-          break;
+          case 'Consentimiento':
+            documentDefinition = await this.pdfTemplatesService.generarConsentimientoSegunTipo(datosParaTemplate);
+            break;
+
         case 'Alta Voluntaria':
           documentDefinition = await this.pdfTemplatesService.generarAltaVoluntaria(datosParaTemplate);
           break;

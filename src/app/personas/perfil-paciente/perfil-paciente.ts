@@ -3024,61 +3024,140 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
     observaciones_adicionales: ['']
   });
   }
-  private initializeConsentimientoForm(): FormGroup {
-    return this.fb.group({
-      // Información del procedimiento (OBLIGATORIO NOM-004)
-      nombre_procedimiento: ['', [Validators.required, Validators.minLength(10)]],
-      tipo_procedimiento: ['quirurgico', [Validators.required]], // quirurgico, diagnostico, terapeutico
+  // C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
+  // private initializeConsentimientoForm(): FormGroup {
+  //   return this.fb.group({
+  //     // Información del procedimiento (OBLIGATORIO NOM-004)
+  //     nombre_procedimiento: ['', [Validators.required]],
+  //     tipo_procedimiento: ['quirurgico', [Validators.required]], // quirurgico, diagnostico, terapeutico
 
-      // Beneficios y justificación (OBLIGATORIO NOM-004)
-      beneficios_procedimiento: ['', [Validators.required, Validators.minLength(20)]],
-      justificacion_medica: ['', [Validators.required, Validators.minLength(15)]],
+  //     // Beneficios y justificación (OBLIGATORIO NOM-004)
+  //     beneficios_procedimiento: ['', [Validators.required]],
+  //     justificacion_medica: ['', [Validators.required]],
 
-      // Riesgos (OBLIGATORIO NOM-004)
-      riesgos_especificos: ['', [Validators.required, Validators.minLength(20)]],
-      riesgos_anestesia: ['Se han explicado los riesgos de la anestesia'],
-      probabilidad_exito: [''],
+  //     // Riesgos (OBLIGATORIO NOM-004)
+  //     riesgos_especificos: ['', [Validators.required]],
+  //     riesgos_anestesia: ['Se han explicado los riesgos de la anestesia'],
+  //     probabilidad_exito: [''],
 
-      // Alternativas de tratamiento (OBLIGATORIO NOM-004)
-      alternativas_tratamiento: [''],
-      consecuencias_no_tratamiento: [''],
+  //     // Alternativas de tratamiento (OBLIGATORIO NOM-004)
+  //     alternativas_tratamiento: [''],
+  //     consecuencias_no_tratamiento: [''],
 
-      // Procedimientos adicionales
-      autoriza_procedimientos_adicionales: ['si', [Validators.required]],
-      procedimientos_adicionales_especificos: [''],
+  //     // Procedimientos adicionales
+  //     autoriza_procedimientos_adicionales: ['si', [Validators.required]],
+  //     procedimientos_adicionales_especificos: [''],
 
-      // Información del responsable
-      nombre_responsable: ['', [Validators.required]],
-      parentesco: ['paciente', [Validators.required]], // paciente, padre, madre, tutor, representante
-      identificacion_responsable: [''],
+  //     // Información del responsable
+  //     nombre_responsable: ['', [Validators.required]],
+  //     parentesco: ['paciente', [Validators.required]], // paciente, padre, madre, tutor, representante
+  //     identificacion_responsable: [''],
 
-      // Testigos (OBLIGATORIO NOM-004)
-      testigo1_nombre: ['', [Validators.required]],
-      testigo1_identificacion: [''],
-      testigo2_nombre: ['', [Validators.required]],
-      testigo2_identificacion: [''],
+  //     // Testigos (OBLIGATORIO NOM-004)
+  //     testigo1_nombre: ['', [Validators.required]],
+  //     testigo1_identificacion: [''],
+  //     testigo2_nombre: ['', [Validators.required]],
+  //     testigo2_identificacion: [''],
 
-      // Información médica adicional
-      medico_responsable: [''],
-      especialidad_medico: [''],
-      numero_cama: [''],
-      servicio_medico: [''],
+  //     // Información médica adicional
+  //     medico_responsable: [''],
+  //     especialidad_medico: [''],
+  //     numero_cama: [''],
+  //     servicio_medico: [''],
 
-      // Fechas
-      fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
-      hora_consentimiento: [new Date().toTimeString().slice(0, 5)],
+  //     // Fechas
+  //     fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
+  //     hora_consentimiento: [new Date().toTimeString().slice(0, 5)],
 
-      // Confirmaciones (OBLIGATORIO NOM-004)
-      confirma_explicacion_satisfactoria: [false, [Validators.requiredTrue]],
-      confirma_dudas_resueltas: [false, [Validators.requiredTrue]],
-      confirma_comprension_riesgos: [false, [Validators.requiredTrue]],
-      confirma_voluntariedad: [false, [Validators.requiredTrue]],
+  //     // Confirmaciones (OBLIGATORIO NOM-004)
+  //     confirma_explicacion_satisfactoria: [false, [Validators.requiredTrue]],
+  //     confirma_dudas_resueltas: [false, [Validators.requiredTrue]],
+  //     confirma_comprension_riesgos: [false, [Validators.requiredTrue]],
+  //     confirma_voluntariedad: [false, [Validators.requiredTrue]],
 
-      // Observaciones
-      observaciones: [''],
-      condiciones_especiales: ['']
-    });
-  }
+  //     // Observaciones
+  //     observaciones: [''],
+  //     condiciones_especiales: ['']
+  //   });
+  // }
+// private initializeConsentimientoForm(): FormGroup {
+//   return this.fb.group({
+//     // Información básica del responsable (OBLIGATORIO)
+//     nombre_responsable: ['', [Validators.required]],
+//     parentesco: ['paciente', [Validators.required]], // paciente, familiar, tutor
+    
+//     // Información médica básica
+//     numero_cama: [''],
+//     servicio_medico: [''],
+    
+//     // Fecha del consentimiento (OBLIGATORIO)
+//     fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
+    
+//     // Confirmación de aceptación (OBLIGATORIO para el consentimiento de hospitalización)
+//     acepta_hospitalizacion: [false, [Validators.requiredTrue]],
+    
+//     // Observaciones adicionales
+//     observaciones: [''],
+    
+//     // Campos calculados automáticamente (no requieren validación)
+//     folio_consentimiento: [''],
+//     medico_responsable: [''],
+//     especialidad_medico: ['']
+//   });
+// }
+private initializeConsentimientoForm(): FormGroup {
+  return this.fb.group({
+    // SELECTOR DE TIPO DE CONSENTIMIENTO
+    tipo_consentimiento: ['hospitalizacion', [Validators.required]], 
+    
+    // CAMPOS BÁSICOS (comunes a todos los tipos)
+    nombre_responsable: ['', [Validators.required]],
+    parentesco: ['paciente', [Validators.required]],
+    numero_cama: [''],
+    servicio_medico: [''],
+    fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
+    
+    // CAMPOS ESPECÍFICOS PARA CIRUGÍA/PROCEDIMIENTOS
+    nombre_procedimiento: [''], 
+    beneficios_procedimiento: [''], 
+    riesgos_especificos: [''], 
+    riesgos_anestesia: ['Se han explicado los riesgos de la anestesia'],
+    autoriza_procedimientos_adicionales: ['si'],
+    
+    // CAMPOS ESPECÍFICOS PARA REFERENCIA
+    motivo_referencia: [''], 
+    unidad_destino: [''], 
+    especialidad_requerida: [''],
+    fecha_ingreso_hospitalario: [''],
+    diagnostico_referencia: [''],
+    
+    // CAMPOS ESPECÍFICOS PARA TRATAMIENTO MÉDICO
+    diagnostico_tratamiento: [''],
+    estudios_autorizados: [''],
+
+    // CAMPOS ESPECÍFICOS PARA TRANSFUSIÓN SANGUÍNEA (NUEVO)
+    diagnostico_transfusion: [''],
+    tipo_hemoderivado: [''],
+    indicacion_transfusion: [''],
+    tipo_sangre_paciente: [''],
+    estado_civil: [''],
+    domicilio_completo: [''],
+    
+    // TESTIGOS (común para algunos tipos)
+    testigo1_nombre: [''],
+    testigo2_nombre: [''],
+    
+    // ACEPTACIÓN FINAL
+    acepta_consentimiento: [false, [Validators.requiredTrue]],
+    
+    // OBSERVACIONES
+    observaciones: ['']
+  });
+}
+
+
+
+
   private initializeNotaPreoperatoriaForm(): FormGroup {
     return this.fb.group({
     
@@ -3937,6 +4016,13 @@ private inicializarModoInteligente(): void {
         this.success = 'Alta Voluntaria guardada correctamente';
         break;
 
+        // 🔥 AGREGAR ESTE CASO QUE FALTA:
+      case 'consentimiento':
+        await this.guardarConsentimientoInformado();
+        this.formularioEstado['consentimiento'] = true;
+        this.success = 'Consentimiento Informado guardado correctamente';
+        break;
+
       case 'notaPreoperatoria':
         await this.guardarNotaPreoperatoria();
         this.formularioEstado['notaPreoperatoria'] = true;
@@ -4168,7 +4254,34 @@ case 'Contrarreferencia':
     }
   });
   break;
-  
+
+ case 'Solicitud de Estudio':
+  case 'Solicitud de Laboratorio':
+  case 'Solicitud de Imagenología':
+    await this.pdfGeneratorService.generarDocumento('Solicitud de Estudio', {
+      ...datosBase,
+      solicitudEstudio: {
+        ...this.solicitudEstudioForm.value,
+        folio_solicitud: this.generarFolioSolicitud(),
+        fecha_elaboracion: new Date().toISOString(),
+        estudios_solicitados: this.construirEstudiosSeleccionados()
+      }
+    });
+    break;
+case 'Consentimiento Informado':
+case 'Consentimiento':
+case 'consentimiento':
+  await this.pdfGeneratorService.generarDocumento('Consentimiento Informado', {
+    ...datosBase,
+    consentimiento: {
+      ...this.consentimientoForm.value,
+      folio_consentimiento: this.generarFolioConsentimiento(),
+      fecha_elaboracion: new Date().toISOString(),
+      estado_consentimiento: 'firmado'
+    }
+  });
+  break;
+
 
       default:
         console.warn('Tipo de documento no soportado:', tipoDocumento);
@@ -4193,27 +4306,78 @@ case 'Contrarreferencia':
 
 
 
-  private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
-    try {
-      const medicoCompleto = await this.obtenerDatosMedicoCompleto();
-      const datosPacienteEstructurados = this.extraerDatosPaciente();
 
-      await this.pdfGeneratorService.generarDocumento('Solicitud de Estudio', {
-        paciente: datosPacienteEstructurados,
-        medico: medicoCompleto,
-        expediente: this.pacienteCompleto?.expediente,
-        solicitudEstudio: {
-          ...this.solicitudEstudioForm.value,
-          estudios_solicitados: this.construirEstudiosSeleccionados(tipoEstudio)
-        }
-      });
 
-      console.log(`✅ PDF de Solicitud de ${tipoEstudio} generado correctamente`);
-    } catch (error) {
-      console.error('❌ Error al generar PDF:', error);
-      this.error = 'Error al generar el PDF de la solicitud';
-    }
+
+private generarFolioSolicitud(): string {
+  const fecha = new Date();
+  const timestamp = fecha.getTime().toString().slice(-6);
+  return `SOL-${fecha.getFullYear()}-${timestamp}`;
+}
+
+// public construirEstudiosSeleccionados(): string {
+//   const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
+  
+//   if (tipoEstudio === 'otros') {
+//     return this.solicitudEstudioForm.value.otros_estudios || 'No especificado';
+//   }
+
+//   const estudiosSeleccionados: string[] = [];
+//   const formValue = this.solicitudEstudioForm.value;
+
+//   // Construir lista basada en checkboxes marcados
+//   Object.keys(formValue).forEach(key => {
+//     if (formValue[key] === true && key !== 'tipo_estudio') {
+//       // Convertir nombre del campo a texto legible
+//       const nombreEstudio = this.convertirNombreCampoATexto(key);
+//       estudiosSeleccionados.push(nombreEstudio);
+//     }
+//   });
+
+//   return estudiosSeleccionados.length > 0 
+//     ? estudiosSeleccionados.join('\n')
+//     : 'No se seleccionaron estudios específicos';
+// }
+
+private convertirNombreCampoATexto(campo: string): string {
+  const traducciones: { [key: string]: string } = {
+    'quimica_sanguinea': 'Química sanguínea completa',
+    'glucosa': 'Glucosa sérica',
+    'urea': 'Urea',
+    'creatinina': 'Creatinina sérica',
+    'biometria_hematica': 'Biometría hemática completa',
+    'radiografia_torax': 'Radiografía de tórax',
+    'ultrasonido_abdominal': 'Ultrasonido abdominal',
+    // ... agregar más según necesites
+  };
+  
+  return traducciones[campo] || campo.replace(/_/g, ' ');
+}
+
+
+
+
+private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
+  try {
+    const medicoCompleto = await this.obtenerDatosMedicoCompleto();
+    const datosPacienteEstructurados = this.extraerDatosPaciente();
+
+    await this.pdfGeneratorService.generarDocumento('Solicitud de Estudio', {
+      paciente: datosPacienteEstructurados,
+      medico: medicoCompleto,
+      expediente: this.pacienteCompleto?.expediente,
+      solicitudEstudio: {
+        ...this.solicitudEstudioForm.value,
+        estudios_solicitados: this.construirEstudiosSeleccionados() // ✅ Sin parámetro
+      }
+    });
+
+    console.log(`✅ PDF de Solicitud de ${tipoEstudio} generado correctamente`);
+  } catch (error) {
+    console.error('❌ Error al generar PDF:', error);
+    this.error = 'Error al generar el PDF de la solicitud';
   }
+}
 
 
 
@@ -4844,85 +5008,166 @@ agregarGuiaClinica(guia: GuiaClinica): void {
     }
   }
 
-  private construirEstudiosSeleccionados(tipoEstudio: string): string {
-    const form = this.solicitudEstudioForm.value;
-    const estudios: string[] = [];
+  // private construirEstudiosSeleccionados(tipoEstudio: string): string {
+  //   const form = this.solicitudEstudioForm.value;
+  //   const estudios: string[] = [];
 
-    // Mapeos según el tipo de estudio
-    let mapeoEstudios: { [key: string]: string } = {};
+  //   // Mapeos según el tipo de estudio
+  //   let mapeoEstudios: { [key: string]: string } = {};
 
-    if (tipoEstudio === 'laboratorio') {
-      mapeoEstudios = {
-        biometria_hematica: 'Biometría hemática completa',
-        quimica_sanguinea: 'Química sanguínea',
-        glucosa: 'Glucosa sérica',
-        urea: 'Urea',
-        creatinina: 'Creatinina',
-        acido_urico: 'Ácido úrico',
-        colesterol_total: 'Colesterol total',
-        trigliceridos: 'Triglicéridos',
-        hdl: 'HDL colesterol',
-        ldl: 'LDL colesterol',
-        transaminasas: 'Transaminasas (ALT/AST)',
-        bilirrubinas: 'Bilirrubinas',
-        proteinas_totales: 'Proteínas totales',
-        albumina: 'Albúmina',
-        fosfatasa_alcalina: 'Fosfatasa alcalina',
-        sodio: 'Sodio sérico',
-        potasio: 'Potasio sérico',
-        cloro: 'Cloro sérico',
-        tsh: 'TSH',
-        t3: 'T3',
-        t4: 'T4',
-        examen_general_orina: 'Examen general de orina',
-        urocultivo: 'Urocultivo',
-        coproparasitoscopico: 'Coproparasitoscópico',
-        coprocultivo: 'Coprocultivo',
-        sangre_oculta_heces: 'Sangre oculta en heces',
-        troponinas: 'Troponinas',
-        ck_mb: 'CK-MB',
-        tiempo_protrombina: 'Tiempo de protrombina',
-        tiempo_tromboplastina: 'Tiempo de tromboplastina parcial',
-        inr: 'INR'
-      };
-    } else if (tipoEstudio === 'imagen') {
-      mapeoEstudios = {
-        radiografia_torax: 'Radiografía de tórax',
-        radiografia_abdomen: 'Radiografía de abdomen',
-        radiografia_columna: 'Radiografía de columna',
-        radiografia_extremidades: 'Radiografía de extremidades',
-        ultrasonido_abdominal: 'Ultrasonido abdominal',
-        ultrasonido_pelvico: 'Ultrasonido pélvico',
-        ultrasonido_tiroideo: 'Ultrasonido tiroideo',
-        ultrasonido_carotideo: 'Ultrasonido carotídeo',
-        ultrasonido_renal: 'Ultrasonido renal',
-        ecocardiograma: 'Ecocardiograma',
-        tomografia_cerebral: 'Tomografía cerebral',
-        tomografia_torax: 'Tomografía de tórax',
-        tomografia_abdomen: 'Tomografía abdominal',
-        tomografia_contrastada: 'Tomografía con contraste',
-        resonancia_cerebral: 'Resonancia magnética cerebral',
-        resonancia_columna: 'Resonancia magnética de columna',
-        resonancia_articular: 'Resonancia magnética articular',
-        mamografia: 'Mamografía',
-        densitometria_osea: 'Densitometría ósea'
-      };
-    }
+  //   if (tipoEstudio === 'laboratorio') {
+  //     mapeoEstudios = {
+  //       biometria_hematica: 'Biometría hemática completa',
+  //       quimica_sanguinea: 'Química sanguínea',
+  //       glucosa: 'Glucosa sérica',
+  //       urea: 'Urea',
+  //       creatinina: 'Creatinina',
+  //       acido_urico: 'Ácido úrico',
+  //       colesterol_total: 'Colesterol total',
+  //       trigliceridos: 'Triglicéridos',
+  //       hdl: 'HDL colesterol',
+  //       ldl: 'LDL colesterol',
+  //       transaminasas: 'Transaminasas (ALT/AST)',
+  //       bilirrubinas: 'Bilirrubinas',
+  //       proteinas_totales: 'Proteínas totales',
+  //       albumina: 'Albúmina',
+  //       fosfatasa_alcalina: 'Fosfatasa alcalina',
+  //       sodio: 'Sodio sérico',
+  //       potasio: 'Potasio sérico',
+  //       cloro: 'Cloro sérico',
+  //       tsh: 'TSH',
+  //       t3: 'T3',
+  //       t4: 'T4',
+  //       examen_general_orina: 'Examen general de orina',
+  //       urocultivo: 'Urocultivo',
+  //       coproparasitoscopico: 'Coproparasitoscópico',
+  //       coprocultivo: 'Coprocultivo',
+  //       sangre_oculta_heces: 'Sangre oculta en heces',
+  //       troponinas: 'Troponinas',
+  //       ck_mb: 'CK-MB',
+  //       tiempo_protrombina: 'Tiempo de protrombina',
+  //       tiempo_tromboplastina: 'Tiempo de tromboplastina parcial',
+  //       inr: 'INR'
+  //     };
+  //   } else if (tipoEstudio === 'imagen') {
+  //     mapeoEstudios = {
+  //       radiografia_torax: 'Radiografía de tórax',
+  //       radiografia_abdomen: 'Radiografía de abdomen',
+  //       radiografia_columna: 'Radiografía de columna',
+  //       radiografia_extremidades: 'Radiografía de extremidades',
+  //       ultrasonido_abdominal: 'Ultrasonido abdominal',
+  //       ultrasonido_pelvico: 'Ultrasonido pélvico',
+  //       ultrasonido_tiroideo: 'Ultrasonido tiroideo',
+  //       ultrasonido_carotideo: 'Ultrasonido carotídeo',
+  //       ultrasonido_renal: 'Ultrasonido renal',
+  //       ecocardiograma: 'Ecocardiograma',
+  //       tomografia_cerebral: 'Tomografía cerebral',
+  //       tomografia_torax: 'Tomografía de tórax',
+  //       tomografia_abdomen: 'Tomografía abdominal',
+  //       tomografia_contrastada: 'Tomografía con contraste',
+  //       resonancia_cerebral: 'Resonancia magnética cerebral',
+  //       resonancia_columna: 'Resonancia magnética de columna',
+  //       resonancia_articular: 'Resonancia magnética articular',
+  //       mamografia: 'Mamografía',
+  //       densitometria_osea: 'Densitometría ósea'
+  //     };
+  //   }
 
-    // Agregar estudios seleccionados
-    Object.keys(mapeoEstudios).forEach(campo => {
-      if (form[campo]) {
-        estudios.push(mapeoEstudios[campo]);
-      }
-    });
+  //   // Agregar estudios seleccionados
+  //   Object.keys(mapeoEstudios).forEach(campo => {
+  //     if (form[campo]) {
+  //       estudios.push(mapeoEstudios[campo]);
+  //     }
+  //   });
 
-    // Agregar otros estudios si los hay
-    if (form.otros_estudios && form.otros_estudios.trim()) {
-      estudios.push(form.otros_estudios.trim());
-    }
+  //   // Agregar otros estudios si los hay
+  //   if (form.otros_estudios && form.otros_estudios.trim()) {
+  //     estudios.push(form.otros_estudios.trim());
+  //   }
 
-    return estudios.join('\n');
+  //   return estudios.join('\n');
+  // }
+// Modificar el método para que no necesite parámetro
+private construirEstudiosSeleccionados(): string {
+  const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio || 'laboratorio'; // ✅ Obtener desde el formulario
+  const form = this.solicitudEstudioForm.value;
+  const estudios: string[] = [];
+  
+  // Mapeos según el tipo de estudio
+  let mapeoEstudios: { [key: string]: string } = {};
+  
+  if (tipoEstudio === 'laboratorio') {
+    mapeoEstudios = {
+      biometria_hematica: 'Biometría hemática completa',
+      quimica_sanguinea: 'Química sanguínea',
+      glucosa: 'Glucosa sérica',
+      urea: 'Urea',
+      creatinina: 'Creatinina',
+      acido_urico: 'Ácido úrico',
+      colesterol_total: 'Colesterol total',
+      trigliceridos: 'Triglicéridos',
+      hdl: 'HDL colesterol',
+      ldl: 'LDL colesterol',
+      transaminasas: 'Transaminasas (ALT/AST)',
+      bilirrubinas: 'Bilirrubinas',
+      proteinas_totales: 'Proteínas totales',
+      albumina: 'Albúmina',
+      fosfatasa_alcalina: 'Fosfatasa alcalina',
+      sodio: 'Sodio sérico',
+      potasio: 'Potasio sérico',
+      cloro: 'Cloro sérico',
+      tsh: 'TSH',
+      t3: 'T3',
+      t4: 'T4',
+      examen_general_orina: 'Examen general de orina',
+      urocultivo: 'Urocultivo',
+      coproparasitoscopico: 'Coproparasitoscópico',
+      coprocultivo: 'Coprocultivo',
+      sangre_oculta_heces: 'Sangre oculta en heces',
+      troponinas: 'Troponinas',
+      ck_mb: 'CK-MB',
+      tiempo_protrombina: 'Tiempo de protrombina',
+      tiempo_tromboplastina: 'Tiempo de tromboplastina parcial',
+      inr: 'INR'
+    };
+  } else if (tipoEstudio === 'imagen') {
+    mapeoEstudios = {
+      radiografia_torax: 'Radiografía de tórax',
+      radiografia_abdomen: 'Radiografía de abdomen',
+      radiografia_columna: 'Radiografía de columna',
+      radiografia_extremidades: 'Radiografía de extremidades',
+      ultrasonido_abdominal: 'Ultrasonido abdominal',
+      ultrasonido_pelvico: 'Ultrasonido pélvico',
+      ultrasonido_tiroideo: 'Ultrasonido tiroideo',
+      ultrasonido_carotideo: 'Ultrasonido carotídeo',
+      ultrasonido_renal: 'Ultrasonido renal',
+      ecocardiograma: 'Ecocardiograma',
+      tomografia_cerebral: 'Tomografía cerebral',
+      tomografia_torax: 'Tomografía de tórax',
+      tomografia_abdomen: 'Tomografía abdominal',
+      tomografia_contrastada: 'Tomografía con contraste',
+      resonancia_cerebral: 'Resonancia magnética cerebral',
+      resonancia_columna: 'Resonancia magnética de columna',
+      resonancia_articular: 'Resonancia magnética articular',
+      mamografia: 'Mamografía',
+      densitometria_osea: 'Densitometría ósea'
+    };
   }
+  
+  // Agregar estudios seleccionados
+  Object.keys(mapeoEstudios).forEach(campo => {
+    if (form[campo]) {
+      estudios.push(mapeoEstudios[campo]);
+    }
+  });
+  
+  // Agregar otros estudios si los hay
+  if (form.otros_estudios && form.otros_estudios.trim()) {
+    estudios.push(form.otros_estudios.trim());
+  }
+  
+  return estudios.length > 0 ? estudios.join('\n') : 'No se seleccionaron estudios específicos';
+}
 
 
   // ===================================
@@ -5559,7 +5804,7 @@ getPresionArterialMedia(): number | null {
     }
 
     const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
-    const estudiosSeleccionados = this.construirEstudiosSeleccionados(tipoEstudio);
+    const estudiosSeleccionados = this.construirEstudiosSeleccionados();
 
     const solicitudData = {
       id_documento: this.documentoClinicoActual!,

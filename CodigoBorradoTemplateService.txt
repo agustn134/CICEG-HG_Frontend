@@ -1362,6 +1362,8 @@ async generarNotaUrgencias(datos: any): Promise<any> {
       },
     };
   }
+
+  TENGO ESTOS TEMPLATES BORRADOS ANTERIORMENTE:
   // 📄 NOTA DE CONSENTIMIENTO INFORMADO PARA PROCEDIMIENTOS SEGÚN NOM-004-SSA3-2012
   async generarNotaConsentimientoProcedimientos(datos: any): Promise<any> {
     console.log(
@@ -1846,7 +1848,6 @@ async generarNotaUrgencias(datos: any): Promise<any> {
       },
     };
   }
-
   // 📄 CONSENTIMIENTO INFORMADO PARA HOSPITALIZACIÓN SEGÚN NOM-004-SSA3-2012
   async generarConsentimientoHospitalizacion(datos: any): Promise<any> {
     console.log(

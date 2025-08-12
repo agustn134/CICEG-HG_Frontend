@@ -3167,10 +3167,10 @@
           </div>
         </form>
       </div>
-    <!-- FORMULARIO DE SOLICITUD DE ESTUDIO MEJORADO -->
+
+    <!-- FORMULARIO DE SOLICITUD DE ESTUDIO MEJORADO   C:\Proyectos\CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.html -->
     <div *ngIf="formularioActivo === 'solicitudEstudio'" class="bg-white shadow rounded-lg mb-6">
-      <!-- ENCABEZADO -->
-      <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+       <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900">
           <i class="fas fa-microscope mr-2 text-blue-500"></i>
           Solicitud de Estudio
@@ -3180,8 +3180,7 @@
 
       <form [formGroup]="solicitudEstudioForm" class="px-4 sm:px-6 py-4">
 
-        <!-- SECCIÓN 1: TIPO DE ESTUDIO -->
-        <div class="mb-6">
+          <div class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>Tipo de Estudio Solicitado
           </h4>
@@ -3199,14 +3198,12 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 2: ESTUDIOS DE LABORATORIO -->
-        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
+         <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'laboratorio'" class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-vial mr-2 text-green-500"></i>Estudios de Laboratorio Solicitados
           </h4>
 
-          <!-- Química Sanguínea -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-blue-700 mb-3">Química Sanguínea</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3257,8 +3254,7 @@
             </div>
           </div>
 
-          <!-- Perfil Lipídico -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-red-700 mb-3">Perfil Lipídico</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3284,8 +3280,7 @@
             </div>
           </div>
 
-          <!-- Hematología -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-purple-700 mb-3">Hematología</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3311,8 +3306,7 @@
             </div>
           </div>
 
-          <!-- Estudios de Orina -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-cyan-700 mb-3">Estudios de Orina</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3328,8 +3322,7 @@
             </div>
           </div>
 
-          <!-- Electrolitos -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-indigo-700 mb-3">Electrolitos Séricos</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3351,14 +3344,12 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 3: ESTUDIOS DE IMAGENOLOGÍA -->
-        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
+         <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'imagen'" class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-x-ray mr-2 text-blue-500"></i>Estudios de Imagenología Solicitados
           </h4>
 
-          <!-- Radiografías -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-green-700 mb-3">Radiografías</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3384,8 +3375,7 @@
             </div>
           </div>
 
-          <!-- Ultrasonidos -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-blue-700 mb-3">Ultrasonidos</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3416,8 +3406,7 @@
             </div>
           </div>
 
-          <!-- Tomografías -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-blue-700 mb-3">Tomografías Computadas</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3443,8 +3432,7 @@
             </div>
           </div>
 
-          <!-- Resonancias -->
-          <div class="mb-4">
+           <div class="mb-4">
             <h5 class="text-sm font-semibold text-purple-700 mb-3">Resonancia Magnética</h5>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               <label class="flex items-center space-x-2 text-sm">
@@ -3466,8 +3454,7 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 4: OTROS ESTUDIOS -->
-        <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
+         <div *ngIf="solicitudEstudioForm.get('tipo_estudio')?.value === 'otros'" class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-flask mr-2 text-teal-500"></i>Otros Estudios Especiales
           </h4>
@@ -3481,8 +3468,7 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 5: INFORMACIÓN CLÍNICA -->
-        <div class="mb-6">
+         <div class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-stethoscope mr-2 text-red-500"></i>Información Clínica del Paciente *
           </h4>
@@ -3507,8 +3493,7 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 6: CONFIGURACIÓN DEL ESTUDIO -->
-        <div class="mb-6">
+         <div class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-cogs mr-2 text-gray-500"></i>Configuración y Urgencia del Estudio
           </h4>
@@ -3553,8 +3538,7 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 7: OBSERVACIONES -->
-        <div class="mb-6">
+         <div class="mb-6">
           <h4 class="text-md font-semibold text-gray-800 mb-3">
             <i class="fas fa-comment-alt mr-2 text-gray-500"></i>Observaciones Adicionales
           </h4>
@@ -3566,8 +3550,7 @@
           </div>
         </div>
 
-        <!-- BOTONES DE ACCIÓN -->
-        <div class="mt-6 flex justify-between">
+         <div class="mt-6 flex justify-between">
           <div class="flex space-x-3">
             <button type="button" (click)="limpiarFormulario('solicitudEstudio')"
               class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
@@ -3600,8 +3583,7 @@
           </div>
         </div>
 
-        <!-- INFORMACIÓN NORMATIVA -->
-        <div class="mt-6 pt-4 border-t border-gray-200">
+         <div class="mt-6 pt-4 border-t border-gray-200">
           <div class="bg-gray-50 rounded-lg p-4">
             <div class="flex items-start space-x-3">
               <i class="fas fa-info-circle text-blue-500 mt-1"></i>
@@ -3628,6 +3610,9 @@
 
       </form>
     </div>
+
+
+
       <!-- FORMULARIO DE PRESCRIPCIÓN DE MEDICAMENTOS -->
       <div *ngIf="formularioActivo === 'prescripcionMedicamento'" class="space-y-6">
 
@@ -5783,84 +5768,489 @@
 
         </form>
       </div>
+
+
+
+
+
       <!-- FORMULARIO DE CONSENTIMIENTO INFORMADO -->
-      <div *ngIf="formularioActivo === 'consentimiento'" class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-file-signature mr-2 text-blue-500"></i>
-            Consentimiento Informado
-          </h3>
-          <p class="text-sm text-gray-600 mt-1">Autorización para procedimientos médicos</p>
+<!-- FORMULARIO DE CONSENTIMIENTO INFORMADO PARA HOSPITALIZACIÓN -->
+<!-- FORMULARIO DE CONSENTIMIENTO INFORMADO ADAPTATIVO -->
+<div *ngIf="formularioActivo === 'consentimiento'" class="bg-white shadow rounded-lg mb-6">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">
+      <i class="fas fa-file-signature mr-2 text-blue-500"></i>
+      Consentimiento Informado
+    </h3>
+    <p class="text-sm text-gray-600 mt-1">Autorización médica según NOM-004-SSA3-2012</p>
+  </div>
+
+  <form [formGroup]="consentimientoForm" class="px-6 py-4">
+    <div class="space-y-6">
+
+      <!-- SELECTOR DE TIPO DE CONSENTIMIENTO -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-blue-800 mb-3">
+          <i class="fas fa-clipboard-list mr-2"></i>
+          Tipo de Consentimiento Informado
+        </h4>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Seleccione el tipo de consentimiento *
+          </label>
+          <select formControlName="tipo_consentimiento" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="hospitalizacion">Consentimiento para Hospitalización</option>
+            <option value="referencia">Consentimiento para Referencia de Pacientes</option>
+            <option value="tratamiento_medico">Consentimiento para Tratamiento Médico</option>
+            <option value="cirugia_procedimientos">Consentimiento para Cirugía/Procedimientos</option>
+            <option value="transfusion_sanguinea">Consentimiento para Transfusión Sanguínea</option>
+          </select>
         </div>
 
-        <form [formGroup]="consentimientoForm" class="px-6 py-4">
-          <div class="grid grid-cols-1 gap-6">
-
-            <!-- Procedimiento -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Procedimiento Autorizado *</label>
-              <textarea formControlName="procedimiento" rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describa el procedimiento para el cual se solicita autorización..."></textarea>
-              <div *ngIf="consentimientoForm.get('procedimiento')?.errors?.['required']"
-                class="text-red-500 text-xs mt-1">
-                Campo obligatorio
-              </div>
-            </div>
-
-            <!-- Riesgos -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Riesgos Explicados</label>
-              <textarea formControlName="riesgos" rows="4"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Riesgos y complicaciones posibles del procedimiento..."></textarea>
-            </div>
-
-            <!-- Alternativas -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Alternativas de Tratamiento</label>
-              <textarea formControlName="alternativas" rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Opciones alternativas de tratamiento disponibles..."></textarea>
-            </div>
-
-            <!-- Testigos -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Testigo 1</label>
-                <input type="text" formControlName="nombre_testigo1"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nombre completo del primer testigo">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Testigo 2</label>
-                <input type="text" formControlName="nombre_testigo2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nombre completo del segundo testigo">
-              </div>
-            </div>
-          </div>
-
-          <!-- Botones -->
-          <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!consentimientoForm.valid || isCreatingDocument"
-              class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
-              <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-              <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
-              {{ isCreatingDocument ? 'Guardando...' : 'Guardar Consentimiento' }}
-            </button>
-
-            <button type="button" (click)="generarPDF('Consentimiento Informado')"
-              [disabled]="!formularioEstado.consentimiento"
-              class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
-              <i class="fas fa-file-pdf mr-2"></i>
-              <span *ngIf="formularioEstado.consentimiento">📄 Descargar PDF</span>
-              <span *ngIf="!formularioEstado.consentimiento">Guardar primero</span>
-            </button>
-          </div>
-        </form>
+        <!-- DESCRIPCIÓN DEL TIPO SELECCIONADO -->
+         <div class="mt-3 p-3 bg-white rounded border-l-4" 
+       [ngClass]="{
+         'border-blue-400': consentimientoForm.get('tipo_consentimiento')?.value === 'hospitalizacion',
+         'border-green-400': consentimientoForm.get('tipo_consentimiento')?.value === 'referencia',
+         'border-purple-400': consentimientoForm.get('tipo_consentimiento')?.value === 'tratamiento_medico',
+         'border-red-400': consentimientoForm.get('tipo_consentimiento')?.value === 'cirugia_procedimientos',
+         'border-pink-400': consentimientoForm.get('tipo_consentimiento')?.value === 'transfusion_sanguinea'
+       }">
+ <div [ngSwitch]="consentimientoForm.get('tipo_consentimiento')?.value">
+      <p *ngSwitchCase="'hospitalizacion'" class="text-sm text-gray-600">
+        <strong>Hospitalización:</strong> Autorización general para procedimientos médicos durante la estancia hospitalaria.
+      </p>
+      <p *ngSwitchCase="'referencia'" class="text-sm text-gray-600">
+        <strong>Referencia:</strong> Autorización para trasladar al paciente a otra unidad médica especializada.
+      </p>
+      <p *ngSwitchCase="'tratamiento_medico'" class="text-sm text-gray-600">
+        <strong>Tratamiento Médico:</strong> Autorización para estudios clínicos, laboratorio y tratamientos.
+      </p>
+      <p *ngSwitchCase="'cirugia_procedimientos'" class="text-sm text-gray-600">
+        <strong>Cirugía/Procedimientos:</strong> Autorización específica para procedimientos quirúrgicos o invasivos.
+      </p>
+      <p *ngSwitchCase="'transfusion_sanguinea'" class="text-sm text-gray-600">
+        <strong>Transfusión Sanguínea:</strong> Autorización para administración de sangre y hemoderivados.
+      </p>
+    </div>
+        </div>
       </div>
+
+      <!-- INFORMACIÓN DEL RESPONSABLE (común para todos) -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">
+          <i class="fas fa-user mr-2 text-blue-500"></i>
+          Información del Responsable
+        </h4>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre del Responsable *
+            </label>
+            <input type="text" formControlName="nombre_responsable"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nombre completo del responsable">
+            <div *ngIf="consentimientoForm.get('nombre_responsable')?.errors?.['required'] && consentimientoForm.get('nombre_responsable')?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              Campo obligatorio
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Parentesco/Relación *
+            </label>
+            <select formControlName="parentesco"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="paciente">Paciente</option>
+              <option value="padre">Padre</option>
+              <option value="madre">Madre</option>
+              <option value="hijo">Hijo/a</option>
+              <option value="conyuge">Cónyuge</option>
+              <option value="hermano">Hermano/a</option>
+              <option value="tutor">Tutor legal</option>
+              <option value="familiar">Otro familiar</option>
+              <option value="representante">Representante legal</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN MÉDICA BÁSICA (común para todos) -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">
+          <i class="fas fa-stethoscope mr-2 text-green-500"></i>
+          Información Médica
+        </h4>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Número de Cama
+            </label>
+            <input type="text" formControlName="numero_cama"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ej: 101, 205A">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Servicio Médico
+            </label>
+            <input type="text" formControlName="servicio_medico"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ej: Medicina Interna, Cirugía">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Fecha del Consentimiento *
+            </label>
+            <input type="date" formControlName="fecha_consentimiento"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPOS ESPECÍFICOS PARA CIRUGÍA/PROCEDIMIENTOS -->
+      <div *ngIf="consentimientoForm.get('tipo_consentimiento')?.value === 'cirugia_procedimientos'" 
+           class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-red-800 mb-4">
+          <i class="fas fa-scalpel mr-2"></i>
+          Información del Procedimiento Quirúrgico
+        </h4>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre del Procedimiento/Cirugía *
+            </label>
+            <textarea formControlName="nombre_procedimiento" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Describa detalladamente el procedimiento quirúrgico a realizar..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Beneficios del Procedimiento
+            </label>
+            <textarea formControlName="beneficios_procedimiento" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ventajas y beneficios esperados del procedimiento..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Riesgos Específicos
+            </label>
+            <textarea formControlName="riesgos_especificos" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Riesgos y complicaciones específicas del procedimiento..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              ¿Autoriza Procedimientos Adicionales?
+            </label>
+            <select formControlName="autoriza_procedimientos_adicionales"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="si">Sí, autorizo procedimientos adicionales si son necesarios</option>
+              <option value="no">No, solo el procedimiento especificado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPOS ESPECÍFICOS PARA REFERENCIA -->
+      <div *ngIf="consentimientoForm.get('tipo_consentimiento')?.value === 'referencia'" 
+           class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-green-800 mb-4">
+          <i class="fas fa-ambulance mr-2"></i>
+          Información de la Referencia
+        </h4>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Motivo de la Referencia *
+            </label>
+            <textarea formControlName="motivo_referencia" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Explique por qué se requiere referir al paciente..."></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Unidad de Destino
+              </label>
+              <input type="text" formControlName="unidad_destino"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Hospital o clínica de destino">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Especialidad Requerida
+              </label>
+              <input type="text" formControlName="especialidad_requerida"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: Cardiología, Neurología">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Fecha de Ingreso Hospitalario
+              </label>
+              <input type="date" formControlName="fecha_ingreso_hospitalario"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Diagnóstico Actual
+              </label>
+              <input type="text" formControlName="diagnostico_referencia"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Diagnóstico principal">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPOS ESPECÍFICOS PARA TRATAMIENTO MÉDICO -->
+      <div *ngIf="consentimientoForm.get('tipo_consentimiento')?.value === 'tratamiento_medico'" 
+           class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-purple-800 mb-4">
+          <i class="fas fa-pills mr-2"></i>
+          Información del Tratamiento Médico
+        </h4>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Diagnóstico Presuntivo
+            </label>
+            <textarea formControlName="diagnostico_tratamiento" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Diagnóstico médico actual..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Estudios y Tratamientos Autorizados
+            </label>
+            <textarea formControlName="estudios_autorizados" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Estudios de laboratorio, gabinete y tratamientos autorizados..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPOS ESPECÍFICOS PARA TRANSFUSIÓN SANGUÍNEA -->
+<div *ngIf="consentimientoForm.get('tipo_consentimiento')?.value === 'transfusion_sanguinea'" 
+     class="bg-pink-50 border border-pink-200 rounded-lg p-4">
+  <h4 class="text-md font-semibold text-pink-800 mb-4">
+    <i class="fas fa-tint mr-2"></i>
+    Información de la Transfusión Sanguínea
+  </h4>
+  
+  <div class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Diagnóstico que Requiere Transfusión
+        </label>
+        <textarea formControlName="diagnostico_transfusion" rows="2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Diagnóstico médico que justifica la transfusión..."></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Tipo de Hemoderivado Requerido
+        </label>
+        <select formControlName="tipo_hemoderivado"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Seleccionar tipo</option>
+          <option value="sangre_total">Sangre Total</option>
+          <option value="concentrado_eritrocitario">Concentrado Eritrocitario</option>
+          <option value="plasma_fresco">Plasma Fresco Congelado</option>
+          <option value="plaquetas">Plaquetas</option>
+          <option value="crioprecipitados">Crioprecipitados</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Indicación Médica
+        </label>
+        <input type="text" formControlName="indicacion_transfusion"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej: Anemia severa, pérdida sanguínea">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Tipo de Sangre del Paciente
+        </label>
+        <select formControlName="tipo_sangre_paciente"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Por determinar</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Estado Civil
+        </label>
+        <select formControlName="estado_civil"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Seleccionar</option>
+          <option value="soltero">Soltero/a</option>
+          <option value="casado">Casado/a</option>
+          <option value="union_libre">Unión Libre</option>
+          <option value="divorciado">Divorciado/a</option>
+          <option value="viudo">Viudo/a</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Domicilio Completo
+      </label>
+      <input type="text" formControlName="domicilio_completo"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Dirección completa del paciente">
+    </div>
+  </div>
+</div>
+
+      <!-- TESTIGOS (solo para cirugía y algunos otros) -->
+      <div *ngIf="consentimientoForm.get('tipo_consentimiento')?.value === 'cirugia_procedimientos'" 
+           class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">
+          <i class="fas fa-users mr-2 text-gray-600"></i>
+          Testigos
+        </h4>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre del Testigo 1
+            </label>
+            <input type="text" formControlName="testigo1_nombre"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nombre completo del primer testigo">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre del Testigo 2
+            </label>
+            <input type="text" formControlName="testigo2_nombre"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nombre completo del segundo testigo">
+          </div>
+        </div>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">
+          <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
+          Observaciones Adicionales
+        </h4>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Observaciones
+          </label>
+          <textarea formControlName="observaciones" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Observaciones especiales sobre el consentimiento (opcional)"></textarea>
+        </div>
+      </div>
+
+      <!-- ACEPTACIÓN FINAL -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="text-md font-semibold text-blue-800 mb-4">
+          <i class="fas fa-check-circle mr-2 text-blue-600"></i>
+          Aceptación del Consentimiento
+        </h4>
+        
+        <div class="space-y-3">
+          <div class="flex items-start space-x-3">
+            <input type="checkbox" formControlName="acepta_consentimiento" id="acepta_consentimiento"
+              class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="acepta_consentimiento" class="text-sm text-gray-700 leading-relaxed">
+              <span class="font-semibold text-blue-800">Acepto y autorizo</span> al Hospital General San Luis de la Paz 
+              y a su personal médico para proceder según el tipo de consentimiento seleccionado, 
+              conforme a lo establecido en la NOM-004-SSA3-2012.
+            </label>
+          </div>
+          
+          <div *ngIf="consentimientoForm.get('acepta_consentimiento')?.errors?.['required'] && consentimientoForm.get('acepta_consentimiento')?.touched" 
+               class="text-red-600 text-sm font-medium bg-red-100 p-3 rounded-md">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            Debe aceptar el consentimiento para continuar
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mt-6 flex justify-end space-x-3">
+      <button type="button" (click)="guardarFormularioActivo()"
+        [disabled]="!consentimientoForm.valid || isCreatingDocument"
+        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
+        <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+        <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2"></i>
+        {{ isCreatingDocument ? 'Guardando...' : 'Guardar Consentimiento' }}
+      </button>
+
+      <button type="button" (click)="generarPDF('Consentimiento Informado')"
+        [disabled]="!formularioEstado.consentimiento"
+        class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 transition-colors">
+        <i class="fas fa-file-pdf mr-2"></i>
+        <span *ngIf="formularioEstado.consentimiento"> Descargar PDF</span>
+        <span *ngIf="!formularioEstado.consentimiento">Guardar primero</span>
+      </button>
+    </div>
+
+    <!-- ESTADO DE VALIDACIÓN -->
+    <div *ngIf="consentimientoForm.invalid" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+      <p class="text-sm text-yellow-800">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <strong>Campos pendientes:</strong> Complete los campos marcados con * para habilitar el botón de guardar.
+      </p>
+    </div>
+  </form>
+</div>
+
+
+
+
+
+
       <!-- FORMULARIO DE ALTA VOLUNTARIA -->
       <!-- FORMULARIO DE ALTA VOLUNTARIA MEJORADO -->
       <div *ngIf="formularioActivo === 'altaVoluntaria'" class="bg-white shadow rounded-lg mb-6">
