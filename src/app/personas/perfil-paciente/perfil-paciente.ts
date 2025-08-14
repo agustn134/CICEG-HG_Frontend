@@ -300,7 +300,7 @@ capturaEvolucionForm!: FormGroup;
   modoPresentacion = false;
 
   
-  // ✅ NUEVAS PROPIEDADES PARA MODO INTELIGENTE
+  //   NUEVAS PROPIEDADES PARA MODO INTELIGENTE
   modoInteligenteActivo = true;
 
 ///////////////////////// INICIO  CIE 10    ////////////////////////////////////////
@@ -655,6 +655,9 @@ seleccionarCie10(codigo: any, formulario: string): void {
     case 'notaPostoperatoria':
       this.notaPostoperatoriaForm.get('codigo_cie10_postoperatorio')?.setValue(valorCompleto);
       break;
+       case 'solicitudEstudio':  //   NUEVO CASO
+      this.solicitudEstudioForm.get('diagnostico_cie10')?.setValue(valorCompleto);
+      break;
     case 'notaEgreso':
       this.notaEgresoForm.get('codigo_cie10_egreso')?.setValue(valorCompleto);
       break;
@@ -794,7 +797,7 @@ desactivarModoPresentacion(): void {
     private medicamentosService: MedicamentosService,
     private validacionesService: ValidacionesComunesService,
     private logoResolverService: LogoResolverService,
-    private modoInteligenteService: ModoInteligenteService // ✅ AGREGAR
+    private modoInteligenteService: ModoInteligenteService //   AGREGAR
   ) {
     this.inicializarFormularios();
     this.signosVitalesForm = this.initializeSignosVitalesForm();
@@ -815,7 +818,7 @@ desactivarModoPresentacion(): void {
   }
 
 
-// ✅ NUEVO MÉTODO PARA CONTROLAR MODO INTELIGENTE
+//   NUEVO MÉTODO PARA CONTROLAR MODO INTELIGENTE
   toggleModoInteligente(event: any): void {
     this.modoInteligenteActivo = event.target.checked;
     this.modoInteligenteService.configurarModo(this.modoInteligenteActivo);
@@ -889,7 +892,7 @@ desactivarModoPresentacion(): void {
         }
       });
 
-      console.log('✅ PDF de Consentimiento Informado generado correctamente');
+      console.log('  PDF de Consentimiento Informado generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF del consentimiento';
@@ -1072,7 +1075,7 @@ ngAfterViewInit(): void {
         }
       });
 
-      console.log('✅ PDF de Nota Postoperatoria generado correctamente');
+      console.log('  PDF de Nota Postoperatoria generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la nota postoperatoria';
@@ -1335,7 +1338,7 @@ private generarFolioPostanestesico(): string {
         }
       });
 
-      console.log('✅ PDF de Interconsulta generado correctamente');
+      console.log('  PDF de Interconsulta generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la interconsulta';
@@ -1371,12 +1374,12 @@ private generarFolioPostanestesico(): string {
 
     🏥 SISTEMA HOSPITALARIO COMPLETADO AL 100% 🏥
 
-    ✅ 12/12 DOCUMENTOS CLÍNICOS FUNCIONALES
-    ✅ CUMPLIMIENTO TOTAL NOM-004-SSA3-2012
-    ✅ EXPEDIENTES ELECTRÓNICOS COMPLETOS
-    ✅ PDFS PROFESIONALES GENERADOS
-    ✅ VALIDACIONES MÉDICAS IMPLEMENTADAS
-    ✅ INTERFAZ ANGULAR MODERNA
+      12/12 DOCUMENTOS CLÍNICOS FUNCIONALES
+      CUMPLIMIENTO TOTAL NOM-004-SSA3-2012
+      EXPEDIENTES ELECTRÓNICOS COMPLETOS
+      PDFS PROFESIONALES GENERADOS
+      VALIDACIONES MÉDICAS IMPLEMENTADAS
+      INTERFAZ ANGULAR MODERNA
 
     ¡Has creado un sistema hospitalario completo y robusto!
   `);
@@ -1632,7 +1635,7 @@ private generarFolioPostanestesico(): string {
         }
       });
 
-      console.log('✅ PDF de Prescripción generado correctamente');
+      console.log('  PDF de Prescripción generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF de prescripción:', error);
       this.error = 'Error al generar el PDF de la prescripción';
@@ -1760,7 +1763,7 @@ private generarFolioPostanestesico(): string {
       // Guardar nota de evolución (aquí integrarías con tu servicio backend)
       console.log('📄 Datos de nota de evolución preparados:', notaEvolucionData);
 
-      this.success = '✅ Nota de Evolución guardada correctamente';
+      this.success = '  Nota de Evolución guardada correctamente';
       this.formularioEstado.notaEvolucion = true;
 
       // Generar PDF automáticamente
@@ -1789,7 +1792,7 @@ private generarFolioPostanestesico(): string {
         notaEvolucion: this.notaEvolucionForm.value
       });
 
-      console.log('✅ PDF de Nota de Evolución generado correctamente');
+      console.log('  PDF de Nota de Evolución generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la nota de evolución';
@@ -1824,7 +1827,7 @@ private generarFolioPostanestesico(): string {
         await this.crearDocumentoClinicoPadre('Nota de Urgencias');
       }
 
-      // ✅ PREPARAR DATOS CON TIPOS CORRECTOS
+      //   PREPARAR DATOS CON TIPOS CORRECTOS
       const notaUrgenciasData: CreateNotaUrgenciasDto = {
         id_documento: this.documentoClinicoActual!,
         motivo_atencion: this.notaUrgenciasForm.value.motivo_atencion,
@@ -1837,7 +1840,7 @@ private generarFolioPostanestesico(): string {
         plan_tratamiento: this.notaUrgenciasForm.value.plan_tratamiento || undefined,
         pronostico: this.notaUrgenciasForm.value.pronostico || undefined,
         id_guia_diagnostico: this.notaUrgenciasForm.value.id_guia_diagnostico || undefined,
-        // ✅ CORREGIDO: usar undefined en lugar de null
+        //   CORREGIDO: usar undefined en lugar de null
         area_interconsulta: undefined // Se puede agregar después si es necesario
       };
 
@@ -1874,7 +1877,7 @@ private generarFolioPostanestesico(): string {
         notaUrgencias: this.notaUrgenciasForm.value
       });
 
-      console.log('✅ PDF de Nota de Urgencias generado correctamente');
+      console.log('  PDF de Nota de Urgencias generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la nota de urgencias';
@@ -1960,7 +1963,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
       }
     });
     
-      console.log('✅ PDF de Referencia y Contrarreferencia generado correctamente');
+      console.log('  PDF de Referencia y Contrarreferencia generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la referencia';
@@ -2034,7 +2037,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
         }
       });
 
-      console.log('✅ PDF de Nota de Egreso generado correctamente');
+      console.log('  PDF de Nota de Egreso generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF de la nota de egreso';
@@ -2047,7 +2050,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
   }
   public debugNotaEvolucion(): void {
     console.log('🔍 DEBUG NOTA EVOLUCIÓN:');
-    console.log('✅ Formulario válido:', this.notaEvolucionForm.valid);
+    console.log('  Formulario válido:', this.notaEvolucionForm.valid);
 
     const obligatorios = [
       'sintomas_signos', 'habitus_exterior', 'estado_nutricional',
@@ -2091,7 +2094,6 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
   this.solicitudEstudioForm = this.initializeSolicitudEstudioForm();
   this.referenciaForm = this.initializeReferenciaForm();
   this.prescripcionForm = this.initializePrescripcionForm();
-  this.referenciaForm = this.initializeReferenciaForm();
   this.controlCrecimientoForm = this.initializeControlCrecimientoForm();
   this.esquemaVacunacionForm = this.initializeEsquemaVacunacionForm();
   this.historiaClinicaPediatricaForm = this.initializeHistoriaClinicaPediatricaForm();
@@ -2201,7 +2203,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
 
 
 
-  // ✅ MÉTODOS AUXILIARES PARA MODO INTELIGENTE
+  //   MÉTODOS AUXILIARES PARA MODO INTELIGENTE
 
 // Verificar si mostrar un campo
 mostrarCampo(nombreCampo: string, formularioActual: string): boolean {
@@ -2809,7 +2811,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       numero_afiliacion: [''],
       nss: ['', [Validators.minLength(11), Validators.maxLength(11)]],
 
-      // ✅ GRUPOS ANIDADOS CORRECTOS - IGUAL AL HTML
+      //   GRUPOS ANIDADOS CORRECTOS - IGUAL AL HTML
       contacto_emergencia_1: this.fb.group({
         nombre_completo: ['', [Validators.required]],
         parentesco: ['', [Validators.required]],
@@ -2985,7 +2987,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
   }
   private initializeNotaEvolucionForm(): FormGroup {
   return this.fb.group({
-    // ✅ SOLO REQUIRED, SIN minLength
+    //   SOLO REQUIRED, SIN minLength
     sintomas_signos: ['', [Validators.required]],
     habitus_exterior: ['', [Validators.required]],
     estado_nutricional: ['', [Validators.required]],
@@ -2996,7 +2998,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
     plan_estudios_tratamiento: ['', [Validators.required]],
     pronostico: ['', [Validators.required]],
 
-    // ✅ CAMPOS OPCIONALES (sin cambios)
+    //   CAMPOS OPCIONALES (sin cambios)
     id_guia_diagnostico: [null],
     dias_hospitalizacion: [null, [Validators.min(0), Validators.max(365)]],
     fecha_ultimo_ingreso: [''],
@@ -3009,7 +3011,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
     peso_actual: [null, [Validators.min(0.5), Validators.max(300)]],
     talla_actual: [null, [Validators.min(30), Validators.max(250)]],
 
-    // ✅ CAMPOS OPCIONALES
+    //   CAMPOS OPCIONALES
     exploracion_cabeza: [''],
     exploracion_cuello: [''],
     exploracion_torax: [''],
@@ -3250,123 +3252,295 @@ servicio_hospitalizacion: ['Cirugía General'],
     revision_cirujano: [false, [Validators.requiredTrue]]
   });
   }
-  private initializeSolicitudEstudioForm(): FormGroup {
-    return this.fb.group({
-      // Tipo de estudio
-      tipo_estudio: ['laboratorio', [Validators.required]], // laboratorio, imagen, otros
+  // private initializeSolicitudEstudioForm(): FormGroup {
+  //   return this.fb.group({
+  //     // Tipo de estudio
+  //     tipo_estudio: ['laboratorio', [Validators.required]], // laboratorio, imagen, otros
 
-      // ===================================
-      // ESTUDIOS DE LABORATORIO
-      // ===================================
+  //     // ===================================
+  //     // ESTUDIOS DE LABORATORIO
+  //     // ===================================
 
-      // Química Sanguínea
-      biometria_hematica: [false],
-      quimica_sanguinea: [false],
-      glucosa: [false],
-      urea: [false],
-      creatinina: [false],
-      acido_urico: [false],
-      colesterol_total: [false],
-      trigliceridos: [false],
-      hdl: [false],
-      ldl: [false],
-      transaminasas: [false],
-      bilirrubinas: [false],
-      proteinas_totales: [false],
-      albumina: [false],
-      fosfatasa_alcalina: [false],
+  //     // Química Sanguínea
+  //     biometria_hematica: [false],
+  //     quimica_sanguinea: [false],
+  //     glucosa: [false],
+  //     urea: [false],
+  //     creatinina: [false],
+  //     acido_urico: [false],
+  //     colesterol_total: [false],
+  //     trigliceridos: [false],
+  //     hdl: [false],
+  //     ldl: [false],
+  //     transaminasas: [false],
+  //     bilirrubinas: [false],
+  //     proteinas_totales: [false],
+  //     albumina: [false],
+  //     fosfatasa_alcalina: [false],
 
-      // Electrolitos
-      sodio: [false],
-      potasio: [false],
-      cloro: [false],
+  //     // Electrolitos
+  //     sodio: [false],
+  //     potasio: [false],
+  //     cloro: [false],
 
-      // Estudios hormonales
-      tsh: [false],
-      t3: [false],
-      t4: [false],
+  //     // Estudios hormonales
+  //     tsh: [false],
+  //     t3: [false],
+  //     t4: [false],
 
-      // Estudios de orina
-      examen_general_orina: [false],
-      urocultivo: [false],
+  //     // Estudios de orina
+  //     examen_general_orina: [false],
+  //     urocultivo: [false],
 
-      // Estudios de heces
-      coproparasitoscopico: [false],
-      coprocultivo: [false],
-      sangre_oculta_heces: [false],
+  //     // Estudios de heces
+  //     coproparasitoscopico: [false],
+  //     coprocultivo: [false],
+  //     sangre_oculta_heces: [false],
 
-      // Marcadores cardiacos
-      troponinas: [false],
-      ck_mb: [false],
+  //     // Marcadores cardiacos
+  //     troponinas: [false],
+  //     ck_mb: [false],
 
-      // Coagulación
-      tiempo_protrombina: [false],
-      tiempo_tromboplastina: [false],
-      inr: [false],
+  //     // Coagulación
+  //     tiempo_protrombina: [false],
+  //     tiempo_tromboplastina: [false],
+  //     inr: [false],
 
-      // ===================================
-      // ESTUDIOS DE IMAGENOLOGÍA
-      // ===================================
+  //     // ===================================
+  //     // ESTUDIOS DE IMAGENOLOGÍA
+  //     // ===================================
 
-      // Radiografías
-      radiografia_torax: [false],
-      radiografia_abdomen: [false],
-      radiografia_columna: [false],
-      radiografia_extremidades: [false],
+  //     // Radiografías
+  //     radiografia_torax: [false],
+  //     radiografia_abdomen: [false],
+  //     radiografia_columna: [false],
+  //     radiografia_extremidades: [false],
 
-      // Ultrasonidos
-      ultrasonido_abdominal: [false],
-      ultrasonido_pelvico: [false],
-      ultrasonido_tiroideo: [false],
-      ultrasonido_carotideo: [false],
-      ultrasonido_renal: [false],
-      ecocardiograma: [false],
+  //     // Ultrasonidos
+  //     ultrasonido_abdominal: [false],
+  //     ultrasonido_pelvico: [false],
+  //     ultrasonido_tiroideo: [false],
+  //     ultrasonido_carotideo: [false],
+  //     ultrasonido_renal: [false],
+  //     ecocardiograma: [false],
 
-      // Tomografías
-      tomografia_cerebral: [false],
-      tomografia_torax: [false],
-      tomografia_abdomen: [false],
-      tomografia_contrastada: [false],
+  //     // Tomografías
+  //     tomografia_cerebral: [false],
+  //     tomografia_torax: [false],
+  //     tomografia_abdomen: [false],
+  //     tomografia_contrastada: [false],
 
-      // Resonancias
-      resonancia_cerebral: [false],
-      resonancia_columna: [false],
-      resonancia_articular: [false],
+  //     // Resonancias
+  //     resonancia_cerebral: [false],
+  //     resonancia_columna: [false],
+  //     resonancia_articular: [false],
 
-      // Estudios especiales
-      mamografia: [false],
-      densitometria_osea: [false],
+  //     // Estudios especiales
+  //     mamografia: [false],
+  //     densitometria_osea: [false],
 
-      // ===================================
-      // CAMPOS COMUNES PARA TODOS
-      // ===================================
+  //     // ===================================
+  //     // CAMPOS COMUNES PARA TODOS
+  //     // ===================================
 
-      // Otros estudios específicos
-      otros_estudios: [''],
+  //     // Otros estudios específicos
+  //     otros_estudios: [''],
 
-      // Información clínica (OBLIGATORIO)
-      indicacion_clinica: ['', [Validators.required]],
-      diagnostico_presuntivo: ['', [Validators.required]],
+  //     // Información clínica (OBLIGATORIO)
+  //     indicacion_clinica: ['', [Validators.required]],
+  //     diagnostico_presuntivo: ['', [Validators.required]],
 
-      // Configuración del estudio
-      urgencia: ['normal'], // normal, urgente, stat
-      ayuno_requerido: [false],
-      contraste_requerido: [false], // Para imagenología
-      sedacion_requerida: [false], // Para ciertos estudios
+  //     // Configuración del estudio
+  //     urgencia: ['normal'], // normal, urgente, stat
+  //     ayuno_requerido: [false],
+  //     contraste_requerido: [false], // Para imagenología
+  //     sedacion_requerida: [false], // Para ciertos estudios
 
-      // Fechas y observaciones
-      fecha_solicitud: [new Date().toISOString().split('T')[0], [Validators.required]],
-      fecha_programada: [''],
-      observaciones: [''],
+  //     // Fechas y observaciones
+  //     fecha_solicitud: [new Date().toISOString().split('T')[0], [Validators.required]],
+  //     fecha_programada: [''],
+  //     observaciones: [''],
 
-      // Médico solicitante
-      medico_solicitante: [''],
-      especialidad_solicitante: [''],
+  //     // Médico solicitante
+  //     medico_solicitante: [''],
+  //     especialidad_solicitante: [''],
 
-      // Guía clínica
-      id_guia_clinica: [''],
-    });
-  }
+  //     // Guía clínica
+  //     id_guia_clinica: [''],
+  //   });
+  // }
+
+
+
+private initializeSolicitudEstudioForm(): FormGroup {
+  const fechaHoy = new Date().toISOString().split('T')[0];
+  
+  return this.fb.group({
+    // TIPO DE SOLICITUD
+    tipo_estudio: ['', [Validators.required]],
+    
+    // DATOS BÁSICOS (comunes)
+    fecha_solicitud: [fechaHoy, [Validators.required]],
+    hora_solicitud: ['', [Validators.required]],
+    servicio_solicitante: ['', [Validators.required]],
+    numero_cama: [''],
+      // curp_paciente: [''],
+    urgencia: ['rutina', [Validators.required]],
+    
+    // CAMPOS ESPECÍFICOS PARA LABORATORIO
+    fecha_proxima_consulta: [''],
+    numero_intervencion_causes: [''],
+    
+    // ESTUDIOS DE LABORATORIO (HEMATOLOGÍA)
+    biometria_hematica: [false],
+    grupo_sanguineo: [false],
+    vel_sedimentacion: [false],
+    reticulocitos: [false],
+    frotis_sangre_gota: [false],
+    hemoglobina_glicosilada: [false],
+    
+    // INMUNOHEMATOLOGÍA
+    pruebas_cruzadas: [false],
+    coombs_directo: [false],
+    coombs_indirecto: [false],
+    
+    // COAGULACIÓN
+    tiempo_protrombina: [false],
+    tiempo_tromboplastina: [false],
+    fibrinogeno: [false],
+    
+    // BIOQUÍMICA CLÍNICA COMPLETA
+    tamiz_gestacional_50g: [false],
+    glucosa_postprandial: [false],
+    curva_tolerancia_glucosa: [false],
+    glucosa: [false],
+    urea: [false],
+    creatinina: [false],
+    acido_urico: [false],
+    colesterol_total: [false],
+    hdl_colesterol: [false],
+    perfil_lipidos: [false],
+    trigliceridos: [false],
+    bilirrubina_directa: [false],
+    bilirrubina_total: [false],
+    transaminasas: [false],
+    alt_tgp: [false],
+    fosfatasa_alcalina: [false],
+    proteinas_totales: [false],
+    albumina: [false],
+    amilasa: [false],
+    lipasa: [false],
+    calcio: [false],
+    fosforo: [false],
+    cloro: [false],
+    potasio: [false],
+    sodio: [false],
+    magnesio: [false],
+    
+    // PAQUETES
+    quimica_sanguinea_iii: [false],
+    quimica_sanguinea_iv: [false],
+    perfil_hepatico: [false],
+    perfil_quirurgico: [false],
+    perfil_reumatico: [false],
+    perfil_control_embarazo: [false],
+    
+    // URIANÁLISIS AMPLIADO
+    examen_general_orina: [false],
+    cloro_orina: [false],
+    potasio_orina: [false],
+    sodio_orina: [false],
+    microalbuminuria_24hrs: [false],
+    depuracion_creatinina: [false],
+    
+    // INMUNOLOGÍA AMPLIADA
+    reacciones_febriles: [false],
+    proteina_c_reactiva: [false],
+    factor_reumatoide: [false],
+    antiestreptolisinas: [false],
+    vdrl: [false],
+    antigeno_prostatico: [false],
+    rpr_sifilis: [false],
+    hgc_beta_serica: [false],
+    prueba_embarazo_orina: [false],
+    
+    // SEROLOGÍA
+    ac_hiv_1_2: [false],
+    
+    // PERFIL CARDÍACO
+    dhl: [false],
+    cpk: [false],
+    ck_mb: [false],
+    
+    // PARASITOLOGÍA
+    coproparasitoscopico_3: [false],
+    coproparasitoscopico_1: [false],
+    citologia_moco_fecal: [false],
+    coprologico: [false],
+    amiba_fresco: [false],
+    sangre_oculta_heces: [false],
+    azucares_reductores: [false],
+    rotavirus: [false],
+    
+    // Control de horarios (laboratorio)
+    hora_toma_muestra: [''],
+    hora_recepcion_muestra: [''],
+    hora_entrega_resultados: [''],
+    
+    // CAMPOS ESPECÍFICOS PARA IMAGENOLOGÍA
+    diagnostico_cie10: [''],
+    intervencion_causes: [''],
+    estudios_imagenologia: [''],
+    hora_recibe_camillero: [''],
+    hora_recibe_tecnico: [''],
+    
+    // MÉDICO SOLICITANTE (común)
+    // nombre_medico_solicitante: ['', [Validators.required]],
+    // cedula_medico_solicitante: ['', [Validators.required]],
+    
+    // INFORMACIÓN CLÍNICA (laboratorio)
+    indicacion_clinica: [''],
+    diagnostico_presuntivo: [''],
+    
+    // OTROS
+    otros_estudios: [''],
+    observaciones: ['']
+  });
+}
+private setupConditionalValidators(): void {
+  this.solicitudEstudioForm.get('tipo_estudio')?.valueChanges.subscribe(tipo => {
+    this.clearConditionalValidators();
+    
+    if (tipo === 'imagenologia') {
+      // Validaciones para imagenología
+      this.solicitudEstudioForm.get('diagnostico_cie10')?.setValidators([Validators.required]);
+      this.solicitudEstudioForm.get('estudios_imagenologia')?.setValidators([Validators.required]);
+    } else if (tipo === 'laboratorio') {
+      // Validaciones para laboratorio
+      this.solicitudEstudioForm.get('indicacion_clinica')?.setValidators([Validators.required]);
+      this.solicitudEstudioForm.get('diagnostico_presuntivo')?.setValidators([Validators.required]);
+    }
+    
+    this.solicitudEstudioForm.updateValueAndValidity();
+  });
+}
+
+private clearConditionalValidators(): void {
+  const fieldsToReset = [
+    'diagnostico_cie10', 'estudios_imagenologia', 
+    'indicacion_clinica', 'diagnostico_presuntivo'
+  ];
+  
+  fieldsToReset.forEach(field => {
+    this.solicitudEstudioForm.get(field)?.clearValidators();
+    this.solicitudEstudioForm.get(field)?.updateValueAndValidity();
+  });
+}
+
+
+
+
+
   private initializeSolicitudLaboratorioForm(): FormGroup {
     return this.fb.group({
       // Estudios de laboratorio más comunes
@@ -3723,10 +3897,10 @@ servicio_hospitalizacion: ['Cirugía General'],
       });
   }
 
-// ✅ AGREGAR ESTE NUEVO MÉTODO
+//   AGREGAR ESTE NUEVO MÉTODO
 // En perfil-paciente.ts
 private inicializarModoInteligente(): void {
-  // ✅ USAR 'capturaIngreso' consistentemente
+  //   USAR 'capturaIngreso' consistentemente
   this.modoInteligenteService.registrarFormulario('capturaIngreso', this.capturaIngresoForm);
   this.modoInteligenteService.registrarFormulario('historiaClinica', this.historiaClinicaForm);
   this.modoInteligenteService.registrarFormulario('notaUrgencias', this.notaUrgenciasForm);
@@ -3817,7 +3991,7 @@ private inicializarModoInteligente(): void {
         }
       });
 
-      console.log('✅ PDF de Alta Voluntaria generado correctamente');
+      console.log('  PDF de Alta Voluntaria generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
       this.error = 'Error al generar el PDF del alta voluntaria';
@@ -3860,7 +4034,7 @@ private inicializarModoInteligente(): void {
       orden: 2,
     },
     {
-      id: 'hojaFrontal', // ✅ AGREGADO
+      id: 'hojaFrontal', //   AGREGADO
       nombre: 'Hoja Frontal',
       descripcion: 'Portada del expediente clínico',
       icono: 'fas fa-folder',
@@ -3919,7 +4093,7 @@ private inicializarModoInteligente(): void {
     });
 
     window.addEventListener('online', () => {
-      this.hayProblemasConexion = false;
+        this.hayProblemasConexion = false;
       this.verificarConexion();
     });
 
@@ -3934,8 +4108,9 @@ private inicializarModoInteligente(): void {
       }
     });
 
-    // ✅ AGREGAR AL FINAL DEL ngOnInit
+    //   AGREGAR AL FINAL DEL ngOnInit
   this.inicializarModoInteligente();
+  this.setupConditionalValidators()
   }
 
   ngOnDestroy(): void {
@@ -3968,7 +4143,7 @@ private inicializarModoInteligente(): void {
           : 'Historia Clínica guardada correctamente';
         break;
 
-      case 'hojaFrontal': // ✅ CASO CORREGIDO
+      case 'hojaFrontal': //   CASO CORREGIDO
         await this.guardarHojaFrontal();
         this.formularioEstado['hojaFrontal'] = true;
         this.success = 'Hoja Frontal guardada correctamente';
@@ -4045,13 +4220,13 @@ private inicializarModoInteligente(): void {
         throw new Error('Tipo de formulario no válido');
     }
 
-    // ✅ MOSTRAR CONFIRMACIÓN PARA HOJA FRONTAL TAMBIÉN
+    //   MOSTRAR CONFIRMACIÓN PARA HOJA FRONTAL TAMBIÉN
     if (this.formularioActivo !== 'signosVitales' && this.formularioActivo !== null) {
       this.mostrarConfirmacionPDF(this.getTituloFormulario(this.formularioActivo));
     }
 
     localStorage.removeItem(`perfil_paciente_${this.pacienteId}`);
-    console.log('✅ Formulario completado:', this.formularioActivo);
+    console.log('  Formulario completado:', this.formularioActivo);
 
     this.cargarDatosPaciente().subscribe((data) => {
       this.construirPacienteCompleto(data);
@@ -4123,7 +4298,7 @@ case 'Evolución':
   });
   break;
 
-      // ✅ AGREGAR CASOS PARA HOJA FRONTAL
+      //   AGREGAR CASOS PARA HOJA FRONTAL
       case 'hojaFrontal':
       case 'Hoja Frontal':
       case 'Hoja Frontal de Expediente':
@@ -4163,7 +4338,7 @@ case 'Evolución':
           notaPreanestesica: {
             ...this.notaPreanestesicaForm.value,
             folio_preanestesico: this.generarFolioPreanestesico(),
-            imc_calculado: this.imcCalculado || this.calcularIMC()  // ✅ USAR PROPIEDAD CALCULADA
+            imc_calculado: this.imcCalculado || this.calcularIMC()  //   USAR PROPIEDAD CALCULADA
           }
         });
         break;
@@ -4289,7 +4464,7 @@ case 'consentimiento':
     }
 
     this.success = `PDF de ${tipoDocumento} generado exitosamente`;
-    console.log(`✅ PDF de ${tipoDocumento} creado correctamente`);
+    console.log(`  PDF de ${tipoDocumento} creado correctamente`);
     setTimeout(() => { this.success = ''; }, 5000);
   } catch (error) {
     console.error('❌ Error al generar PDF:', error);
@@ -4368,11 +4543,11 @@ private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
       expediente: this.pacienteCompleto?.expediente,
       solicitudEstudio: {
         ...this.solicitudEstudioForm.value,
-        estudios_solicitados: this.construirEstudiosSeleccionados() // ✅ Sin parámetro
+        estudios_solicitados: this.construirEstudiosSeleccionados() //   Sin parámetro
       }
     });
 
-    console.log(`✅ PDF de Solicitud de ${tipoEstudio} generado correctamente`);
+    console.log(`  PDF de Solicitud de ${tipoEstudio} generado correctamente`);
   } catch (error) {
     console.error('❌ Error al generar PDF:', error);
     this.error = 'Error al generar el PDF de la solicitud';
@@ -4739,7 +4914,7 @@ private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
         this.presentacionesDisponibles = presentacionesResponse.data || [];
       }
 
-      console.log('✅ Catálogos de medicamentos cargados:', {
+      console.log('  Catálogos de medicamentos cargados:', {
         medicamentos: this.medicamentosDisponibles.length,
         masPrescitos: this.medicamentosMasPrescitos.length,
         grupos: this.gruposTerapeuticos.length
@@ -4817,7 +4992,7 @@ agregarGuiaClinica(guia: GuiaClinica): void {
   // 🔥 LIMPIAR LA BÚSQUEDA Y CERRAR DROPDOWN
   this.limpiarBusquedaGuia();
   
-  console.log('✅ Guía agregada. Total guías:', this.guiasClinicasSeleccionadas.length);
+  console.log('  Guía agregada. Total guías:', this.guiasClinicasSeleccionadas.length);
 }
 
   eliminarGuiaClinica(guia: GuiaClinica): void {
@@ -4853,7 +5028,7 @@ agregarGuiaClinica(guia: GuiaClinica): void {
     }
     
     // 🔥 MOSTRAR FEEDBACK VISUAL
-    console.log('✅ Guía eliminada. Guías restantes:', this.guiasClinicasSeleccionadas.length);
+    console.log('  Guía eliminada. Guías restantes:', this.guiasClinicasSeleccionadas.length);
     
     // Opcional: Mostrar mensaje temporal
     if (this.guiasClinicasSeleccionadas.length === 0) {
@@ -5089,7 +5264,7 @@ agregarGuiaClinica(guia: GuiaClinica): void {
   // }
 // Modificar el método para que no necesite parámetro
 private construirEstudiosSeleccionados(): string {
-  const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio || 'laboratorio'; // ✅ Obtener desde el formulario
+  const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio || 'laboratorio'; //   Obtener desde el formulario
   const form = this.solicitudEstudioForm.value;
   const estudios: string[] = [];
   
@@ -5244,7 +5419,7 @@ private sincronizarSignosVitalesAutomatico(): void {
   // Actualizar formulario principal sin triggear eventos infinitos
   this.signosVitalesForm.patchValue(valoresParaSincronizar, { emitEvent: false });
   
-  console.log('✅ Signos vitales sincronizados automáticamente');
+  console.log('  Signos vitales sincronizados automáticamente');
 }
 
 private validarRangosSignosVitales(): void {
@@ -5891,7 +6066,7 @@ getPresionArterialMedia(): number | null {
       'Nota Preoperatoria': 'fas fa-procedures',
       'Nota Postoperatoria': 'fas fa-band-aid',
       'Nota de Egreso': 'fas fa-sign-out-alt',
-      'Hoja Frontal': 'fas fa-folder', // ✅ AGREGADO
+      'Hoja Frontal': 'fas fa-folder', //   AGREGADO
     };
     return iconos[nombre] || 'fas fa-file-alt';
   }
@@ -5905,7 +6080,7 @@ getPresionArterialMedia(): number | null {
       'Nota Preoperatoria': 'orange',
       'Nota Postoperatoria': 'indigo',
       'Nota de Egreso': 'indigo',
-      'Hoja Frontal': 'gray', // ✅ AGREGADO
+      'Hoja Frontal': 'gray', //   AGREGADO
     };
     return colores[nombre] || 'gray';
   }
@@ -6002,22 +6177,22 @@ getPresionArterialMedia(): number | null {
 
     switch (formulario) {
       case 'signosVitales':
-        return true; // ✅ Siempre disponible
+        return true; //   Siempre disponible
 
       case 'historiaClinica':
-        // return this.formularioEstado.signosVitales; // ✅ Requiere signos vitales iniciales
+        // return this.formularioEstado.signosVitales; //   Requiere signos vitales iniciales
 return this.capturaIngresoForm?.valid || false;
       case 'hojaFrontal':
-        return true; // ✅ Siempre disponible
+        return true; //   Siempre disponible
 
       case 'notaUrgencias':
       case 'notaEvolucion':
       case 'prescripcionMedicamento':
       case 'solicitudEstudio':
-        return true; // ✅ ACCESO LIBRE - Son documentos independientes
+        return true; //   ACCESO LIBRE - Son documentos independientes
 
       default:
-        return true; // ✅ Por defecto, acceso libre
+        return true; //   Por defecto, acceso libre
     }
   }
 
@@ -6172,7 +6347,7 @@ propagarDatosIngreso(): void {
 
 
 
-    console.log('✅ Datos propagados correctamente a Historia Clínica');
+    console.log('  Datos propagados correctamente a Historia Clínica');
     this.mostrarExito('Datos propagados correctamente a Historia Clínica y otros documentos');
     
   } catch (error) {
@@ -6226,7 +6401,7 @@ aplicarSignosVitalesDeIngreso(): void {
     glucosa: signosIngreso.glucosa
   });
 
-  this.mostrarExito('✅ Signos vitales de ingreso aplicados como punto de partida');
+  this.mostrarExito('  Signos vitales de ingreso aplicados como punto de partida');
 }
 
 // 🔥 MÉTODOS PARA MOSTRAR CAMBIOS EN PRESIÓN ARTERIAL
@@ -6384,7 +6559,7 @@ sincronizarSignosVitales(): void {
   // Aquí podrías hacer la sincronización real con el backend
   console.log('🔄 Sincronizando signos vitales:', signosActuales);
   
-  this.mostrarExito('✅ Signos vitales sincronizados con el historial principal del paciente');
+  this.mostrarExito('  Signos vitales sincronizados con el historial principal del paciente');
 }
 
 
@@ -6452,10 +6627,10 @@ sincronizarSignosVitales(): void {
 
 //     // 🔥 CREAR TÍTULO PERSONALIZADO SEGÚN SERVICIO
 //     const tituloServicio = `NOTA EVOLUCIÓN - ${servicio.toUpperCase()}`;
-//     console.log('✅ Título generado:', tituloServicio);
+//     console.log('  Título generado:', tituloServicio);
 
-//     this.mostrarExito(`✅ Datos propagados exitosamente a las notas de ${servicio}`);
-//     console.log('✅ Propagación de evolución completada exitosamente');
+//     this.mostrarExito(`  Datos propagados exitosamente a las notas de ${servicio}`);
+//     console.log('  Propagación de evolución completada exitosamente');
 
 //   } catch (error) {
 //     console.error('❌ Error al propagar datos de evolución:', error);
@@ -6515,8 +6690,8 @@ sincronizarSignosVitales(): void {
 //       indicaciones_medicas: datos.indicaciones_medicas
 //     });
 
-//     console.log('✅ Datos propagados correctamente a Nota de Evolución');
-//     this.mostrarExito('✅ Datos propagados correctamente a Nota de Evolución');
+//     console.log('  Datos propagados correctamente a Nota de Evolución');
+//     this.mostrarExito('  Datos propagados correctamente a Nota de Evolución');
     
 //   } catch (error) {
 //     console.error('❌ Error propagando datos de evolución:', error);
@@ -6580,8 +6755,8 @@ propagarDatosEvolucion(): void {
 
     });
 
-    console.log('✅ Datos propagados correctamente a Nota de Evolución');
-    this.mostrarExito('✅ Datos propagados correctamente a Nota de Evolución');
+    console.log('  Datos propagados correctamente a Nota de Evolución');
+    this.mostrarExito('  Datos propagados correctamente a Nota de Evolución');
     console.log('🔧 VERIFICACIÓN - Datos propagados:');
 console.log('- Servicio destino:', datos.servicio_destino);
 console.log('- Cama seleccionada:', this.camaSeleccionada);
@@ -6619,7 +6794,7 @@ aplicarSignosVitalesDeEvolucion(): void {
     talla_actual: signosEvolucion.talla_actual
   });
 
-  this.mostrarExito('✅ Signos vitales de evolución aplicados correctamente');
+  this.mostrarExito('  Signos vitales de evolución aplicados correctamente');
 }
 
 // 🔥 VERIFICAR SI HAY SIGNOS VITALES DE EVOLUCIÓN
@@ -6682,8 +6857,8 @@ guardarCapturaEvolucion(): void {
   setTimeout(() => {
     this.formularioEstado.capturaEvolucion = true;
     this.isCreatingDocument = false;
-    this.mostrarExito('✅ Captura de evolución guardada correctamente');
-    console.log('✅ Captura de evolución guardada:', datos);
+    this.mostrarExito('  Captura de evolución guardada correctamente');
+    console.log('  Captura de evolución guardada:', datos);
   }, 1000);
 }
 
@@ -6797,7 +6972,7 @@ private initializeCapturaIngresoForm(): FormGroup {
     padecimiento_actual: ['', Validators.required],
     sintomas_generales: [''],
     
-    // ✅ SIGNOS VITALES ÚNICOS CON VALIDACIONES CORRECTAS
+    //   SIGNOS VITALES ÚNICOS CON VALIDACIONES CORRECTAS
     presion_arterial_sistolica: [null, Validators.required],
     presion_arterial_diastolica: [null, Validators.required], 
     frecuencia_cardiaca: [null, Validators.required],
@@ -7087,7 +7262,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
 
       this.signosVitalesForm.patchValue(datos.signosVitales || {});
       this.historiaClinicaForm.patchValue(datos.historiaClinica || {});
-      this.hojaFrontalForm?.patchValue(datos.hojaFrontal || {}); // ✅ AGREGADO
+      this.hojaFrontalForm?.patchValue(datos.hojaFrontal || {}); //   AGREGADO
       this.notaUrgenciasForm.patchValue(datos.notaUrgencias || {});
       this.notaEvolucionForm.patchValue(datos.notaEvolucion || {});
       this.consentimientoForm.patchValue(datos.consentimiento || {});
@@ -7127,7 +7302,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
     return [
       this.signosVitalesForm,
       this.historiaClinicaForm,
-      this.hojaFrontalForm, // ✅ AGREGADO
+      this.hojaFrontalForm, //   AGREGADO
       this.notaUrgenciasForm,
       this.notaEvolucionForm,
       this.consentimientoForm,
@@ -7206,7 +7381,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
       // Resetear todos los formularios
       this.signosVitalesForm.reset();
       this.historiaClinicaForm.reset();
-      this.hojaFrontalForm?.reset(); // ✅ AGREGADO
+      this.hojaFrontalForm?.reset(); //   AGREGADO
       this.notaUrgenciasForm.reset();
       this.notaEvolucionForm.reset();
           this.capturaEvolucionForm.reset(); // 🔥 AGREGAR ESTA LÍNEA
@@ -7241,7 +7416,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
         case 'historiaClinica':
           this.historiaClinicaForm.reset();
           break;
-        case 'hojaFrontal': // ✅ AGREGADO
+        case 'hojaFrontal': //   AGREGADO
           this.hojaFrontalForm.reset();
           break;
         case 'notaUrgencias':
@@ -7523,7 +7698,7 @@ getGruposVisibles(): any[] {
       data: {
         nombre: 'Documentos Principales',
         icono: 'fas fa-star',
-        color: 'blue', // ✅ Azul - color principal
+        color: 'blue', //   Azul - color principal
         formularios: ['signosVitales', 'historiaClinica', 'hojaFrontal', 'notaInterconsulta', 'notaEgreso']
       }
     },
@@ -7532,7 +7707,7 @@ getGruposVisibles(): any[] {
       data: {
         nombre: 'Documentos Clínicos',
         icono: 'fas fa-file-medical',
-        color: 'green', // ✅ Verde - color médico clásico
+        color: 'green', //   Verde - color médico clásico
         formularios: ['notaUrgencias', 'notaEvolucion']
       }
     },
@@ -7541,7 +7716,7 @@ getGruposVisibles(): any[] {
       data: {
         nombre: 'Documentos Quirúrgicos',
         icono: 'fas fa-user-md',
-        color: 'red', // ✅ CAMBIADO - rojo para quirúrgicos (más impactante)
+        color: 'red', //   CAMBIADO - rojo para quirúrgicos (más impactante)
         formularios: ['notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica']
       }
     },
@@ -7550,7 +7725,7 @@ getGruposVisibles(): any[] {
       data: {
         nombre: 'Solicitudes de Estudios',
         icono: 'fas fa-microscope',
-        color: 'teal', // ✅ CAMBIADO - teal para diferenciarlo
+        color: 'teal', //   CAMBIADO - teal para diferenciarlo
         formularios: ['solicitudEstudio']
       }
     },
@@ -7559,7 +7734,7 @@ getGruposVisibles(): any[] {
       data: {
         nombre: 'Documentos Administrativos',
         icono: 'fas fa-folder-open',
-        color: 'indigo', // ✅ CAMBIADO - indigo para documentos administrativos
+        color: 'indigo', //   CAMBIADO - indigo para documentos administrativos
         formularios: ['referenciaTraslado', 'altaVoluntaria', 'consentimiento']
       }
     }
@@ -7574,7 +7749,7 @@ getGruposVisibles(): any[] {
     return formularios
       .filter(key => this.configFormularios[key]) // Solo formularios que existen
       .map(key => ({
-        key: key,  // ✅ ASEGURAR QUE EXISTE LA PROPIEDAD KEY
+        key: key,  //   ASEGURAR QUE EXISTE LA PROPIEDAD KEY
         ...this.configFormularios[key]
       }));
   }
@@ -7639,7 +7814,7 @@ getGruposVisibles(): any[] {
     }
   });
   
-  console.log('✅ Cama limpiada de todos los formularios');
+  console.log('  Cama limpiada de todos los formularios');
 }
 
   seleccionarCama(cama: any): void {
@@ -7692,7 +7867,7 @@ getGruposVisibles(): any[] {
     }
   });
   
-  console.log('✅ Cama sincronizada con formularios:', {
+  console.log('  Cama sincronizada con formularios:', {
     cama: numeroCama,
     id_cama: cama.id_cama,
     area: cama.area,
@@ -7745,7 +7920,7 @@ private crearFormularioHojaFrontal(): FormGroup {
     nacionalidad: ['Mexicana'],
     grupo_etnico: [''],
     lengua_indigena: [''],
-    telefono_secundario: [''], // ✅ Acceso directo, no con bracket notation aquí
+    telefono_secundario: [''], //   Acceso directo, no con bracket notation aquí
     email: ['', [Validators.email]],
 
     // Datos socioeconómicos
@@ -7759,7 +7934,7 @@ private crearFormularioHojaFrontal(): FormGroup {
     numero_afiliacion: [''],
     nss: ['', [Validators.minLength(11), Validators.maxLength(11)]],
 
-    // ✅ GRUPOS ANIDADOS CORRECTOS
+    //   GRUPOS ANIDADOS CORRECTOS
     contacto_emergencia_1: this.fb.group({
       nombre_completo: ['', [Validators.required]],
       parentesco: ['', [Validators.required]],
@@ -7801,7 +7976,7 @@ private crearFormularioHojaFrontal(): FormGroup {
 validarFormularioHojaFrontal(): void {
   if (!this.hojaFrontalForm.valid) {
     this.marcarCamposComoTocados(this.hojaFrontalForm);
-    this.error = 'Por favor, complete todos los campos obligatorios'; // ✅ USAR this.error en lugar de mostrarError()
+    this.error = 'Por favor, complete todos los campos obligatorios'; //   USAR this.error en lugar de mostrarError()
     return;
   }
 
@@ -7810,22 +7985,22 @@ validarFormularioHojaFrontal(): void {
 
   if (!resultadoValidacion.valido) {
     let mensaje = 'Errores encontrados:\n';
-    resultadoValidacion.errores.forEach((error: string) => { // ✅ TIPAR PARÁMETRO
+    resultadoValidacion.errores.forEach((error: string) => { //   TIPAR PARÁMETRO
       mensaje += `• ${error}\n`;
     });
-    this.error = mensaje; // ✅ USAR this.error en lugar de mostrarError()
+    this.error = mensaje; //   USAR this.error en lugar de mostrarError()
     return;
   }
 
   if (resultadoValidacion.advertencias.length > 0) {
     let mensaje = 'Advertencias:\n';
-    resultadoValidacion.advertencias.forEach((advertencia: string) => { // ✅ TIPAR PARÁMETRO
+    resultadoValidacion.advertencias.forEach((advertencia: string) => { //   TIPAR PARÁMETRO
       mensaje += `• ${advertencia}\n`;
     });
     this.mostrarAdvertencia(mensaje);
   }
 
-  this.success = `Formulario validado correctamente (${resultadoValidacion.porcentaje_completitud}% completo)`; // ✅ USAR this.success
+  this.success = `Formulario validado correctamente (${resultadoValidacion.porcentaje_completitud}% completo)`; //   USAR this.success
 }
 
 private mostrarExito(mensaje: string): void {
@@ -7877,7 +8052,7 @@ async guardarHojaFrontal(): Promise<void> {
       await this.crearDocumentoClinicoPadre('Hoja Frontal');
     }
 
-    // ✅ Estructurar datos correctamente
+    //   Estructurar datos correctamente
     const hojaFrontalData = {
       id_documento: this.documentoClinicoActual!,
       id_expediente: this.pacienteCompleto.expediente.id_expediente,
@@ -7898,7 +8073,7 @@ async guardarHojaFrontal(): Promise<void> {
     // Simular guardado exitoso (aquí integrarías con tu servicio)
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    this.success = '✅ Hoja Frontal guardada correctamente';
+    this.success = '  Hoja Frontal guardada correctamente';
     this.formularioEstado.hojaFrontal = true;
 
     // ❌ QUITAR ESTA LÍNEA - NO GENERAR PDF AUTOMÁTICAMENTE
@@ -7929,7 +8104,7 @@ private prellenarDatosHojaFrontal(): void {
   const personaData = this.pacienteCompleto.persona || {};
 
   const datosExistentes = {
-    // ✅ USAR BRACKET NOTATION para propiedades con índice signature
+    //   USAR BRACKET NOTATION para propiedades con índice signature
     lugar_nacimiento: personaData.lugar_nacimiento || pacienteData.lugar_nacimiento || '',
     telefono_secundario: personaData['telefono_secundario'] || pacienteData['telefono_secundario'] || '',
     email: personaData.correo_electronico || pacienteData['email'] || '',
@@ -8046,7 +8221,7 @@ async verificarCompletitudNOM004(): Promise<void> {
 
     if (response?.success) {
       this.completitudNOM004 = response.data;
-      console.log('✅ Completitud NOM-004:', this.completitudNOM004);
+      console.log('  Completitud NOM-004:', this.completitudNOM004);
     }
 
   } catch (error) {
@@ -8082,7 +8257,7 @@ async generarCaratula(): Promise<void> {
       window.URL.revokeObjectURL(url);
       
       this.success = 'Carátula generada exitosamente';
-      console.log('✅ Carátula generada exitosamente');
+      console.log('  Carátula generada exitosamente');
     }
 
   } catch (error) {
