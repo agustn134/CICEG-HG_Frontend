@@ -1391,7 +1391,7 @@ private validarCumplimientoHojaFrontal(datos: any, medico: any, paciente: any): 
  if (porcentaje < 85) {
    console.warn('⚠️ ADVERTENCIA: Cumplimiento por debajo del 85%');
  } else {
-   console.log('✅ HOJA FRONTAL CUMPLE CON NOM-004 SECCIÓN 5.18');
+   console.log('   HOJA FRONTAL CUMPLE CON NOM-004 SECCIÓN 5.18');
  }
 }
 

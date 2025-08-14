@@ -247,7 +247,7 @@
 
           <!-- Retroalimentación -->
           <div *ngIf="showTriviaAnswer" class="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <p *ngIf="isCorrectAnswer" class="text-green-700 font-medium">¡Correcto! +{{ getCurrentTriviaPoints() }} puntos 🎉</p>
+            <p *ngIf="isCorrectAnswer" class="text-green-700 font-medium">¡Correcto! +{{ getCurrentTriviaPoints() }} puntos   </p>
             <p *ngIf="!isCorrectAnswer" class="text-red-700 font-medium">Incorrecto. La respuesta correcta era: <strong>{{ currentTrivia.correct_answer }}</strong></p>
             <button (click)="obtenerNuevaTrivia()" class="mt-3 bg-rose-500 hover:bg-rose-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
               Siguiente Pregunta

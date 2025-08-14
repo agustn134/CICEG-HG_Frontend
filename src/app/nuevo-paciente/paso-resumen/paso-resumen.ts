@@ -209,7 +209,7 @@ export class PasoResumen implements OnInit, OnDestroy {
   // ==========================================
 
   finalizarProceso(): void {
-    console.log('🎉 Finalizando proceso del wizard...');
+    console.log('   Finalizando proceso del wizard...');
 
     this.isLoading = true;
     this.estadoProceso = 'finalizando';
@@ -224,9 +224,9 @@ export class PasoResumen implements OnInit, OnDestroy {
       setTimeout(() => {
         this.isLoading = false;
         this.estadoProceso = 'completado';
-        this.autoGuardadoStatus = '🎉 ¡Expediente creado exitosamente!';
+        this.autoGuardadoStatus = '   ¡Expediente creado exitosamente!';
 
-        console.log('🎉 Proceso completado exitosamente');
+        console.log('   Proceso completado exitosamente');
         console.log('  Resumen final:', this.resumen);
 
         // Navegar al dashboard después de un momento

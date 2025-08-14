@@ -319,7 +319,7 @@ mostrarFormularioCrear(): void {
   this.personalEnEdicion = null;
   this.personalForm.reset();
   
-  // ✅ RESTAURAR VALIDACIONES DE CREDENCIALES EN MODO CREACIÓN
+  //    RESTAURAR VALIDACIONES DE CREDENCIALES EN MODO CREACIÓN
   this.personalForm.get('usuario')?.setValidators([Validators.required, Validators.minLength(3)]);
   this.personalForm.get('password_texto')?.setValidators([Validators.required, Validators.minLength(6)]);
   this.personalForm.get('usuario')?.updateValueAndValidity();
@@ -339,7 +339,7 @@ mostrarFormularioEditar(personal: PersonalMedico): void {
   this.isEditMode = true;
   this.personalEnEdicion = personal;
 
-  // ✅ REMOVER VALIDACIONES DE CREDENCIALES EN MODO EDICIÓN
+  //    REMOVER VALIDACIONES DE CREDENCIALES EN MODO EDICIÓN
   this.personalForm.get('usuario')?.clearValidators();
   this.personalForm.get('password_texto')?.clearValidators();
   this.personalForm.get('usuario')?.updateValueAndValidity();
@@ -375,7 +375,7 @@ cerrarModal(): void {
   this.isEditMode = false;
   this.personalEnEdicion = null;
   
-  // ✅ RESTAURAR VALIDACIONES ORIGINALES AL CERRAR
+  //    RESTAURAR VALIDACIONES ORIGINALES AL CERRAR
   this.personalForm.get('usuario')?.setValidators([Validators.required, Validators.minLength(3)]);
   this.personalForm.get('password_texto')?.setValidators([Validators.minLength(6)]); // Sin required para permitir crear sin password si es necesario
   this.personalForm.get('usuario')?.updateValueAndValidity();

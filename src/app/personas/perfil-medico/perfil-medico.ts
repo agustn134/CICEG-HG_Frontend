@@ -127,7 +127,7 @@ export class PerfilMedico implements OnInit, OnDestroy {
     if (response?.success) {
       // Actualizar la foto local
       this.medicoCompleto.foto = this.nuevaFotoUrl || undefined;
-      console.log('✅ Foto actualizada:', this.nuevaFotoUrl);
+      console.log('   Foto actualizada:', this.nuevaFotoUrl);
     } else {
       throw new Error(response?.message || 'Error al guardar foto');
     }

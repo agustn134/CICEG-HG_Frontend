@@ -6,7 +6,7 @@ export interface CampoCompartido {
   jerarquia: number; // 1 = mayor prioridad
   fuente?: string;
   valor?: any;
-  completado?: boolean; // ✅ OPCIONAL para evitar el error
+  completado?: boolean; //    OPCIONAL para evitar el error
    campoOrigen?: string;
 }
 
@@ -350,7 +350,7 @@ export const CAMPOS_COMPARTIDOS: CampoCompartido[] = [
 ];
 
 export const JERARQUIA_FORMULARIOS: { [key: string]: number } = {
-  'capturaIngreso': 1,     // ✅ Mayor prioridad
+  'capturaIngreso': 1,     //    Mayor prioridad
   'historiaClinica': 2,
   'notaUrgencias': 3,
   'notaEvolucion': 4,

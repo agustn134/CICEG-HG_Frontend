@@ -54,7 +54,7 @@
     <!-- Status del proceso -->
     <div *ngIf="autoGuardadoStatus" class="mt-3 p-3 rounded-md"
          [ngClass]="{
-           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('🎉') || autoGuardadoStatus.includes(' '),
+           'bg-green-50 border border-green-200 text-green-800': autoGuardadoStatus.includes('  ') || autoGuardadoStatus.includes(' '),
            'bg-blue-50 border border-blue-200 text-blue-800': autoGuardadoStatus.includes('Finalizando'),
            'bg-red-50 border border-red-200 text-red-800': autoGuardadoStatus.includes('❌')
          }">

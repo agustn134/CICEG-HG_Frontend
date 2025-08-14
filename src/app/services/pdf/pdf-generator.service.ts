@@ -233,7 +233,7 @@ export class PdfGeneratorService {
           documentDefinition = await this.pdfTemplatesService.generarNotaInterconsulta(datosParaTemplate);
           break;
 
-        // ✅ AGREGAR ESTE CASO SIMPLE:
+        //    AGREGAR ESTE CASO SIMPLE:
         case 'Nota de Egreso':
         case 'notaEgreso':
           documentDefinition = await this.pdfTemplatesService.generarNotaEgreso(datosParaTemplate);
@@ -251,7 +251,7 @@ export class PdfGeneratorService {
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log(`✅ ${tipoDocumento} generado exitosamente`);
+      console.log(`   ${tipoDocumento} generado exitosamente`);
     } catch (error) {
       console.error(`❌ Error generando ${tipoDocumento}:`, error);
       throw error;
@@ -525,7 +525,7 @@ private obtenerSignosVitalesReales(datos: any): any {
 
   // 🔥 NUEVA PRIORIDAD 1: Buscar en Historia Clínica PRIMERO (datos propagados)
   if (datos.historiaClinica) {
-    console.log('✅ Encontrados signos vitales en Historia Clínica (datos propagados)');
+    console.log('   Encontrados signos vitales en Historia Clínica (datos propagados)');
     signosVitales = {
       ...signosVitales,
       peso: datos.historiaClinica.peso || null,
@@ -543,7 +543,7 @@ private obtenerSignosVitalesReales(datos: any): any {
 
   // 🔥 PRIORIDAD 2: Si no hay en Historia Clínica, buscar en signosVitales
   if (datos.signosVitales && Object.values(signosVitales).every(v => v === null)) {
-    console.log('✅ Usando signos vitales de datos.signosVitales');
+    console.log('   Usando signos vitales de datos.signosVitales');
     signosVitales = {
       ...signosVitales,
       ...Object.fromEntries(
@@ -559,7 +559,7 @@ private obtenerSignosVitalesReales(datos: any): any {
   if (datos.paciente?.signosVitales && Array.isArray(datos.paciente.signosVitales) && 
       datos.paciente.signosVitales.length > 0 && 
       Object.values(signosVitales).every(v => v === null)) {
-    console.log('✅ Usando signos vitales históricos del paciente');
+    console.log('   Usando signos vitales históricos del paciente');
     const ultimosSignos = datos.paciente.signosVitales[0];
     signosVitales = {
       ...signosVitales,
@@ -692,7 +692,7 @@ private formatearDireccionMejorada(paciente: any): string {
   
   if (!paciente) return 'Sin dirección registrada';
   
-  // ✅ USAR BRACKET NOTATION para propiedades con índice signature
+  //    USAR BRACKET NOTATION para propiedades con índice signature
   const domicilio =
     paciente.domicilio ||
     paciente.direccion ||
@@ -811,7 +811,7 @@ private formatearDireccionMejorada(paciente: any): string {
       };
 
       this.isLoaded = true;
-      console.log('✅ PDFMake cargado correctamente en PdfGeneratorService');
+      console.log('   PDFMake cargado correctamente en PdfGeneratorService');
     } catch (error) {
       console.error('❌ Error al cargar PDFMake:', error);
       throw error;
@@ -1552,7 +1552,7 @@ private formatearDireccionMejorada(paciente: any): string {
 
       // 1. Obtener y procesar datos (responsabilidad del generador)
       const medicoCompleto = await this.obtenerDatosMedicoActual();
-      // ✅ CAMBIO CRÍTICO: NO procesar de nuevo, usar los datos ya estructurados
+      //    CAMBIO CRÍTICO: NO procesar de nuevo, usar los datos ya estructurados
       const pacienteCompleto = datos.paciente; // Los datos YA vienen procesados correctamente
       const configuracion = await this.configuracionService.getConfiguracionCompleta().toPromise();
       const signosVitalesReales = this.obtenerSignosVitalesReales(datos); // 🔥 LÍNEA SEPARADA
@@ -1575,7 +1575,7 @@ private formatearDireccionMejorada(paciente: any): string {
   configuracion,
 };
 
-      // ✅ DEBUG: Verificar que los datos llegan correctamente
+      //    DEBUG: Verificar que los datos llegan correctamente
       console.log('  Datos del paciente que van al template:', pacienteCompleto);
       console.log('🏠 Domicilio del paciente:', pacienteCompleto.domicilio);
       console.log('🩸 Tipo de sangre:', pacienteCompleto.tipo_sangre);
@@ -1597,14 +1597,14 @@ private formatearDireccionMejorada(paciente: any): string {
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Historia Clínica Pediátrica NOM-004 generado exitosamente');
+      console.log('   PDF de Historia Clínica Pediátrica NOM-004 generado exitosamente');
       console.log(`📄 Archivo: ${nombreArchivo}`);
 
       // 6. Validaciones normativas
       this.validarCumplimientoNOM004(datos, medicoCompleto, pacienteCompleto);
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
-      // ✅ MOSTRAR DETALLES DEL ERROR
+      //    MOSTRAR DETALLES DEL ERROR
       if (error instanceof Error) {
         console.error('Stack trace:', error.stack);
       }
@@ -1639,7 +1639,7 @@ private formatearDireccionMejorada(paciente: any): string {
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+      console.log('   PDF de Hoja Frontal de Expediente generado exitosamente');
 
     } catch (error) {
       console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
@@ -1674,7 +1674,7 @@ private formatearDireccionMejorada(paciente: any): string {
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+      console.log('   PDF de Prescripción de Medicamentos generado exitosamente');
 
     } catch (error) {
       console.error('❌ Error al generar PDF de Prescripción:', error);
@@ -1710,7 +1710,7 @@ private formatearDireccionMejorada(paciente: any): string {
       const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
       pdfDocGenerator.download(nombreArchivo);
 
-      console.log('✅ PDF de Nota de Urgencias generado exitosamente');
+      console.log('   PDF de Nota de Urgencias generado exitosamente');
 
     } catch (error) {
       console.error('❌ Error al generar PDF de Nota de Urgencias:', error);
@@ -1745,7 +1745,7 @@ private formatearDireccionMejorada(paciente: any): string {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Evolución generado exitosamente');
+    console.log('   PDF de Nota de Evolución generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Nota de Evolución:', error);

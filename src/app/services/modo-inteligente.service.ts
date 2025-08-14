@@ -26,11 +26,11 @@ export class ModoInteligenteService {
     const campo = CAMPOS_COMPARTIDOS.find(c => c.nombre === nombreCampo);
     if (!campo) return false;
 
-    // ✅ CORRECCIÓN: Usar as any o verificar existencia
+    //    CORRECCIÓN: Usar as any o verificar existencia
     const jerarquiaActual = (JERARQUIA_FORMULARIOS as any)[formularioActual] || 999;
     
     for (const formularioNombre of campo.formularios) {
-      // ✅ CORRECCIÓN: Usar as any o verificar existencia
+      //    CORRECCIÓN: Usar as any o verificar existencia
       const jerarquiaFormulario = (JERARQUIA_FORMULARIOS as any)[formularioNombre] || 999;
       
       // Solo revisar formularios de mayor jerarquía (menor número)
@@ -50,14 +50,14 @@ export class ModoInteligenteService {
     const campo = CAMPOS_COMPARTIDOS.find(c => c.nombre === nombreCampo);
     if (!campo) return null;
 
-    // ✅ CORRECCIÓN: Usar as any
+    //    CORRECCIÓN: Usar as any
     const jerarquiaActual = (JERARQUIA_FORMULARIOS as any)[formularioActual] || 999;
     let mejorValor: any = null;
     let mejorFuente = '';
     let mejorJerarquia = 999;
 
     for (const formularioNombre of campo.formularios) {
-      // ✅ CORRECCIÓN: Usar as any
+      //    CORRECCIÓN: Usar as any
       const jerarquiaFormulario = (JERARQUIA_FORMULARIOS as any)[formularioNombre] || 999;
       
       if (jerarquiaFormulario < jerarquiaActual && jerarquiaFormulario < mejorJerarquia) {
@@ -94,7 +94,7 @@ export class ModoInteligenteService {
         // Propagar a todos los demás formularios de menor jerarquía
         campo.formularios.forEach(formularioDestino => {
           if (formularioDestino !== formularioOrigen) {
-            // ✅ CORRECCIÓN: Usar as any
+            //    CORRECCIÓN: Usar as any
             const jerarquiaOrigen = (JERARQUIA_FORMULARIOS as any)[formularioOrigen] || 999;
             const jerarquiaDestino = (JERARQUIA_FORMULARIOS as any)[formularioDestino] || 999;
             
@@ -119,7 +119,7 @@ export class ModoInteligenteService {
     let mejorJerarquia = 999;
 
     campo.formularios.forEach(formularioNombre => {
-      // ✅ CORRECCIÓN: Usar as any
+      //    CORRECCIÓN: Usar as any
       const jerarquia = (JERARQUIA_FORMULARIOS as any)[formularioNombre] || 999;
       const formulario = this.formularios[formularioNombre];
       

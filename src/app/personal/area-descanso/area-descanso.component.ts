@@ -152,7 +152,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
       this.obtenerNoticiasPositivas(),
       this.obtenerMusicaRelajante()
     ]).then(() => {
-      console.log('✅ Contenido inicial cargado completamente');
+      console.log('   Contenido inicial cargado completamente');
     }).catch(error => {
       console.error('❌ Error cargando contenido inicial:', error);
     });
@@ -376,7 +376,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad(): void {
-    console.log('✅ Imagen cargada correctamente');
+    console.log('   Imagen cargada correctamente');
   }
 
   onImageError(): void {
@@ -496,7 +496,7 @@ export class AreaDescansoComponent implements OnInit, OnDestroy {
         title: ach.title,
         description: ach.description
       });
-      this.showNotification(`🎉 Logro: ${ach.title}`, 'success');
+      this.showNotification(`   Logro: ${ach.title}`, 'success');
     });
   }
 

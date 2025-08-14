@@ -86,7 +86,7 @@ export class HojaFrontalService {
     return this.http.post<ApiResponse<HojaFrontal>>(this.apiUrl, data);
   }
 
-  // ✅ AGREGAR ESTE MÉTODO QUE FALTA
+  //    AGREGAR ESTE MÉTODO QUE FALTA
   crearHojaFrontal(data: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, data);
   }

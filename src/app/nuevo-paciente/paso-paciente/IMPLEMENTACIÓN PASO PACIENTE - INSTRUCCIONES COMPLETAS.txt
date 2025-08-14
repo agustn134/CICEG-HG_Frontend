@@ -161,7 +161,7 @@ Después de probar que este paso funciona correctamente:
 - **Siguiente:** Implementar `PasoExpedienteComponent` (creación automática)
 - **Después:** `PasoDocumentoClinicoComponent` (selección tipo documento)
 
-## 🎉 RESULTADO FINAL
+##    RESULTADO FINAL
 
 Una vez implementado correctamente, tendrás:
 

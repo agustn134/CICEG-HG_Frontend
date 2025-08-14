@@ -22,9 +22,9 @@ export class ConsentimientosInformados {
     console.log('  URL:', `${this.apiUrl}`);
     console.log('  Datos enviados:', data);
     console.log('  Campos requeridos verificados:');
-    console.log('  - id_expediente:', data.id_expediente ? '✅' : '❌');
-    console.log('  - id_paciente:', data.id_paciente ? '✅' : '❌');
-    console.log('  - id_personal_medico:', data.id_personal_medico ? '✅' : '❌');
+    console.log('  - id_expediente:', data.id_expediente ? '  ' : '❌');
+    console.log('  - id_paciente:', data.id_paciente ? '  ' : '❌');
+    console.log('  - id_personal_medico:', data.id_personal_medico ? '  ' : '❌');
 
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, data);
   }

@@ -1312,7 +1312,7 @@ private generarFolioPostanestesico(): string {
       // Generar PDF automáticamente
       await this.generarPDFInterconsulta();
 
-      // 🎉 ¡PROYECTO COMPLETADO AL 100%!
+      //    ¡PROYECTO COMPLETADO AL 100%!
       this.mostrarMensaje100Porciento();
 
     } catch (error: any) {
@@ -1361,10 +1361,10 @@ private generarFolioPostanestesico(): string {
     return fechaLimite.toISOString().split('T')[0];
   }
 
-  // 🎉 MÉTODO ESPECIAL - ¡100% COMPLETADO!
+  //    MÉTODO ESPECIAL - ¡100% COMPLETADO!
   private mostrarMensaje100Porciento(): void {
     console.log(`
-    🎉🎉🎉 ¡FELICIDADES! 🎉🎉🎉
+           ¡FELICIDADES!       
 
     ██████  ██  ██████ ███████  ██████           ██   ██  ██████
     ██      ██ ██      ██      ██               ██   ██ ██
@@ -1385,7 +1385,7 @@ private generarFolioPostanestesico(): string {
   `);
 
     // Mostrar notificación en pantalla
-    this.success = '🎉 ¡PROYECTO COMPLETADO AL 100%! - Sistema hospitalario completo';
+    this.success = '   ¡PROYECTO COMPLETADO AL 100%! - Sistema hospitalario completo';
   }
 
 
@@ -6381,27 +6381,88 @@ tieneSignosVitalesPrevios(): boolean {
   return !!(signos.temperatura || signos.presion_arterial_sistolica || signos.frecuencia_cardiaca);
 }
 
-// Aplicar signos vitales de ingreso como base
-aplicarSignosVitalesDeIngreso(): void {
-  const signosIngreso = this.getSignosPrevios();
+// // Aplicar signos vitales de ingreso como base
+// aplicarSignosVitalesDeIngreso(): void {
+//   const signosIngreso = this.getSignosPrevios();
   
-  if (!this.tieneSignosVitalesPrevios()) {
-    this.mostrarErrorMetodo('No hay signos vitales de ingreso disponibles');
+//   if (!this.tieneSignosVitalesPrevios()) {
+//     this.mostrarErrorMetodo('No hay signos vitales de ingreso disponibles');
+//     return;
+//   }
+  
+//   this.notaUrgenciasForm.patchValue({
+//     temperatura: signosIngreso.temperatura,
+//     presion_arterial_sistolica: signosIngreso.presion_arterial_sistolica,
+//     presion_arterial_diastolica: signosIngreso.presion_arterial_diastolica,
+//     frecuencia_cardiaca: signosIngreso.frecuencia_cardiaca,
+//     frecuencia_respiratoria: signosIngreso.frecuencia_respiratoria,
+//     saturacion_oxigeno: signosIngreso.saturacion_oxigeno,
+//     peso: signosIngreso.peso,
+//     glucosa: signosIngreso.glucosa
+//   });
+
+//   this.mostrarExito('  Signos vitales de ingreso aplicados como punto de partida');
+// }
+
+aplicarSignosVitalesDeIngreso(): void {
+  // Prevenir el comportamiento por defecto
+  event?.preventDefault();
+  
+  const signosIngreso = this.capturaIngresoForm?.value || {};
+  
+  if (!this.tieneSignosVitalesDeIngreso()) {
+    this.mostrarErrorMetodo('No hay signos vitales de ingreso disponibles para copiar');
     return;
   }
   
-  this.notaUrgenciasForm.patchValue({
-    temperatura: signosIngreso.temperatura,
-    presion_arterial_sistolica: signosIngreso.presion_arterial_sistolica,
-    presion_arterial_diastolica: signosIngreso.presion_arterial_diastolica,
-    frecuencia_cardiaca: signosIngreso.frecuencia_cardiaca,
-    frecuencia_respiratoria: signosIngreso.frecuencia_respiratoria,
-    saturacion_oxigeno: signosIngreso.saturacion_oxigeno,
-    peso: signosIngreso.peso,
-    glucosa: signosIngreso.glucosa
-  });
+  // Determinar qué formulario estamos llenando
+  const formularioActual = this.formularioActivo;
+  let targetForm: any = null;
+  
+  switch (formularioActual) {
+    case 'notaUrgencias':
+      targetForm = this.notaUrgenciasForm;
+      break;
+    case 'notaEvolucion':
+      targetForm = this.notaEvolucionForm;
+      break;
+    default:
+      this.mostrarErrorMetodo('No se puede determinar el formulario destino');
+      return;
+  }
 
-  this.mostrarExito('  Signos vitales de ingreso aplicados como punto de partida');
+  // Aplicar datos solo si existen
+  const datosParaAplicar: any = {};
+  
+  if (signosIngreso.temperatura) {
+    datosParaAplicar.temperatura = signosIngreso.temperatura;
+  }
+  if (signosIngreso.presion_arterial_sistolica) {
+    datosParaAplicar.presion_arterial_sistolica = signosIngreso.presion_arterial_sistolica;
+  }
+  if (signosIngreso.presion_arterial_diastolica) {
+    datosParaAplicar.presion_arterial_diastolica = signosIngreso.presion_arterial_diastolica;
+  }
+  if (signosIngreso.frecuencia_cardiaca) {
+    datosParaAplicar.frecuencia_cardiaca = signosIngreso.frecuencia_cardiaca;
+  }
+  if (signosIngreso.frecuencia_respiratoria) {
+    datosParaAplicar.frecuencia_respiratoria = signosIngreso.frecuencia_respiratoria;
+  }
+  if (signosIngreso.saturacion_oxigeno) {
+    datosParaAplicar.saturacion_oxigeno = signosIngreso.saturacion_oxigeno;
+  }
+  if (signosIngreso.peso) {
+    datosParaAplicar.peso = signosIngreso.peso;
+  }
+  if (signosIngreso.glucosa) {
+    datosParaAplicar.glucosa = signosIngreso.glucosa;
+  }
+
+  targetForm.patchValue(datosParaAplicar);
+  
+  const camposAplicados = Object.keys(datosParaAplicar).length;
+  this.mostrarExito(`   Signos vitales de ingreso aplicados: ${camposAplicados} campos copiados`);
 }
 
 // 🔥 MÉTODOS PARA MOSTRAR CAMBIOS EN PRESIÓN ARTERIAL
@@ -6529,8 +6590,44 @@ private construirResumenInterrogatorio(datos: any): string {
   return partes.length > 0 ? partes.join('. ') + '.' : '';
 }
 
-// 🔥 MÉTODO PARA SINCRONIZAR SIGNOS VITALES (si no lo tienes)
+// // 🔥 MÉTODO PARA SINCRONIZAR SIGNOS VITALES (si no lo tienes)
+// sincronizarSignosVitales(): void {
+//   const signosActuales = {
+//     temperatura: this.notaUrgenciasForm.get('temperatura')?.value,
+//     presion_arterial_sistolica: this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value,
+//     presion_arterial_diastolica: this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value,
+//     frecuencia_cardiaca: this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value,
+//     frecuencia_respiratoria: this.notaUrgenciasForm.get('frecuencia_respiratoria')?.value,
+//     saturacion_oxigeno: this.notaUrgenciasForm.get('saturacion_oxigeno')?.value,
+//     peso: this.notaUrgenciasForm.get('peso')?.value,
+//     glucosa: this.notaUrgenciasForm.get('glucosa')?.value
+//   };
+
+//   // Sincronizar con el formulario principal de signos vitales
+//   if (this.signosVitalesForm) {
+//     this.signosVitalesForm.patchValue({
+//       temperatura: signosActuales.temperatura,
+//       presion_arterial_sistolica: signosActuales.presion_arterial_sistolica,
+//       presion_arterial_diastolica: signosActuales.presion_arterial_diastolica,
+//       frecuencia_cardiaca: signosActuales.frecuencia_cardiaca,
+//       frecuencia_respiratoria: signosActuales.frecuencia_respiratoria,
+//       saturacion_oxigeno: signosActuales.saturacion_oxigeno,
+//       peso: signosActuales.peso,
+//       glucosa: signosActuales.glucosa
+//     });
+//   }
+
+//   // Aquí podrías hacer la sincronización real con el backend
+//   console.log('🔄 Sincronizando signos vitales:', signosActuales);
+  
+//   this.mostrarExito('  Signos vitales sincronizados con el historial principal del paciente');
+// }
+
+// 🔥 MÉTODO MEJORADO PARA SINCRONIZAR SIGNOS VITALES
 sincronizarSignosVitales(): void {
+  // Prevenir comportamiento por defecto
+  event?.preventDefault();
+  
   const signosActuales = {
     temperatura: this.notaUrgenciasForm.get('temperatura')?.value,
     presion_arterial_sistolica: this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value,
@@ -6541,6 +6638,14 @@ sincronizarSignosVitales(): void {
     peso: this.notaUrgenciasForm.get('peso')?.value,
     glucosa: this.notaUrgenciasForm.get('glucosa')?.value
   };
+
+  // Verificar que hay datos para sincronizar
+  const tieneDatos = Object.values(signosActuales).some(valor => valor !== null && valor !== undefined);
+  
+  if (!tieneDatos) {
+    this.mostrarErrorMetodo('No hay signos vitales para sincronizar');
+    return;
+  }
 
   // Sincronizar con el formulario principal de signos vitales
   if (this.signosVitalesForm) {
@@ -6556,10 +6661,17 @@ sincronizarSignosVitales(): void {
     });
   }
 
-  // Aquí podrías hacer la sincronización real con el backend
+  // Aquí conectarías con tu backend real:
+  // this.signosVitalesService.guardarSignosVitales(this.pacienteId, signosActuales)
+  //   .subscribe(response => {
+  //     this.mostrarExito('   Signos vitales guardados en el historial del paciente');
+  //   });
+
   console.log('🔄 Sincronizando signos vitales:', signosActuales);
   
-  this.mostrarExito('  Signos vitales sincronizados con el historial principal del paciente');
+  // Contar cuántos campos se sincronizaron
+  const camposSincronizados = Object.values(signosActuales).filter(valor => valor !== null && valor !== undefined).length;
+  this.mostrarExito(`   Signos vitales sincronizados: ${camposSincronizados} campos actualizados en el historial principal`);
 }
 
 
@@ -6774,35 +6886,103 @@ console.log('- formulario final:', this.notaEvolucionForm.value);
 
 
 
-// 🔥 MÉTODO PARA APLICAR SIGNOS VITALES DE EVOLUCIÓN
+// // 🔥 MÉTODO PARA APLICAR SIGNOS VITALES DE EVOLUCIÓN
+// aplicarSignosVitalesDeEvolucion(): void {
+//   const signosEvolucion = this.capturaEvolucionForm.value;
+  
+//   if (!this.tieneSignosVitalesDeEvolucion()) {
+//     this.mostrarErrorMetodo('No hay signos vitales de evolución disponibles');
+//     return;
+//   }
+  
+//   this.notaEvolucionForm.patchValue({
+//     temperatura: signosEvolucion.temperatura_actual,
+//     presion_arterial_sistolica: signosEvolucion.presion_arterial_sistolica_actual,
+//     presion_arterial_diastolica: signosEvolucion.presion_arterial_diastolica_actual,
+//     frecuencia_cardiaca: signosEvolucion.frecuencia_cardiaca_actual,
+//     frecuencia_respiratoria: signosEvolucion.frecuencia_respiratoria_actual,
+//     saturacion_oxigeno: signosEvolucion.saturacion_oxigeno_actual,
+//     peso_actual: signosEvolucion.peso_actual,
+//     talla_actual: signosEvolucion.talla_actual
+//   });
+
+//   this.mostrarExito('  Signos vitales de evolución aplicados correctamente');
+// }
+
 aplicarSignosVitalesDeEvolucion(): void {
+  // Prevenir el comportamiento por defecto del formulario
+  event?.preventDefault();
+  
   const signosEvolucion = this.capturaEvolucionForm.value;
   
   if (!this.tieneSignosVitalesDeEvolucion()) {
-    this.mostrarErrorMetodo('No hay signos vitales de evolución disponibles');
+    this.mostrarErrorMetodo('No hay signos vitales de evolución disponibles para copiar');
     return;
   }
   
-  this.notaEvolucionForm.patchValue({
-    temperatura: signosEvolucion.temperatura_actual,
-    presion_arterial_sistolica: signosEvolucion.presion_arterial_sistolica_actual,
-    presion_arterial_diastolica: signosEvolucion.presion_arterial_diastolica_actual,
-    frecuencia_cardiaca: signosEvolucion.frecuencia_cardiaca_actual,
-    frecuencia_respiratoria: signosEvolucion.frecuencia_respiratoria_actual,
-    saturacion_oxigeno: signosEvolucion.saturacion_oxigeno_actual,
-    peso_actual: signosEvolucion.peso_actual,
-    talla_actual: signosEvolucion.talla_actual
-  });
+  // Aplicar solo los valores que existen
+  const datosParaAplicar: any = {};
+  
+  if (signosEvolucion.temperatura_actual) {
+    datosParaAplicar.temperatura = signosEvolucion.temperatura_actual;
+  }
+  if (signosEvolucion.presion_arterial_sistolica_actual) {
+    datosParaAplicar.presion_arterial_sistolica = signosEvolucion.presion_arterial_sistolica_actual;
+  }
+  if (signosEvolucion.presion_arterial_diastolica_actual) {
+    datosParaAplicar.presion_arterial_diastolica = signosEvolucion.presion_arterial_diastolica_actual;
+  }
+  if (signosEvolucion.frecuencia_cardiaca_actual) {
+    datosParaAplicar.frecuencia_cardiaca = signosEvolucion.frecuencia_cardiaca_actual;
+  }
+  if (signosEvolucion.frecuencia_respiratoria_actual) {
+    datosParaAplicar.frecuencia_respiratoria = signosEvolucion.frecuencia_respiratoria_actual;
+  }
+  if (signosEvolucion.saturacion_oxigeno_actual) {
+    datosParaAplicar.saturacion_oxigeno = signosEvolucion.saturacion_oxigeno_actual;
+  }
+  if (signosEvolucion.peso_actual) {
+    datosParaAplicar.peso_actual = signosEvolucion.peso_actual;
+  }
+  if (signosEvolucion.talla_actual) {
+    datosParaAplicar.talla_actual = signosEvolucion.talla_actual;
+  }
 
-  this.mostrarExito('  Signos vitales de evolución aplicados correctamente');
+  // Aplicar los datos al formulario
+  this.notaEvolucionForm.patchValue(datosParaAplicar);
+
+  const camposAplicados = Object.keys(datosParaAplicar).length;
+  this.mostrarExito(`   Signos vitales de evolución aplicados: ${camposAplicados} campos copiados`);
 }
+
 
 // 🔥 VERIFICAR SI HAY SIGNOS VITALES DE EVOLUCIÓN
+// tieneSignosVitalesDeEvolucion(): boolean {
+//   const signos = this.capturaEvolucionForm.value;
+//   return !!(signos.temperatura_actual || signos.presion_arterial_sistolica_actual || signos.frecuencia_cardiaca_actual);
+// }
+
 tieneSignosVitalesDeEvolucion(): boolean {
   const signos = this.capturaEvolucionForm.value;
-  return !!(signos.temperatura_actual || signos.presion_arterial_sistolica_actual || signos.frecuencia_cardiaca_actual);
+  return !!(signos.temperatura_actual || 
+           signos.presion_arterial_sistolica_actual || 
+           signos.frecuencia_cardiaca_actual ||
+           signos.frecuencia_respiratoria_actual ||
+           signos.saturacion_oxigeno_actual ||
+           signos.peso_actual ||
+           signos.talla_actual);
 }
 
+tieneSignosVitalesDeIngreso(): boolean {
+  const signos = this.capturaIngresoForm?.value || {};
+  return !!(signos.temperatura || 
+           signos.presion_arterial_sistolica || 
+           signos.frecuencia_cardiaca ||
+           signos.frecuencia_respiratoria ||
+           signos.saturacion_oxigeno ||
+           signos.peso ||
+           signos.talla);
+}
 
 
 

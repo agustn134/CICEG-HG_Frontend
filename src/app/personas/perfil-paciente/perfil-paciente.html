@@ -471,13 +471,13 @@
 <!-- <div class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md">
   {{ getInicialNombre() }}
 </div> -->
-<h3 class="mt-3 text-lg font-semibold text-gray-900">
+<!-- <h3 class="mt-3 text-lg font-semibold text-gray-900">
   {{ getNombreCompleto() }}
 </h3>
 <p class="text-sm text-gray-600">
   {{ calcularEdad(pacienteCompleto?.persona?.fecha_nacimiento) }} años • 
   {{ getSexoTexto() }}
-</p>
+</p> -->
 
       <!-- Información Clínica Rápida -->
       <div class="bg-white shadow rounded-lg p-6">
@@ -4250,7 +4250,7 @@
               <i class="fas fa-heartbeat mr-2 text-red-500"></i>Signos Vitales Actuales
             </h4>
             <!-- AGREGAR al inicio de Signos Vitales en Nota de Evolución -->
-<div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+<!-- <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
   <div class="flex items-center justify-between">
     <div class="flex items-center">
       <i class="fas fa-chart-line text-green-500 mr-2"></i>
@@ -4269,6 +4269,38 @@
       <i class="fas fa-copy mr-1"></i>
       Usar Signos de Evolución
     </button>
+  </div>
+</div> -->
+
+<!-- 🔥 BOTÓN CORREGIDO DE SIGNOS VITALES DE EVOLUCIÓN -->
+<div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center">
+      <i class="fas fa-chart-line text-green-500 mr-2"></i>
+      <div>
+        <p class="text-sm font-medium text-green-700">
+          <strong>Signos Vitales de Evolución</strong>
+        </p>
+        <p class="text-xs text-green-600">
+          Actualización de signos vitales desde Captura Evolución
+        </p>
+      </div>
+    </div>
+    <button type="button" 
+            (click)="aplicarSignosVitalesDeEvolucion()"
+            [disabled]="!tieneSignosVitalesDeEvolucion()"
+            [class]="tieneSignosVitalesDeEvolucion() ? 
+                    'text-green-600 hover:text-green-800 px-3 py-1 text-sm border border-green-300 rounded bg-white hover:bg-green-50' : 
+                    'text-gray-400 px-3 py-1 text-sm border border-gray-300 rounded bg-gray-100 cursor-not-allowed'">
+      <i class="fas fa-copy mr-1"></i>
+      {{ tieneSignosVitalesDeEvolucion() ? 'Usar Signos de Evolución' : 'Sin datos disponibles' }}
+    </button>
+  </div>
+  
+  <!-- Mensaje informativo cuando no hay datos -->
+  <div *ngIf="!tieneSignosVitalesDeEvolucion()" class="mt-2 text-xs text-gray-500">
+    <i class="fas fa-info-circle mr-1"></i>
+    Complete primero la "Captura Evolución" para usar esta función
   </div>
 </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -4666,106 +4698,53 @@
                 </div>
               </form>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
       <!-- FORMULARIO DE NOTA DE URGENCIAS -->
+
+
+      <!-- FORMULARIO DE NOTA DE URGENCIAS MEJORADO Y ORGANIZADO -->
       <div *ngIf="formularioActivo === 'notaUrgencias'" class="bg-white shadow rounded-lg mb-6">
         <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-ambulance mr-2 text-red-500"></i>
-            Nota de Urgencias
-          </h3>
-          <p class="text-sm text-gray-600 mt-1">Atención de emergencia y urgencias médicas (NOM-004)</p>
+          <h3 class="text-lg font-semibold text-gray-900"> <i class="fas fa-ambulance mr-2 text-red-600"></i> Nota de
+            Urgencias </h3>
+          <p class="text-sm text-gray-600 mt-1">Atención de emergencia y urgencias médicas (NOM-004-SSA3-2012)</p>
         </div>
-
-        <form [formGroup]="notaUrgenciasForm" class="px-4 sm:px-6 py-4">
-
-          <!-- SECCIÓN 1: DATOS DE ATENCIÓN -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-clock mr-2 text-red-500"></i>Datos de Atención de Urgencias
-            </h4>
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Atención *</label>
-                <input formControlName="hora_atencion" type="time"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+        <form [formGroup]="notaUrgenciasForm" class="px-4 sm:px-6 py-4"> <!-- SECCIÓN 1: DATOS DE ATENCIÓN -->
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"> <i
+                class="fas fa-clock mr-2 text-gray-600"></i> Datos de Atención de Urgencias </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <!-- Hora de Atención -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Atención *</label> <input
+                  formControlName="hora_atencion" type="time"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <div *ngIf="notaUrgenciasForm.get('hora_atencion')?.errors?.['required']" class="text-red-500 text-xs mt-1">
                   Campo obligatorio según NOM-004</div>
-              </div>
-
-              <!-- SELECTOR DE CAMA MEJORADO -->
-              <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Cama/Cubículo de Urgencias *
-                  <span class="text-red-500 ml-1 cursor-help" title="Seleccione la cama asignada en urgencias">
-                    <i class="fas fa-bed"></i>
-                  </span>
-                </label>
-
-                <div class="relative">
-                  <div class="flex">
-                    <input type="text" [(ngModel)]="filtroCama" [ngModelOptions]="{standalone: true}"
-                      (ngModelChange)="onCamaInputChange($event)" (focus)="toggleDropdownCamas()"
-                      (click)="toggleDropdownCamas()"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="Buscar cama de urgencias..." [readonly]="!!camaSeleccionada">
-                    <button type="button" (click)="toggleDropdownCamas()"
-                      class="px-3 py-2 bg-red-500 text-white border border-red-500 rounded-r-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
-                      <i class="fas fa-bed"></i>
-                    </button>
-                  </div>
-
-                  <!-- Información de la cama seleccionada -->
-                  <div *ngIf="camaSeleccionada" class="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <div class="font-medium text-red-900">Cama {{ camaSeleccionada.numero }}</div>
-                        <div class="text-sm text-red-700">
-                          <span>Área: {{ camaSeleccionada.area }}</span>
-                          <span *ngIf="camaSeleccionada.subarea" class="ml-2">Subárea: {{ camaSeleccionada.subarea }}</span>
-                          <span class="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                            {{ camaSeleccionada.estado }}
-                          </span>
-                        </div>
-                      </div>
-                      <button type="button" (click)="limpiarCama()" class="text-red-500 hover:text-red-700 ml-4">
-                        <i class="fas fa-times">x</i>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Dropdown de camas -->
-                  <div *ngIf="mostrarDropdownCamas && camas && camas.length > 0"
-                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-
-                    <div *ngIf="camas.length === 0" class="p-4 text-gray-500 text-center">
-                      No se encontraron camas de urgencias disponibles
-                    </div>
-
-                    <div *ngFor="let cama of camas; trackBy: trackByCamaId" (click)="seleccionarCama(cama)"
-                      class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                      <div class="font-medium text-gray-900">Cama {{ cama.numero }}</div>
-                      <div class="text-sm text-gray-600">
-                        <span>{{ cama.area }}</span>
-                        <span *ngIf="cama.subarea" class="ml-1">• {{ cama.subarea }}</span>
-                        <span class="ml-1 px-2 py-1 text-xs rounded-full" [ngClass]="{
-                            'bg-green-100 text-green-800': cama.estado === 'Disponible',
-                            'bg-yellow-100 text-yellow-800': cama.estado === 'Reservada',
-                            'bg-red-100 text-red-800': cama.estado === 'Ocupada'
-                          }">
-                          {{ cama.estado }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div *ngIf="notaUrgenciasForm.get('numero_cama')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-                  Campo obligatorio</div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Área de Interconsulta</label>
-                <select formControlName="area_interconsulta"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+              </div> <!-- Área de Interconsulta -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Área de Interconsulta</label> <select
+                  formControlName="area_interconsulta"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Sin interconsulta</option>
                   <option value="1">Medicina Interna</option>
                   <option value="2">Cirugía General</option>
@@ -4774,356 +4753,252 @@
                   <option value="5">Traumatología</option>
                   <option value="6">Cardiología</option>
                   <option value="7">Neurología</option>
-                </select>
+                </select> </div>
+            </div> <!-- Selector de Cama -->
+            <div class="mt-6"> <label class="block text-sm font-medium text-gray-700 mb-1"> Cama/Cubículo de Urgencias * <span
+                  class="text-gray-500 ml-1 cursor-help" title="Seleccione la cama asignada en urgencias"> <i
+                    class="fas fa-bed"></i> </span> </label>
+              <div class="relative">
+                <div class="flex"> <input type="text" [(ngModel)]="filtroCama" [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="onCamaInputChange($event)" (focus)="toggleDropdownCamas()"
+                    (click)="toggleDropdownCamas()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Buscar cama de urgencias..." [readonly]="!!camaSeleccionada"> <button type="button"
+                    (click)="toggleDropdownCamas()"
+                    class="px-3 py-2 bg-gray-600 text-white border border-gray-600 rounded-r-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-bed"></i> </button> </div> <!-- Información de la cama seleccionada -->
+                <div *ngIf="camaSeleccionada" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="font-medium text-blue-900">Cama {{ camaSeleccionada.numero }}</div>
+                      <div class="text-sm text-blue-700"> <span>Área: {{ camaSeleccionada.area }}</span> <span
+                          *ngIf="camaSeleccionada.subarea" class="ml-2">Subárea: {{ camaSeleccionada.subarea }}</span> <span
+                          class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs"> {{ camaSeleccionada.estado }}
+                        </span> </div>
+                    </div> <button type="button" (click)="limpiarCama()" class="text-gray-500 hover:text-gray-700 ml-4"> <i
+                        class="fas fa-times"></i> </button>
+                  </div>
+                </div> <!-- Dropdown de camas -->
+                <div *ngIf="mostrarDropdownCamas && camas && camas.length > 0"
+                  class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
+                  <div *ngIf="camas.length === 0" class="p-4 text-gray-500 text-center"> No se encontraron camas de urgencias
+                    disponibles </div>
+                  <div *ngFor="let cama of camas; trackBy: trackByCamaId" (click)="seleccionarCama(cama)"
+                    class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                    <div class="font-medium text-gray-900">Cama {{ cama.numero }}</div>
+                    <div class="text-sm text-gray-600"> <span>{{ cama.area }}</span> <span *ngIf="cama.subarea" class="ml-1">•
+                        {{ cama.subarea }}</span> <span class="ml-1 px-2 py-1 text-xs rounded-full"
+                        [ngClass]="{ 'bg-green-100 text-green-800': cama.estado === 'Disponible', 'bg-yellow-100 text-yellow-800': cama.estado === 'Reservada', 'bg-red-100 text-red-800': cama.estado === 'Ocupada' }">
+                        {{ cama.estado }} </span> </div>
+                  </div>
+                </div>
               </div>
+              <div *ngIf="notaUrgenciasForm.get('numero_cama')?.errors?.['required']" class="text-red-500 text-xs mt-1"> Campo
+                obligatorio</div>
             </div>
-          </div>
-
-          <!-- SECCIÓN 2: MOTIVO DE ATENCIÓN -->
-<div class="mb-6">
-  <h4 class="text-md font-semibold text-gray-800 mb-3">
-    <i class="fas fa-exclamation-circle mr-2 text-blue-500"></i>Motivo de Atención *
-  </h4>
-  
-  <app-campo-inteligente 
-    nombreCampo="padecimiento_actual"
-    formularioActual="notaUrgencias"
-    [formulario]="notaUrgenciasForm"
-    [obligatorio]="true"
-    [mapeoDestino]="'motivo_atencion'">
-    
-    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de la Consulta de Urgencias *</label>
-    <textarea formControlName="motivo_atencion" rows="3"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-      placeholder="Describa el motivo principal por el cual el paciente acude a urgencias..."></textarea>
-    <div *ngIf="notaUrgenciasForm.get('motivo_atencion')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-      Campo obligatorio según NOM-004 numeral 7.1.3</div>
-  </app-campo-inteligente>
-</div>
-
-          <!-- SECCIÓN 3: SIGNOS VITALES CON CÁLCULOS AUTOMÁTICOS -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-heartbeat mr-2 text-red-600"></i>Signos Vitales de Urgencias *
-            </h4>
-            
+          </div> <!-- SECCIÓN 2: MOTIVO DE ATENCIÓN -->
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"> <i
+                class="fas fa-exclamation-circle mr-2 text-gray-600"></i> Motivo de Atención * </h4> <app-campo-inteligente
+              nombreCampo="padecimiento_actual" formularioActual="notaUrgencias" [formulario]="notaUrgenciasForm"
+              [obligatorio]="true" [mapeoDestino]="'motivo_atencion'"> <label
+                class="block text-sm font-medium text-gray-700 mb-1">Motivo de la Consulta de Urgencias *</label> <textarea
+                formControlName="motivo_atencion" rows="3"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describa el motivo principal por el cual el paciente acude a urgencias..."></textarea>
+              <div *ngIf="notaUrgenciasForm.get('motivo_atencion')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                Campo obligatorio según NOM-004 numeral 7.1.3</div>
+            </app-campo-inteligente>
+          </div> <!-- SECCIÓN 3: SIGNOS VITALES -->
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"> <i
+                class="fas fa-heartbeat mr-2 text-gray-600"></i> Signos Vitales de Urgencias * </h4>
             <!-- Indicador de sincronización -->
+            <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+              <div class="flex items-center"> <i class="fas fa-sync-alt text-gray-600 mr-2"></i>
+                <p class="text-sm text-gray-700"> <strong>Sincronización automática:</strong> Los signos vitales se guardarán
+                  en el historial principal del paciente. </p>
+              </div>
+            </div> <!-- Indicador inteligente de comparación -->
             <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <div class="flex items-center">
-                <i class="fas fa-sync-alt text-blue-500 mr-2"></i>
-                <p class="text-sm text-blue-700">
-                  <strong>Sincronización automática:</strong> Los signos vitales se guardarán en el historial principal del paciente.
-                </p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center"> <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                  <div>
+                    <p class="text-sm font-medium text-blue-700"> <strong>Signos Vitales Inteligentes</strong> </p>
+                    <p class="text-xs text-blue-600"> Pre-llenado con datos de ingreso • Modificable para cambios •
+                      Sincronización automática </p>
+                  </div>
+                </div> <button type="button" (click)="mostrarComparacionSignosVitales = !mostrarComparacionSignosVitales"
+                  class="text-blue-600 hover:text-blue-800 px-3 py-1 text-sm border border-blue-300 rounded"> <i
+                    class="fas fa-chart-bar mr-1"></i> {{ mostrarComparacionSignosVitales ? 'Ocultar' : 'Ver' }} Comparación
+                </button>
               </div>
-            </div>
-
-<!-- 🔥 INDICADOR INTELIGENTE DE COMPARACIÓN -->
-  <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <i class="fas fa-chart-line text-blue-500 mr-2"></i>
-        <div>
-          <p class="text-sm font-medium text-blue-700">
-            <strong>Signos Vitales Inteligentes</strong>
-          </p>
-          <p class="text-xs text-blue-600">
-            Pre-llenado con datos de ingreso • Modificable para cambios • Sincronización automática
-          </p>
-        </div>
-      </div>
-      <button type="button" 
-              (click)="mostrarComparacionSignosVitales = !mostrarComparacionSignosVitales"
-              class="text-blue-600 hover:text-blue-800 px-3 py-1 text-sm border border-blue-300 rounded">
-        <i class="fas fa-chart-bar mr-1"></i>
-        {{ mostrarComparacionSignosVitales ? 'Ocultar' : 'Ver' }} Comparación
-      </button>
-    </div>
-  </div>
-
-  <!-- 🔥 TABLA DE COMPARACIÓN (OPCIONAL) -->
-  <div *ngIf="mostrarComparacionSignosVitales && tieneSignosVitalesPrevios()" 
-       class="mb-4 bg-gray-50 border border-gray-200 rounded-md p-4">
-    <h5 class="text-sm font-semibold text-gray-800 mb-3">
-      <i class="fas fa-history mr-2"></i>Comparación con Signos de Ingreso
-    </h5>
-    <div class="grid grid-cols-2 gap-4 text-sm">
-      <div>
-        <p class="font-medium text-gray-700">Signos de Ingreso:</p>
-        <div class="text-gray-600 space-y-1">
-          <p>TA: {{ getSignosPrevios().presion_arterial_sistolica || '___' }}/{{ getSignosPrevios().presion_arterial_diastolica || '___' }} mmHg</p>
-          <p>FC: {{ getSignosPrevios().frecuencia_cardiaca || '___' }} lpm</p>
-          <p>Temp: {{ getSignosPrevios().temperatura || '___' }} °C</p>
-        </div>
-      </div>
-      <div>
-        <p class="font-medium text-gray-700">Signos Actuales:</p>
-        <div class="text-gray-600 space-y-1">
-          <p>TA: {{ notaUrgenciasForm.get('presion_arterial_sistolica')?.value || '___' }}/{{ notaUrgenciasForm.get('presion_arterial_diastolica')?.value || '___' }} mmHg</p>
-          <p>FC: {{ notaUrgenciasForm.get('frecuencia_cardiaca')?.value || '___' }} lpm</p>
-          <p>Temp: {{ notaUrgenciasForm.get('temperatura')?.value || '___' }} °C</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <!-- Presión Arterial -->
-<div class="col-span-2">
-      <app-campo-inteligente 
-        nombreCampo="presion_arterial_sistolica,presion_arterial_diastolica"
-        formularioActual="notaUrgencias"
-        [formulario]="notaUrgenciasForm"
-        [obligatorio]="false">
-        
-        <label class="block text-sm font-medium text-gray-700 mb-1">Presión Arterial *</label>
-        <div class="flex space-x-1">
-          <input formControlName="presion_arterial_sistolica" type="number" min="50" max="300"
-            (input)="onSignosVitalesChange()"
-            class="w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="120">
-          <span class="py-2 text-gray-500">/</span>
-          <input formControlName="presion_arterial_diastolica" type="number" min="30" max="200"
-            (input)="onSignosVitalesChange()"
-            class="w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="80">
-        </div>
-        <div class="text-xs mt-1 flex justify-between">
-          <div>
-            <span class="text-gray-500">mmHg</span>
-            <span *ngIf="getPresionArterialFormatted()" 
-                  class="ml-2 px-2 py-1 rounded text-xs"
-                  [ngClass]="getColorPresionArterial()">
-              {{ getInterpretacionPresionArterial() }}
-            </span>
-          </div>
-          <!-- 🔥 INDICADOR DE CAMBIO -->
-          <div *ngIf="getCambioPresionArterial()" class="text-xs">
-            <span class="px-2 py-1 rounded" [ngClass]="getColorCambioPresion()">
-              <i class="fas" [ngClass]="getIconoCambioPresion()"></i>
-              {{ getCambioPresionArterial() }}
-            </span>
-          </div>
-        </div>
-      </app-campo-inteligente>
-    </div>
-
-              <!-- Frecuencia Cardíaca -->
-<div>
-      <app-campo-inteligente 
-        nombreCampo="frecuencia_cardiaca"
-        formularioActual="notaUrgencias"
-        [formulario]="notaUrgenciasForm"
-        [obligatorio]="false">
-        
-        <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia Cardíaca *</label>
-        <input formControlName="frecuencia_cardiaca" type="number" min="40" max="200"
-          (input)="onSignosVitalesChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          placeholder="72">
-        <div class="text-xs mt-1 flex justify-between">
-          <div>
-            <span class="text-gray-500">lpm</span>
-            <span *ngIf="notaUrgenciasForm.get('frecuencia_cardiaca')?.value" 
-                  class="ml-2 px-2 py-1 rounded text-xs"
-                  [ngClass]="getColorFrecuenciaCardiaca()">
-              {{ getInterpretacionFrecuenciaCardiaca() }}
-            </span>
-          </div>
-          <div *ngIf="getCambioFrecuenciaCardiaca()" class="text-xs">
-            <span class="px-2 py-1 rounded" [ngClass]="getColorCambioFC()">
-              <i class="fas" [ngClass]="getIconoCambioFC()"></i>
-              {{ getCambioFrecuenciaCardiaca() }}
-            </span>
-          </div>
-        </div>
-      </app-campo-inteligente>
-</div>
-
-              <!-- Frecuencia Respiratoria -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia Respiratoria *</label>
-                <input formControlName="frecuencia_respiratoria" type="number" min="8" max="60"
-                  (input)="onSignosVitalesChange()"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            </div> <!-- Tabla de comparación (opcional) -->
+            <div *ngIf="mostrarComparacionSignosVitales && tieneSignosVitalesPrevios()"
+              class="mb-4 bg-gray-50 border border-gray-200 rounded-md p-4">
+              <h5 class="text-sm font-semibold text-gray-800 mb-3"> <i class="fas fa-history mr-2"></i>Comparación con Signos
+                de Ingreso </h5>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="font-medium text-gray-700">Signos de Ingreso:</p>
+                  <div class="text-gray-600 space-y-1">
+                    <p>TA: {{ getSignosPrevios().presion_arterial_sistolica || '___' }}/{{
+                      getSignosPrevios().presion_arterial_diastolica || '___' }} mmHg</p>
+                    <p>FC: {{ getSignosPrevios().frecuencia_cardiaca || '___' }} lpm</p>
+                    <p>Temp: {{ getSignosPrevios().temperatura || '___' }} °C</p>
+                  </div>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-700">Signos Actuales:</p>
+                  <div class="text-gray-600 space-y-1">
+                    <p>TA: {{ notaUrgenciasForm.get('presion_arterial_sistolica')?.value || '___' }}/{{
+                      notaUrgenciasForm.get('presion_arterial_diastolica')?.value || '___' }} mmHg</p>
+                    <p>FC: {{ notaUrgenciasForm.get('frecuencia_cardiaca')?.value || '___' }} lpm</p>
+                    <p>Temp: {{ notaUrgenciasForm.get('temperatura')?.value || '___' }} °C</p>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- Campos de signos vitales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> <!-- Presión Arterial -->
+              <div class="md:col-span-2 lg:col-span-1"> <app-campo-inteligente
+                  nombreCampo="presion_arterial_sistolica,presion_arterial_diastolica" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="false"> <label
+                    class="block text-sm font-medium text-gray-700 mb-1">Presión Arterial *</label>
+                  <div class="flex space-x-1"> <input formControlName="presion_arterial_sistolica" type="number" min="50"
+                      max="300" (input)="onSignosVitalesChange()"
+                      class="w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="120"> <span class="py-2 text-gray-500">/</span> <input
+                      formControlName="presion_arterial_diastolica" type="number" min="30" max="200"
+                      (input)="onSignosVitalesChange()"
+                      class="w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="80"> </div>
+                  <div class="text-xs mt-1 flex justify-between">
+                    <div> <span class="text-gray-500">mmHg</span> <span *ngIf="getPresionArterialFormatted()"
+                        class="ml-2 px-2 py-1 rounded text-xs" [ngClass]="getColorPresionArterial()"> {{
+                        getInterpretacionPresionArterial() }} </span> </div>
+                    <div *ngIf="getCambioPresionArterial()" class="text-xs"> <span class="px-2 py-1 rounded"
+                        [ngClass]="getColorCambioPresion()"> <i class="fas" [ngClass]="getIconoCambioPresion()"></i> {{
+                        getCambioPresionArterial() }} </span> </div>
+                  </div>
+                </app-campo-inteligente> </div> <!-- Frecuencia Cardíaca -->
+              <div> <app-campo-inteligente nombreCampo="frecuencia_cardiaca" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="false"> <label
+                    class="block text-sm font-medium text-gray-700 mb-1">Frecuencia Cardíaca *</label> <input
+                    formControlName="frecuencia_cardiaca" type="number" min="40" max="200" (input)="onSignosVitalesChange()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="72">
+                  <div class="text-xs mt-1 flex justify-between">
+                    <div> <span class="text-gray-500">lpm</span> <span
+                        *ngIf="notaUrgenciasForm.get('frecuencia_cardiaca')?.value" class="ml-2 px-2 py-1 rounded text-xs"
+                        [ngClass]="getColorFrecuenciaCardiaca()"> {{ getInterpretacionFrecuenciaCardiaca() }} </span> </div>
+                    <div *ngIf="getCambioFrecuenciaCardiaca()" class="text-xs"> <span class="px-2 py-1 rounded"
+                        [ngClass]="getColorCambioFC()"> <i class="fas" [ngClass]="getIconoCambioFC()"></i> {{
+                        getCambioFrecuenciaCardiaca() }} </span> </div>
+                  </div>
+                </app-campo-inteligente> </div> <!-- Frecuencia Respiratoria -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia Respiratoria *</label> <input
+                  formControlName="frecuencia_respiratoria" type="number" min="8" max="60" (input)="onSignosVitalesChange()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="16">
-                <div class="text-xs mt-1">
-                  <span class="text-gray-500">rpm</span>
-                  <span *ngIf="notaUrgenciasForm.get('frecuencia_respiratoria')?.value" 
-                        class="ml-2 px-2 py-1 rounded text-xs"
-                        [ngClass]="getColorFrecuenciaRespiratoria()">
-                    {{ getInterpretacionFrecuenciaRespiratoria() }}
-                  </span>
+                <div class="text-xs mt-1"> <span class="text-gray-500">rpm</span> <span
+                    *ngIf="notaUrgenciasForm.get('frecuencia_respiratoria')?.value" class="ml-2 px-2 py-1 rounded text-xs"
+                    [ngClass]="getColorFrecuenciaRespiratoria()"> {{ getInterpretacionFrecuenciaRespiratoria() }} </span>
                 </div>
-              </div>
-
-              <!-- Temperatura -->
-<div>
-      <app-campo-inteligente 
-        nombreCampo="temperatura"
-        formularioActual="notaUrgencias"
-        [formulario]="notaUrgenciasForm"
-        [obligatorio]="false">
-        
-        <label class="block text-sm font-medium text-gray-700 mb-1">Temperatura *</label>
-        <input formControlName="temperatura" type="number" step="0.1" min="32" max="45"
-          (input)="onSignosVitalesChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          placeholder="36.5">
-        <div class="text-xs mt-1 flex justify-between">
-          <div>
-            <span class="text-gray-500">°C</span>
-            <span *ngIf="notaUrgenciasForm.get('temperatura')?.value" 
-                  class="ml-2 px-2 py-1 rounded text-xs"
-                  [ngClass]="getColorTemperatura()">
-              {{ getInterpretacionTemperatura() }}
-            </span>
-          </div>
-          <div *ngIf="getCambioTemperatura()" class="text-xs">
-            <span class="px-2 py-1 rounded" [ngClass]="getColorCambioTemp()">
-              <i class="fas" [ngClass]="getIconoCambioTemp()"></i>
-              {{ getCambioTemperatura() }}
-            </span>
-          </div>
-        </div>
-      </app-campo-inteligente>
-    </div>
-
-              <!-- Saturación O2 -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Saturación O2 *</label>
-                <input formControlName="saturacion_oxigeno" type="number" min="50" max="100"
-                  (input)="onSignosVitalesChange()"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              </div> <!-- Temperatura -->
+              <div> <app-campo-inteligente nombreCampo="temperatura" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="false"> <label
+                    class="block text-sm font-medium text-gray-700 mb-1">Temperatura *</label> <input
+                    formControlName="temperatura" type="number" step="0.1" min="32" max="45" (input)="onSignosVitalesChange()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="36.5">
+                  <div class="text-xs mt-1 flex justify-between">
+                    <div> <span class="text-gray-500">°C</span> <span *ngIf="notaUrgenciasForm.get('temperatura')?.value"
+                        class="ml-2 px-2 py-1 rounded text-xs" [ngClass]="getColorTemperatura()"> {{
+                        getInterpretacionTemperatura() }} </span> </div>
+                    <div *ngIf="getCambioTemperatura()" class="text-xs"> <span class="px-2 py-1 rounded"
+                        [ngClass]="getColorCambioTemp()"> <i class="fas" [ngClass]="getIconoCambioTemp()"></i> {{
+                        getCambioTemperatura() }} </span> </div>
+                  </div>
+                </app-campo-inteligente> </div> <!-- Saturación O2 -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Saturación O2 *</label> <input
+                  formControlName="saturacion_oxigeno" type="number" min="50" max="100" (input)="onSignosVitalesChange()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="98">
-                <div class="text-xs mt-1">
-                  <span class="text-gray-500">%</span>
-                  <span *ngIf="notaUrgenciasForm.get('saturacion_oxigeno')?.value" 
-                        class="ml-2 px-2 py-1 rounded text-xs"
-                        [ngClass]="getColorSaturacionOxigeno()">
-                    {{ getInterpretacionSaturacionOxigeno() }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Glucosa -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Glucosa</label>
-                <input formControlName="glucosa" type="number" min="30" max="600"
-                  (input)="onSignosVitalesChange()"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                <div class="text-xs mt-1"> <span class="text-gray-500">%</span> <span
+                    *ngIf="notaUrgenciasForm.get('saturacion_oxigeno')?.value" class="ml-2 px-2 py-1 rounded text-xs"
+                    [ngClass]="getColorSaturacionOxigeno()"> {{ getInterpretacionSaturacionOxigeno() }} </span> </div>
+              </div> <!-- Glucosa -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Glucosa</label> <input
+                  formControlName="glucosa" type="number" min="30" max="600" (input)="onSignosVitalesChange()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="90">
-                <div class="text-xs mt-1">
-                  <span class="text-gray-500">mg/dL</span>
-                  <span *ngIf="notaUrgenciasForm.get('glucosa')?.value" 
-                        class="ml-2 px-2 py-1 rounded text-xs"
-                        [ngClass]="getColorGlucosa()">
-                    {{ getInterpretacionGlucosa() }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Escala del Dolor -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Escala del Dolor (EVA)</label>
-                <input formControlName="escala_dolor" type="number" min="0" max="10"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                <div class="text-xs mt-1"> <span class="text-gray-500">mg/dL</span> <span
+                    *ngIf="notaUrgenciasForm.get('glucosa')?.value" class="ml-2 px-2 py-1 rounded text-xs"
+                    [ngClass]="getColorGlucosa()"> {{ getInterpretacionGlucosa() }} </span> </div>
+              </div> <!-- Escala del Dolor -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Escala del Dolor (EVA)</label> <input
+                  formControlName="escala_dolor" type="number" min="0" max="10"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0">
-                <div class="text-xs mt-1">
-                  <span class="text-gray-500">0-10</span>
-                  <span *ngIf="notaUrgenciasForm.get('escala_dolor')?.value !== null" 
-                        class="ml-2 px-2 py-1 rounded text-xs"
-                        [ngClass]="getColorEscalaDolor()">
-                    {{ getInterpretacionEscalaDolor() }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Peso -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Peso</label>
-                <input formControlName="peso" type="number" step="0.1" min="1" max="300"
-                  (input)="onSignosVitalesChange()"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                <div class="text-xs mt-1"> <span class="text-gray-500">0-10</span> <span
+                    *ngIf="notaUrgenciasForm.get('escala_dolor')?.value !== null" class="ml-2 px-2 py-1 rounded text-xs"
+                    [ngClass]="getColorEscalaDolor()"> {{ getInterpretacionEscalaDolor() }} </span> </div>
+              </div> <!-- Peso -->
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Peso</label> <input formControlName="peso"
+                  type="number" step="0.1" min="1" max="300" (input)="onSignosVitalesChange()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="70">
-                <div class="text-xs mt-1">
-                  <span class="text-gray-500">kg</span>
-                </div>
+                <div class="text-xs mt-1"> <span class="text-gray-500">kg</span> </div>
               </div>
-            </div>
-
-            <!-- CÁLCULOS AUTOMÁTICOS -->
+            </div> <!-- Cálculos automáticos -->
             <div *ngIf="tieneSignosVitalesParaCalculos()" class="mt-6">
-              <h5 class="text-sm font-semibold text-gray-800 mb-3">
-                <i class="fas fa-calculator mr-2 text-blue-500"></i>Cálculos Automáticos
-              </h5>
-              
-              <div class="grid grid-cols-1 gap-4">
-                <!-- IMC -->
+              <h5 class="text-sm font-semibold text-gray-800 mb-3"> <i
+                  class="fas fa-calculator mr-2 text-gray-600"></i>Cálculos Automáticos </h5>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <!-- IMC -->
                 <div *ngIf="getIMCCalculado()" class="p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-xs text-gray-600">Índice de Masa Corporal</p>
                       <p class="text-lg font-semibold text-blue-700">{{ getIMCCalculado() }} kg/m²</p>
                       <p class="text-xs" [ngClass]="getColorIMC()">{{ getInterpretacionIMC() }}</p>
-                    </div>
-                    <i class="fas fa-weight text-blue-400"></i>
+                    </div> <i class="fas fa-weight text-blue-400"></i>
                   </div>
-                </div>
-
-                <!-- Superficie Corporal -->
+                </div> <!-- Superficie Corporal -->
                 <div *ngIf="getSuperficieCorporal()" class="p-3 bg-green-50 border border-green-200 rounded-md">
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-xs text-gray-600">Superficie Corporal</p>
                       <p class="text-lg font-semibold text-green-700">{{ getSuperficieCorporal() }} m²</p>
                       <p class="text-xs text-green-600">Fórmula de Mosteller</p>
-                    </div>
-                    <i class="fas fa-user text-green-400"></i>
+                    </div> <i class="fas fa-user text-green-400"></i>
                   </div>
-                </div>
-
-                <!-- Presión Arterial Media -->
-                <div *ngIf="getPresionArterialMedia()" class="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                </div> <!-- Presión Arterial Media -->
+                <div *ngIf="getPresionArterialMedia()" class="p-3 bg-gray-50 border border-gray-200 rounded-md">
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-xs text-gray-600">Presión Arterial Media</p>
-                      <p class="text-lg font-semibold text-purple-700">{{ getPresionArterialMedia() }} mmHg</p>
+                      <p class="text-lg font-semibold text-gray-700">{{ getPresionArterialMedia() }} mmHg</p>
                       <p class="text-xs" [ngClass]="getColorPAM()">{{ getInterpretacionPAM() }}</p>
-                    </div>
-                    <i class="fas fa-heart text-purple-400"></i>
+                    </div> <i class="fas fa-heart text-gray-400"></i>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Botón de sincronización manual -->
-<div class="mt-4 flex justify-between">
-    <button type="button" 
-            (click)="aplicarSignosVitalesDeIngreso()"
-            class="text-sm bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md flex items-center">
-      <i class="fas fa-copy mr-2"></i>
-      Usar Signos de Ingreso como Base
-    </button>
-    
-    <button type="button" 
-            (click)="sincronizarSignosVitales()"
-            class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
-      <i class="fas fa-sync mr-2"></i>
-      Sincronizar con Historial Principal
-    </button>
-  </div>
-          </div>
-
-          <!-- SECCIÓN 4: ESTADO MENTAL Y CONCIENCIA -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-brain mr-2 text-purple-500"></i>Estado Mental del Paciente *
-            </h4>
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado de Conciencia *</label>
-                <select formControlName="estado_conciencia"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div> <!-- Botones de signos vitales -->
+            <div class="mt-6 flex flex-col sm:flex-row justify-between gap-3"> <button type="button"
+                (click)="aplicarSignosVitalesDeIngreso()" [disabled]="!tieneSignosVitalesDeIngreso()"
+                [class]="tieneSignosVitalesDeIngreso() ? 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md flex items-center text-sm' : 'bg-gray-300 text-gray-500 px-4 py-2 rounded-md flex items-center cursor-not-allowed text-sm'">
+                <i class="fas fa-copy mr-2"></i> {{ tieneSignosVitalesDeIngreso() ? 'Usar Signos de Ingreso como Base' : 'Sin
+                datos de ingreso' }} </button> <button type="button" (click)="sincronizarSignosVitales()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center text-sm"> <i
+                  class="fas fa-sync mr-2"></i> Sincronizar con Historial Principal </button> </div>
+          </div> <!-- SECCIÓN 4: ESTADO MENTAL Y CONCIENCIA -->
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"> <i
+                class="fas fa-brain mr-2 text-gray-600"></i> Estado Mental del Paciente * </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Estado de Conciencia *</label> <select
+                  formControlName="estado_conciencia"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Seleccionar estado...</option>
                   <option value="Alerta y orientado">Alerta y orientado</option>
                   <option value="Alerta y confuso">Alerta y confuso</option>
@@ -5135,66 +5010,58 @@
                 <div *ngIf="notaUrgenciasForm.get('estado_conciencia')?.errors?.['required']"
                   class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 numeral 7.1.4</div>
               </div>
+              <div> <label class="block text-sm font-medium text-gray-700 mb-1">Estado Mental Adicional</label> <textarea
+                  formControlName="estado_mental" rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Aspectos adicionales: cooperación, agitación, ansiedad, etc."></textarea> </div>
+            </div>
+          </div> <!-- SECCIÓN 5: RESUMEN DEL INTERROGATORIO Y EXPLORACIÓN -->
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"> <i
+                class="fas fa-stethoscope mr-2 text-gray-600"></i> Resumen del Interrogatorioy Exploración Física *
+            </h4>
+            <div class="grid grid-cols-1 gap-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado Mental Adicional</label>
-                <textarea formControlName="estado_mental" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Aspectos adicionales: cooperación, agitación, ansiedad, etc."></textarea>
+                <app-campo-inteligente
+                  nombreCampo="interrogatorio_cardiovascular,interrogatorio_respiratorio,interrogatorio_digestivo"
+                  formularioActual="notaUrgencias" [formulario]="notaUrgenciasForm" [obligatorio]="true"
+                  [mapeoDestino]="'resumen_interrogatorio'">
+      
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Resumen del Interrogatorio *</label>
+                  <textarea formControlName="resumen_interrogatorio" rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Resumen de los antecedentes relevantes para la urgencia actual..."></textarea>
+                  <div *ngIf="notaUrgenciasForm.get('resumen_interrogatorio')?.errors?.['required']"
+                    class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
+                </app-campo-inteligente>
+              </div>
+              <div>
+                <app-campo-inteligente nombreCampo="exploracion_general" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="true" [mapeoDestino]="'exploracion_fisica'">
+      
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Exploración Física *</label>
+                  <textarea formControlName="exploracion_fisica" rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Hallazgos relevantes de la exploración física dirigida a la urgencia..."></textarea>
+                  <div *ngIf="notaUrgenciasForm.get('exploracion_fisica')?.errors?.['required']"
+                    class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
+                </app-campo-inteligente>
               </div>
             </div>
           </div>
-
-          <!-- SECCIÓN 5: RESUMEN DEL INTERROGATORIO Y EXPLORACIÓN -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-stethoscope mr-2 text-blue-500"></i>Resumen del Interrogatorio y Exploración Física *
-            </h4>
-            <div class="grid grid-cols-1 gap-4">
-<div>
-  <app-campo-inteligente 
-    nombreCampo="interrogatorio_cardiovascular,interrogatorio_respiratorio,interrogatorio_digestivo"
-    formularioActual="notaUrgencias"
-    [formulario]="notaUrgenciasForm"
-    [obligatorio]="true"
-    [mapeoDestino]="'resumen_interrogatorio'">
-    
-    <label class="block text-sm font-medium text-gray-700 mb-1">Resumen del Interrogatorio *</label>
-    <textarea formControlName="resumen_interrogatorio" rows="4"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-      placeholder="Resumen de los antecedentes relevantes para la urgencia actual..."></textarea>
-    <div *ngIf="notaUrgenciasForm.get('resumen_interrogatorio')?.errors?.['required']"
-      class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
-  </app-campo-inteligente>
-</div>
-<div>
-  <app-campo-inteligente 
-    nombreCampo="exploracion_general"
-    formularioActual="notaUrgencias"
-    [formulario]="notaUrgenciasForm"
-    [obligatorio]="true"
-    [mapeoDestino]="'exploracion_fisica'">
-    
-    <label class="block text-sm font-medium text-gray-700 mb-1">Exploración Física *</label>
-    <textarea formControlName="exploracion_fisica" rows="4"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-      placeholder="Hallazgos relevantes de la exploración física dirigida a la urgencia..."></textarea>
-    <div *ngIf="notaUrgenciasForm.get('exploracion_fisica')?.errors?.['required']"
-      class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004</div>
-  </app-campo-inteligente>
-</div>
-            </div>
-          </div>
-
+      
           <!-- SECCIÓN 6: ESTUDIOS AUXILIARES -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-microscope mr-2 text-green-500"></i>Resultados de Estudios
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+              <i class="fas fa-microscope mr-2 text-gray-600"></i>
+              Resultados de Estudios
             </h4>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Resultados de Estudios de Servicios Auxiliares de
-                Diagnóstico y Tratamiento</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Resultados de Estudios de Servicios Auxiliares de Diagnóstico y Tratamiento
+              </label>
               <textarea formControlName="resultados_estudios" rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Resultados relevantes de estudios de laboratorio, gabinete y otros (NOM-004 7.1.5)..."></textarea>
               <div class="text-xs text-gray-500 mt-1">
                 <i class="fas fa-info-circle mr-1"></i>
@@ -5202,58 +5069,62 @@
               </div>
             </div>
           </div>
-
+      
           <!-- SECCIÓN 7: GUÍAS CLÍNICAS -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-book-medical mr-2 text-indigo-500"></i>Guías Clínicas de Diagnóstico
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+              <i class="fas fa-book-medical mr-2 text-gray-600"></i>
+              Guías Clínicas de Diagnóstico
             </h4>
+      
             <!-- Guías seleccionadas -->
             <div *ngIf="guiasClinicasSeleccionadas.length > 0" class="mb-4">
               <div class="flex flex-wrap gap-2">
                 <div *ngFor="let guia of guiasClinicasSeleccionadas"
-                  class="bg-red-100 text-red-800 px-3 py-2 rounded-full text-sm flex items-center">
+                  class="bg-blue-100 text-blue-800 px-3 py-2 rounded-full text-sm flex items-center">
                   <span>{{ guia.nombre }}</span>
                   <button type="button" (click)="eliminarGuiaClinica(guia)"
-                    class="ml-2 text-red-600 hover:text-red-800 hover:bg-red-200 rounded-full p-1" title="Eliminar guía clínica">
-                    <i class="fas fa-times">x</i>
+                    class="ml-2 text-blue-600 hover:text-blue-800 hover:bg-blue-200 rounded-full p-1"
+                    title="Eliminar guía clínica">
+                    <i class="fas fa-times"></i>
                   </button>
                 </div>
               </div>
             </div>
+      
             <!-- Buscador de guías -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 Agregar Guía Clínica de Urgencias
-                <span class="text-red-500 ml-1 cursor-help" title="Puede seleccionar múltiples guías clínicas">
+                <span class="text-gray-500 ml-1 cursor-help" title="Puede seleccionar múltiples guías clínicas">
                   <i class="fas fa-question-circle"></i>
                 </span>
               </label>
-
+      
               <div class="relative">
                 <div class="flex">
                   <input type="text" [(ngModel)]="filtroGuiaClinica" [ngModelOptions]="{standalone: true}"
                     (ngModelChange)="onGuiaClinicaInputChange($event)" (focus)="toggleDropdownGuias()"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Buscar guías clínicas para urgencias...">
                   <button type="button" (click)="toggleDropdownGuias()"
-                    class="px-3 py-2 bg-red-500 text-white border border-red-500 rounded-r-md hover:bg-red-600">
+                    class="px-3 py-2 bg-gray-600 text-white border border-gray-600 rounded-r-md hover:bg-gray-700">
                     <i class="fas fa-plus"></i>
                   </button>
                 </div>
-
+      
                 <!-- Dropdown de guías -->
                 <div *ngIf="mostrarDropdownGuias && guiasClinicasFiltradas"
                   class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-
+      
                   <div *ngIf="guiasClinicasFiltradas.length === 0" class="p-4 text-gray-500 text-center">
                     No se encontraron guías clínicas
                   </div>
-
+      
                   <div *ngFor="let guia of guiasClinicasFiltradas; trackBy: trackByGuiaId" (click)="agregarGuiaClinica(guia)"
                     class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                    [class.bg-red-50]="esGuiaSeleccionada(guia)">
-
+                    [class.bg-blue-50]="esGuiaSeleccionada(guia)">
+      
                     <div class="flex justify-between items-center">
                       <div>
                         <div class="font-medium text-gray-900">{{ guia.nombre }}</div>
@@ -5262,168 +5133,159 @@
                           <span *ngIf="guia.area" class="ml-1">• {{ guia.area }}</span>
                         </div>
                       </div>
-                      <i *ngIf="esGuiaSeleccionada(guia)" class="fas fa-check text-red-500"></i>
+                      <i *ngIf="esGuiaSeleccionada(guia)" class="fas fa-check text-blue-500"></i>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
+      
           <!-- SECCIÓN 8: DIAGNÓSTICO Y PLAN -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-clipboard-list mr-2 text-indigo-500"></i>Diagnóstico y Plan de Tratamiento *
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+              <i class="fas fa-clipboard-list mr-2 text-gray-600"></i>
+              Diagnóstico y Plan de Tratamiento *
             </h4>
-            <div class="grid grid-cols-1 gap-4">
-<div>
-  <app-campo-inteligente 
-    nombreCampo="impresion_diagnostica"
-    formularioActual="notaUrgencias"
-    [formulario]="notaUrgenciasForm"
-    [obligatorio]="true"
-    [mapeoDestino]="'diagnostico'">
-    
-    <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico(s) o Problemas Clínicos *</label>
-    <textarea formControlName="diagnostico" rows="3"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-      placeholder="Diagnóstico principal y diagnósticos diferenciales..."></textarea>
-    <div *ngIf="notaUrgenciasForm.get('diagnostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
-      Campo obligatorio según NOM-004 numeral 7.1.6</div>
-  </app-campo-inteligente>
-</div>
-<div class="mb-4">
-  <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
-    <i class="fas fa-ambulance mr-2 text-red-600"></i>
-    Código CIE-10 de Urgencias
-  </h5>
-
-  <!-- CIE-10 seleccionado -->
-  <div *ngIf="notaUrgenciasForm.get('codigo_cie10')?.value" class="mb-3">
-    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="w-3 h-3 bg-red-500 rounded-full mr-3 animate-pulse"></div>
-          <div>
-            <div class="font-medium text-red-900 flex items-center">
-              <i class="fas fa-exclamation-triangle mr-1 text-red-600"></i>
-              {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[0] }}
-            </div>
-            <div class="text-sm text-red-700">
-              {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[1] }}
-            </div>
-          </div>
-        </div>
-        <button type="button" 
-          (click)="notaUrgenciasForm.get('codigo_cie10')?.setValue('')"
-          class="text-red-600 hover:text-red-800 p-1">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Buscador CIE-10 -->
-  <div class="relative">
-    <label class="block text-sm font-medium text-gray-700 mb-1">
-      <i class="fas fa-user-injured mr-1 text-red-500"></i>
-      Clasificación de Urgencia
-      <span class="text-red-500 ml-1 cursor-help" 
-        title="Código CIE-10 para categorización de urgencias médicas">
-        <i class="fas fa-info-circle"></i>
-      </span>
-    </label>
-
-    <div class="relative">
-      <div class="flex">
-        <input type="text" 
-          formControlName="codigo_cie10"
-          (input)="buscarCodigosCie10($any($event.target).value, 'notaUrgencias')"
-          (focus)="mostrarDropdownCie10 = true"
-          class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          placeholder="Buscar código para caso de urgencia..."
-          autocomplete="off">
-        <button type="button" 
-          (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
-          class="px-3 py-2 bg-red-500 text-white border border-red-500 rounded-r-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
-          <i class="fas fa-plus-square"></i>
-        </button>
-      </div>
-
-      <!-- Dropdown mejorado -->
-      <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
-        class="absolute z-50 w-full mt-1 bg-white border border-red-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
-        
-        <div class="px-3 py-2 bg-red-50 border-b border-red-200">
-          <div class="text-xs font-semibold text-red-800 uppercase tracking-wide flex items-center">
-            <i class="fas fa-triage mr-1"></i>
-            Códigos de Urgencias ({{ codigosCie10Filtrados.length }})
-          </div>
-        </div>
-
-        <div *ngFor="let codigo of codigosCie10Filtrados"
-          (click)="seleccionarCie10(codigo, 'notaUrgencias')"
-          class="px-3 py-3 hover:bg-red-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
-          
-          <div class="flex items-start space-x-3">
-            <div class="flex-shrink-0">
-              <div class="w-2 h-2 bg-red-500 rounded-full mt-2 animate-pulse"></div>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="font-medium text-red-700 text-sm flex items-center">
-                <i class="fas fa-exclamation mr-1 text-red-500"></i>
-                {{ codigo.codigo }}
+      
+            <div class="grid grid-cols-1 gap-6">
+              <div>
+                <app-campo-inteligente nombreCampo="impresion_diagnostica" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="true" [mapeoDestino]="'diagnostico'">
+      
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico(s) o Problemas Clínicos *</label>
+                  <textarea formControlName="diagnostico" rows="3"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Diagnóstico principal y diagnósticos diferenciales..."></textarea>
+                  <div *ngIf="notaUrgenciasForm.get('diagnostico')?.errors?.['required']" class="text-red-500 text-xs mt-1">
+                    Campo obligatorio según NOM-004 numeral 7.1.6</div>
+                </app-campo-inteligente>
               </div>
-              <div class="text-sm text-gray-600 mt-1">
-                {{ codigo.descripcion }}
+      
+              <!-- Código CIE-10 -->
+              <div class="mb-4">
+                <h5 class="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                  <i class="fas fa-code mr-2 text-gray-600"></i>
+                  Código CIE-10 de Urgencias
+                </h5>
+      
+                <!-- CIE-10 seleccionado -->
+                <div *ngIf="notaUrgenciasForm.get('codigo_cie10')?.value" class="mb-3">
+                  <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                        <div>
+                          <div class="font-medium text-blue-900 flex items-center">
+                            <i class="fas fa-tag mr-1 text-blue-600"></i>
+                            {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[0] }}
+                          </div>
+                          <div class="text-sm text-blue-700">
+                            {{ notaUrgenciasForm.get('codigo_cie10')?.value?.split(' - ')[1] }}
+                          </div>
+                        </div>
+                      </div>
+                      <button type="button" (click)="notaUrgenciasForm.get('codigo_cie10')?.setValue('')"
+                        class="text-gray-500 hover:text-gray-700 p-1">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+      
+                <!-- Buscador CIE-10 -->
+                <div class="relative">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-search mr-1 text-gray-500"></i>
+                    Clasificación de Urgencia
+                    <span class="text-gray-500 ml-1 cursor-help"
+                      title="Código CIE-10 para categorización de urgencias médicas">
+                      <i class="fas fa-info-circle"></i>
+                    </span>
+                  </label>
+      
+                  <div class="relative">
+                    <div class="flex">
+                      <input type="text" formControlName="codigo_cie10"
+                        (input)="buscarCodigosCie10($any($event.target).value, 'notaUrgencias')"
+                        (focus)="mostrarDropdownCie10 = true"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Buscar código para caso de urgencia..." autocomplete="off">
+                      <button type="button" (click)="mostrarDropdownCie10 = !mostrarDropdownCie10"
+                        class="px-3 py-2 bg-gray-600 text-white border border-gray-600 rounded-r-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search"></i>
+                      </button>
+                    </div>
+      
+                    <!-- Dropdown CIE-10 -->
+                    <div *ngIf="mostrarDropdownCie10 && codigosCie10Filtrados.length > 0"
+                      class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+      
+                      <div class="px-3 py-2 bg-gray-50 border-b border-gray-200">
+                        <div class="text-xs font-semibold text-gray-800 uppercase tracking-wide flex items-center">
+                          <i class="fas fa-list mr-1"></i>
+                          Códigos de Urgencias ({{ codigosCie10Filtrados.length }})
+                        </div>
+                      </div>
+      
+                      <div *ngFor="let codigo of codigosCie10Filtrados" (click)="seleccionarCie10(codigo, 'notaUrgencias')"
+                        class="px-3 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors duration-150">
+      
+                        <div class="flex items-start space-x-3">
+                          <div class="flex-shrink-0">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <div class="font-medium text-gray-700 text-sm flex items-center">
+                              <i class="fas fa-tag mr-1 text-gray-500"></i>
+                              {{ codigo.codigo }}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">
+                              {{ codigo.descripcion }}
+                            </div>
+                          </div>
+                          <div class="flex-shrink-0">
+                            <i class="fas fa-arrow-right text-gray-400 mt-1"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+      
+                  <!-- Información adicional -->
+                  <div class="mt-2 text-xs text-gray-600 flex items-center">
+                    <i class="fas fa-info mr-1"></i>
+                    Clasificación para priorización de urgencias médicas
+                  </div>
+                </div>
+              </div>
+      
+              <div>
+                <app-campo-inteligente nombreCampo="plan_terapeutico" formularioActual="notaUrgencias"
+                  [formulario]="notaUrgenciasForm" [obligatorio]="true" [mapeoDestino]="'plan_tratamiento'">
+      
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento y Pronóstico *</label>
+                  <textarea formControlName="plan_tratamiento" rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Tratamiento inmediato, medicamentos y pronóstico..."></textarea>
+                  <div *ngIf="notaUrgenciasForm.get('plan_tratamiento')?.errors?.['required']"
+                    class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 numeral 7.1.7</div>
+                </app-campo-inteligente>
               </div>
             </div>
-            <div class="flex-shrink-0">
-              <i class="fas fa-plus-circle text-red-400 mt-1"></i>
-            </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Información adicional -->
-    <div class="mt-2 text-xs text-red-600 flex items-center">
-      <i class="fas fa-clock mr-1"></i>
-      Clasificación para priorización de urgencias médicas
-    </div>
-  </div>
-</div>
-
-
-<div>
-  <app-campo-inteligente 
-    nombreCampo="plan_terapeutico"
-    formularioActual="notaUrgencias"
-    [formulario]="notaUrgenciasForm"
-    [obligatorio]="true"
-    [mapeoDestino]="'plan_tratamiento'">
-    
-    <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento y Pronóstico *</label>
-    <textarea formControlName="plan_tratamiento" rows="4"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-      placeholder="Tratamiento inmediato, medicamentos y pronóstico..."></textarea>
-    <div *ngIf="notaUrgenciasForm.get('plan_tratamiento')?.errors?.['required']"
-      class="text-red-500 text-xs mt-1">Campo obligatorio según NOM-004 numeral 7.1.7</div>
-  </app-campo-inteligente>
-</div>
-            </div>
-          </div>
-
+      
           <!-- SECCIÓN 9: PRONÓSTICO Y DESTINO -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-route mr-2 text-teal-500"></i>Pronóstico y Destino del Paciente
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+              <i class="fas fa-route mr-2 text-gray-600"></i>
+              Pronóstico y Destino del Paciente
             </h4>
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pronóstico Específico</label>
                 <select formControlName="pronostico"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Seleccionar pronóstico...</option>
                   <option value="Excelente">Excelente</option>
                   <option value="Bueno">Bueno</option>
@@ -5435,7 +5297,7 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Destino del Paciente después de Urgencias</label>
                 <select formControlName="destino_paciente"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="">Seleccionar destino...</option>
                   <option value="Alta médica">Alta médica</option>
                   <option value="Hospitalización">Hospitalización</option>
@@ -5448,16 +5310,17 @@
               </div>
             </div>
           </div>
-
+      
           <!-- SECCIÓN 10: PROCEDIMIENTOS EN URGENCIAS -->
-          <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">
-              <i class="fas fa-tools mr-2 text-blue-600"></i>Procedimientos Realizados en Urgencias
+          <div class="mb-8">
+            <h4 class="text-md font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+              <i class="fas fa-tools mr-2 text-gray-600"></i>
+              Procedimientos Realizados en Urgencias
             </h4>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Procedimientos en el Área de Urgencias</label>
               <textarea formControlName="procedimientos_urgencias" rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Describa los procedimientos específicos realizados en el área de urgencias..."></textarea>
               <div class="text-xs text-gray-500 mt-1">
                 <i class="fas fa-info-circle mr-1"></i>
@@ -5465,48 +5328,50 @@
               </div>
             </div>
           </div>
-
+      
           <!-- BOTONES DE ACCIÓN -->
-          <div class="mt-6 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <button type="button" (click)="limpiarFormulario('notaUrgencias')"
-                class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-                <i class="fas fa-eraser mr-2"></i>
-                Limpiar
-              </button>
-
-              <button type="button" (click)="guardarBorrador()"
-                class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors">
-                <i class="fas fa-save mr-2"></i>
-                Guardar Borrador
-              </button>
-            </div>
-
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <button type="button" (click)="guardarNotaUrgencias()"
-                [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
-                class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 sm:px-6 rounded transition-colors">
-                <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
-                <i *ngIf="!isCreatingDocument" class="fas fa-ambulance mr-2"></i>
-                {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota' }}
-              </button>
-
-              <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 transition-colors">
-                <i class="fas fa-file-pdf mr-2"></i>
-                {{ formularioEstado.notaUrgencias ? 'Generar PDF' : 'Guardar primero' }}
-              </button>
-            
+          <div class="mt-8 pt-6 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row justify-between gap-4">
+      
+              <!-- Botones secundarios -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" (click)="limpiarFormulario('notaUrgencias')"
+                  class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center justify-center">
+                  <i class="fas fa-eraser mr-2"></i>
+                  Limpiar
+                </button>
+      
+                <button type="button" (click)="guardarBorrador()"
+                  class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center justify-center">
+                  <i class="fas fa-save mr-2"></i>
+                  Guardar Borrador
+                </button>
+              </div>
+      
+              <!-- Botones principales -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" (click)="guardarNotaUrgencias()"
+                  [disabled]="!notaUrgenciasForm.valid || isCreatingDocument"
+                  class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-md transition-colors flex items-center justify-center">
+                  <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
+                  <i *ngIf="!isCreatingDocument" class="fas fa-ambulance mr-2"></i>
+                  {{ isCreatingDocument ? 'Guardando...' : 'Guardar Nota' }}
+                </button>
+      
+                <button type="button" (click)="generarPDF('Nota de Urgencias')" [disabled]="!formularioEstado.notaUrgencias"
+                  class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center justify-center">
+                  <i class="fas fa-file-pdf mr-2"></i>
+                  {{ formularioEstado.notaUrgencias ? 'Generar PDF' : 'Guardar primero' }}
+                </button>
+              </div>
             </div>
           </div>
-
-
-
+      
           <!-- INFORMACIÓN NORMATIVA -->
-          <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="mt-8 pt-6 border-t border-gray-200">
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-start space-x-3">
-                <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                <i class="fas fa-info-circle text-blue-600 mt-1"></i>
                 <div>
                   <h5 class="text-sm font-medium text-gray-900 mb-2">Cumplimiento Normativo NOM-004-SSA3-2012</h5>
                   <div class="text-xs text-gray-600 space-y-1">
@@ -5521,19 +5386,17 @@
                 </div>
               </div>
             </div>
-
+      
             <div class="mt-3 text-center">
               <div class="text-sm text-gray-500">
-                <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+                <i class="fas fa-exclamation-triangle mr-1 text-amber-500"></i>
                 Los campos marcados con * son obligatorios según NOM-004-SSA3-2012
               </div>
             </div>
           </div>
-
+      
         </form>
       </div>
-
-
 
 
 

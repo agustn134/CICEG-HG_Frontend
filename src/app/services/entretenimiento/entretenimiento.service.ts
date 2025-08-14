@@ -131,14 +131,14 @@ export class EntretenimientoService {
 
   // Categorías médicas
   private medicalCategories: MedicalCategory[] = [
-    { id: 'anatomia', name: 'Anatomía', description: 'Estructura del cuerpo humano', icon: '🦴', color: '#FF6B6B' },
-    { id: 'fisiologia', name: 'Fisiología', description: 'Funcionamiento del organismo', icon: '⚡', color: '#4ECDC4' },
-    { id: 'cardiologia', name: 'Cardiología', description: 'Sistema cardiovascular', icon: '❤️', color: '#45B7D1' },
+    { id: 'anatomia', name: 'Anatomía', description: 'Estructura del cuerpo humano', icon: '', color: '#FF6B6B' },
+    { id: 'fisiologia', name: 'Fisiología', description: 'Funcionamiento del organismo', icon: '', color: '#4ECDC4' },
+    { id: 'cardiologia', name: 'Cardiología', description: 'Sistema cardiovascular', icon: '', color: '#45B7D1' },
     { id: 'neurologia', name: 'Neurología', description: 'Sistema nervioso', icon: '🧠', color: '#96CEB4' },
     { id: 'endocrinologia', name: 'Endocrinología', description: 'Sistema endocrino y hormonas', icon: '🔬', color: '#FECA57' },
-    { id: 'farmacologia', name: 'Farmacología', description: 'Medicamentos y tratamientos', icon: '💊', color: '#FF9FF3' },
+    { id: 'farmacologia', name: 'Farmacología', description: 'Medicamentos y tratamientos', icon: '', color: '#FF9FF3' },
     { id: 'epidemiologia', name: 'Epidemiología', description: 'Estudios poblacionales de salud', icon: ' ', color: '#54A0FF' },
-    { id: 'patologia', name: 'Patología', description: 'Estudio de enfermedades', icon: '🧫', color: '#A55EEA' },
+    { id: 'patologia', name: 'Patología', description: 'Estudio de enfermedades', icon: '', color: '#A55EEA' },
   ];
 
   // Logros
@@ -147,7 +147,7 @@ export class EntretenimientoService {
       id: 'first_steps',
       title: 'Primeros Pasos',
       description: 'Respondiste tu primera pregunta',
-      icon: '👟',
+      icon: ' ',
       unlocked: false,
       condition: (stats) => stats.answered >= 1,
     },
@@ -155,7 +155,7 @@ export class EntretenimientoService {
       id: 'accuracy_master',
       title: 'Maestro de la Precisión',
       description: 'Alcanzaste una precisión del 90% o más',
-      icon: '🎯',
+      icon: '',
       unlocked: false,
       condition: (stats) => stats.accuracy >= 90,
     },
@@ -163,7 +163,7 @@ export class EntretenimientoService {
       id: 'streak_king',
       title: 'Rey de la Racha',
       description: 'Lograste una racha de 10 respuestas correctas',
-      icon: '🔥',
+      icon: '',
       unlocked: false,
       condition: (stats) => stats.streak >= 10,
     },
@@ -171,7 +171,7 @@ export class EntretenimientoService {
       id: 'knowledge_seeker',
       title: 'Buscador del Conocimiento',
       description: 'Alcanzaste el nivel 5',
-      icon: '📚',
+      icon: '',
       unlocked: false,
       condition: (stats) => stats.level >= 5,
     },
@@ -179,7 +179,7 @@ export class EntretenimientoService {
       id: 'zen_master',
       title: 'Maestro Zen',
       description: 'Completaste una sesión de bienestar completa',
-      icon: '🧘',
+      icon: '',
       unlocked: false,
       condition: () => this.getWellnessProgress() === 100,
     },
@@ -268,7 +268,7 @@ export class EntretenimientoService {
       if (!achievement.unlocked && achievement.condition(this._triviaStats)) {
         achievement.unlocked = true;
         newUnlocks = true;
-        console.log(`🎉 Logro desbloqueado: ${achievement.title}`);
+        console.log(` Logro desbloqueado: ${achievement.title}`);
       }
     });
 
@@ -576,7 +576,7 @@ private getMedicalTriviaFallback(): TriviaQuestion {
 
   public pauseTrack(): void {
     this.isPlayingSubject.next(false);
-    console.log('⏸️ Música pausada');
+    console.log('⏸ Música pausada');
   }
 
   // ==========================================
@@ -620,9 +620,9 @@ private getMedicalTriviaFallback(): TriviaQuestion {
 
   getRecommendationEmoji(): string {
     const progress = this.getWellnessProgress();
-    if (progress === 100) return '🌟';
-    if (progress < 50) return '🧠';
-    return '😺';
+    if (progress === 100) return '>';
+    if (progress < 50) return '<';
+    return '>';
   }
 
   // ==========================================
@@ -657,4 +657,29 @@ private getMedicalTriviaFallback(): TriviaQuestion {
   getMedicalCategories(): MedicalCategory[] {
     return this.medicalCategories;
   }
+
+
+
+  // En entretenimiento.service.ts - Agregar este método:
+
+unlockSpecialAchievement(achievementId: string): void {
+  const specialAchievements = {
+    'master_zen_supreme': {
+      id: 'master_zen_supreme',
+      title: 'Maestro Zen Supremo',
+      description: 'Alcanzaste el 100% de relajación en una sesión',
+      icon: '🧘‍♀️',
+      unlocked: true,
+      condition: () => true
+    }
+  };
+
+  const achievement = specialAchievements[achievementId as keyof typeof specialAchievements];
+  if (achievement) {
+    this.achievements.push(achievement);
+    this.saveAchievements();
+  }
+}
+
+
 }

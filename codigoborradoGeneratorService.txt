@@ -24,7 +24,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const nombreArchivo = `nota-urgencias-${pacienteCompleto.nombre.replace(/\s+/g, '-').toLowerCase()}-${fechaActual.toISOString().split('T')[0]}.pdf`;
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
-    console.log('✅ PDF de Nota de Urgencias generado exitosamente');
+    console.log('   PDF de Nota de Urgencias generado exitosamente');
     // 5. Validación específica
     this.validarCumplimientoNotaUrgencias(datos, medicoCompleto, pacienteCompleto);
   } catch (error) {
@@ -68,7 +68,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Evolución generado exitosamente');
+    console.log('   PDF de Nota de Evolución generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaEvolucion(datos, medicoCompleto, pacienteCompleto);
@@ -109,7 +109,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Egreso generado exitosamente');
+    console.log('   PDF de Nota de Egreso generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaEgreso(datos, medicoCompleto, pacienteCompleto);
@@ -147,7 +147,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota de Interconsulta generado exitosamente');
+    console.log('   PDF de Nota de Interconsulta generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaInterconsulta(datos, medicoCompleto, pacienteCompleto);
@@ -187,7 +187,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota Preoperatoria generado exitosamente');
+    console.log('   PDF de Nota Preoperatoria generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaPreoperatoria(datos, medicoCompleto, pacienteCompleto);
@@ -227,7 +227,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota Postoperatoria generado exitosamente');
+    console.log('   PDF de Nota Postoperatoria generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaPostoperatoria(datos, medicoCompleto, pacienteCompleto);
@@ -267,7 +267,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota Preanestésica generado exitosamente');
+    console.log('   PDF de Nota Preanestésica generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Nota Preanestésica:', error);
@@ -305,7 +305,7 @@ async generarNotaUrgencias(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Nota Postanestésica generado exitosamente');
+    console.log('   PDF de Nota Postanestésica generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoNotaPostanestesica(datos, medicoCompleto, pacienteCompleto);
@@ -346,7 +346,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento Informado de Procedimientos generado exitosamente');
+    console.log('   PDF de Consentimiento Informado de Procedimientos generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoConsentimientoProcedimientos(datos, medicoCompleto, pacienteCompleto);
@@ -384,7 +384,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento de Hospitalización generado exitosamente');
+    console.log('   PDF de Consentimiento de Hospitalización generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoConsentimientoHospitalizacion(datos, medicoCompleto, pacienteCompleto);
@@ -422,7 +422,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento de Referencia generado exitosamente');
+    console.log('   PDF de Consentimiento de Referencia generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoConsentimientoReferencia(datos, medicoCompleto, pacienteCompleto);
@@ -460,7 +460,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento de Transfusión Sanguínea generado exitosamente');
+    console.log('   PDF de Consentimiento de Transfusión Sanguínea generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoConsentimientoTransfusion(datos, medicoCompleto, pacienteCompleto);
@@ -498,7 +498,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Consentimiento de Tratamiento Médico generado exitosamente');
+    console.log('   PDF de Consentimiento de Tratamiento Médico generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoConsentimientoTratamiento(datos, medicoCompleto, pacienteCompleto);
@@ -540,7 +540,7 @@ const documentDefinition = await this.pdfTemplatesService.generarConsentimientoP
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Hoja de Alta Voluntaria generado exitosamente');
+    console.log('   PDF de Hoja de Alta Voluntaria generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoAltaVoluntaria(datos, medicoCompleto, pacienteCompleto);
@@ -578,7 +578,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Hoja de Informe Diario generado exitosamente');
+    console.log('   PDF de Hoja de Informe Diario generado exitosamente');
 
     // 5. Validación específica
     this.validarCumplimientoInformeDiario(datos, medicoCompleto, pacienteCompleto);
@@ -616,7 +616,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Hoja Frontal de Expediente generado exitosamente');
+    console.log('   PDF de Hoja Frontal de Expediente generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Hoja Frontal de Expediente:', error);
@@ -655,7 +655,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Solicitud de Laboratorio generado exitosamente');
+    console.log('   PDF de Solicitud de Laboratorio generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Solicitud de Laboratorio:', error);
@@ -690,7 +690,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Solicitud de Imagenología generado exitosamente');
+    console.log('   PDF de Solicitud de Imagenología generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
@@ -725,7 +725,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
     const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
     pdfDocGenerator.download(nombreArchivo);
 
-    console.log('✅ PDF de Solicitud de Cultivo generado exitosamente');
+    console.log('   PDF de Solicitud de Cultivo generado exitosamente');
 
   } catch (error) {
     console.error('❌ Error al generar PDF de Solicitud de Imagenología:', error);
@@ -762,7 +762,7 @@ private async generarHojaInformeDiario(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Prescripción de Medicamentos generado exitosamente');
+   console.log('   PDF de Prescripción de Medicamentos generado exitosamente');
 
    // 5. Validación específica
    this.validarCumplimientoPrescripcionMedicamentos(datos, medicoCompleto, pacienteCompleto);
@@ -802,7 +802,7 @@ private async generarRegistroTransfusion(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Registro de Transfusión generado exitosamente');
+   console.log('   PDF de Registro de Transfusión generado exitosamente');
 
    // 5. Validación específica
    this.validarCumplimientoRegistroTransfusion(datos, medicoCompleto, pacienteCompleto);
@@ -842,7 +842,7 @@ private async generarHojaQuirofano(datos: any): Promise<void> {
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log('✅ PDF de Hoja de Quirófano generado exitosamente');
+   console.log('   PDF de Hoja de Quirófano generado exitosamente');
 
  } catch (error) {
    console.error('❌ Error al generar PDF de Hoja de Quirófano:', error);
@@ -1058,7 +1058,7 @@ private async generarDocumentoGenerico(tipoDocumento: string, datos: any): Promi
    const pdfDocGenerator = this.pdfMake.createPdf(documentDefinition);
    pdfDocGenerator.download(nombreArchivo);
 
-   console.log(`✅ PDF de ${tipoDocumento} generado exitosamente`);
+   console.log(`   PDF de ${tipoDocumento} generado exitosamente`);
 
  } catch (error) {
    console.error(`❌ Error al generar PDF de ${tipoDocumento}:`, error);

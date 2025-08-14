@@ -1,13 +1,13 @@
 // src/app/campo-inteligente/campo-inteligente.component.ts
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // ✅ AGREGADO
+import { CommonModule } from '@angular/common'; //    AGREGADO
 import { ModoInteligenteService } from '../services/modo-inteligente.service';
 
 @Component({
   selector: 'app-campo-inteligente',
-  standalone: true, // ✅ AGREGADO para Angular 20
-  imports: [CommonModule], // ✅ AGREGADO
+  standalone: true, //    AGREGADO para Angular 20
+  imports: [CommonModule], //    AGREGADO
   template: `
     <div class="campo-inteligente-container">
       <!-- Campo normal cuando debe mostrarse -->

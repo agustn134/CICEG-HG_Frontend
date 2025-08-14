@@ -28,12 +28,12 @@ export class PdfTemplatesService {
 //   const numeroRegular = expediente?.expediente?.numero_expediente;
   
 //   if (numeroAdministrativo) {
-//     console.log('✅ Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
+//     console.log('   Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
 //     return numeroAdministrativo;
 //   }
   
 //   if (numeroRegular) {
-//     console.log('✅ Número REGULAR encontrado:', numeroRegular);
+//     console.log('   Número REGULAR encontrado:', numeroRegular);
 //     return numeroRegular;
 //   }
   
@@ -54,12 +54,12 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
   const numeroRegular = expediente?.expediente?.numero_expediente;
   
   if (numeroAdministrativo) {
-    console.log('✅ Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
+    console.log('   Número ADMINISTRATIVO encontrado:', numeroAdministrativo);
     return numeroAdministrativo;
   }
   
   if (numeroRegular) {
-    console.log('✅ Número REGULAR encontrado:', numeroRegular);
+    console.log('   Número REGULAR encontrado:', numeroRegular);
     return numeroRegular;
   }
   
@@ -166,7 +166,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
             .toPromise();
             
           if (response && response.size > 0) {
-            console.log(`✅ Imagen cargada exitosamente: ${ruta}`);
+            console.log(`   Imagen cargada exitosamente: ${ruta}`);
             return await this.procesarImagen(response, ruta);
           }
         } catch (error) {
@@ -238,7 +238,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
-        console.log('✅ Imagen convertida exitosamente');
+        console.log('   Imagen convertida exitosamente');
         resolve(result);
       };
       reader.onerror = reject;
@@ -303,7 +303,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const dataUrl = canvas.toDataURL('image/png', 0.9);
           console.log(
-            `✅ SVG convertido: ${img.width}x${img.height} → ${canvasWidth}x${canvasHeight}`
+            `   SVG convertido: ${img.width}x${img.height} → ${canvasWidth}x${canvasHeight}`
           );
           resolve(dataUrl);
         };
@@ -388,7 +388,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
 private obtenerTituloSolicitud(tipo: string): string {
   const titulos: { [key: string]: string } = {
     laboratorio: 'SOLICITUD DE ESTUDIOS DE LABORATORIO',
-    imagenologia: 'SOLICITUD DE ESTUDIOS DE IMAGENOLOGÍA', // ✅ Cambio aquí
+    imagenologia: 'SOLICITUD DE ESTUDIOS DE IMAGENOLOGÍA', //    Cambio aquí
     otros: 'SOLICITUD DE ESTUDIOS ESPECIALES',
   };
   return titulos[tipo] || 'SOLICITUD DE ESTUDIO';
@@ -397,7 +397,7 @@ private obtenerTituloSolicitud(tipo: string): string {
   private obtenerIconoSolicitud(tipo: string): string {
   const iconos: { [key: string]: string } = {
     laboratorio: '-',
-    imagenologia: '-', // ✅ Cambio aquí
+    imagenologia: '-', //    Cambio aquí
     otros: '-',
   };
   return iconos[tipo] || '📄';
@@ -406,7 +406,7 @@ private obtenerTituloSolicitud(tipo: string): string {
 private obtenerTituloSeccionEstudios(tipo: string): string {
   const titulos: { [key: string]: string } = {
     laboratorio: 'ESTUDIOS DE LABORATORIO SOLICITADOS',
-    imagenologia: 'ESTUDIOS DE IMAGENOLOGÍA SOLICITADOS', // ✅ Cambio aquí
+    imagenologia: 'ESTUDIOS DE IMAGENOLOGÍA SOLICITADOS', //    Cambio aquí
     otros: 'ESTUDIOS ESPECIALES SOLICITADOS',
   };
   return titulos[tipo] || 'ESTUDIOS SOLICITADOS';
@@ -815,7 +815,7 @@ public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
   // Buscar SOLO el administrativo primero
   for (const ruta of posiblesRutasAdministrativo) {
     if (ruta && ruta.toString().trim() !== '' && ruta.toString() !== 'null') {
-      console.log('✅ Número ADMINISTRATIVO encontrado:', ruta);
+      console.log('   Número ADMINISTRATIVO encontrado:', ruta);
       return ruta.toString();
     }
   }
@@ -832,7 +832,7 @@ public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
   
   for (const ruta of posiblesRutasRegular) {
     if (ruta && ruta.toString().trim() !== '' && ruta.toString() !== 'null') {
-      console.log('✅ Número regular encontrado como fallback:', ruta);
+      console.log('   Número regular encontrado como fallback:', ruta);
       return `${ruta.toString()} (REG)`; // Marcar que es regular
     }
   }
@@ -967,7 +967,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
 
       if (erroresEncontrados.length === 0) {
         console.log(
-          `✅ Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`
+          `   Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`
         );
       } else {
         throw new Error(
@@ -1187,7 +1187,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                   },
                 ],
                 [
-                  // ✅ USAR CAMPOS YA PROCESADOS
+                  //    USAR CAMPOS YA PROCESADOS
                   {
                     text:
                       this.formatearFecha(pacienteCompleto.fecha_nacimiento) ||
@@ -1383,7 +1383,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                   },
                 ],
                 [
-                  // ✅ USAR CAMPOS YA PROCESADOS
+                  //    USAR CAMPOS YA PROCESADOS
                   {
                     text:
                       pacienteCompleto.familiar_responsable || 'No registrado',
@@ -2358,11 +2358,11 @@ columns: [
       },
     };
 
-    // ✅ AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
+    //    AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
     console.log('  Validando todas las tablas del documento...');
     try {
       validarTodasLasTablas(documentoFinal.content, 'HistoriaClinica');
-      console.log('✅ Todas las tablas validadas correctamente');
+      console.log('   Todas las tablas validadas correctamente');
     } catch (error) {
       console.error('❌ Error en validación de tablas:', error);
       throw error;
@@ -2376,7 +2376,7 @@ columns: [
   async generarHojaFrontalExpediente(datos: any): Promise<any> {
     console.log('📂 Generando Hoja Frontal de Expediente según NOM-004...');
 
-    // ✅ VALIDACIÓN CORREGIDA (ya funcionaba)
+    //    VALIDACIÓN CORREGIDA (ya funcionaba)
     const validarTabla = (tabla: any, nombreTabla: string) => {
       if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
         console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
@@ -2410,7 +2410,7 @@ columns: [
         }
       });
 
-      console.log(`✅ Tabla ${nombreTabla} validada: ${tabla.table.body.length} filas`);
+      console.log(`   Tabla ${nombreTabla} validada: ${tabla.table.body.length} filas`);
     };
 
     const validarTodasLasTablas = (contenido: any[], nombre: string = 'Documento') => {
@@ -2438,13 +2438,13 @@ columns: [
     const header = {
       margin: [20, 10, 20, 10],
       table: {
-        widths: ['20%', '60%', '20%'], // ✅ 3 COLUMNAS EXACTAS
+        widths: ['20%', '60%', '20%'], //    3 COLUMNAS EXACTAS
         body: [
           [
             {
               image: await this.obtenerImagenBase64(
               datos.configuracion?.logo_gobierno || 
-              '/uploads/logos/logo-gobierno-importado.png' // ✅ PRIORIZA IMPORTADO
+              '/uploads/logos/logo-gobierno-importado.png' //    PRIORIZA IMPORTADO
             ),
             fit: [80, 40],
             alignment: 'left',
@@ -2461,7 +2461,7 @@ columns: [
             {
             image: await this.obtenerImagenBase64(
               datos.configuracion?.logo_principal || 
-              '/uploads/logos/logo-principal-importado.png' // ✅ PRIORIZA IMPORTADO
+              '/uploads/logos/logo-principal-importado.png' //    PRIORIZA IMPORTADO
             ),
             fit: [80, 40],
             alignment: 'right',
@@ -2476,7 +2476,7 @@ columns: [
     // 🔥 TABLA DATOS DEL ESTABLECIMIENTO - ESTILO LIMPIO
     const tablaDatosEstablecimiento = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2519,7 +2519,7 @@ columns: [
     // 🔥 TABLA DATOS DEL PACIENTE - ESTILO LIMPIO
     const tablaDatosPaciente = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2578,7 +2578,7 @@ columns: [
     // 🔥 TABLA DATOS DE CONTACTO - ESTILO LIMPIO
     const tablaDatosContacto = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2621,7 +2621,7 @@ columns: [
     // 🔥 TABLA DATOS SOCIOECONÓMICOS - ESTILO LIMPIO
     const tablaDatosSocioeconomicos = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2672,7 +2672,7 @@ columns: [
     // 🔥 TABLA CONTACTO DE EMERGENCIA - ESTILO LIMPIO
     const tablaContactoEmergencia = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2719,7 +2719,7 @@ columns: [
     // 🔥 TABLA INFORMACIÓN MÉDICA - ESTILO LIMPIO
     const tablaInformacionMedica = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2762,7 +2762,7 @@ columns: [
     // 🔥 TABLA DATOS DEL EXPEDIENTE - ESTILO LIMPIO
     const tablaDatosExpediente = {
       table: {
-        widths: ['30%', '70%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2809,7 +2809,7 @@ columns: [
     // 🔥 TABLA FIRMA DEL RESPONSABLE - ESTILO LIMPIO
     const tablaFirmaResponsable = {
       table: {
-        widths: ['50%', '50%'], // ✅ 2 COLUMNAS EXACTAS
+        widths: ['50%', '50%'], //    2 COLUMNAS EXACTAS
         body: [
           [
             {
@@ -2898,7 +2898,7 @@ columns: [
       footer: (currentPage: number, pageCount: number) => ({
         margin: [20, 10],
         table: {
-          widths: ['33%', '34%', '33%'], // ✅ 3 COLUMNAS PARA EL FOOTER
+          widths: ['33%', '34%', '33%'], //    3 COLUMNAS PARA EL FOOTER
           body: [
             [
               { text: `Página ${currentPage} de ${pageCount}`, fontSize: 7, color: '#666666' },
@@ -2911,17 +2911,17 @@ columns: [
       }),
     };
 
-    // ✅ VALIDACIÓN FINAL
+    //    VALIDACIÓN FINAL
     console.log('🔍 Validando todas las tablas del documento...');
     try {
       validarTodasLasTablas(documentoFinal.content, 'HojaFrontal');
-      console.log('✅ Todas las tablas validadas correctamente');
+      console.log('   Todas las tablas validadas correctamente');
     } catch (error) {
       console.error('❌ Error en validación de tablas:', error);
       throw error;
     }
 
-    console.log('✅ Hoja Frontal de Expediente generada exitosamente');
+    console.log('   Hoja Frontal de Expediente generada exitosamente');
     return documentoFinal;
   }
 
@@ -8364,7 +8364,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
   //     '📝 Generando Nota de Consentimiento Informado para Procedimientos según NOM-004...'
   //   );
 
-  //   // ✅ CORRECCIÓN: Usar los datos ya preparados
+  //   //    CORRECCIÓN: Usar los datos ya preparados
   //   const medicoCompleto = datos.medicoCompleto;
   //   const pacienteCompleto = datos.pacienteCompleto;
   //   const consentimientoData = datos.consentimiento || {};
