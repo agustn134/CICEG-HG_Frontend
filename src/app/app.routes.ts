@@ -1,3 +1,4 @@
+// C:\Proyectos\CICEG-HG_Frontend\src\app\app.routes.ts
 import { Routes } from '@angular/router';
 
 // === Auth ===

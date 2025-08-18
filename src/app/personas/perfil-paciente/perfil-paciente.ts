@@ -2863,7 +2863,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
   private initializeHistoriaClinicaForm(): FormGroup {
     return this.fb.group({
       // Antecedentes heredofamiliares
-      antecedentes_heredo_familiares: ['', [Validators.required]],
+      antecedentes_heredo_familiares: [''],
 
       // Antecedentes personales no patológicos
       habitos_higienicos: [''],
@@ -2881,28 +2881,28 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       apgar: [''],
       complicaciones_neonatales: [''],
 
-      // 🔥 CAMPOS PEDIÁTRICOS ESPECÍFICOS
-      ...(this.esPacientePediatrico && {
-        // Datos de los padres
-        nombre_padre: [''],
-        apellido_paterno_padre: [''],
-        apellido_materno_padre: [''],
-        edad_padre: [null, [Validators.min(15), Validators.max(80)]],
-        ocupacion_padre: [''],
-        escolaridad_padre: [''],
+      // // 🔥 CAMPOS PEDIÁTRICOS ESPECÍFICOS
+      // ...(this.esPacientePediatrico && {
+      //   // Datos de los padres
+      //   nombre_padre: [''],
+      //   apellido_paterno_padre: [''],
+      //   apellido_materno_padre: [''],
+      //   edad_padre: [null],
+      //   ocupacion_padre: [''],
+      //   escolaridad_padre: [''],
 
-        nombre_madre: [''],
-        apellido_paterno_madre: [''],
-        apellido_materno_madre: [''],
-        edad_madre: [null, [Validators.min(15), Validators.max(80)]],
-        ocupacion_madre: [''],
-        escolaridad_madre: [''],
+      //   nombre_madre: [''],
+      //   apellido_paterno_madre: [''],
+      //   apellido_materno_madre: [''],
+      //   edad_madre: [null],
+      //   ocupacion_madre: [''],
+      //   escolaridad_madre: [''],
 
-        // Datos del embarazo
-        embarazo_planeado: [false],
-        edad_madre_embarazo: [null],
-        control_prenatal: [false],
-      }),
+      //   // Datos del embarazo
+      //   embarazo_planeado: [false],
+      //   edad_madre_embarazo: [null],
+      //   control_prenatal: [false],
+      // }),
 
       // Antecedentes ginecobstétricos (se mostrarán condicionalmente)
       menarca: [''],
@@ -2922,15 +2922,15 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       enfermedades_adulto: [''],
       cirugias_previas: [''],
       traumatismos: [''],
-      alergias: ['', Validators.required], // Obligatorio por seguridad
+      alergias: [''], // Obligatorio por seguridad
 
       // Padecimiento actual
-      padecimiento_actual: ['', [Validators.required]],
+      padecimiento_actual: [''],
       sintomas_generales: [''],
       aparatos_sistemas: [''],
 
       // Exploración física
-      exploracion_general: ['', [Validators.required]],
+      exploracion_general: [''],
       exploracion_cabeza: [''],
       exploracion_cuello: [''],
       exploracion_torax: [''],
@@ -2940,14 +2940,14 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       exploracion_genitales: [''],
 
       // Impresión diagnóstica y plan
-      impresion_diagnostica: ['', [Validators.required]],
+      impresion_diagnostica: [''],
       id_guia_diagnostico: [null],
-      codigo_cie10: ['', [Validators.required]], // ← NUEVA LÍNEA CIE-10
+      codigo_cie10: [''], 
       plan_diagnostico: [''],
-      plan_terapeutico: ['', [Validators.required]],
-      pronostico: ['', [Validators.required]],
+      plan_terapeutico: [''],
+      pronostico: [''],
 
-      // 🔥 NUEVOS CAMPOS FALTANTES
+      //  NUEVOS CAMPOS FALTANTES
       numero_cama: [null],
       id_cama: [null],
 

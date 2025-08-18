@@ -23,7 +23,7 @@ export class PdfTemplatesService {
 //       expediente?.numero_expediente ||
 //       'Sin número';
       
-//     // 🔥 BUSCAR EN RUTA CORRECTA:
+//     //     BUSCAR EN RUTA CORRECTA:
 //   const numeroAdministrativo = expediente?.expediente?.numero_expediente_administrativo;
 //   const numeroRegular = expediente?.expediente?.numero_expediente;
   
@@ -49,7 +49,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
     numero_regular: expediente?.expediente?.numero_expediente
   });
   
-  // 🔥 BUSCAR EN RUTA CORRECTA:
+  //     BUSCAR EN RUTA CORRECTA:
   const numeroAdministrativo = expediente?.expediente?.numero_expediente_administrativo;
   const numeroRegular = expediente?.expediente?.numero_expediente;
   
@@ -154,7 +154,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
 
   public async obtenerImagenBase64(rutaImagen: string): Promise<string> {
     try {
-      // 🔥 SISTEMA DE PRIORIDAD DE RUTAS
+      //     SISTEMA DE PRIORIDAD DE RUTAS
       const rutasAIntentar = this.construirRutasPrioridad(rutaImagen);
       
       // Intentar cada ruta en orden de prioridad
@@ -202,7 +202,7 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
       tipoLogo = 'sidebar';
     }
     
-    // 🔥 ORDEN DE PRIORIDAD:
+    //     ORDEN DE PRIORIDAD:
     // 1. Imagen importada PNG (mejor calidad)
     rutas.push(`${environment.BASE_URL}/uploads/logos/logo-${tipoLogo}-importado.png`);
     
@@ -326,8 +326,8 @@ public obtenerNumeroExpedientePreferido(expediente: any): string {
   private obtenerImagenPlaceholder(): string {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    canvas.width = 120; // 🔥 Tamaño más apropiado
-    canvas.height = 40; // 🔥 Proporción 3:1
+    canvas.width = 120; //     Tamaño más apropiado
+    canvas.height = 40; //     Proporción 3:1
     ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Borde
@@ -803,7 +803,7 @@ private construirEstudiosImagenologia(solicitud: any): string {
 public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
   console.log('🔍 Obteniendo número de expediente ADMINISTRATIVO:', pacienteCompleto);
   
-  // 🔥 ESTRATEGIA 1: PRIORIZAR SIEMPRE EL ADMINISTRATIVO
+  //     ESTRATEGIA 1: PRIORIZAR SIEMPRE EL ADMINISTRATIVO
   const posiblesRutasAdministrativo = [
     // Administrativo PRIMERO en todas las rutas
     pacienteCompleto?.expediente?.numero_expediente_administrativo,
@@ -820,7 +820,7 @@ public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
     }
   }
   
-  // 🔥 ESTRATEGIA 2: Si no hay administrativo, usar el regular como fallback
+  //     ESTRATEGIA 2: Si no hay administrativo, usar el regular como fallback
   console.log('⚠️ No se encontró número administrativo, usando regular como fallback');
   
   const posiblesRutasRegular = [
@@ -843,7 +843,7 @@ public obtenerNumeroExpedienteInteligente(pacienteCompleto: any): string {
   return numeroTemporal;
 }
 
-// 🔥 MÉTODO AUXILIAR PARA CONSTRUIR TEXTO DE EXPLORACIÓN POR SISTEMAS
+//     MÉTODO AUXILIAR PARA CONSTRUIR TEXTO DE EXPLORACIÓN POR SISTEMAS
 private construirTextoExploracionSistemas(notaEvolucion: any): string {
   const exploraciones = [
     { campo: notaEvolucion.exploracion_cabeza, label: 'CABEZA Y CUELLO' },
@@ -1656,7 +1656,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
       header: {
         margin: [20, 10, 20, 10],
         table: {
-          widths: ['20%', '60%', '20%'], // 🔥 Ajustar anchos para dar más espacio a logos
+          widths: ['20%', '60%', '20%'], //     Ajustar anchos para dar más espacio a logos
           body: [
             [
               {
@@ -1665,7 +1665,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                   datos.configuracion?.logo_gobierno ||
                   '/uploads/logos/logo-gobierno-importado.svg'
                 ),
-                fit: [80, 40], // 🔥 USAR fit EN LUGAR DE width/height
+                fit: [80, 40], //     USAR fit EN LUGAR DE width/height
                 alignment: 'left',
                 margin: [0, 5],
               },
@@ -1686,7 +1686,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                   datos.configuracion?.logo_principal ||
                   '/uploads/logos/logo-principal-importado.svg'
                 ),
-                fit: [80, 40], // 🔥 USAR fit EN LUGAR DE width/height
+                fit: [80, 40], //     USAR fit EN LUGAR DE width/height
                 alignment: 'right',
                 margin: [0, 5],
               },
@@ -2067,7 +2067,7 @@ columns: [
         fontSize: 7,
         bold: true,
       },
-      // 🔥 AGREGAR CIE-10
+      //     AGREGAR CIE-10
       historiaClinicaData.codigo_cie10 ? {
         text: `\n\nCódigo CIE-10: ${historiaClinicaData.codigo_cie10}`,
         fontSize: 7,
@@ -2372,7 +2372,7 @@ columns: [
   }
 
 
-  // 🔥 VERSIÓN MEJORADA
+  //     VERSIÓN MEJORADA
   async generarHojaFrontalExpediente(datos: any): Promise<any> {
     console.log('📂 Generando Hoja Frontal de Expediente según NOM-004...');
 
@@ -2426,7 +2426,7 @@ columns: [
       });
     };
 
-    // 🔥 EXTRAER DATOS CORRECTAMENTE
+    //     EXTRAER DATOS CORRECTAMENTE
     const pacienteCompleto = datos.pacienteCompleto || datos.paciente;
     const medicoCompleto = datos.medicoCompleto || datos.medico;
     const hojaFrontalData = datos.hojaFrontal || {};
@@ -2434,7 +2434,7 @@ columns: [
     const fechaActual = new Date();
     const esPediatrico = pacienteCompleto.edad < 18;
 
-    // 🔥 HEADER LIMPIO Y PROFESIONAL (igual que Historia Clínica)
+    //     HEADER LIMPIO Y PROFESIONAL (igual que Historia Clínica)
     const header = {
       margin: [20, 10, 20, 10],
       table: {
@@ -2473,7 +2473,7 @@ columns: [
       layout: 'noBorders',
     };
 
-    // 🔥 TABLA DATOS DEL ESTABLECIMIENTO - ESTILO LIMPIO
+    //     TABLA DATOS DEL ESTABLECIMIENTO - ESTILO LIMPIO
     const tablaDatosEstablecimiento = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2516,7 +2516,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA DATOS DEL PACIENTE - ESTILO LIMPIO
+    //     TABLA DATOS DEL PACIENTE - ESTILO LIMPIO
     const tablaDatosPaciente = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2575,7 +2575,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA DATOS DE CONTACTO - ESTILO LIMPIO
+    //     TABLA DATOS DE CONTACTO - ESTILO LIMPIO
     const tablaDatosContacto = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2618,7 +2618,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA DATOS SOCIOECONÓMICOS - ESTILO LIMPIO
+    //     TABLA DATOS SOCIOECONÓMICOS - ESTILO LIMPIO
     const tablaDatosSocioeconomicos = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2669,7 +2669,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA CONTACTO DE EMERGENCIA - ESTILO LIMPIO
+    //     TABLA CONTACTO DE EMERGENCIA - ESTILO LIMPIO
     const tablaContactoEmergencia = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2716,7 +2716,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA INFORMACIÓN MÉDICA - ESTILO LIMPIO
+    //     TABLA INFORMACIÓN MÉDICA - ESTILO LIMPIO
     const tablaInformacionMedica = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2759,7 +2759,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA DATOS DEL EXPEDIENTE - ESTILO LIMPIO
+    //     TABLA DATOS DEL EXPEDIENTE - ESTILO LIMPIO
     const tablaDatosExpediente = {
       table: {
         widths: ['30%', '70%'], //    2 COLUMNAS EXACTAS
@@ -2806,7 +2806,7 @@ columns: [
       margin: [0, 0, 0, 10],
     };
 
-    // 🔥 TABLA FIRMA DEL RESPONSABLE - ESTILO LIMPIO
+    //     TABLA FIRMA DEL RESPONSABLE - ESTILO LIMPIO
     const tablaFirmaResponsable = {
       table: {
         widths: ['50%', '50%'], //    2 COLUMNAS EXACTAS
@@ -2854,7 +2854,7 @@ columns: [
       margin: [0, 10, 0, 10],
     };
 
-    // 🔥 DOCUMENTO FINAL LIMPIO Y PROFESIONAL
+    //     DOCUMENTO FINAL LIMPIO Y PROFESIONAL
     const documentoFinal = {
       pageSize: 'LETTER',
       pageMargins: [20, 70, 20, 50],
@@ -3343,7 +3343,7 @@ columns: [
 //   const fechaActual = new Date();
 //   const tipoEstudio = solicitudEstudio.tipo_estudio || 'laboratorio';
   
-//   // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+//   //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
 //   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
 //   // Obtener título dinámico
@@ -3915,7 +3915,7 @@ async generarSolicitudEstudio(datos: any): Promise<any> {
   const fechaActual = new Date();
   const tipoEstudio = solicitudEstudio.tipo_estudio || 'laboratorio';
   
-  // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+  //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
   // DECIDIR QUÉ FORMATO GENERAR
@@ -3934,7 +3934,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
   const fechaActual = new Date();
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
-  // 🔥 HEADER ESTÁNDAR (igual que Historia Clínica)
+  //     HEADER ESTÁNDAR (igual que Historia Clínica)
   const header = {
     margin: [20, 10, 20, 10],
     table: {
@@ -3983,7 +3983,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
     content: [
       { text: '', margin: [0, 5] },
 
-      // 🔥 TABLA IDENTIFICACIÓN (ESTILO ESTÁNDAR)
+      //     TABLA IDENTIFICACIÓN (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4091,7 +4091,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
 
       { text: '', margin: [0, 2] },
 
-      // 🔥 TABLA ESTUDIOS SOLICITADOS (ESTILO ESTÁNDAR)
+      //     TABLA ESTUDIOS SOLICITADOS (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4218,7 +4218,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
 
       { text: '', margin: [0, 2] },
 
-      // 🔥 TABLA INFORMACIÓN CLÍNICA (ESTILO ESTÁNDAR)
+      //     TABLA INFORMACIÓN CLÍNICA (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4278,7 +4278,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
 
       { text: '', margin: [0, 2] },
 
-      // 🔥 TABLA CONTROL DE HORARIOS (ESTILO ESTÁNDAR)
+      //     TABLA CONTROL DE HORARIOS (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4338,7 +4338,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
 
       { text: '', margin: [0, 5] },
 
-      // 🔥 TABLA FIRMA MÉDICA (ESTILO ESTÁNDAR)
+      //     TABLA FIRMA MÉDICA (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['50%', '50%'],
@@ -4452,7 +4452,7 @@ async generarSolicitudLaboratorio(datos: any): Promise<any> {
 
       { text: '', margin: [0, 15] },
 
-      // 🔥 NOTAS AL PIE (ESTILO ESTÁNDAR)
+      //     NOTAS AL PIE (ESTILO ESTÁNDAR)
       {
         columns: [
           {
@@ -4557,7 +4557,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
   const fechaActual = new Date();
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
-  // 🔥 HEADER ESTÁNDAR
+  //     HEADER ESTÁNDAR
   const header = {
     margin: [20, 10, 20, 10],
     table: {
@@ -4606,7 +4606,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
     content: [
       { text: '', margin: [0, 5] },
 
-      // 🔥 TABLA IDENTIFICACIÓN (ESTILO ESTÁNDAR)
+      //     TABLA IDENTIFICACIÓN (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4701,7 +4701,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
 
       { text: '', margin: [0, 2] },
 
-      // 🔥 TABLA DIAGNÓSTICO (ESTILO ESTÁNDAR)
+      //     TABLA DIAGNÓSTICO (ESTILO ESTÁNDAR)
       {
         table: {
           widths: ['15%', '85%'],
@@ -4761,7 +4761,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
 
      { text: '', margin: [0, 2] },
 
-     // 🔥 TABLA ESTUDIOS SOLICITADOS (ESTILO ESTÁNDAR)
+     //     TABLA ESTUDIOS SOLICITADOS (ESTILO ESTÁNDAR)
      {
        table: {
          widths: ['15%', '85%'],
@@ -4804,7 +4804,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
 
      { text: '', margin: [0, 10] },
 
-     // 🔥 TABLA FIRMAS DE RECEPCIÓN (ESTILO ESTÁNDAR)
+     //     TABLA FIRMAS DE RECEPCIÓN (ESTILO ESTÁNDAR)
      {
        table: {
          widths: ['50%', '50%'],
@@ -4924,7 +4924,7 @@ async generarSolicitudImagenologia(datos: any): Promise<any> {
 
      { text: '', margin: [0, 15] },
 
-     // 🔥 NOTAS AL PIE (ESTILO ESTÁNDAR)
+     //     NOTAS AL PIE (ESTILO ESTÁNDAR)
      {
        columns: [
          {
@@ -5353,9 +5353,9 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
     const fechaActual = new Date();
     const esPediatrico = pacienteCompleto.edad < 18;
     
-    // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+    //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
     const configuracion = await this.obtenerConfiguracionLogosInteligente();
- // 🔥 DEBUG ADICIONAL:
+ //     DEBUG ADICIONAL:
   console.log('🔧 DEBUG PDF - Datos recibidos:');
   console.log('- servicio_destino en notaEvolucionData:', notaEvolucionData.servicio_destino);
   console.log('- numero_cama en notaEvolucionData:', notaEvolucionData.numero_cama);
@@ -5763,7 +5763,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
         fontSize: 7,
         bold: true,
       },
-      // 🔥 AGREGAR CIE-10 PARA NOTA DE EVOLUCIÓN
+      //     AGREGAR CIE-10 PARA NOTA DE EVOLUCIÓN
       notaEvolucionData.codigo_cie10 ? {
         text: `\n\nCódigo CIE-10: ${notaEvolucionData.codigo_cie10}`,
         fontSize: 7,
@@ -6474,7 +6474,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
         fontSize: 7,
         bold: true,
       },
-      // 🔥 AGREGAR CIE-10 PARA URGENCIAS
+      //     AGREGAR CIE-10 PARA URGENCIAS
       notaUrgenciasData.codigo_cie10 ? {
         text: `\n\nCódigo CIE-10: ${notaUrgenciasData.codigo_cie10}`,
         fontSize: 7,
@@ -7667,7 +7667,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
   const fechaActual = new Date();
   const esContrarreferencia = referencia.tipo_referencia === 'contrarreferencia';
   
-  // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+  //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
   return {
@@ -8849,7 +8849,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
 //   const { pacienteCompleto, medicoCompleto, consentimiento } = datos;
 //   const fechaActual = new Date();
   
-//   // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+//   //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
 //   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
 //   return {
@@ -9648,7 +9648,7 @@ private construirEstudiosPaquetes(solicitud: any): any[] {
 //   const { pacienteCompleto, medicoCompleto, consentimiento } = datos;
 //   const fechaActual = new Date();
   
-//   // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+//   //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
 //   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
 //   return {
@@ -10543,7 +10543,7 @@ async generarConsentimientoHospitalizacion(datos: any): Promise<any> {
   const { pacienteCompleto, medicoCompleto, consentimiento } = datos;
   const fechaActual = new Date();
   
-  // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+  //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
   return {
@@ -15096,7 +15096,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
   const { pacienteCompleto, medicoCompleto, altaVoluntaria } = datos;
   const fechaActual = new Date();
   
-  // 🔥 OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
+  //     OBTENER CONFIGURACIÓN INTELIGENTE DE LOGOS
   const configuracion = await this.obtenerConfiguracionLogosInteligente();
 
   return {
@@ -15963,12 +15963,12 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
  async generarNotaPreanestesica(datos: any): Promise<any> {
   console.log('📄 Generando Nota Preanestésica según NOM-004...');
   
-  // 🔥 CORRECCIÓN: Adaptar estructura de datos
+  //     CORRECCIÓN: Adaptar estructura de datos
   const pacienteData = datos.paciente || datos.pacienteCompleto;
   const medicoData = datos.medico || datos.medicoCompleto;
   const notaData = datos.notaPreanestesica || {};
   
-  // 🔥 ADAPTAR DATOS DEL PACIENTE
+  //     ADAPTAR DATOS DEL PACIENTE
   const pacienteAdaptado = {
     nombre_completo: pacienteData.nombre_completo || 
                     `${pacienteData.nombre || ''} ${pacienteData.apellido_paterno || ''} ${pacienteData.apellido_materno || ''}`.trim(),
@@ -15978,7 +15978,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
     fecha_nacimiento: pacienteData.fecha_nacimiento
   };
 
-  // 🔥 ADAPTAR DATOS DEL MÉDICO
+  //     ADAPTAR DATOS DEL MÉDICO
   const medicoAdaptado = {
     nombre_completo: medicoData.nombre_completo || 
                     `${medicoData.nombre || ''} ${medicoData.apellido_paterno || ''}`.trim(),
@@ -15990,7 +15990,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
     
-    // 🔥 HEADER PROFESIONAL SIN COLORES
+    //     HEADER PROFESIONAL SIN COLORES
     header: {
       margin: [20, 10, 20, 10],
       table: {
@@ -16027,7 +16027,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
     },
 
     content: [
-      // 🔥 DATOS DEL PACIENTE - ESTILO LIMPIO
+      //     DATOS DEL PACIENTE - ESTILO LIMPIO
       {
         table: {
           widths: ['*', '*', '*'],
@@ -16053,7 +16053,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 SIGNOS VITALES - ESTILO PROFESIONAL
+      //     SIGNOS VITALES - ESTILO PROFESIONAL
       { text: 'SIGNOS VITALES PREOPERATORIOS', style: 'sectionHeader' },
       {
         table: {
@@ -16077,7 +16077,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 EVALUACIÓN CLÍNICA
+      //     EVALUACIÓN CLÍNICA
       { text: 'EVALUACIÓN CLÍNICA DEL PACIENTE', style: 'sectionHeader' },
       {
         table: {
@@ -16095,7 +16095,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 CLASIFICACIÓN ASA
+      //     CLASIFICACIÓN ASA
       { text: 'CLASIFICACIÓN ASA Y RIESGO ANESTÉSICO', style: 'sectionHeader' },
       {
         table: {
@@ -16111,7 +16111,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 10]
       },
 
-      // 🔥 TIPO DE ANESTESIA
+      //     TIPO DE ANESTESIA
       { text: 'TIPO DE ANESTESIA PROPUESTO', style: 'sectionHeader' },
       {
         table: {
@@ -16125,7 +16125,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 PLAN ANESTÉSICO
+      //     PLAN ANESTÉSICO
       { text: 'PLAN ANESTÉSICO', style: 'sectionHeader' },
       {
         text: notaData.plan_anestesia || 'Plan anestésico estándar según procedimiento.',
@@ -16133,7 +16133,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 ANTECEDENTES
+      //     ANTECEDENTES
       { text: 'ANTECEDENTES ANESTÉSICOS Y MEDICAMENTOS', style: 'sectionHeader' },
       {
         table: {
@@ -16148,7 +16148,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 15]
       },
 
-      // 🔥 CONSENTIMIENTO INFORMADO
+      //     CONSENTIMIENTO INFORMADO
       {
         table: {
           widths: ['*'],
@@ -16169,7 +16169,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
         margin: [0, 0, 0, 30]
       },
 
-      // 🔥 FIRMA DEL ANESTESIÓLOGO
+      //     FIRMA DEL ANESTESIÓLOGO
       {
         table: {
           widths: ['*', '*'],
@@ -16204,7 +16204,7 @@ async generarAltaVoluntaria(datos: any): Promise<any> {
       }
     ],
 
-    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    //     ESTILOS PROFESIONALES - SIN COLORES
     styles: {
       sectionHeader: { 
         fontSize: 8, 
@@ -16233,7 +16233,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
 
-    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    //     HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
     header: {
       margin: [20, 10, 20, 10],
       table: {
@@ -16438,7 +16438,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
               text: notaPreoperatoria.diagnostico_preoperatorio || 'No especificado',
               style: 'boldText',
             },
-            // 🔥 AGREGAR CIE-10 PARA NOTA PREOPERATORIA
+            //     AGREGAR CIE-10 PARA NOTA PREOPERATORIA
             notaPreoperatoria.codigo_cie10_preoperatorio ? {
               text: `\n\nCódigo CIE-10: ${notaPreoperatoria.codigo_cie10_preoperatorio}`,
               fontSize: 7,
@@ -16724,7 +16724,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
       layout: 'noBorders',
     }),
 
-    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    //     ESTILOS PROFESIONALES - SIN COLORES
     styles: {
       sectionHeader: { 
         fontSize: 8, 
@@ -16757,7 +16757,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
   async generarNotaPostanestesica(datos: any): Promise<any> {
     console.log('📄 Generando Nota Postanestésica según NOM-004...');
     
-    // 🔥 ADAPTAR ESTRUCTURA DE DATOS
+    //     ADAPTAR ESTRUCTURA DE DATOS
     const pacienteData = datos.paciente || datos.pacienteCompleto;
     const medicoData = datos.medico || datos.medicoCompleto;
     const notaData = datos.notaPostanestesica || {};
@@ -16781,7 +16781,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
       pageSize: 'LETTER',
       pageMargins: [20, 60, 20, 40],
       
-      // 🔥 HEADER PROFESIONAL
+      //     HEADER PROFESIONAL
       header: {
         margin: [20, 10, 20, 10],
         table: {
@@ -16818,7 +16818,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
       },
 
       content: [
-        // 🔥 DATOS DEL PACIENTE
+        //     DATOS DEL PACIENTE
         {
           table: {
             widths: ['*', '*', '*'],
@@ -16844,7 +16844,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 DATOS DEL PROCEDIMIENTO
+        //     DATOS DEL PROCEDIMIENTO
         { text: 'DATOS DEL PROCEDIMIENTO ANESTÉSICO', style: 'sectionHeader' },
         {
           table: {
@@ -16874,7 +16874,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 TIPO DE ANESTESIA
+        //     TIPO DE ANESTESIA
         { text: 'TIPO Y TÉCNICA ANESTÉSICA UTILIZADA', style: 'sectionHeader' },
         {
           table: {
@@ -16888,7 +16888,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 MEDICAMENTOS UTILIZADOS (NOM-004)
+        //     MEDICAMENTOS UTILIZADOS (NOM-004)
         { text: 'MEDICAMENTOS UTILIZADOS (NOM-004 D11.12)', style: 'sectionHeader' },
         {
           text: notaData.medicamentos_utilizados || 'No se registraron medicamentos específicos.',
@@ -16896,7 +16896,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 SIGNOS VITALES DE EGRESO
+        //     SIGNOS VITALES DE EGRESO
         { text: 'SIGNOS VITALES AL EGRESO DEL QUIRÓFANO', style: 'sectionHeader' },
         {
           table: {
@@ -16915,7 +16915,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 ESCALA DE ALDRETE
+        //     ESCALA DE ALDRETE
         { text: 'ESCALA DE ALDRETE (RECUPERACIÓN POSTANESTÉSICA)', style: 'sectionHeader' },
         {
           table: {
@@ -16943,7 +16943,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 EVALUACIÓN CLÍNICA DE EGRESO
+        //     EVALUACIÓN CLÍNICA DE EGRESO
         { text: 'EVALUACIÓN CLÍNICA DE EGRESO (NOM-004 D11.16)', style: 'sectionHeader' },
         {
           table: {
@@ -16958,7 +16958,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 INCIDENTES Y COMPLICACIONES (NOM-004)
+        //     INCIDENTES Y COMPLICACIONES (NOM-004)
         { text: 'INCIDENTES Y COMPLICACIONES (NOM-004 D11.14)', style: 'sectionHeader' },
         {
           table: {
@@ -16972,7 +16972,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 BALANCE HÍDRICO (NOM-004)
+        //     BALANCE HÍDRICO (NOM-004)
         { text: 'BALANCE HÍDRICO Y PÉRDIDAS (NOM-004 D11.15)', style: 'sectionHeader' },
         {
           table: {
@@ -16990,7 +16990,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 PLAN DE MANEJO (NOM-004)
+        //     PLAN DE MANEJO (NOM-004)
         { text: 'PLAN DE MANEJO Y TRATAMIENTO (NOM-004 D11.17)', style: 'sectionHeader' },
         {
           text: notaData.plan_tratamiento || 'Plan de manejo postanestésico estándar según protocolo institucional.',
@@ -16998,7 +16998,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 15]
         },
 
-        // 🔥 PRONÓSTICO
+        //     PRONÓSTICO
         {
           table: {
             widths: ['*'],
@@ -17016,7 +17016,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
           margin: [0, 0, 0, 20]
         },
 
-        // 🔥 FIRMA DEL ANESTESIÓLOGO
+        //     FIRMA DEL ANESTESIÓLOGO
         {
           table: {
             widths: ['*', '*'],
@@ -17051,7 +17051,7 @@ async generarNotaPreoperatoria(datos: any): Promise<any> {
         }
       ],
 
-      // 🔥 ESTILOS PROFESIONALES
+      //     ESTILOS PROFESIONALES
       styles: {
         sectionHeader: { 
           fontSize: 8, 
@@ -17080,7 +17080,7 @@ async generarNotaPostoperatoria(datos: any): Promise<any> {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
 
-    // 🔥 HEADER PROFESIONAL IGUAL QUE HISTORIA CLÍNICA
+    //     HEADER PROFESIONAL IGUAL QUE HISTORIA CLÍNICA
     header: {
       margin: [20, 10, 20, 10],
       table: {
@@ -17225,7 +17225,7 @@ async generarNotaPostoperatoria(datos: any): Promise<any> {
               text: notaPostoperatoria.diagnostico_postoperatorio || 'No especificado',
               style: 'tableText'
             },
-            // 🔥 AGREGAR CIE-10 PARA NOTA POSTOPERATORIA
+            //     AGREGAR CIE-10 PARA NOTA POSTOPERATORIA
             notaPostoperatoria.codigo_cie10_postoperatorio ? {
               text: `\n\nCódigo CIE-10: ${notaPostoperatoria.codigo_cie10_postoperatorio}`,
               fontSize: 7,
@@ -17631,7 +17631,7 @@ async generarNotaPostoperatoria(datos: any): Promise<any> {
       }
     ],
 
-    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    //     ESTILOS PROFESIONALES - SIN COLORES
     styles: {
       sectionHeader: { 
         fontSize: 8, 
@@ -17673,7 +17673,7 @@ async generarNotaInterconsulta(datos: any): Promise<any> {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
 
-    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    //     HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
     header: {
       margin: [20, 10, 20, 10],
       table: {
@@ -18322,7 +18322,7 @@ text: `FOLIO: ${datos.notaInterconsulta?.numero_interconsulta || this.generarNum
       layout: 'noBorders',
     }),
 
-    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    //     ESTILOS PROFESIONALES - SIN COLORES
     styles: {
       sectionHeader: { 
         fontSize: 8, 
@@ -18359,7 +18359,7 @@ async generarNotaEgreso(datos: any): Promise<any> {
     pageSize: 'LETTER',
     pageMargins: [20, 60, 20, 40],
 
-    // 🔥 HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
+    //     HEADER PROFESIONAL IGUAL QUE OTROS DOCUMENTOS
     header: {
       margin: [20, 10, 20, 10],
       table: {
@@ -18601,7 +18601,7 @@ async generarNotaEgreso(datos: any): Promise<any> {
               text: datos.notaEgreso?.diagnostico_egreso || 'No especificado',
               style: 'boldText'
             },
-            // 🔥 AGREGAR CIE-10 PARA NOTA DE EGRESO
+            //     AGREGAR CIE-10 PARA NOTA DE EGRESO
             datos.notaEgreso?.codigo_cie10_egreso ? {
               text: `\n\nCódigo CIE-10: ${datos.notaEgreso.codigo_cie10_egreso}`,
               fontSize: 7,
@@ -18898,7 +18898,7 @@ async generarNotaEgreso(datos: any): Promise<any> {
       layout: 'noBorders',
     }),
 
-    // 🔥 ESTILOS PROFESIONALES - SIN COLORES
+    //     ESTILOS PROFESIONALES - SIN COLORES
     styles: {
       sectionHeader: { 
         fontSize: 8, 
