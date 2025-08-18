@@ -2971,8 +2971,8 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       estudios_gabinete_previos: [null],
 
       // Campos de tratamiento
-      terapeutica_empleada: [null],
-      indicacion_terapeutica: [null],
+      // terapeutica_empleada: [null],
+      // indicacion_terapeutica: [null],
 
       // Campos pediátricos adicionales
       desarrollo_psicomotor_exploracion: [null],

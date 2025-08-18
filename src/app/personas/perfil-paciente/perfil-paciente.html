@@ -2271,7 +2271,7 @@
           </div>
 
           <!-- SECCIÓN TRATAMIENTO Y SEGUIMIENTO -->
-          <div class="mb-6">
+          <!-- <div class="mb-6">
             <h4 class="text-md font-semibold text-gray-800 mb-3">Tratamiento y Seguimiento</h4>
             <div class="grid grid-cols-1 gap-6">
               <div>
@@ -2288,7 +2288,7 @@
                   placeholder="Medicamentos, dosis, vía de administración, frecuencia..."></textarea>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- SECCIÓN IMPRESIÓN DIAGNÓSTICA Y PLAN -->
           <div class="mb-6">
@@ -2559,8 +2559,7 @@
       <button 
         type="button" 
         (click)="guardarFormularioActivo()"
-[disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.capturaIngreso"
-        class="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm sm:text-base font-medium rounded-md transition-colors shadow-sm">
+[disabled]="!historiaClinicaForm.valid || isCreatingDocument"        class="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm sm:text-base font-medium rounded-md transition-colors shadow-sm">
         <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2 text-xs sm:text-sm"></i>
         <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2 text-xs sm:text-sm"></i>
         {{ isCreatingDocument ? 'Guardando...' : 'Guardar Historia' }}
@@ -2579,6 +2578,22 @@
   </div>
 </div>
         </form>
+      
+      <!-- Debug temporal - agregar antes del botón -->
+<div class="bg-yellow-100 p-2 rounded mb-4 text-xs">
+  <p><strong>Debug del formulario:</strong></p>
+  <p>Formulario válido: {{ historiaClinicaForm.valid }}</p>
+  <p>Captura Inicial completada: {{ formularioEstado.capturaIngreso }}</p>
+  <p>Creando documento: {{ isCreatingDocument }}</p>
+  
+  <div *ngIf="!historiaClinicaForm.valid">
+    <p><strong>Errores encontrados:</strong></p>
+    <div *ngFor="let control of getFormErrors() | keyvalue">
+      {{ control.key }}: {{ control.value | json }}
+    </div>
+  </div>
+</div>
+
       </div>
 
 

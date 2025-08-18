@@ -191,9 +191,9 @@ export interface CreateHistoriaClinicaDto {
   estudios_laboratorio_previos?: string;
   estudios_gabinete_previos?: string;
 
-  // Campos de tratamiento
-  terapeutica_empleada?: string;
-  indicacion_terapeutica?: string;
+  // // Campos de tratamiento
+  // terapeutica_empleada?: string;
+  // indicacion_terapeutica?: string;
 
   // Campos de antecedentes adicionales
   hospitalizaciones_previas?: string;
@@ -411,14 +411,14 @@ export const SECCIONES_HISTORIA_CLINICA: SeccionHistoriaClinica[] = [
     aplicable_genero: 'ambos',
     descripcion: 'Estudios de laboratorio y gabinete'
   },
-  {
-    id: 'tratamiento',
-    nombre: 'Tratamiento y Seguimiento',
-    campos: ['terapeutica_empleada', 'indicacion_terapeutica'],
-    obligatoria: false,
-    aplicable_genero: 'ambos',
-    descripcion: 'Tratamiento aplicado y indicaciones'
-  },
+  // {
+  //   id: 'tratamiento',
+  //   nombre: 'Tratamiento y Seguimiento',
+  //   campos: ['terapeutica_empleada', 'indicacion_terapeutica'],
+  //   obligatoria: false,
+  //   aplicable_genero: 'ambos',
+  //   descripcion: 'Tratamiento aplicado y indicaciones'
+  // },
   {
     id: 'impresion_diagnostica',
     nombre: 'Impresión Diagnóstica y Plan',
@@ -567,10 +567,10 @@ export const CAMPOS_ESTUDIOS_COMPLEMENTARIOS = [
 ];
 
 // 🔥 NUEVA CONSTANTE PARA TRATAMIENTO
-export const CAMPOS_TRATAMIENTO = [
-  'terapeutica_empleada',
-  'indicacion_terapeutica'
-];
+// export const CAMPOS_TRATAMIENTO = [
+//   'terapeutica_empleada',
+//   'indicacion_terapeutica'
+// ];
 
 // 🔥 NUEVA CONSTANTE PARA ANTECEDENTES PERINATALES
 export const CAMPOS_ANTECEDENTES_PERINATALES = [

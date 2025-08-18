@@ -936,6 +936,14 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
       console.log(
         `  Antecedentes: ${filas} filas calculadas (esPediatrico: ${esPediatrico}, sexo: ${pacienteCompleto.sexo})`
       );
+
+      console.log(`🔍 DEBUG ANTECEDENTES: ${filas} filas calculadas para:`, {
+    esPediatrico,
+    sexo: pacienteCompleto.sexo,
+    agregarGineco: !esPediatrico && pacienteCompleto.sexo === 'F',
+    agregarPediatrico: esPediatrico
+  });
+  
       return filas;
     };
 
@@ -1484,9 +1492,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
         [
           {},
           {
-            text:
-              historiaClinicaData.antecedentes_heredo_familiares ||
-              'Sin información registrada',
+text: historiaClinicaData.antecedentes_heredo_familiares || 'No especificado',
             fontSize: 7,
             margin: [3, 2],
             lineHeight: 1.1,
@@ -1723,10 +1729,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
               [
                 {},
                 {
-                  text:
-                    historiaClinicaData.motivo_consulta ||
-                    historiaClinicaData.padecimiento_actual ||
-                    'Sin información registrada',
+text: historiaClinicaData.padecimiento_actual || 'No especificado',
                   fontSize: 7,
                   margin: [5, 8],
                   lineHeight: 1.4,
@@ -1746,7 +1749,7 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                 {
                   text:
                     historiaClinicaData.sintomas_generales ||
-                    'Sin información registrada',
+                    'No especificado',
                   fontSize: 7,
                   margin: [5, 8],
                   lineHeight: 1.4,
@@ -1766,22 +1769,22 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
                 {
     text:
       `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }\n` +
       `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }\n` +
       `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }\n` +
       `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }\n` +
       `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }\n` +
       `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
-      'Sin información registrada'
+      'Sin alteraciones'
       }`,
     fontSize: 7,
     margin: [3, 2],
@@ -1876,7 +1879,7 @@ columns: [
                   text:
                     historiaClinicaData.habitus_exterior ||
                     historiaClinicaData.exploracion_general ||
-                    'Sin información registrada',
+                    'No especificado',
                   fontSize: 7,
                   margin: [5, 3],
                   lineHeight: 1.1,
@@ -1896,25 +1899,25 @@ columns: [
                 {
                   text:
                     `CABEZA Y CUELLO: ${historiaClinicaData.exploracion_cabeza ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `TÓRAX Y PULMONES: ${historiaClinicaData.exploracion_torax ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `CARDIOVASCULAR: ${historiaClinicaData.exploracion_corazon ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `ABDOMEN: ${historiaClinicaData.exploracion_abdomen ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `EXTREMIDADES: ${historiaClinicaData.exploracion_extremidades ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `GENITALES: ${historiaClinicaData.exploracion_genitales ||
-                    'Sin información registrada'
+                    'Normal'
                     }\n\n` +
                     `NEUROLÓGICO: ${historiaClinicaData.exploracion_neurologico ||
-                    'Sin información registrada'
+                    'Normal'
                     }`,
                   fontSize: 7,
                   margin: [5, 3],
@@ -1935,7 +1938,7 @@ columns: [
                 {
                   text:
                     historiaClinicaData.desarrollo_psicomotor_exploracion ||
-                    'Sin información registrada',
+                    'Acorde a la edad',
                   fontSize: 7,
                   margin: [5, 3],
                   lineHeight: 1.1,
@@ -1978,7 +1981,7 @@ columns: [
                 {
                   text:
                     historiaClinicaData.estudios_laboratorio_previos ||
-                    'Sin información registrada',
+                    'No se han realizado estudios previos',
                   fontSize: 7,
                   margin: [3, 2],
                   lineHeight: 1.1,
@@ -1998,7 +2001,7 @@ columns: [
                 {
                   text:
                     historiaClinicaData.estudios_gabinete_previos ||
-                    'Sin información registrada.',
+                    'No se han realizado estudios previos.',
                   fontSize: 7,
                   margin: [3, 2],
                   lineHeight: 1.1,
@@ -2061,9 +2064,7 @@ columns: [
                 {
     text: [
       {
-        text: historiaClinicaData.impresion_diagnostica ||
-              historiaClinicaData.diagnosticos ||
-              'Sin información registrada',
+text: historiaClinicaData.impresion_diagnostica || 'No especificado',
         fontSize: 7,
         bold: true,
       },
@@ -2080,26 +2081,26 @@ columns: [
     lineHeight: 1.1,
   },
               ],
-              [
-                {},
-                {
-                  text: 'TERAPÉUTICA EMPLEADA Y RESULTADOS OBTENIDOS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.terapeutica_empleada ||
-                    'Sin información registrada',
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
-              ],
+              // [
+              //   {},
+              //   {
+              //     text: 'TERAPÉUTICA EMPLEADA Y RESULTADOS OBTENIDOS',
+              //     fontSize: 7,
+              //     bold: true,
+              //     fillColor: '#f0f0f0',
+              //   },
+              // ],
+              // [
+              //   {},
+              //   {
+              //     text:
+              //       historiaClinicaData.terapeutica_empleada ||
+              //       'Sin información registrada',
+              //     fontSize: 7,
+              //     margin: [3, 2],
+              //     lineHeight: 1.1,
+              //   },
+              // ],
               [
                 {},
                 {
@@ -2112,9 +2113,7 @@ columns: [
               [
                 {},
                 {
-                  text:
-                    historiaClinicaData.plan_diagnostico ||
-                    'Sin información registrada.',
+text: historiaClinicaData.plan_diagnostico || 'No especificado',
                   fontSize: 7,
                   margin: [3, 2],
                   lineHeight: 1.1,
@@ -2132,10 +2131,8 @@ columns: [
               [
                 {},
                 {
-                  text:
-                    historiaClinicaData.plan_terapeutico ||
-                    historiaClinicaData.indicacion_terapeutica ||
-                    'Sin información registrada.',
+text: historiaClinicaData.plan_terapeutico || 'No especificado',
+
                   fontSize: 7,
                   margin: [3, 2],
                   lineHeight: 1.1,
@@ -2157,9 +2154,7 @@ columns: [
             body: [
               [
                 {
-                  text: `PRONÓSTICO: ${historiaClinicaData.pronostico ||
-                    'Sin información registrada.'
-                    }`,
+text: `PRONÓSTICO: ${historiaClinicaData.pronostico || 'No especificado'}`,
                   fontSize: 6,
                   bold: true,
                   fillColor: '#f8f8f8',
