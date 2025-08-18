@@ -155,6 +155,7 @@ interface FormularioEstado {
   historiaClinicaPediatrica: boolean;
   notaUrgencias: boolean;
   notaEvolucion: boolean;
+  capturaIngreso: boolean; // 🔥
     capturaEvolucion: boolean; // 🔥 AGREGAR ESTA LÍNEA
   consentimiento: boolean;
   notaPreoperatoria: boolean;
@@ -739,7 +740,7 @@ desactivarModoPresentacion(): void {
     notaPostanestesica: false, notaInterconsulta: false, controlCrecimiento: false, esquemaVacunacion: false, solicitudEstudio: false, referenciaTraslado: false, prescripcionMedicamento: false,
     registroTransfusion: false, notaEgreso: false, historiaClinicaPediatrica: false, desarrolloPsicomotriz: false, alimentacionPediatrica: false, tamizajeNeonatal: false, antecedentesHeredoFamiliares: false,
     antecedentesPerinatales: false, estadoNutricionalPediatrico: false, inmunizaciones: false, vacunasAdicionales: false, solicitudCultivo: false, solicitudGasometria: false, hojaFrontal: false,
-    altaVoluntaria: false, capturaEvolucion: false,
+    altaVoluntaria: false, capturaEvolucion: false, capturaIngreso: false,
   };
 
   tiposDocumentosDisponibles: TipoDocumentoDisponible[] = [];
@@ -7575,7 +7576,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
         registroTransfusion: false, notaEgreso: false, historiaClinicaPediatrica: false, desarrolloPsicomotriz: false,
         alimentacionPediatrica: false, tamizajeNeonatal: false, antecedentesHeredoFamiliares: false,
         antecedentesPerinatales: false, estadoNutricionalPediatrico: false, inmunizaciones: false,
-        vacunasAdicionales: false, solicitudCultivo: false, solicitudGasometria: false, altaVoluntaria: false, capturaEvolucion: false,
+        vacunasAdicionales: false, solicitudCultivo: false, solicitudGasometria: false, altaVoluntaria: false, capturaEvolucion: false, capturaIngreso: false,
       };
 
       setTimeout(() => { this.success = null; }, 3000);

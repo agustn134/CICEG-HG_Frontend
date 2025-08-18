@@ -2559,7 +2559,7 @@
       <button 
         type="button" 
         (click)="guardarFormularioActivo()"
-        [disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.signosVitales"
+[disabled]="!historiaClinicaForm.valid || isCreatingDocument || !formularioEstado.capturaIngreso"
         class="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm sm:text-base font-medium rounded-md transition-colors shadow-sm">
         <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2 text-xs sm:text-sm"></i>
         <i *ngIf="!isCreatingDocument" class="fas fa-save mr-2 text-xs sm:text-sm"></i>
@@ -5911,7 +5911,7 @@
 
           <div class="flex space-x-3">
             <button type="button" (click)="guardarFormularioActivo()"
-              [disabled]="!altaVoluntariaForm.valid || isCreatingDocument"
+[disabled]="!formularioEstado.altaVoluntaria"
               class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded transition-colors">
               <i *ngIf="isCreatingDocument" class="fas fa-spinner fa-spin mr-2"></i>
               <i *ngIf="!isCreatingDocument" class="fas fa-door-open mr-2"></i>
