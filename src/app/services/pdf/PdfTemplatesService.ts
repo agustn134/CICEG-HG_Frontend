@@ -865,1507 +865,3007 @@ private construirTextoExploracionSistemas(notaEvolucion: any): string {
 }
   /////////////////////////////////////////// GENERACION DE DOCUMETNOS ///////////////////////////////////////
 // C:\Proyectos\CICEG-HG_Frontend\src\app\services\PDF\PdfTemplatesService.ts
-  async generarHistoriaClinica(datos: any): Promise<any> {
-    const validarTodasLasTablas = (
-      contenido: any[],
-      nombre: string = 'Documento'
-    ) => {
-      contenido.forEach((elemento, index) => {
-        if (elemento && elemento.table) {
-          try {
-            validarTabla(elemento, `${nombre}[${index}]`);
-          } catch (error) {
-            console.error(`Error en tabla ${nombre}[${index}]:`, error);
-            throw error;
-          }
+//   async generarHistoriaClinica(datos: any): Promise<any> {
+//     const validarTodasLasTablas = (
+//       contenido: any[],
+//       nombre: string = 'Documento'
+//     ) => {
+//       contenido.forEach((elemento, index) => {
+//         if (elemento && elemento.table) {
+//           try {
+//             validarTabla(elemento, `${nombre}[${index}]`);
+//           } catch (error) {
+//             console.error(`Error en tabla ${nombre}[${index}]:`, error);
+//             throw error;
+//           }
+//         }
+//         if (elemento && elemento.table && elemento.table.body) {
+//           elemento.table.body.forEach((fila: any[], filaIndex: number) => {
+//             fila.forEach((celda: any, celdaIndex: number) => {
+//               if (celda && celda.table) {
+//                 try {
+//                   validarTabla(
+//                     celda,
+//                     `${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]`
+//                   );
+//                 } catch (error) {
+//                   console.error(
+//                     `❌ Error en tabla anidada ${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]:`,
+//                     error
+//                   );
+//                   throw error;
+//                 }
+//               }
+//             });
+//           });
+//         }
+//       });
+//     };
+
+//     const pacienteCompleto = datos.pacienteCompleto;
+//     const medicoCompleto = datos.medicoCompleto;
+//     const historiaClinicaData = datos.historiaClinica || {};
+//     const signosVitales = datos.signosVitales || {};
+//     const guiaClinicaData = datos.guiaClinica || {};
+//     const datosPadres = datos.datosPadres || {};
+//     const fechaActual = new Date();
+//     const esPediatrico = pacienteCompleto.edad < 18;
+//     const domicilioPaciente =
+//       pacienteCompleto.domicilio || 'Sin dirección registrada';
+//     const lugarNacimiento =
+//       pacienteCompleto.lugar_nacimiento || 'No especificado';
+//     const tipoSangre = pacienteCompleto.tipo_sangre || 'No especificado';
+//     const contarFilasIdentificacion = () => {
+//       let filas = 7;
+//       if (esPediatrico) filas += 1;
+//       return filas;
+//     };
+//     const contarFilasAntecedentes = () => {
+//       let filas = 6; // Base: heredo familiares, personales no patológicos, personales patológicos
+
+//       // Sección ginecobstétrica (solo mujeres adultas)
+//       if (!esPediatrico && pacienteCompleto.sexo === 'F') {
+//         filas += 2; // +2 filas
+//       }
+
+//       // Antecedentes perinatales (solo pediátrico)
+//       if (esPediatrico) {
+//         filas += 2; // +2 filas
+//       }
+
+//       console.log(
+//         `  Antecedentes: ${filas} filas calculadas (esPediatrico: ${esPediatrico}, sexo: ${pacienteCompleto.sexo})`
+//       );
+
+//       console.log(`🔍 DEBUG ANTECEDENTES: ${filas} filas calculadas para:`, {
+//     esPediatrico,
+//     sexo: pacienteCompleto.sexo,
+//     agregarGineco: !esPediatrico && pacienteCompleto.sexo === 'F',
+//     agregarPediatrico: esPediatrico
+//   });
+
+//       return filas;
+//     };
+
+//     const validarTabla = (tabla: any, nombreTabla: string) => {
+//       if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
+//         console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
+//         return;
+//       }
+
+//       const numColumnas = tabla.table.widths.length;
+//       let erroresEncontrados: string[] = [];
+
+//       tabla.table.body.forEach((fila: any[], index: number) => {
+//         let celdas = 0;
+//         fila.forEach((celda, celdaIndex) => {
+//           if (celda && typeof celda === 'object' && celda.colSpan) {
+//             celdas += celda.colSpan;
+//           } else {
+//             celdas += 1;
+//           }
+//         });
+
+//         if (celdas !== numColumnas) {
+//           const error = `Fila ${index}: esperaba ${numColumnas} columnas, encontró ${celdas}`;
+//           erroresEncontrados.push(error);
+//           console.error(`❌ ERROR en ${nombreTabla}, ${error}`);
+//         }
+//       });
+
+//       if (erroresEncontrados.length === 0) {
+//         console.log(
+//           `   Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`
+//         );
+//       } else {
+//         throw new Error(
+//           `Tabla ${nombreTabla} tiene errores: ${erroresEncontrados.join(', ')}`
+//         );
+//       }
+//     };
+
+//     const crearFilasIdentificacion = () => {
+//       const filasBase = [
+//         [
+//           {
+//             text: 'IDENTIFICACIÓN',
+//             fontSize: 6,
+//             bold: true,
+//             fillColor: '#f5f5f5',
+//             alignment: 'center',
+//             rowSpan: contarFilasIdentificacion(),
+//           },
+//           {
+//             table: {
+//               widths: ['20%', '20%', '20%', '20%', '20%'],
+//               body: [
+//                 [
+//                   {
+//                     text: 'Fecha de elaboración',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Hora de elaboración',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'No. Expediente',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'No. de cama',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Servicio',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   {
+//                     text: fechaActual.toLocaleDateString('es-MX'),
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: fechaActual.toLocaleTimeString('es-MX'),
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text:
+//                       this.obtenerNumeroExpedientePreferido(
+//                         pacienteCompleto.expediente
+//                       ) || 'N/A',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                     bold: true,
+//                   },
+//                   {
+//                     text: historiaClinicaData.numero_cama || 'NO ASIGNADO',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: medicoCompleto.departamento || 'No especificado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+
+//         // FILA 2: Datos del paciente
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['55%', '15%', '15%', '15%'],
+//               body: [
+//                 [
+//                   {
+//                     text: 'Nombre completo del paciente',
+//                     fontSize: 7,
+//                     bold: true,
+//                   },
+//                   {
+//                     text: 'Edad',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Sexo',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Tipo de sangre',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   {
+//                     text: pacienteCompleto.nombre_completo,
+//                     fontSize: 6,
+//                     bold: true,
+//                     margin: [2, 3],
+//                   },
+//                   {
+//                     text: `${pacienteCompleto.edad} años`,
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.sexo,
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: tipoSangre,
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                     bold: true,
+//                     color: '#dc2626',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+
+//         // FILA 3: Domicilio
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['100%'],
+//               body: [
+//                 [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
+//                 [{ text: domicilioPaciente, fontSize: 7, margin: [2, 3] }],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+
+//         // FILA 4: Datos personales básicos
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['25%', '25%', '25%', '25%'],
+//               body: [
+//                 [
+//                   {
+//                     text: 'Fecha nacimiento',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'CURP',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Lugar de nacimiento',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Teléfono',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   //    USAR CAMPOS YA PROCESADOS
+//                   {
+//                     text:
+//                       this.formatearFecha(pacienteCompleto.fecha_nacimiento) ||
+//                       'No registrada',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.curp || 'No registrado',
+//                     fontSize: 6,
+//                     alignment: 'center',
+//                   },
+//                   { text: lugarNacimiento, fontSize: 7, alignment: 'center' },
+//                   {
+//                     text: pacienteCompleto.telefono || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+
+//         // FILA 5: Ocupación/Escolaridad
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['25%', '25%', '25%', '25%'],
+//               body: [
+//                 [
+//                   {
+//                     text: esPediatrico ? 'Grado escolar' : 'Ocupación',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Escolaridad',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Estado civil',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Religión',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   {
+//                     text: esPediatrico
+//                       ? pacienteCompleto.grado_escolar ||
+//                       this.determinarGradoEscolarPorEdad(
+//                         pacienteCompleto.edad
+//                       )
+//                       : pacienteCompleto.ocupacion || 'No registrada',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.escolaridad || 'No registrada',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.estado_civil || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.religion || 'No registrada',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+//       ];
+
+//       // FILA DE PADRES SOLO SI ES PEDIÁTRICO
+//       if (esPediatrico) {
+//         filasBase.push([
+//           {},
+//           {
+//             table: {
+//               widths: ['25%', '25%', '25%', '25%'],
+//               body: [
+//                 [
+//                   {
+//                     text: 'Nombre del padre',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Edad padre',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Nombre de la madre',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Edad madre',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   {
+//                     text: datosPadres.nombre_padre || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: datosPadres.edad_padre || 'N/A',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: datosPadres.nombre_madre || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: datosPadres.edad_madre || 'N/A',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ]);
+//       }
+//       // FILAS FINALES
+//       filasBase.push(
+//         // Familiar responsable
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['60%', '40%'],
+//               body: [
+//                 [
+//                   {
+//                     text: esPediatrico
+//                       ? 'Familiar responsable/Tutor'
+//                       : 'Contacto de emergencia',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Teléfono de contacto',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   //    USAR CAMPOS YA PROCESADOS
+//                   {
+//                     text:
+//                       pacienteCompleto.familiar_responsable || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: pacienteCompleto.telefono_familiar || 'No registrado',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ],
+//         // Médico responsable
+//         [
+//           {},
+//           {
+//             table: {
+//               widths: ['70%', '30%'],
+//               body: [
+//                 [
+//                   {
+//                     text: 'Médico responsable de la elaboración',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: 'Cédula profesional',
+//                     fontSize: 7,
+//                     bold: true,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//                 [
+//                   {
+//                     text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                   {
+//                     text: medicoCompleto.numero_cedula || 'No registrada',
+//                     fontSize: 7,
+//                     alignment: 'center',
+//                   },
+//                 ],
+//               ],
+//             },
+//             layout: {
+//               hLineWidth: () => 0.3,
+//               vLineWidth: () => 0.3,
+//               hLineColor: () => '#000000',
+//               vLineColor: () => '#000000',
+//             },
+//           },
+//         ]
+//       );
+//       return filasBase;
+//     };
+
+//     const tablaIdentificacion = {
+//       table: { widths: ['15%', '85%'], body: crearFilasIdentificacion() },
+//       layout: {
+//         hLineWidth: () => 0.5,
+//         vLineWidth: () => 0.5,
+//         hLineColor: () => '#000000',
+//         vLineColor: () => '#000000',
+//       },
+//     };
+
+//     const crearFilasAntecedentes = () => {
+//       const filasBase = [
+//         [
+//           {
+//             text: 'ANTECEDENTES',
+//             fontSize: 6,
+//             bold: true,
+//             fillColor: '#eeece1',
+//             alignment: 'center',
+//             rowSpan: contarFilasAntecedentes(),
+//           },
+//           {
+//             text: 'HEREDO FAMILIARES',
+//             fontSize: 7,
+//             bold: true,
+//             fillColor: '#f0f0f0',
+//           },
+//         ],
+//         [
+//           {},
+//           {
+// text: historiaClinicaData.antecedentes_heredo_familiares || 'No especificado',
+//             fontSize: 7,
+//             margin: [3, 2],
+//             lineHeight: 1.1,
+//           },
+//         ],
+//         [
+//           {},
+//           {
+//             text: 'PERSONALES NO PATOLÓGICOS',
+//             fontSize: 7,
+//             bold: true,
+//             fillColor: '#f0f0f0',
+//           },
+//         ],
+//         [
+//           {},
+//           {
+//     text:
+//       `Alimentación: ${historiaClinicaData.habitos_alimenticios || 'No registrado'}\n` +
+//       `Higiene: ${historiaClinicaData.habitos_higienicos || 'Adecuada'}\n` +
+//       `Actividad física: ${historiaClinicaData.actividad_fisica || 
+//         (esPediatrico ? 'Apropiada para la edad' : 'Regular')}\n` +
+//       `Vivienda: ${historiaClinicaData.vivienda || 'Casa habitación con servicios básicos'}\n` +
+//       `${esPediatrico ? 'Inmunizaciones: Esquema completo según edad\n' : ''}` +
+//       `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''}` +
+//       `${!esPediatrico && historiaClinicaData.toxicomanias
+//         ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n`
+//         : !esPediatrico ? 'Toxicomanías: Negadas\n' : ''
+//       }`,
+//     fontSize: 7,
+//     margin: [3, 2],
+//     lineHeight: 1.1,
+//   },
+//         ],
+//         [
+//           {},
+//           {
+//             text: 'PERSONALES PATOLÓGICOS',
+//             fontSize: 7,
+//             bold: true,
+//             fillColor: '#f0f0f0',
+//           },
+//         ],
+//         [
+//           {},
+//           {
+//             text:
+//               `Enfermedades en la infancia: ${historiaClinicaData.enfermedades_infancia || 'Negadas'
+//               }\n` +
+//               `${!esPediatrico
+//                 ? `Enfermedades en el adulto: ${historiaClinicaData.enfermedades_adulto || 'Negadas'
+//                 }\n`
+//                 : ''
+//               }` +
+//               `Hospitalizaciones previas: ${historiaClinicaData.hospitalizaciones_previas || 'Ninguna'
+//               }\n` +
+//               `Cirugías previas: ${historiaClinicaData.cirugias_previas || 'Ninguna'
+//               }\n` +
+//               `Traumatismos: ${historiaClinicaData.traumatismos || 'Ninguno'
+//               }\n` +
+//               `Alergias (medicamentos/alimentos): ${historiaClinicaData.alergias || 'Negadas'
+//               }\n` +
+//               `Transfusiones: ${historiaClinicaData.transfusiones || 'Ninguna'
+//               }`,
+//             fontSize: 7,
+//             margin: [3, 2],
+//             lineHeight: 1.1,
+//           },
+//         ],
+//       ];
+
+//       // Sección ginecobstétrica (solo mujeres adultas)
+//       if (!esPediatrico && pacienteCompleto.sexo === 'F') {
+//         filasBase.push(
+//           [
+//             {},
+//             {
+//               text: 'GINECOBSTÉTRICOS',
+//               fontSize: 7,
+//               bold: true,
+//               fillColor: '#f0f0f0',
+//             },
+//           ],
+//           [
+//             {},
+//             {
+//               text:
+//                 `Menarca: ${historiaClinicaData.menarca || 'No registrada'
+//                 } años\n` +
+//                 `Ritmo menstrual: ${historiaClinicaData.ritmo_menstrual || 'No registrado'
+//                 }\n` +
+//                 `Gestas: ${historiaClinicaData.gestas || '0'} | Partos: ${historiaClinicaData.partos || '0'
+//                 } | Cesáreas: ${historiaClinicaData.cesareas || '0'
+//                 } | Abortos: ${historiaClinicaData.abortos || '0'}\n` +
+//                 `Método de planificación familiar: ${historiaClinicaData.metodo_planificacion || 'Ninguno'
+//                 }`,
+//               fontSize: 7,
+//               margin: [3, 2],
+//               lineHeight: 1.1,
+//             },
+//           ]
+//         );
+//       }
+
+//       // Antecedentes perinatales (solo pediátrico)
+//       if (esPediatrico) {
+//         filasBase.push(
+//           [
+//             {},
+//             {
+//               text: 'PERINATALES (Pediatría)',
+//               fontSize: 7,
+//               bold: true,
+//               fillColor: '#f0f0f0',
+//             },
+//           ],
+//           [
+//             {},
+//             {
+//               text:
+//                 `Control prenatal: ${historiaClinicaData.control_prenatal || 'Sí'
+//                 }\n` +
+//                 `Tipo de parto: ${historiaClinicaData.tipo_parto || 'Vaginal'
+//                 }\n` +
+//                 `Peso al nacer: ${historiaClinicaData.peso_nacer || 'No registrado'
+//                 } kg\n` +
+//                 `Complicaciones neonatales: ${historiaClinicaData.complicaciones_neonatales || 'Ninguna'
+//                 }\n` +
+//                 `Apgar: ${historiaClinicaData.apgar || 'No registrado'}\n` +
+//                 `Edad gestacional: ${historiaClinicaData.edad_gestacional || 'No registrada'
+//                 } semanas`,
+//               fontSize: 7,
+//               margin: [3, 2],
+//               lineHeight: 1.1,
+//             },
+//           ]
+//         );
+//       }
+
+//       return filasBase;
+//     };
+
+//     const tablaAntecedentes = {
+//       table: {
+//         widths: ['15%', '85%'],
+//         body: crearFilasAntecedentes(),
+//       },
+//       layout: {
+//         hLineWidth: () => 0.5,
+//         vLineWidth: () => 0.5,
+//         hLineColor: () => '#000000',
+//         vLineColor: () => '#000000',
+//       },
+//     };
+
+//     console.log(
+//       `  Debug: Tabla tiene ${tablaIdentificacion.table.body.length
+//       } filas, rowSpan configurado para ${contarFilasIdentificacion()}`
+//     );
+//     console.log(`  esPediatrico: ${esPediatrico}`);
+
+//     validarTabla(tablaIdentificacion, 'Identificación');
+
+//     const documentoFinal = {
+//       pageSize: 'LETTER',
+//       pageMargins: [20, 60, 20, 40],
+//       header: {
+//         margin: [20, 10, 20, 10],
+//         table: {
+//           widths: ['20%', '60%', '20%'], //     Ajustar anchos para dar más espacio a logos
+//           body: [
+//             [
+//               {
+//                 // Logo de gobierno (izquierda)
+//                 image: await this.obtenerImagenBase64(
+//                   datos.configuracion?.logo_gobierno ||
+//                   '/uploads/logos/logo-gobierno-importado.svg'
+//                 ),
+//                 fit: [80, 40], //     USAR fit EN LUGAR DE width/height
+//                 alignment: 'left',
+//                 margin: [0, 5],
+//               },
+//               {
+//                 // Texto central
+//                 text: esPediatrico
+//                   ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA PEDIÁTRICA GENERAL'
+//                   : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA GENERAL',
+//                 fontSize: 8,
+//                 bold: true,
+//                 alignment: 'center',
+//                 color: '#1a365d',
+//                 margin: [0, 8],
+//               },
+//               {
+//                 // Logo del hospital (derecha)
+//                 image: await this.obtenerImagenBase64(
+//                   datos.configuracion?.logo_principal ||
+//                   '/uploads/logos/logo-principal-importado.svg'
+//                 ),
+//                 fit: [80, 40], //     USAR fit EN LUGAR DE width/height
+//                 alignment: 'right',
+//                 margin: [0, 5],
+//               },
+//             ],
+//           ],
+//         },
+//         layout: 'noBorders',
+//       },
+//       content: [
+//         tablaIdentificacion,
+//         { text: '', margin: [0, 1] },
+//         tablaAntecedentes,
+//         { text: '', margin: [0, 1] },
+//         {
+//           table: {
+//             widths: ['15%', '85%'],
+//             body: [
+//               [
+//                 {
+//                   text: 'PADECIMIENTO ACTUAL',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#eeece1',
+//                   alignment: 'center',
+//                   rowSpan: 6,
+//                 },
+//                 {
+//                   text: 'MOTIVO DE CONSULTA',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+// text: historiaClinicaData.padecimiento_actual || 'No especificado',
+//                   fontSize: 7,
+//                   margin: [5, 8],
+//                   lineHeight: 1.4,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'SÍNTOMAS GENERALES',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     historiaClinicaData.sintomas_generales ||
+//                     'No especificado',
+//                   fontSize: 7,
+//                   margin: [5, 8],
+//                   lineHeight: 1.4,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'INTERROGATORIO POR APARATOS Y SISTEMAS',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//     text:
+//       `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
+//       'Sin alteraciones'
+//       }\n` +
+//       `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
+//       'Sin alteraciones'
+//       }\n` +
+//       `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
+//       'Sin alteraciones'
+//       }\n` +
+//       `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
+//       'Sin alteraciones'
+//       }\n` +
+//       `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
+//       'Sin alteraciones'
+//       }\n` +
+//       `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
+//       'Sin alteraciones'
+//       }`,
+//     fontSize: 7,
+//     margin: [3, 2],
+//     lineHeight: 1.1,
+//   },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+//         { text: '', margin: [0, 1] },
+//         {
+//           table: {
+//             widths: ['15%', '85%'],
+//             body: [
+//               [
+//                 {
+//                   text: 'EXPLORACIÓN FÍSICA',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#eeece1',
+//                   alignment: 'center',
+//                   rowSpan: 8,
+//                 },
+//                 {
+//                   text: 'SIGNOS VITALES Y SOMATOMETRÍA',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+// columns: [
+//     {
+//       width: '33%',
+//       text: `Peso: ${signosVitales.peso || 
+//              historiaClinicaData.peso || '___'} kg\n` +
+//             `Talla: ${signosVitales.talla || 
+//              historiaClinicaData.talla || '___'} cm\n` +
+//             `IMC: ${this.calcularIMC(
+//               signosVitales.peso || historiaClinicaData.peso,
+//               signosVitales.talla || historiaClinicaData.talla
+//             )}`,
+//       fontSize: 7,
+//     },
+//     {
+//       width: '33%',
+//       text: `TA: ${signosVitales.presion_arterial_sistolica || 
+//              historiaClinicaData.presion_arterial_sistolica || '___'}/${
+//              signosVitales.presion_arterial_diastolica || 
+//              historiaClinicaData.presion_arterial_diastolica || '___'
+//             } mmHg\n` +
+//             `FC: ${signosVitales.frecuencia_cardiaca || 
+//              historiaClinicaData.frecuencia_cardiaca || '___'} lpm\n` +
+//             `FR: ${signosVitales.frecuencia_respiratoria || 
+//              historiaClinicaData.frecuencia_respiratoria || '___'} rpm`,
+//       fontSize: 7,
+//     },
+//     {
+//       width: '34%',
+//       text: `Temperatura: ${signosVitales.temperatura || 
+//              historiaClinicaData.temperatura || '___'} °C\n` +
+//             `Saturación O2: ${signosVitales.saturacion_oxigeno || 
+//              historiaClinicaData.saturacion_oxigeno || '___'} %\n` +
+//             `Glucosa: ${signosVitales.glucosa || 
+//              historiaClinicaData.glucosa || '___'} mg/dL`,
+//       fontSize: 7,
+//     },
+//   ],
+//                   margin: [5, 3],
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'HABITUS EXTERIOR',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     historiaClinicaData.habitus_exterior ||
+//                     historiaClinicaData.exploracion_general ||
+//                     'No especificado',
+//                   fontSize: 7,
+//                   margin: [5, 3],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'EXPLORACIÓN POR APARATOS Y SISTEMAS',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     `CABEZA Y CUELLO: ${historiaClinicaData.exploracion_cabeza ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `TÓRAX Y PULMONES: ${historiaClinicaData.exploracion_torax ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `CARDIOVASCULAR: ${historiaClinicaData.exploracion_corazon ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `ABDOMEN: ${historiaClinicaData.exploracion_abdomen ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `EXTREMIDADES: ${historiaClinicaData.exploracion_extremidades ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `GENITALES: ${historiaClinicaData.exploracion_genitales ||
+//                     'Normal'
+//                     }\n\n` +
+//                     `NEUROLÓGICO: ${historiaClinicaData.exploracion_neurologico ||
+//                     'Normal'
+//                     }`,
+//                   fontSize: 7,
+//                   margin: [5, 3],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'DESARROLLO PSICOMOTOR (PEDIÁTRICO)',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     historiaClinicaData.desarrollo_psicomotor_exploracion ||
+//                     'Acorde a la edad',
+//                   fontSize: 7,
+//                   margin: [5, 3],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+
+//         { text: '', margin: [0, 1] },
+
+//         {
+//           table: {
+//             widths: ['15%', '85%'],
+//             body: [
+//               [
+//                 {
+//                   text: 'ESTUDIOS',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#eeece1',
+//                   alignment: 'center',
+//                   rowSpan: 4,
+//                 },
+//                 {
+//                   text: 'LABORATORIO PREVIO Y ACTUAL',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     historiaClinicaData.estudios_laboratorio_previos ||
+//                     'No se han realizado estudios previos',
+//                   fontSize: 7,
+//                   margin: [3, 2],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'GABINETE PREVIO Y ACTUAL',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text:
+//                     historiaClinicaData.estudios_gabinete_previos ||
+//                     'No se han realizado estudios previos.',
+//                   fontSize: 7,
+//                   margin: [3, 2],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+//         { text: '', margin: [0, 1] },
+//         {
+//           table: {
+//             widths: ['15%', '85%'],
+//             body: [
+//               [
+//                 {
+//                   text: 'DIAGNÓSTICO Y PLAN',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#eeece1',
+//                   alignment: 'center',
+//                   rowSpan: 10,
+//                 },
+//                 {
+//                   text: 'GUÍA CLÍNICA DE DIAGNÓSTICO',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: this.construirTextoGuiasClinicas(
+//                     datos.guiasClinicas ||
+//                     (datos.guiaClinica ? [datos.guiaClinica] : [])
+//                   ),
+//                   fontSize: 7,
+//                   margin: [3, 2],
+//                   italics:
+//                     !datos.guiasClinicas || datos.guiasClinicas.length === 0,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//     text: [
+//       {
+// text: historiaClinicaData.impresion_diagnostica || 'No especificado',
+//         fontSize: 7,
+//         bold: true,
+//       },
+//       //     AGREGAR CIE-10
+//       historiaClinicaData.codigo_cie10 ? {
+//         text: `\n\nCódigo CIE-10: ${historiaClinicaData.codigo_cie10}`,
+//         fontSize: 7,
+//         bold: true,
+//         color: '#000000ff',
+//         italics: true,
+//       } : {}
+//     ],
+//     margin: [3, 2],
+//     lineHeight: 1.1,
+//   },
+//               ],
+//               // [
+//               //   {},
+//               //   {
+//               //     text: 'TERAPÉUTICA EMPLEADA Y RESULTADOS OBTENIDOS',
+//               //     fontSize: 7,
+//               //     bold: true,
+//               //     fillColor: '#f0f0f0',
+//               //   },
+//               // ],
+//               // [
+//               //   {},
+//               //   {
+//               //     text:
+//               //       historiaClinicaData.terapeutica_empleada ||
+//               //       'Sin información registrada',
+//               //     fontSize: 7,
+//               //     margin: [3, 2],
+//               //     lineHeight: 1.1,
+//               //   },
+//               // ],
+//               [
+//                 {},
+//                 {
+//                   text: 'PLAN DIAGNÓSTICO',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+// text: historiaClinicaData.plan_diagnostico || 'No especificado',
+//                   fontSize: 7,
+//                   margin: [3, 2],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+//                   text: 'INDICACIÓN TERAPÉUTICA',
+//                   fontSize: 7,
+//                   bold: true,
+//                   fillColor: '#f0f0f0',
+//                 },
+//               ],
+//               [
+//                 {},
+//                 {
+// text: historiaClinicaData.plan_terapeutico || 'No especificado',
+
+//                   fontSize: 7,
+//                   margin: [3, 2],
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+//         { text: '', margin: [0, 1] },
+//         {
+//           table: {
+//             widths: ['100%'],
+//             body: [
+//               [
+//                 {
+// text: `PRONÓSTICO: ${historiaClinicaData.pronostico || 'No especificado'}`,
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#f8f8f8',
+//                   margin: [5, 8],
+//                   alignment: 'center',
+//                   lineHeight: 1.1,
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+//         { text: '', margin: [0, 1] },
+//         // FIRMA MÉDICA COMPLETA SEGÚN NOM-004 (5.10)
+//         {
+//           table: {
+//             widths: ['50%', '50%'],
+//             body: [
+//               [
+//                 {
+//                   text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#ddd9c3',
+//                   alignment: 'center',
+//                   margin: [2, 5],
+//                 },
+//                 {
+//                   text: 'FIRMA AUTÓGRAFA',
+//                   fontSize: 6,
+//                   bold: true,
+//                   fillColor: '#ddd9c3',
+//                   alignment: 'center',
+//                   margin: [2, 5],
+//                 },
+//               ],
+//               [
+//                 {
+//                   text: [
+//                     {
+//                       text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+//                       fontSize: 7,
+//                       bold: true,
+//                     },
+//                     {
+//                       text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+//                       fontSize: 6,
+//                     },
+//                     {
+//                       text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+//                       fontSize: 6,
+//                     },
+//                     {
+//                       text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+//                       fontSize: 6,
+//                     },
+//                     {
+//                       text: `Hospital General San Luis de la Paz\n`,
+//                       fontSize: 7,
+//                       color: '#6b7280',
+//                     },
+//                     {
+//                       text: `Fecha: ${fechaActual.toLocaleDateString(
+//                         'es-MX'
+//                       )}\n`,
+//                       fontSize: 7,
+//                     },
+//                     {
+//                       text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+//                       fontSize: 7,
+//                     },
+//                   ],
+//                   margin: [5, 20],
+//                   alignment: 'center',
+//                 },
+//                 {
+//                   text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO\n(Según NOM-004-SSA3-2012)',
+//                   fontSize: 6,
+//                   margin: [5, 20],
+//                   alignment: 'center',
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: {
+//             hLineWidth: () => 0.5,
+//             vLineWidth: () => 0.5,
+//             hLineColor: () => '#000000',
+//             vLineColor: () => '#000000',
+//           },
+//         },
+//         { text: '', margin: [0, 5] },
+//         {
+//           columns: [
+//             {
+//               width: '50%',
+//               text: [
+//                 {
+//                   text: '* Elaborado conforme a:\n',
+//                   fontSize: 6,
+//                   italics: true,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: '• NOM-004-SSA3-2012 Del expediente clínico\n',
+//                   fontSize: 6,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: '• NOM-031-SSA2-1999 Para la atención a la salud del niño\n',
+//                   fontSize: 6,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: '• Modelo de Evaluación del Expediente Clínico Integrado y de Calidad (MECIC)',
+//                   fontSize: 6,
+//                   color: '#666666',
+//                 },
+//               ],
+//               alignment: 'left',
+//             },
+//             {
+//               width: '50%',
+//               text: [
+//                 {
+//                   text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n',
+//                   fontSize: 6,
+//                   italics: true,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: `Documento generado el: ${fechaActual.toLocaleString(
+//                     'es-MX'
+//                   )}\n`,
+//                   fontSize: 6,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: 'Hospital General San Luis de la Paz, Guanajuato',
+//                   fontSize: 6,
+//                   color: '#666666',
+//                 },
+//               ],
+//               alignment: 'right',
+//             },
+//           ],
+//         },
+//       ],
+
+//       footer: (currentPage: number, pageCount: number) => {
+//         return {
+//           margin: [20, 10],
+//           table: {
+//             widths: ['25%', '50%', '25%'],
+//             body: [
+//               [
+//                 {
+//                   text: `Página ${currentPage} de ${pageCount}`,
+//                   fontSize: 7,
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: esPediatrico
+//                     ? 'Historia Clínica Pediátrica General - SICEG\nNOM-004-SSA3-2012 • NOM-031-SSA2-1999'
+//                     : 'Historia Clínica General - SICEG\nNOM-004-SSA3-2012',
+//                   fontSize: 7,
+//                   alignment: 'center',
+//                   color: '#666666',
+//                 },
+//                 {
+//                   text: [
+//                     {
+//                       text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+//                       fontSize: 7,
+//                     },
+//                     {
+//                       text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+//                         pacienteCompleto.expediente
+//                       )}`,
+//                       fontSize: 6,
+//                     },
+//                   ],
+//                   alignment: 'right',
+//                   color: '#666666',
+//                 },
+//               ],
+//             ],
+//           },
+//           layout: 'noBorders',
+//         };
+//       },
+//     };
+
+//     //    AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
+//     console.log('  Validando todas las tablas del documento...');
+//     try {
+//       validarTodasLasTablas(documentoFinal.content, 'HistoriaClinica');
+//       console.log('   Todas las tablas validadas correctamente');
+//     } catch (error) {
+//       console.error('❌ Error en validación de tablas:', error);
+//       throw error;
+//     }
+
+//     return documentoFinal;
+//   }
+
+async generarHistoriaClinica(datos: any): Promise<any> {
+  const validarTodasLasTablas = (
+    contenido: any[],
+    nombre: string = 'Documento'
+  ) => {
+    contenido.forEach((elemento, index) => {
+      if (elemento && elemento.table) {
+        try {
+          validarTabla(elemento, `${nombre}[${index}]`);
+        } catch (error) {
+          console.error(`Error en tabla ${nombre}[${index}]:`, error);
+          throw error;
         }
-        if (elemento && elemento.table && elemento.table.body) {
-          elemento.table.body.forEach((fila: any[], filaIndex: number) => {
-            fila.forEach((celda: any, celdaIndex: number) => {
-              if (celda && celda.table) {
-                try {
-                  validarTabla(
-                    celda,
-                    `${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]`
-                  );
-                } catch (error) {
-                  console.error(
-                    `❌ Error en tabla anidada ${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]:`,
-                    error
-                  );
-                  throw error;
-                }
+      }
+      if (elemento && elemento.table && elemento.table.body) {
+        elemento.table.body.forEach((fila: any[], filaIndex: number) => {
+          fila.forEach((celda: any, celdaIndex: number) => {
+            if (celda && celda.table) {
+              try {
+                validarTabla(
+                  celda,
+                  `${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]`
+                );
+              } catch (error) {
+                console.error(
+                  `❌ Error en tabla anidada ${nombre}[${index}].fila[${filaIndex}].celda[${celdaIndex}]:`,
+                  error
+                );
+                throw error;
               }
-            });
+            }
           });
-        }
-      });
-    };
-
-    const pacienteCompleto = datos.pacienteCompleto;
-    const medicoCompleto = datos.medicoCompleto;
-    const historiaClinicaData = datos.historiaClinica || {};
-    const signosVitales = datos.signosVitales || {};
-    const guiaClinicaData = datos.guiaClinica || {};
-    const datosPadres = datos.datosPadres || {};
-    const fechaActual = new Date();
-    const esPediatrico = pacienteCompleto.edad < 18;
-    const domicilioPaciente =
-      pacienteCompleto.domicilio || 'Sin dirección registrada';
-    const lugarNacimiento =
-      pacienteCompleto.lugar_nacimiento || 'No especificado';
-    const tipoSangre = pacienteCompleto.tipo_sangre || 'No especificado';
-    const contarFilasIdentificacion = () => {
-      let filas = 7;
-      if (esPediatrico) filas += 1;
-      return filas;
-    };
-    const contarFilasAntecedentes = () => {
-      let filas = 6; // Base: heredo familiares, personales no patológicos, personales patológicos
-
-      // Sección ginecobstétrica (solo mujeres adultas)
-      if (!esPediatrico && pacienteCompleto.sexo === 'F') {
-        filas += 2; // +2 filas
-      }
-
-      // Antecedentes perinatales (solo pediátrico)
-      if (esPediatrico) {
-        filas += 2; // +2 filas
-      }
-
-      console.log(
-        `  Antecedentes: ${filas} filas calculadas (esPediatrico: ${esPediatrico}, sexo: ${pacienteCompleto.sexo})`
-      );
-
-      console.log(`🔍 DEBUG ANTECEDENTES: ${filas} filas calculadas para:`, {
-    esPediatrico,
-    sexo: pacienteCompleto.sexo,
-    agregarGineco: !esPediatrico && pacienteCompleto.sexo === 'F',
-    agregarPediatrico: esPediatrico
-  });
-  
-      return filas;
-    };
-
-    const validarTabla = (tabla: any, nombreTabla: string) => {
-      if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
-        console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
-        return;
-      }
-
-      const numColumnas = tabla.table.widths.length;
-      let erroresEncontrados: string[] = [];
-
-      tabla.table.body.forEach((fila: any[], index: number) => {
-        let celdas = 0;
-        fila.forEach((celda, celdaIndex) => {
-          if (celda && typeof celda === 'object' && celda.colSpan) {
-            celdas += celda.colSpan;
-          } else {
-            celdas += 1;
-          }
         });
+      }
+    });
+  };
 
-        if (celdas !== numColumnas) {
-          const error = `Fila ${index}: esperaba ${numColumnas} columnas, encontró ${celdas}`;
-          erroresEncontrados.push(error);
-          console.error(`❌ ERROR en ${nombreTabla}, ${error}`);
+  const pacienteCompleto = datos.pacienteCompleto;
+  const medicoCompleto = datos.medicoCompleto;
+  const historiaClinicaData = datos.historiaClinica || {};
+  const signosVitales = datos.signosVitales || {};
+  const guiaClinicaData = datos.guiaClinica || {};
+  const datosPadres = datos.datosPadres || {};
+  const fechaActual = new Date();
+  const esPediatrico = pacienteCompleto.edad < 18;
+  const domicilioPaciente =
+    pacienteCompleto.domicilio || 'Sin dirección registrada';
+  const lugarNacimiento =
+    pacienteCompleto.lugar_nacimiento || 'No especificado';
+  const tipoSangre = pacienteCompleto.tipo_sangre || 'No especificado';
+
+  const validarTabla = (tabla: any, nombreTabla: string) => {
+    if (!tabla.table || !tabla.table.widths || !tabla.table.body) {
+      console.warn(`⚠️ Tabla ${nombreTabla} no tiene estructura válida`);
+      return;
+    }
+
+    const numColumnas = tabla.table.widths.length;
+    let erroresEncontrados: string[] = [];
+
+    tabla.table.body.forEach((fila: any[], index: number) => {
+      let celdas = 0;
+      fila.forEach((celda, celdaIndex) => {
+        if (celda && typeof celda === 'object' && celda.colSpan) {
+          celdas += celda.colSpan;
+        } else {
+          celdas += 1;
         }
       });
 
-      if (erroresEncontrados.length === 0) {
-        console.log(
-          `   Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`
-        );
-      } else {
-        throw new Error(
-          `Tabla ${nombreTabla} tiene errores: ${erroresEncontrados.join(', ')}`
-        );
+      if (celdas !== numColumnas) {
+        const error = `Fila ${index}: esperaba ${numColumnas} columnas, encontró ${celdas}`;
+        erroresEncontrados.push(error);
+        console.error(`❌ ERROR en ${nombreTabla}, ${error}`);
       }
-    };
+    });
 
-    const crearFilasIdentificacion = () => {
-      const filasBase = [
-        [
-          {
-            text: 'IDENTIFICACIÓN',
-            fontSize: 6,
-            bold: true,
-            fillColor: '#f5f5f5',
-            alignment: 'center',
-            rowSpan: contarFilasIdentificacion(),
-          },
-          {
-            table: {
-              widths: ['20%', '20%', '20%', '20%', '20%'],
-              body: [
-                [
-                  {
-                    text: 'Fecha de elaboración',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Hora de elaboración',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'No. Expediente',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'No. de cama',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Servicio',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: fechaActual.toLocaleDateString('es-MX'),
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: fechaActual.toLocaleTimeString('es-MX'),
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text:
-                      this.obtenerNumeroExpedientePreferido(
-                        pacienteCompleto.expediente
-                      ) || 'N/A',
-                    fontSize: 7,
-                    alignment: 'center',
-                    bold: true,
-                  },
-                  {
-                    text: historiaClinicaData.numero_cama || 'NO ASIGNADO',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: medicoCompleto.departamento || 'No especificado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-
-        // FILA 2: Datos del paciente
-        [
-          {},
-          {
-            table: {
-              widths: ['55%', '15%', '15%', '15%'],
-              body: [
-                [
-                  {
-                    text: 'Nombre completo del paciente',
-                    fontSize: 7,
-                    bold: true,
-                  },
-                  {
-                    text: 'Edad',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Sexo',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Tipo de sangre',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: pacienteCompleto.nombre_completo,
-                    fontSize: 6,
-                    bold: true,
-                    margin: [2, 3],
-                  },
-                  {
-                    text: `${pacienteCompleto.edad} años`,
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.sexo,
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: tipoSangre,
-                    fontSize: 7,
-                    alignment: 'center',
-                    bold: true,
-                    color: '#dc2626',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-
-        // FILA 3: Domicilio
-        [
-          {},
-          {
-            table: {
-              widths: ['100%'],
-              body: [
-                [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
-                [{ text: domicilioPaciente, fontSize: 7, margin: [2, 3] }],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-
-        // FILA 4: Datos personales básicos
-        [
-          {},
-          {
-            table: {
-              widths: ['25%', '25%', '25%', '25%'],
-              body: [
-                [
-                  {
-                    text: 'Fecha nacimiento',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'CURP',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Lugar de nacimiento',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Teléfono',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  //    USAR CAMPOS YA PROCESADOS
-                  {
-                    text:
-                      this.formatearFecha(pacienteCompleto.fecha_nacimiento) ||
-                      'No registrada',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.curp || 'No registrado',
-                    fontSize: 6,
-                    alignment: 'center',
-                  },
-                  { text: lugarNacimiento, fontSize: 7, alignment: 'center' },
-                  {
-                    text: pacienteCompleto.telefono || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-
-        // FILA 5: Ocupación/Escolaridad
-        [
-          {},
-          {
-            table: {
-              widths: ['25%', '25%', '25%', '25%'],
-              body: [
-                [
-                  {
-                    text: esPediatrico ? 'Grado escolar' : 'Ocupación',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Escolaridad',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Estado civil',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Religión',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: esPediatrico
-                      ? pacienteCompleto.grado_escolar ||
-                      this.determinarGradoEscolarPorEdad(
-                        pacienteCompleto.edad
-                      )
-                      : pacienteCompleto.ocupacion || 'No registrada',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.escolaridad || 'No registrada',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.estado_civil || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.religion || 'No registrada',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-      ];
-
-      // FILA DE PADRES SOLO SI ES PEDIÁTRICO
-      if (esPediatrico) {
-        filasBase.push([
-          {},
-          {
-            table: {
-              widths: ['25%', '25%', '25%', '25%'],
-              body: [
-                [
-                  {
-                    text: 'Nombre del padre',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Edad padre',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Nombre de la madre',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Edad madre',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: datosPadres.nombre_padre || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: datosPadres.edad_padre || 'N/A',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: datosPadres.nombre_madre || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: datosPadres.edad_madre || 'N/A',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ]);
-      }
-      // FILAS FINALES
-      filasBase.push(
-        // Familiar responsable
-        [
-          {},
-          {
-            table: {
-              widths: ['60%', '40%'],
-              body: [
-                [
-                  {
-                    text: esPediatrico
-                      ? 'Familiar responsable/Tutor'
-                      : 'Contacto de emergencia',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Teléfono de contacto',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  //    USAR CAMPOS YA PROCESADOS
-                  {
-                    text:
-                      pacienteCompleto.familiar_responsable || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: pacienteCompleto.telefono_familiar || 'No registrado',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ],
-        // Médico responsable
-        [
-          {},
-          {
-            table: {
-              widths: ['70%', '30%'],
-              body: [
-                [
-                  {
-                    text: 'Médico responsable de la elaboración',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                  {
-                    text: 'Cédula profesional',
-                    fontSize: 7,
-                    bold: true,
-                    alignment: 'center',
-                  },
-                ],
-                [
-                  {
-                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                  {
-                    text: medicoCompleto.numero_cedula || 'No registrada',
-                    fontSize: 7,
-                    alignment: 'center',
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: () => 0.3,
-              vLineWidth: () => 0.3,
-              hLineColor: () => '#000000',
-              vLineColor: () => '#000000',
-            },
-          },
-        ]
+    if (erroresEncontrados.length === 0) {
+      console.log(
+        `✅ Tabla ${nombreTabla} validada correctamente: ${tabla.table.body.length} filas`
       );
-      return filasBase;
-    };
+    } else {
+      throw new Error(
+        `Tabla ${nombreTabla} tiene errores: ${erroresEncontrados.join(', ')}`
+      );
+    }
+  };
 
-    const tablaIdentificacion = {
-      table: { widths: ['15%', '85%'], body: crearFilasIdentificacion() },
-      layout: {
-        hLineWidth: () => 0.5,
-        vLineWidth: () => 0.5,
-        hLineColor: () => '#000000',
-        vLineColor: () => '#000000',
-      },
-    };
+  const crearFilasIdentificacion = () => {
+    const filasBase = [
+      // FILA 1: Headers
+      [
+        {
+          text: 'IDENTIFICACIÓN',
+          fontSize: 6,
+          bold: true,
+          fillColor: '#f5f5f5',
+          alignment: 'center',
+        },
+        {
+          table: {
+            widths: ['20%', '20%', '20%', '20%', '20%'],
+            body: [
+              [
+                {
+                  text: 'Fecha de elaboración',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Hora de elaboración',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'No. Expediente',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'No. de cama',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Servicio',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: fechaActual.toLocaleDateString('es-MX'),
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: fechaActual.toLocaleTimeString('es-MX'),
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text:
+                    this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    ) || 'N/A',
+                  fontSize: 7,
+                  alignment: 'center',
+                  bold: true,
+                },
+                {
+                  text: historiaClinicaData.numero_cama || 'NO ASIGNADO',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: medicoCompleto.departamento || 'No especificado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
 
-    const crearFilasAntecedentes = () => {
-      const filasBase = [
+      // FILA 2: Datos del paciente
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['55%', '15%', '15%', '15%'],
+            body: [
+              [
+                {
+                  text: 'Nombre completo del paciente',
+                  fontSize: 7,
+                  bold: true,
+                },
+                {
+                  text: 'Edad',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Sexo',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Tipo de sangre',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: pacienteCompleto.nombre_completo,
+                  fontSize: 6,
+                  bold: true,
+                  margin: [2, 3],
+                },
+                {
+                  text: `${pacienteCompleto.edad} años`,
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.sexo,
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: tipoSangre,
+                  fontSize: 7,
+                  alignment: 'center',
+                  bold: true,
+                  color: '#dc2626',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
+
+      // FILA 3: Domicilio
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['100%'],
+            body: [
+              [{ text: 'Domicilio del paciente', fontSize: 7, bold: true }],
+              [{ text: domicilioPaciente, fontSize: 7, margin: [2, 3] }],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
+
+      // FILA 4: Datos personales básicos
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['25%', '25%', '25%', '25%'],
+            body: [
+              [
+                {
+                  text: 'Fecha nacimiento',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'CURP',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Lugar de nacimiento',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Teléfono',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text:
+                    this.formatearFecha(pacienteCompleto.fecha_nacimiento) ||
+                    'No registrada',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.curp || 'No registrado',
+                  fontSize: 6,
+                  alignment: 'center',
+                },
+                { text: lugarNacimiento, fontSize: 7, alignment: 'center' },
+                {
+                  text: pacienteCompleto.telefono || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
+
+      // FILA 5: Ocupación/Escolaridad
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['25%', '25%', '25%', '25%'],
+            body: [
+              [
+                {
+                  text: esPediatrico ? 'Grado escolar' : 'Ocupación',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Escolaridad',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Estado civil',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Religión',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: esPediatrico
+                    ? pacienteCompleto.grado_escolar ||
+                    this.determinarGradoEscolarPorEdad(
+                      pacienteCompleto.edad
+                    )
+                    : pacienteCompleto.ocupacion || 'No registrada',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.escolaridad || 'No registrada',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.estado_civil || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.religion || 'No registrada',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
+    ];
+
+    // FILA DE PADRES SOLO SI ES PEDIÁTRICO
+    if (esPediatrico) {
+      filasBase.push([
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['25%', '25%', '25%', '25%'],
+            body: [
+              [
+                {
+                  text: 'Nombre del padre',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Edad padre',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Nombre de la madre',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Edad madre',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: datosPadres.nombre_padre || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: datosPadres.edad_padre || 'N/A',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: datosPadres.nombre_madre || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: datosPadres.edad_madre || 'N/A',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ]);
+    }
+
+    // FILAS FINALES
+    filasBase.push(
+      // Familiar responsable
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['60%', '40%'],
+            body: [
+              [
+                {
+                  text: esPediatrico
+                    ? 'Familiar responsable/Tutor'
+                    : 'Contacto de emergencia',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Teléfono de contacto',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text:
+                    pacienteCompleto.familiar_responsable || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: pacienteCompleto.telefono_familiar || 'No registrado',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ],
+      // Médico responsable
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          table: {
+            widths: ['70%', '30%'],
+            body: [
+              [
+                {
+                  text: 'Médico responsable de la elaboración',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Cédula profesional',
+                  fontSize: 7,
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              [
+                {
+                  text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}`,
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+                {
+                  text: medicoCompleto.numero_cedula || 'No registrada',
+                  fontSize: 7,
+                  alignment: 'center',
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.3,
+            vLineWidth: () => 0.3,
+            hLineColor: () => '#000000',
+            vLineColor: () => '#000000',
+          },
+        },
+      ]
+    );
+
+    return filasBase;
+  };
+
+  const tablaIdentificacion = {
+    table: { widths: ['15%', '85%'], body: crearFilasIdentificacion() },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+  };
+
+  const crearFilasAntecedentes = () => {
+    const filasBase = [
+      [
+        {
+          text: 'ANTECEDENTES',
+          fontSize: 6,
+          bold: true,
+          fillColor: '#eeece1',
+          alignment: 'center',
+        },
+        {
+          text: 'HEREDO FAMILIARES',
+          fontSize: 7,
+          bold: true,
+          fillColor: '#f0f0f0',
+        },
+      ],
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          text: historiaClinicaData.antecedentes_heredo_familiares || 'No especificado',
+          fontSize: 7,
+          margin: [3, 2],
+          lineHeight: 1.1,
+        },
+      ],
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          text: 'PERSONALES NO PATOLÓGICOS',
+          fontSize: 7,
+          bold: true,
+          fillColor: '#f0f0f0',
+        },
+      ],
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          text:
+            `Alimentación: ${historiaClinicaData.habitos_alimenticios || 'No registrado'}\n` +
+            `Higiene: ${historiaClinicaData.habitos_higienicos || 'Adecuada'}\n` +
+            `Actividad física: ${historiaClinicaData.actividad_fisica || 
+              (esPediatrico ? 'Apropiada para la edad' : 'Regular')}\n` +
+            `Vivienda: ${historiaClinicaData.vivienda || 'Casa habitación con servicios básicos'}\n` +
+            `${esPediatrico ? 'Inmunizaciones: Esquema completo según edad\n' : ''}` +
+            `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''}` +
+            `${!esPediatrico && historiaClinicaData.toxicomanias
+              ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n`
+              : !esPediatrico ? 'Toxicomanías: Negadas\n' : ''
+            }`,
+          fontSize: 7,
+          margin: [3, 2],
+          lineHeight: 1.1,
+        },
+      ],
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          text: 'PERSONALES PATOLÓGICOS',
+          fontSize: 7,
+          bold: true,
+          fillColor: '#f0f0f0',
+        },
+      ],
+      [
+        {
+          text: '', // Celda vacía para mantener estructura
+        },
+        {
+          text:
+            `Enfermedades en la infancia: ${historiaClinicaData.enfermedades_infancia || 'Negadas'
+            }\n` +
+            `${!esPediatrico
+              ? `Enfermedades en el adulto: ${historiaClinicaData.enfermedades_adulto || 'Negadas'
+              }\n`
+              : ''
+            }` +
+            `Hospitalizaciones previas: ${historiaClinicaData.hospitalizaciones_previas || 'Ninguna'
+            }\n` +
+            `Cirugías previas: ${historiaClinicaData.cirugias_previas || 'Ninguna'
+            }\n` +
+            `Traumatismos: ${historiaClinicaData.traumatismos || 'Ninguno'
+            }\n` +
+            `Alergias (medicamentos/alimentos): ${historiaClinicaData.alergias || 'Negadas'
+            }\n` +
+            `Transfusiones: ${historiaClinicaData.transfusiones || 'Ninguna'
+            }`,
+          fontSize: 7,
+          margin: [3, 2],
+          lineHeight: 1.1,
+        },
+      ],
+    ];
+
+    // Sección ginecobstétrica (solo mujeres adultas)
+    if (!esPediatrico && pacienteCompleto.sexo === 'F') {
+      filasBase.push(
         [
           {
-            text: 'ANTECEDENTES',
-            fontSize: 6,
-            bold: true,
-            fillColor: '#eeece1',
-            alignment: 'center',
-            rowSpan: contarFilasAntecedentes(),
+            text: '', // Celda vacía para mantener estructura
           },
           {
-            text: 'HEREDO FAMILIARES',
+            text: 'GINECOBSTÉTRICOS',
             fontSize: 7,
             bold: true,
             fillColor: '#f0f0f0',
           },
         ],
         [
-          {},
           {
-text: historiaClinicaData.antecedentes_heredo_familiares || 'No especificado',
-            fontSize: 7,
-            margin: [3, 2],
-            lineHeight: 1.1,
+            text: '', // Celda vacía para mantener estructura
           },
-        ],
-        [
-          {},
-          {
-            text: 'PERSONALES NO PATOLÓGICOS',
-            fontSize: 7,
-            bold: true,
-            fillColor: '#f0f0f0',
-          },
-        ],
-        [
-          {},
-          {
-    text:
-      `Alimentación: ${historiaClinicaData.habitos_alimenticios || 'No registrado'}\n` +
-      `Higiene: ${historiaClinicaData.habitos_higienicos || 'Adecuada'}\n` +
-      `Actividad física: ${historiaClinicaData.actividad_fisica || 
-        (esPediatrico ? 'Apropiada para la edad' : 'Regular')}\n` +
-      `Vivienda: ${historiaClinicaData.vivienda || 'Casa habitación con servicios básicos'}\n` +
-      `${esPediatrico ? 'Inmunizaciones: Esquema completo según edad\n' : ''}` +
-      `${esPediatrico ? 'Desarrollo psicomotor: Acorde a la edad\n' : ''}` +
-      `${!esPediatrico && historiaClinicaData.toxicomanias
-        ? `Toxicomanías: ${historiaClinicaData.toxicomanias}\n`
-        : !esPediatrico ? 'Toxicomanías: Negadas\n' : ''
-      }`,
-    fontSize: 7,
-    margin: [3, 2],
-    lineHeight: 1.1,
-  },
-        ],
-        [
-          {},
-          {
-            text: 'PERSONALES PATOLÓGICOS',
-            fontSize: 7,
-            bold: true,
-            fillColor: '#f0f0f0',
-          },
-        ],
-        [
-          {},
           {
             text:
-              `Enfermedades en la infancia: ${historiaClinicaData.enfermedades_infancia || 'Negadas'
+              `Menarca: ${historiaClinicaData.menarca || 'No registrada'
+              } años\n` +
+              `Ritmo menstrual: ${historiaClinicaData.ritmo_menstrual || 'No registrado'
               }\n` +
-              `${!esPediatrico
-                ? `Enfermedades en el adulto: ${historiaClinicaData.enfermedades_adulto || 'Negadas'
-                }\n`
-                : ''
-              }` +
-              `Hospitalizaciones previas: ${historiaClinicaData.hospitalizaciones_previas || 'Ninguna'
-              }\n` +
-              `Cirugías previas: ${historiaClinicaData.cirugias_previas || 'Ninguna'
-              }\n` +
-              `Traumatismos: ${historiaClinicaData.traumatismos || 'Ninguno'
-              }\n` +
-              `Alergias (medicamentos/alimentos): ${historiaClinicaData.alergias || 'Negadas'
-              }\n` +
-              `Transfusiones: ${historiaClinicaData.transfusiones || 'Ninguna'
+              `Gestas: ${historiaClinicaData.gestas || '0'} | Partos: ${historiaClinicaData.partos || '0'
+              } | Cesáreas: ${historiaClinicaData.cesareas || '0'
+              } | Abortos: ${historiaClinicaData.abortos || '0'}\n` +
+              `Método de planificación familiar: ${historiaClinicaData.metodo_planificacion || 'Ninguno'
               }`,
             fontSize: 7,
             margin: [3, 2],
             lineHeight: 1.1,
           },
+        ]
+      );
+    }
+
+    // Antecedentes perinatales (solo pediátrico)
+    if (esPediatrico) {
+      filasBase.push(
+        [
+          {
+            text: '', // Celda vacía para mantener estructura
+          },
+          {
+            text: 'PERINATALES (Pediatría)',
+            fontSize: 7,
+            bold: true,
+            fillColor: '#f0f0f0',
+          },
         ],
-      ];
+        [
+          {
+            text: '', // Celda vacía para mantener estructura
+          },
+          {
+            text:
+              `Control prenatal: ${historiaClinicaData.control_prenatal || 'Sí'
+              }\n` +
+              `Tipo de parto: ${historiaClinicaData.tipo_parto || 'Vaginal'
+              }\n` +
+              `Peso al nacer: ${historiaClinicaData.peso_nacer || 'No registrado'
+              } kg\n` +
+              `Complicaciones neonatales: ${historiaClinicaData.complicaciones_neonatales || 'Ninguna'
+              }\n` +
+              `Apgar: ${historiaClinicaData.apgar || 'No registrado'}\n` +
+              `Edad gestacional: ${historiaClinicaData.edad_gestacional || 'No registrada'
+              } semanas`,
+            fontSize: 7,
+            margin: [3, 2],
+            lineHeight: 1.1,
+          },
+        ]
+      );
+    }
 
-      // Sección ginecobstétrica (solo mujeres adultas)
-      if (!esPediatrico && pacienteCompleto.sexo === 'F') {
-        filasBase.push(
-          [
-            {},
-            {
-              text: 'GINECOBSTÉTRICOS',
-              fontSize: 7,
-              bold: true,
-              fillColor: '#f0f0f0',
-            },
-          ],
-          [
-            {},
-            {
-              text:
-                `Menarca: ${historiaClinicaData.menarca || 'No registrada'
-                } años\n` +
-                `Ritmo menstrual: ${historiaClinicaData.ritmo_menstrual || 'No registrado'
-                }\n` +
-                `Gestas: ${historiaClinicaData.gestas || '0'} | Partos: ${historiaClinicaData.partos || '0'
-                } | Cesáreas: ${historiaClinicaData.cesareas || '0'
-                } | Abortos: ${historiaClinicaData.abortos || '0'}\n` +
-                `Método de planificación familiar: ${historiaClinicaData.metodo_planificacion || 'Ninguno'
-                }`,
-              fontSize: 7,
-              margin: [3, 2],
-              lineHeight: 1.1,
-            },
-          ]
-        );
-      }
+    return filasBase;
+  };
 
-      // Antecedentes perinatales (solo pediátrico)
-      if (esPediatrico) {
-        filasBase.push(
-          [
-            {},
-            {
-              text: 'PERINATALES (Pediatría)',
-              fontSize: 7,
-              bold: true,
-              fillColor: '#f0f0f0',
-            },
-          ],
-          [
-            {},
-            {
-              text:
-                `Control prenatal: ${historiaClinicaData.control_prenatal || 'Sí'
-                }\n` +
-                `Tipo de parto: ${historiaClinicaData.tipo_parto || 'Vaginal'
-                }\n` +
-                `Peso al nacer: ${historiaClinicaData.peso_nacer || 'No registrado'
-                } kg\n` +
-                `Complicaciones neonatales: ${historiaClinicaData.complicaciones_neonatales || 'Ninguna'
-                }\n` +
-                `Apgar: ${historiaClinicaData.apgar || 'No registrado'}\n` +
-                `Edad gestacional: ${historiaClinicaData.edad_gestacional || 'No registrada'
-                } semanas`,
-              fontSize: 7,
-              margin: [3, 2],
-              lineHeight: 1.1,
-            },
-          ]
-        );
-      }
+  const tablaAntecedentes = {
+    table: {
+      widths: ['15%', '85%'],
+      body: crearFilasAntecedentes(),
+    },
+    layout: {
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => '#000000',
+      vLineColor: () => '#000000',
+    },
+  };
 
-      return filasBase;
-    };
+  validarTabla(tablaIdentificacion, 'Identificación');
+  validarTabla(tablaAntecedentes, 'Antecedentes');
 
-    const tablaAntecedentes = {
+  const documentoFinal = {
+    pageSize: 'LETTER',
+    pageMargins: [20, 60, 20, 40],
+    header: {
+      margin: [20, 10, 20, 10],
       table: {
-        widths: ['15%', '85%'],
-        body: crearFilasAntecedentes(),
+        widths: ['20%', '60%', '20%'],
+        body: [
+          [
+            {
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_gobierno ||
+                '/uploads/logos/logo-gobierno-importado.svg'
+              ),
+              fit: [80, 40],
+              alignment: 'left',
+              margin: [0, 5],
+            },
+            {
+              text: esPediatrico
+                ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA PEDIÁTRICA GENERAL'
+                : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA GENERAL',
+              fontSize: 8,
+              bold: true,
+              alignment: 'center',
+              color: '#1a365d',
+              margin: [0, 8],
+            },
+            {
+              image: await this.obtenerImagenBase64(
+                datos.configuracion?.logo_principal ||
+                '/uploads/logos/logo-principal-importado.svg'
+              ),
+              fit: [80, 40],
+              alignment: 'right',
+              margin: [0, 5],
+            },
+          ],
+        ],
       },
-      layout: {
-        hLineWidth: () => 0.5,
-        vLineWidth: () => 0.5,
-        hLineColor: () => '#000000',
-        vLineColor: () => '#000000',
-      },
-    };
-
-    console.log(
-      `  Debug: Tabla tiene ${tablaIdentificacion.table.body.length
-      } filas, rowSpan configurado para ${contarFilasIdentificacion()}`
-    );
-    console.log(`  esPediatrico: ${esPediatrico}`);
-
-    validarTabla(tablaIdentificacion, 'Identificación');
-
-    const documentoFinal = {
-      pageSize: 'LETTER',
-      pageMargins: [20, 60, 20, 40],
-      header: {
-        margin: [20, 10, 20, 10],
+      layout: 'noBorders',
+    },
+    content: [
+      tablaIdentificacion,
+      { text: '', margin: [0, 1] },
+      tablaAntecedentes,
+      { text: '', margin: [0, 1] },
+      {
         table: {
-          widths: ['20%', '60%', '20%'], //     Ajustar anchos para dar más espacio a logos
+          widths: ['15%', '85%'],
           body: [
             [
               {
-                // Logo de gobierno (izquierda)
-                image: await this.obtenerImagenBase64(
-                  datos.configuracion?.logo_gobierno ||
-                  '/uploads/logos/logo-gobierno-importado.svg'
-                ),
-                fit: [80, 40], //     USAR fit EN LUGAR DE width/height
-                alignment: 'left',
-                margin: [0, 5],
-              },
-              {
-                // Texto central
-                text: esPediatrico
-                  ? 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA PEDIÁTRICA GENERAL'
-                  : 'HOSPITAL GENERAL SAN LUIS DE LA PAZ - HISTORIA CLÍNICA GENERAL',
-                fontSize: 8,
+                text: 'PADECIMIENTO ACTUAL',
+                fontSize: 6,
                 bold: true,
+                fillColor: '#eeece1',
                 alignment: 'center',
-                color: '#1a365d',
-                margin: [0, 8],
               },
               {
-                // Logo del hospital (derecha)
-                image: await this.obtenerImagenBase64(
-                  datos.configuracion?.logo_principal ||
-                  '/uploads/logos/logo-principal-importado.svg'
+                text: 'MOTIVO DE CONSULTA',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: historiaClinicaData.padecimiento_actual || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.4,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'SÍNTOMAS GENERALES',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: historiaClinicaData.sintomas_generales || 'No especificado',
+                fontSize: 7,
+                margin: [5, 8],
+                lineHeight: 1.4,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'INTERROGATORIO POR APARATOS Y SISTEMAS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
+                  'Sin alteraciones'
+                  }\n` +
+                  `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
+                  'Sin alteraciones'
+                  }\n` +
+                  `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
+                  'Sin alteraciones'
+                  }\n` +
+                  `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
+                  'Sin alteraciones'
+                  }\n` +
+                  `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
+                  'Sin alteraciones'
+                  }\n` +
+                  `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
+                  'Sin alteraciones'
+                  }`,
+                fontSize: 7,
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 1] },
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'EXPLORACIÓN FÍSICA',
+                fontSize: 6,
+                bold: true,
+                fillColor: '#eeece1',
+                alignment: 'center',
+              },
+              {
+                text: 'SIGNOS VITALES Y SOMATOMETRÍA',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+},
+              {
+                columns: [
+                  {
+                    width: '33%',
+                    text: `Peso: ${signosVitales.peso || 
+                           historiaClinicaData.peso || '___'} kg\n` +
+                          `Talla: ${signosVitales.talla || 
+                           historiaClinicaData.talla || '___'} cm\n` +
+                          `IMC: ${this.calcularIMC(
+                            signosVitales.peso || historiaClinicaData.peso,
+                            signosVitales.talla || historiaClinicaData.talla
+                          )}`,
+                    fontSize: 7,
+                  },
+                  {
+                    width: '33%',
+                    text: `TA: ${signosVitales.presion_arterial_sistolica || 
+                           historiaClinicaData.presion_arterial_sistolica || '___'}/${
+                           signosVitales.presion_arterial_diastolica || 
+                           historiaClinicaData.presion_arterial_diastolica || '___'
+                          } mmHg\n` +
+                          `FC: ${signosVitales.frecuencia_cardiaca || 
+                           historiaClinicaData.frecuencia_cardiaca || '___'} lpm\n` +
+                          `FR: ${signosVitales.frecuencia_respiratoria || 
+                           historiaClinicaData.frecuencia_respiratoria || '___'} rpm`,
+                    fontSize: 7,
+                  },
+                  {
+                    width: '34%',
+                    text: `Temperatura: ${signosVitales.temperatura || 
+                           historiaClinicaData.temperatura || '___'} °C\n` +
+                          `Saturación O2: ${signosVitales.saturacion_oxigeno || 
+                           historiaClinicaData.saturacion_oxigeno || '___'} %\n` +
+                          `Glucosa: ${signosVitales.glucosa || 
+                           historiaClinicaData.glucosa || '___'} mg/dL`,
+                    fontSize: 7,
+                  },
+                ],
+                margin: [5, 3],
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'HABITUS EXTERIOR',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  historiaClinicaData.habitus_exterior ||
+                  historiaClinicaData.exploracion_general ||
+                  'No especificado',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.1,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'EXPLORACIÓN POR APARATOS Y SISTEMAS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  `CABEZA Y CUELLO: ${historiaClinicaData.exploracion_cabeza ||
+                  'Normal'
+                  }\n\n` +
+                  `TÓRAX Y PULMONES: ${historiaClinicaData.exploracion_torax ||
+                  'Normal'
+                  }\n\n` +
+                  `CARDIOVASCULAR: ${historiaClinicaData.exploracion_corazon ||
+                  'Normal'
+                  }\n\n` +
+                  `ABDOMEN: ${historiaClinicaData.exploracion_abdomen ||
+                  'Normal'
+                  }\n\n` +
+                  `EXTREMIDADES: ${historiaClinicaData.exploracion_extremidades ||
+                  'Normal'
+                  }\n\n` +
+                  `GENITALES: ${historiaClinicaData.exploracion_genitales ||
+                  'Normal'
+                  }\n\n` +
+                  `NEUROLÓGICO: ${historiaClinicaData.exploracion_neurologico ||
+                  'Normal'
+                  }`,
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.1,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'DESARROLLO PSICOMOTOR (PEDIÁTRICO)',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  historiaClinicaData.desarrollo_psicomotor_exploracion ||
+                  'Acorde a la edad',
+                fontSize: 7,
+                margin: [5, 3],
+                lineHeight: 1.1,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 1] },
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'ESTUDIOS',
+                fontSize: 6,
+                bold: true,
+                fillColor: '#eeece1',
+                alignment: 'center',
+              },
+              {
+                text: 'LABORATORIO PREVIO Y ACTUAL',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  historiaClinicaData.estudios_laboratorio_previos ||
+                  'No se han realizado estudios previos',
+                fontSize: 7,
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'GABINETE PREVIO Y ACTUAL',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text:
+                  historiaClinicaData.estudios_gabinete_previos ||
+                  'No se han realizado estudios previos',
+                fontSize: 7,
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 1] },
+      {
+        table: {
+          widths: ['15%', '85%'],
+          body: [
+            [
+              {
+                text: 'DIAGNÓSTICO Y PLAN',
+                fontSize: 6,
+                bold: true,
+                fillColor: '#eeece1',
+                alignment: 'center',
+              },
+              {
+                text: 'GUÍA CLÍNICA DE DIAGNÓSTICO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: this.construirTextoGuiasClinicas(
+                  datos.guiasClinicas ||
+                  (datos.guiaClinica ? [datos.guiaClinica] : [])
                 ),
-                fit: [80, 40], //     USAR fit EN LUGAR DE width/height
+                fontSize: 7,
+                margin: [3, 2],
+                italics:
+                  !datos.guiasClinicas || datos.guiasClinicas.length === 0,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: [
+                  {
+                    text: historiaClinicaData.impresion_diagnostica || 'No especificado',
+                    fontSize: 7,
+                    bold: true,
+                  },
+                  historiaClinicaData.codigo_cie10 ? {
+                    text: `\n\nCódigo CIE-10: ${historiaClinicaData.codigo_cie10}`,
+                    fontSize: 7,
+                    bold: true,
+                    color: '#000000ff',
+                    italics: true,
+                  } : {}
+                ],
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'PLAN DIAGNÓSTICO',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: historiaClinicaData.plan_diagnostico || 'No especificado',
+                fontSize: 7,
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: 'INDICACIÓN TERAPÉUTICA',
+                fontSize: 7,
+                bold: true,
+                fillColor: '#f0f0f0',
+              },
+            ],
+            [
+              {
+                text: '', // Celda vacía para mantener estructura
+              },
+              {
+                text: historiaClinicaData.plan_terapeutico || 'No especificado',
+                fontSize: 7,
+                margin: [3, 2],
+                lineHeight: 1.1,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 1] },
+      {
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                text: `PRONÓSTICO: ${historiaClinicaData.pronostico || 'No especificado'}`,
+                fontSize: 6,
+                bold: true,
+                fillColor: '#f8f8f8',
+                margin: [5, 8],
+                alignment: 'center',
+                lineHeight: 1.1,
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 1] },
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              {
+                text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA',
+                fontSize: 6,
+                bold: true,
+                fillColor: '#ddd9c3',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+              {
+                text: 'FIRMA AUTÓGRAFA',
+                fontSize: 6,
+                bold: true,
+                fillColor: '#ddd9c3',
+                alignment: 'center',
+                margin: [2, 5],
+              },
+            ],
+            [
+              {
+                text: [
+                  {
+                    text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
+                    fontSize: 7,
+                    bold: true,
+                  },
+                  {
+                    text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
+                    fontSize: 6,
+                  },
+                  {
+                    text: `Especialidad: ${medicoCompleto.especialidad}\n`,
+                    fontSize: 6,
+                  },
+                  {
+                    text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
+                    fontSize: 6,
+                  },
+                  {
+                    text: `Hospital General San Luis de la Paz\n`,
+                    fontSize: 7,
+                    color: '#6b7280',
+                  },
+                  {
+                    text: `Fecha: ${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    fontSize: 7,
+                  },
+                  {
+                    text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
+                    fontSize: 7,
+                  },
+                ],
+                margin: [5, 20],
+                alignment: 'center',
+              },
+              {
+                text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO\n(Según NOM-004-SSA3-2012)',
+                fontSize: 6,
+                margin: [5, 20],
+                alignment: 'center',
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: () => 0.5,
+          vLineWidth: () => 0.5,
+          hLineColor: () => '#000000',
+          vLineColor: () => '#000000',
+        },
+      },
+      { text: '', margin: [0, 5] },
+      {
+        columns: [
+          {
+            width: '50%',
+            text: [
+              {
+                text: '* Elaborado conforme a:\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: '• NOM-004-SSA3-2012 Del expediente clínico\n',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: '• NOM-031-SSA2-1999 Para la atención a la salud del niño\n',
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: '• Modelo de Evaluación del Expediente Clínico Integrado y de Calidad (MECIC)',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'left',
+          },
+          {
+            width: '50%',
+            text: [
+              {
+                text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n',
+                fontSize: 6,
+                italics: true,
+                color: '#666666',
+              },
+              {
+                text: `Documento generado el: ${fechaActual.toLocaleString('es-MX')}\n`,
+                fontSize: 6,
+                color: '#666666',
+              },
+              {
+                text: 'Hospital General San Luis de la Paz, Guanajuato',
+                fontSize: 6,
+                color: '#666666',
+              },
+            ],
+            alignment: 'right',
+          },
+        ],
+      },
+    ],
+
+    footer: (currentPage: number, pageCount: number) => {
+      return {
+        margin: [20, 10],
+        table: {
+          widths: ['25%', '50%', '25%'],
+          body: [
+            [
+              {
+                text: `Página ${currentPage} de ${pageCount}`,
+                fontSize: 7,
+                color: '#666666',
+              },
+              {
+                text: esPediatrico
+                  ? 'Historia Clínica Pediátrica General - SICEG\nNOM-004-SSA3-2012 • NOM-031-SSA2-1999'
+                  : 'Historia Clínica General - SICEG\nNOM-004-SSA3-2012',
+                fontSize: 7,
+                alignment: 'center',
+                color: '#666666',
+              },
+              {
+                text: [
+                  {
+                    text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
+                    fontSize: 7,
+                  },
+                  {
+                    text: `Exp: ${this.obtenerNumeroExpedientePreferido(
+                      pacienteCompleto.expediente
+                    )}`,
+                    fontSize: 6,
+                  },
+                ],
                 alignment: 'right',
-                margin: [0, 5],
+                color: '#666666',
               },
             ],
           ],
         },
         layout: 'noBorders',
-      },
-      content: [
-        tablaIdentificacion,
-        { text: '', margin: [0, 1] },
-        tablaAntecedentes,
-        { text: '', margin: [0, 1] },
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'PADECIMIENTO ACTUAL',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#eeece1',
-                  alignment: 'center',
-                  rowSpan: 6,
-                },
-                {
-                  text: 'MOTIVO DE CONSULTA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-text: historiaClinicaData.padecimiento_actual || 'No especificado',
-                  fontSize: 7,
-                  margin: [5, 8],
-                  lineHeight: 1.4,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'SÍNTOMAS GENERALES',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.sintomas_generales ||
-                    'No especificado',
-                  fontSize: 7,
-                  margin: [5, 8],
-                  lineHeight: 1.4,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'INTERROGATORIO POR APARATOS Y SISTEMAS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-    text:
-      `Cardiovascular: ${historiaClinicaData.interrogatorio_cardiovascular ||
-      'Sin alteraciones'
-      }\n` +
-      `Respiratorio: ${historiaClinicaData.interrogatorio_respiratorio ||
-      'Sin alteraciones'
-      }\n` +
-      `Digestivo: ${historiaClinicaData.interrogatorio_digestivo ||
-      'Sin alteraciones'
-      }\n` +
-      `Genitourinario: ${historiaClinicaData.interrogatorio_genitourinario ||
-      'Sin alteraciones'
-      }\n` +
-      `Neurológico: ${historiaClinicaData.interrogatorio_neurologico ||
-      'Sin alteraciones'
-      }\n` +
-      `Musculoesquelético: ${historiaClinicaData.interrogatorio_musculoesqueletico ||
-      'Sin alteraciones'
-      }`,
-    fontSize: 7,
-    margin: [3, 2],
-    lineHeight: 1.1,
-  },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-        { text: '', margin: [0, 1] },
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'EXPLORACIÓN FÍSICA',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#eeece1',
-                  alignment: 'center',
-                  rowSpan: 8,
-                },
-                {
-                  text: 'SIGNOS VITALES Y SOMATOMETRÍA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-columns: [
-    {
-      width: '33%',
-      text: `Peso: ${signosVitales.peso || 
-             historiaClinicaData.peso || '___'} kg\n` +
-            `Talla: ${signosVitales.talla || 
-             historiaClinicaData.talla || '___'} cm\n` +
-            `IMC: ${this.calcularIMC(
-              signosVitales.peso || historiaClinicaData.peso,
-              signosVitales.talla || historiaClinicaData.talla
-            )}`,
-      fontSize: 7,
+      };
     },
-    {
-      width: '33%',
-      text: `TA: ${signosVitales.presion_arterial_sistolica || 
-             historiaClinicaData.presion_arterial_sistolica || '___'}/${
-             signosVitales.presion_arterial_diastolica || 
-             historiaClinicaData.presion_arterial_diastolica || '___'
-            } mmHg\n` +
-            `FC: ${signosVitales.frecuencia_cardiaca || 
-             historiaClinicaData.frecuencia_cardiaca || '___'} lpm\n` +
-            `FR: ${signosVitales.frecuencia_respiratoria || 
-             historiaClinicaData.frecuencia_respiratoria || '___'} rpm`,
-      fontSize: 7,
-    },
-    {
-      width: '34%',
-      text: `Temperatura: ${signosVitales.temperatura || 
-             historiaClinicaData.temperatura || '___'} °C\n` +
-            `Saturación O2: ${signosVitales.saturacion_oxigeno || 
-             historiaClinicaData.saturacion_oxigeno || '___'} %\n` +
-            `Glucosa: ${signosVitales.glucosa || 
-             historiaClinicaData.glucosa || '___'} mg/dL`,
-      fontSize: 7,
-    },
-  ],
-                  margin: [5, 3],
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'HABITUS EXTERIOR',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.habitus_exterior ||
-                    historiaClinicaData.exploracion_general ||
-                    'No especificado',
-                  fontSize: 7,
-                  margin: [5, 3],
-                  lineHeight: 1.1,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'EXPLORACIÓN POR APARATOS Y SISTEMAS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    `CABEZA Y CUELLO: ${historiaClinicaData.exploracion_cabeza ||
-                    'Normal'
-                    }\n\n` +
-                    `TÓRAX Y PULMONES: ${historiaClinicaData.exploracion_torax ||
-                    'Normal'
-                    }\n\n` +
-                    `CARDIOVASCULAR: ${historiaClinicaData.exploracion_corazon ||
-                    'Normal'
-                    }\n\n` +
-                    `ABDOMEN: ${historiaClinicaData.exploracion_abdomen ||
-                    'Normal'
-                    }\n\n` +
-                    `EXTREMIDADES: ${historiaClinicaData.exploracion_extremidades ||
-                    'Normal'
-                    }\n\n` +
-                    `GENITALES: ${historiaClinicaData.exploracion_genitales ||
-                    'Normal'
-                    }\n\n` +
-                    `NEUROLÓGICO: ${historiaClinicaData.exploracion_neurologico ||
-                    'Normal'
-                    }`,
-                  fontSize: 7,
-                  margin: [5, 3],
-                  lineHeight: 1.1,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'DESARROLLO PSICOMOTOR (PEDIÁTRICO)',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.desarrollo_psicomotor_exploracion ||
-                    'Acorde a la edad',
-                  fontSize: 7,
-                  margin: [5, 3],
-                  lineHeight: 1.1,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
+  };
 
-        { text: '', margin: [0, 1] },
-
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'ESTUDIOS',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#eeece1',
-                  alignment: 'center',
-                  rowSpan: 4,
-                },
-                {
-                  text: 'LABORATORIO PREVIO Y ACTUAL',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.estudios_laboratorio_previos ||
-                    'No se han realizado estudios previos',
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'GABINETE PREVIO Y ACTUAL',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text:
-                    historiaClinicaData.estudios_gabinete_previos ||
-                    'No se han realizado estudios previos.',
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-        { text: '', margin: [0, 1] },
-        {
-          table: {
-            widths: ['15%', '85%'],
-            body: [
-              [
-                {
-                  text: 'DIAGNÓSTICO Y PLAN',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#eeece1',
-                  alignment: 'center',
-                  rowSpan: 10,
-                },
-                {
-                  text: 'GUÍA CLÍNICA DE DIAGNÓSTICO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-                  text: this.construirTextoGuiasClinicas(
-                    datos.guiasClinicas ||
-                    (datos.guiaClinica ? [datos.guiaClinica] : [])
-                  ),
-                  fontSize: 7,
-                  margin: [3, 2],
-                  italics:
-                    !datos.guiasClinicas || datos.guiasClinicas.length === 0,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'IMPRESIÓN DIAGNÓSTICA O PROBLEMAS CLÍNICOS',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-    text: [
-      {
-text: historiaClinicaData.impresion_diagnostica || 'No especificado',
-        fontSize: 7,
-        bold: true,
-      },
-      //     AGREGAR CIE-10
-      historiaClinicaData.codigo_cie10 ? {
-        text: `\n\nCódigo CIE-10: ${historiaClinicaData.codigo_cie10}`,
-        fontSize: 7,
-        bold: true,
-        color: '#000000ff',
-        italics: true,
-      } : {}
-    ],
-    margin: [3, 2],
-    lineHeight: 1.1,
-  },
-              ],
-              // [
-              //   {},
-              //   {
-              //     text: 'TERAPÉUTICA EMPLEADA Y RESULTADOS OBTENIDOS',
-              //     fontSize: 7,
-              //     bold: true,
-              //     fillColor: '#f0f0f0',
-              //   },
-              // ],
-              // [
-              //   {},
-              //   {
-              //     text:
-              //       historiaClinicaData.terapeutica_empleada ||
-              //       'Sin información registrada',
-              //     fontSize: 7,
-              //     margin: [3, 2],
-              //     lineHeight: 1.1,
-              //   },
-              // ],
-              [
-                {},
-                {
-                  text: 'PLAN DIAGNÓSTICO',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-text: historiaClinicaData.plan_diagnostico || 'No especificado',
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
-              ],
-              [
-                {},
-                {
-                  text: 'INDICACIÓN TERAPÉUTICA',
-                  fontSize: 7,
-                  bold: true,
-                  fillColor: '#f0f0f0',
-                },
-              ],
-              [
-                {},
-                {
-text: historiaClinicaData.plan_terapeutico || 'No especificado',
-
-                  fontSize: 7,
-                  margin: [3, 2],
-                  lineHeight: 1.1,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-        { text: '', margin: [0, 1] },
-        {
-          table: {
-            widths: ['100%'],
-            body: [
-              [
-                {
-text: `PRONÓSTICO: ${historiaClinicaData.pronostico || 'No especificado'}`,
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#f8f8f8',
-                  margin: [5, 8],
-                  alignment: 'center',
-                  lineHeight: 1.1,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-        { text: '', margin: [0, 1] },
-        // FIRMA MÉDICA COMPLETA SEGÚN NOM-004 (5.10)
-        {
-          table: {
-            widths: ['50%', '50%'],
-            body: [
-              [
-                {
-                  text: 'NOMBRE COMPLETO, CÉDULA PROFESIONAL Y FIRMA',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#ddd9c3',
-                  alignment: 'center',
-                  margin: [2, 5],
-                },
-                {
-                  text: 'FIRMA AUTÓGRAFA',
-                  fontSize: 6,
-                  bold: true,
-                  fillColor: '#ddd9c3',
-                  alignment: 'center',
-                  margin: [2, 5],
-                },
-              ],
-              [
-                {
-                  text: [
-                    {
-                      text: `${medicoCompleto.titulo_profesional} ${medicoCompleto.nombre_completo}\n`,
-                      fontSize: 7,
-                      bold: true,
-                    },
-                    {
-                      text: `Cédula Profesional: ${medicoCompleto.numero_cedula}\n`,
-                      fontSize: 6,
-                    },
-                    {
-                      text: `Especialidad: ${medicoCompleto.especialidad}\n`,
-                      fontSize: 6,
-                    },
-                    {
-                      text: `${medicoCompleto.cargo} - ${medicoCompleto.departamento}\n`,
-                      fontSize: 6,
-                    },
-                    {
-                      text: `Hospital General San Luis de la Paz\n`,
-                      fontSize: 7,
-                      color: '#6b7280',
-                    },
-                    {
-                      text: `Fecha: ${fechaActual.toLocaleDateString(
-                        'es-MX'
-                      )}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Hora: ${fechaActual.toLocaleTimeString('es-MX')}`,
-                      fontSize: 7,
-                    },
-                  ],
-                  margin: [5, 20],
-                  alignment: 'center',
-                },
-                {
-                  text: '\n\n\n\n_________________________\nFIRMA DEL MÉDICO\n(Según NOM-004-SSA3-2012)',
-                  fontSize: 6,
-                  margin: [5, 20],
-                  alignment: 'center',
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#000000',
-            vLineColor: () => '#000000',
-          },
-        },
-        { text: '', margin: [0, 5] },
-        {
-          columns: [
-            {
-              width: '50%',
-              text: [
-                {
-                  text: '* Elaborado conforme a:\n',
-                  fontSize: 6,
-                  italics: true,
-                  color: '#666666',
-                },
-                {
-                  text: '• NOM-004-SSA3-2012 Del expediente clínico\n',
-                  fontSize: 6,
-                  color: '#666666',
-                },
-                {
-                  text: '• NOM-031-SSA2-1999 Para la atención a la salud del niño\n',
-                  fontSize: 6,
-                  color: '#666666',
-                },
-                {
-                  text: '• Modelo de Evaluación del Expediente Clínico Integrado y de Calidad (MECIC)',
-                  fontSize: 6,
-                  color: '#666666',
-                },
-              ],
-              alignment: 'left',
-            },
-            {
-              width: '50%',
-              text: [
-                {
-                  text: 'Sistema Integral Clínico de Expedientes y Gestión (SICEG)\n',
-                  fontSize: 6,
-                  italics: true,
-                  color: '#666666',
-                },
-                {
-                  text: `Documento generado el: ${fechaActual.toLocaleString(
-                    'es-MX'
-                  )}\n`,
-                  fontSize: 6,
-                  color: '#666666',
-                },
-                {
-                  text: 'Hospital General San Luis de la Paz, Guanajuato',
-                  fontSize: 6,
-                  color: '#666666',
-                },
-              ],
-              alignment: 'right',
-            },
-          ],
-        },
-      ],
-
-      footer: (currentPage: number, pageCount: number) => {
-        return {
-          margin: [20, 10],
-          table: {
-            widths: ['25%', '50%', '25%'],
-            body: [
-              [
-                {
-                  text: `Página ${currentPage} de ${pageCount}`,
-                  fontSize: 7,
-                  color: '#666666',
-                },
-                {
-                  text: esPediatrico
-                    ? 'Historia Clínica Pediátrica General - SICEG\nNOM-004-SSA3-2012 • NOM-031-SSA2-1999'
-                    : 'Historia Clínica General - SICEG\nNOM-004-SSA3-2012',
-                  fontSize: 7,
-                  alignment: 'center',
-                  color: '#666666',
-                },
-                {
-                  text: [
-                    {
-                      text: `${fechaActual.toLocaleDateString('es-MX')}\n`,
-                      fontSize: 7,
-                    },
-                    {
-                      text: `Exp: ${this.obtenerNumeroExpedientePreferido(
-                        pacienteCompleto.expediente
-                      )}`,
-                      fontSize: 6,
-                    },
-                  ],
-                  alignment: 'right',
-                  color: '#666666',
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        };
-      },
-    };
-
-    //    AQUÍ AGREGAR LA VALIDACIÓN COMPLETA
-    console.log('  Validando todas las tablas del documento...');
-    try {
-      validarTodasLasTablas(documentoFinal.content, 'HistoriaClinica');
-      console.log('   Todas las tablas validadas correctamente');
-    } catch (error) {
-      console.error('❌ Error en validación de tablas:', error);
-      throw error;
-    }
-
-    return documentoFinal;
+  console.log('🔍 Validando todas las tablas del documento...');
+  try {
+    validarTodasLasTablas(documentoFinal.content, 'HistoriaClinica');
+    console.log('✅ Todas las tablas validadas correctamente');
+  } catch (error) {
+    console.error('❌ Error en validación de tablas:', error);
+    throw error;
   }
 
+  return documentoFinal;
+}
 
   //     VERSIÓN MEJORADA
   async generarHojaFrontalExpediente(datos: any): Promise<any> {
