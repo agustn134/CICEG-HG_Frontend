@@ -1250,15 +1250,65 @@ public calcularDuracionAnestesia(): string {
   return '';
 }
 
-public  calcularTotalAldrete(): number {
+// public  calcularTotalAldrete(): number {
+//   const actividad = parseInt(this.notaPostanestesicaForm.get('aldrete_actividad')?.value) || 0;
+//   const respiracion = parseInt(this.notaPostanestesicaForm.get('aldrete_respiracion')?.value) || 0;
+//   const circulacion = parseInt(this.notaPostanestesicaForm.get('aldrete_circulacion')?.value) || 0;
+//   const conciencia = parseInt(this.notaPostanestesicaForm.get('aldrete_conciencia')?.value) || 0;
+//   const saturacion = parseInt(this.notaPostanestesicaForm.get('aldrete_saturacion')?.value) || 0;
+  
+//   return actividad + respiracion + circulacion + conciencia + saturacion;
+// }
+
+// En perfil-paciente.ts - MEJORAR el método existente calcularTotalAldrete():
+
+public calcularTotalAldrete(): number {
   const actividad = parseInt(this.notaPostanestesicaForm.get('aldrete_actividad')?.value) || 0;
   const respiracion = parseInt(this.notaPostanestesicaForm.get('aldrete_respiracion')?.value) || 0;
   const circulacion = parseInt(this.notaPostanestesicaForm.get('aldrete_circulacion')?.value) || 0;
   const conciencia = parseInt(this.notaPostanestesicaForm.get('aldrete_conciencia')?.value) || 0;
   const saturacion = parseInt(this.notaPostanestesicaForm.get('aldrete_saturacion')?.value) || 0;
   
-  return actividad + respiracion + circulacion + conciencia + saturacion;
+  const total = actividad + respiracion + circulacion + conciencia + saturacion;
+  
+  // Actualizar automáticamente el campo total si existe
+  if (this.notaPostanestesicaForm.get('aldrete_total')) {
+    this.notaPostanestesicaForm.get('aldrete_total')?.setValue(total);
+  }
+  
+  return total;
 }
+
+/**
+ * Obtener interpretación del puntaje Aldrete
+ */
+getInterpretacionAldrete(): string {
+  const total = this.calcularTotalAldrete();
+  
+  if (total >= 9) {
+    return 'Paciente apto para egreso de recuperación';
+  } else if (total >= 7) {
+    return 'Requiere vigilancia adicional en recuperación';
+  } else if (total >= 5) {
+    return 'Paciente necesita más tiempo de recuperación';
+  } else {
+    return 'Requiere vigilancia estrecha y prolongada';
+  }
+}
+
+/**
+ * Obtener color del indicador Aldrete
+ */
+getColorAldrete(): string {
+  const total = this.calcularTotalAldrete();
+  
+  if (total >= 9) return 'text-green-600 bg-green-100';
+  if (total >= 7) return 'text-yellow-600 bg-yellow-100';
+  if (total >= 5) return 'text-orange-600 bg-orange-100';
+  return 'text-red-600 bg-red-100';
+}
+
+
 
 private generarFolioPostanestesico(): string {
   const fecha = new Date();
@@ -4111,8 +4161,35 @@ private inicializarModoInteligente(): void {
 
     //   AGREGAR AL FINAL DEL ngOnInit
   this.inicializarModoInteligente();
-  this.setupConditionalValidators()
+  this.setupConditionalValidators();
+  // 🔥 AGREGAR listeners para cálculo automático de duración
+  this.notaPostoperatoriaForm.get('hora_inicio')?.valueChanges.subscribe(() => {
+    this.actualizarDuracionCirugia();
+  });
+  
+  this.notaPostoperatoriaForm.get('hora_fin')?.valueChanges.subscribe(() => {
+    this.actualizarDuracionCirugia();
+  });
+
+    // 🔥 AGREGAR listeners para cálculo automático de Aldrete
+  const camposAldrete = [
+    'aldrete_actividad',
+    'aldrete_respiracion', 
+    'aldrete_circulacion',
+    'aldrete_conciencia',
+    'aldrete_saturacion'
+  ];
+
+  camposAldrete.forEach(campo => {
+    this.notaPostanestesicaForm.get(campo)?.valueChanges.subscribe(() => {
+      this.calcularTotalAldrete(); // Recalcular automáticamente
+      this.changeDetectorRef?.detectChanges(); // Actualizar vista
+    });
+  });
+
   }
+
+
 
   ngOnDestroy(): void {
     if (this.autoguardadoInterval) {
@@ -4206,6 +4283,9 @@ private inicializarModoInteligente(): void {
         break;
 
       case 'notaPostoperatoria':
+        if (!this.validarCheckboxesFinales()) {
+    return; // No continuar si faltan validaciones
+  }
         await this.guardarNotaPostoperatoria();
         this.formularioEstado['notaPostoperatoria'] = true;
         this.success = 'Nota Postoperatoria guardada correctamente';
@@ -6256,106 +6336,108 @@ cambiarTab(tab: string): void {
   }
 }
 
-propagarDatosIngreso(): void {
-  if (!this.capturaIngresoForm.valid) {
-    this.mostrarErrorMetodo('Por favor complete todos los campos obligatorios antes de propagar');
-    return;
+  propagarDatosIngreso(): void {
+    if (!this.capturaIngresoForm.valid) {
+      this.mostrarErrorMetodo('Por favor complete todos los campos obligatorios antes de propagar');
+      return;
+    }
+
+    const datos = this.capturaIngresoForm.value;
+    console.log('Propagando datos de ingreso:', datos);
+
+    try {
+      // 🔥 PROPAGAR A HISTORIA CLÍNICA - VERSIÓN COMPLETA
+      this.historiaClinicaForm.patchValue({
+        // Antecedentes
+        antecedentes_heredo_familiares: datos.antecedentes_heredo_familiares,
+        alergias: datos.alergias,
+
+        // 🔥 ANTECEDENTES PERSONALES NO PATOLÓGICOS
+        habitos_higienicos: datos.habitos_higienicos,
+        habitos_alimenticios: datos.habitos_alimenticios,
+        actividad_fisica: datos.actividad_fisica,
+        vivienda: datos.vivienda,
+        toxicomanias: datos.toxicomanias,
+
+        // 🔥 INTERROGATORIO POR APARATOS Y SISTEMAS
+        interrogatorio_cardiovascular: datos.interrogatorio_cardiovascular,
+        interrogatorio_respiratorio: datos.interrogatorio_respiratorio,
+        interrogatorio_digestivo: datos.interrogatorio_digestivo,
+        interrogatorio_genitourinario: datos.interrogatorio_genitourinario,
+        interrogatorio_neurologico: datos.interrogatorio_neurologico,
+        interrogatorio_musculoesqueletico: datos.interrogatorio_musculoesqueletico,
+
+        // Padecimiento actual
+        padecimiento_actual: datos.padecimiento_actual,
+        sintomas_generales: datos.sintomas_generales,
+
+        // 🔥 SIGNOS VITALES COMPLETOS
+        temperatura: datos.temperatura,
+        presion_arterial_sistolica: datos.presion_arterial_sistolica,
+        presion_arterial_diastolica: datos.presion_arterial_diastolica,
+        frecuencia_cardiaca: datos.frecuencia_cardiaca,
+        frecuencia_respiratoria: datos.frecuencia_respiratoria,
+        saturacion_oxigeno: datos.saturacion_oxigeno,
+        peso: datos.peso,
+        talla: datos.talla,
+        glucosa: datos.glucosa,
+        observaciones_signos_vitales: datos.observaciones_signos_vitales,
+
+        // Exploración física
+        exploracion_general: datos.exploracion_general,
+        exploracion_cabeza: datos.exploracion_cabeza,
+        exploracion_cuello: datos.exploracion_cuello,
+        exploracion_torax: datos.exploracion_torax,
+        exploracion_abdomen: datos.exploracion_abdomen,
+        exploracion_extremidades: datos.exploracion_extremidades,
+        exploracion_genitales: datos.exploracion_genitales,
+        exploracion_neurologico: datos.exploracion_neurologico,
+        habitus_exterior: datos.habitus_exterior,
+
+        // Diagnóstico y plan
+        impresion_diagnostica: datos.impresion_diagnostica,
+        plan_terapeutico: datos.plan_terapeutico
+      });
+
+
+      // 🔥 PROPAGAR A NOTA DE URGENCIAS
+      this.notaUrgenciasForm.patchValue({
+        motivo_atencion: datos.padecimiento_actual,
+        resumen_interrogatorio: this.construirResumenInterrogatorio(datos),
+        exploracion_fisica: datos.exploracion_general,
+        diagnostico: datos.impresion_diagnostica,
+        plan_tratamiento: datos.plan_terapeutico,
+
+        // Signos vitales
+        temperatura: datos.temperatura,
+        presion_arterial_sistolica: datos.presion_arterial_sistolica,
+        presion_arterial_diastolica: datos.presion_arterial_diastolica,
+        frecuencia_cardiaca: datos.frecuencia_cardiaca,
+        frecuencia_respiratoria: datos.frecuencia_respiratoria,
+        saturacion_oxigeno: datos.saturacion_oxigeno,
+        peso: datos.peso,
+        glucosa: datos.glucosa
+      });
+
+
+      // 🔥 AGREGAR ESTA SECCIÓN PARA NOTA PREOPERATORIA
+      this.notaPreoperatoriaForm.patchValue({
+        // Campos que se propagan automáticamente
+        resumen_interrogatorio: this.construirResumenCompleto(datos),
+        exploracion_fisica: this.construirExploracionCompleta(datos),
+        diagnostico_preoperatorio: datos.impresion_diagnostica,
+        plan_quirurgico: datos.plan_terapeutico,
+        pronostico: this.construirPronosticoInicial(datos),
+
+        // Resultados de estudios (si los hay)
+        resultados_estudios: this.construirResultadosEstudios(datos)
+      });
+
+    } catch (error) {
+      console.error('❌ Error propagando datos:', error);
+      this.mostrarErrorMetodo('Error al propagar datos');
+    }
   }
-
-  const datos = this.capturaIngresoForm.value;
-  console.log('Propagando datos de ingreso:', datos);
-
-  try {
-    // 🔥 PROPAGAR A HISTORIA CLÍNICA - VERSIÓN COMPLETA
-    this.historiaClinicaForm.patchValue({
-      // Antecedentes
-      antecedentes_heredo_familiares: datos.antecedentes_heredo_familiares,
-      alergias: datos.alergias,
-      
-      // 🔥 ANTECEDENTES PERSONALES NO PATOLÓGICOS
-      habitos_higienicos: datos.habitos_higienicos,
-      habitos_alimenticios: datos.habitos_alimenticios,
-      actividad_fisica: datos.actividad_fisica,
-      vivienda: datos.vivienda,
-      toxicomanias: datos.toxicomanias,
-      
-      // 🔥 INTERROGATORIO POR APARATOS Y SISTEMAS
-      interrogatorio_cardiovascular: datos.interrogatorio_cardiovascular,
-      interrogatorio_respiratorio: datos.interrogatorio_respiratorio,
-      interrogatorio_digestivo: datos.interrogatorio_digestivo,
-      interrogatorio_genitourinario: datos.interrogatorio_genitourinario,
-      interrogatorio_neurologico: datos.interrogatorio_neurologico,
-      interrogatorio_musculoesqueletico: datos.interrogatorio_musculoesqueletico,
-      
-      // Padecimiento actual
-      padecimiento_actual: datos.padecimiento_actual,
-      sintomas_generales: datos.sintomas_generales,
-      
-      // 🔥 SIGNOS VITALES COMPLETOS
-      temperatura: datos.temperatura,
-      presion_arterial_sistolica: datos.presion_arterial_sistolica,
-      presion_arterial_diastolica: datos.presion_arterial_diastolica,
-      frecuencia_cardiaca: datos.frecuencia_cardiaca,
-      frecuencia_respiratoria: datos.frecuencia_respiratoria,
-      saturacion_oxigeno: datos.saturacion_oxigeno,
-      peso: datos.peso,
-      talla: datos.talla,
-      glucosa: datos.glucosa,
-      observaciones_signos_vitales: datos.observaciones_signos_vitales,
-      
-      // Exploración física
-      exploracion_general: datos.exploracion_general,
-      exploracion_cabeza: datos.exploracion_cabeza,
-      exploracion_cuello: datos.exploracion_cuello,
-      exploracion_torax: datos.exploracion_torax,
-      exploracion_abdomen: datos.exploracion_abdomen,
-      exploracion_extremidades: datos.exploracion_extremidades,
-      exploracion_genitales: datos.exploracion_genitales,
-      exploracion_neurologico: datos.exploracion_neurologico,
-      habitus_exterior: datos.habitus_exterior,
-      
-      // Diagnóstico y plan
-      impresion_diagnostica: datos.impresion_diagnostica,
-      plan_terapeutico: datos.plan_terapeutico
-    });
-
-
-     // 🔥 PROPAGAR A NOTA DE URGENCIAS
-  this.notaUrgenciasForm.patchValue({
-    motivo_atencion: datos.padecimiento_actual,
-    resumen_interrogatorio: this.construirResumenInterrogatorio(datos),
-    exploracion_fisica: datos.exploracion_general,
-    diagnostico: datos.impresion_diagnostica,
-    plan_tratamiento: datos.plan_terapeutico,
-    
-    // Signos vitales
-    temperatura: datos.temperatura,
-    presion_arterial_sistolica: datos.presion_arterial_sistolica,
-    presion_arterial_diastolica: datos.presion_arterial_diastolica,
-    frecuencia_cardiaca: datos.frecuencia_cardiaca,
-    frecuencia_respiratoria: datos.frecuencia_respiratoria,
-    saturacion_oxigeno: datos.saturacion_oxigeno,
-    peso: datos.peso,
-    glucosa: datos.glucosa
-  });
-
-
-
-
-
-
-
-
-
-
-    console.log('  Datos propagados correctamente a Historia Clínica');
-    this.mostrarExito('Datos propagados correctamente a Historia Clínica y otros documentos');
-    
-  } catch (error) {
-    console.error('❌ Error propagando datos:', error);
-    this.mostrarErrorMetodo('Error al propagar datos');
-  }
-}
 
 
 // Agregar al perfil-paciente.ts
@@ -6381,6 +6463,348 @@ tieneSignosVitalesPrevios(): boolean {
   const signos = this.getSignosPrevios();
   return !!(signos.temperatura || signos.presion_arterial_sistolica || signos.frecuencia_cardiaca);
 }
+
+
+// En perfil-paciente.ts - AGREGAR este nuevo método:
+
+/**
+ * Propagar datos desde Preanestésica y Postoperatoria a Postanestésica
+ * Este método hereda información de ambos documentos
+ */
+// propagarDatosAPostanestesica(): void {
+//   console.log('🔄 Propagando datos a Postanestésica desde Preanestésica y Postoperatoria...');
+  
+//   // Verificar que hay datos en documentos previos
+//   if (!this.notaPreanestesicaForm.valid) {
+//     this.mostrarErrorMetodo('Se requiere completar primero la Nota Preanestésica');
+//     return;
+//   }
+
+//   const datosPreanestesica = this.notaPreanestesicaForm.value;
+//   const datosPostoperatoria = this.notaPostoperatoriaForm?.value || {};
+//   const datosCaptura = this.capturaIngresoForm?.value || {};
+  
+//   try {
+//     // 🔥 PROPAGACIÓN COMPLETA A NOTA POSTANESTÉSICA
+//     this.notaPostanestesicaForm.patchValue({
+//       // === DATOS BÁSICOS DEL PROCEDIMIENTO ===
+//       fecha_procedimiento: datosPostoperatoria.fecha_cirugia || datosPreanestesica.fecha_evaluacion || new Date().toISOString().split('T')[0],
+//       hora_inicio: datosPostoperatoria.hora_inicio || '',
+//       hora_termino: datosPostoperatoria.hora_fin || '',
+//       quirofano: datosPostoperatoria.quirofano_utilizado || '',
+      
+//       // === INFORMACIÓN DEL PROCEDIMIENTO ===
+//       procedimiento_realizado: datosPostoperatoria.operacion_realizada || datosPreanestesica.procedimiento_quirurgico || '',
+//       clasificacion_asa: datosPreanestesica.asa || '',
+      
+//       // === TIPO Y TÉCNICA ANESTÉSICA ===
+//       tipo_anestesia: datosPreanestesica.tipo_anestesia || '',
+//       tecnica_anestesica: datosPreanestesica.tecnica_anestesica || '',
+      
+//       // === MEDICAMENTOS DESDE PREANESTÉSICA ===
+//       medicamentos_utilizados: this.construirMedicamentosUtilizados(datosPreanestesica),
+//       agentes_anestesicos: this.extraerAgentesAnestesicos(datosPreanestesica),
+//       analgesicos_utilizados: this.construirAnalgesicos(),
+      
+//       // === SIGNOS VITALES DE EGRESO (valores seguros por defecto) ===
+//       presion_arterial_egreso: this.construirPresionArterialNormal(datosCaptura),
+//       frecuencia_cardiaca_egreso: this.ajustarFrecuenciaCardiaca(datosCaptura.frecuencia_cardiaca),
+//       frecuencia_respiratoria_egreso: datosCaptura.frecuencia_respiratoria || 18,
+//       saturacion_oxigeno_egreso: datosCaptura.saturacion_oxigeno || 98,
+//       temperatura_egreso: datosCaptura.temperatura || 36.5,
+      
+//       // === ESCALA DE ALDRETE (valores óptimos por defecto) ===
+//       aldrete_actividad: 2, // Máximo
+//       aldrete_respiracion: 2, // Máximo
+//       aldrete_circulacion: 2, // Máximo
+//       aldrete_conciencia: 2, // Máximo
+//       aldrete_saturacion: 2, // Máximo
+      
+//       // === EVALUACIÓN CLÍNICA DE EGRESO ===
+//       estado_clinico_egreso: this.construirEstadoClinicoEgreso(datosPostoperatoria),
+//       estado_conciencia_egreso: 'Despierto, orientado',
+//       dolor_postoperatorio: 'Controlado con analgesia',
+      
+//       // === INFORMACIÓN DEL ANESTESIÓLOGO ===
+//       anestesiologo_nombre: datosPreanestesica.medico_anestesiologo || datosPostoperatoria.anestesiologo || '[Nombre del Anestesiólogo]',
+//       cedula_anestesiologo: datosPreanestesica.cedula_anestesiologo || '[Cédula]',
+      
+//       // === PLAN DE TRATAMIENTO ===
+//       plan_tratamiento: this.construirPlanTratamientoPostanestesico(datosPostoperatoria),
+//       tiempo_recuperacion: this.calcularTiempoRecuperacion(datosPreanestesica.asa),
+//       indicaciones_egreso: this.construirIndicacionesEgreso(datosPreanestesica, datosPostoperatoria),
+      
+//       // === PRONÓSTICO ===
+//       pronostico: datosPostoperatoria.pronostico || 'Favorable con recuperación anestésica satisfactoria',
+      
+//       // === CAMPOS SEGUROS POR DEFECTO ===
+//       incidentes_accidentes: datosPostoperatoria.incidentes_accidentes || 'Sin incidentes transanestésicos',
+//       complicaciones_transanestesicas: 'Sin complicaciones anestésicas',
+//       liquidos_administrados: 500, // Valor típico
+//       sangrado: datosPostoperatoria.sangrado_estimado || 0,
+//       balance_hidrico: 'Equilibrado'
+//     });
+    
+//     console.log('✅ Datos propagados exitosamente a Nota Postanestésica');
+//     this.mostrarExito('✅ Datos propagados desde documentos previos. Ajuste valores según evolución real del paciente');
+    
+//   } catch (error) {
+//     console.error('❌ Error al propagar datos a Postanestésica:', error);
+//     this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
+//   }
+// }
+
+/**
+ * Propagar datos REALES desde Preanestésica y Postoperatoria a Postanestésica
+ * SIN generar contenido médico ficticio
+ */
+propagarDatosAPostanestesica(): void {
+  console.log('🔄 Propagando datos REALES a Postanestésica...');
+  
+  if (!this.notaPreanestesicaForm.valid) {
+    this.mostrarErrorMetodo('Se requiere completar primero la Nota Preanestésica');
+    return;
+  }
+
+  const datosPreanestesica = this.notaPreanestesicaForm.value;
+  const datosPostoperatoria = this.notaPostoperatoriaForm?.value || {};
+  
+  try {
+    // 🔥 PROPAGACIÓN DE DATOS REALES ÚNICAMENTE
+    this.notaPostanestesicaForm.patchValue({
+      // === DATOS REALES DEL PROCEDIMIENTO ===
+      fecha_procedimiento: datosPostoperatoria.fecha_cirugia || datosPreanestesica.fecha_evaluacion,
+      hora_inicio: datosPostoperatoria.hora_inicio || '',
+      hora_termino: datosPostoperatoria.hora_fin || '',
+      quirofano: datosPostoperatoria.quirofano_utilizado || '',
+      
+      // === INFORMACIÓN REAL DEL PROCEDIMIENTO ===
+      procedimiento_realizado: datosPostoperatoria.operacion_realizada || datosPreanestesica.procedimiento_quirurgico || '',
+      clasificacion_asa: datosPreanestesica.asa || '',
+      
+      // === TIPO Y TÉCNICA ANESTÉSICA REAL ===
+      tipo_anestesia: datosPreanestesica.tipo_anestesia || '',
+      tecnica_anestesica: datosPreanestesica.tecnica_anestesica || '',
+      
+      // === INFORMACIÓN DEL ANESTESIÓLOGO REAL ===
+      anestesiologo_nombre: datosPreanestesica.medico_anestesiologo || datosPostoperatoria.anestesiologo || '',
+      cedula_anestesiologo: datosPreanestesica.cedula_anestesiologo || '',
+      
+      // === PRONÓSTICO REAL ===
+      pronostico: datosPostoperatoria.pronostico || '',
+      
+      // === INCIDENTES REALES (si los hay) ===
+      incidentes_accidentes: datosPostoperatoria.incidentes_accidentes || '',
+      
+      // === SANGRADO REAL ===
+      sangrado: datosPostoperatoria.sangrado_estimado || 0,
+      
+      // === CAMPOS VACÍOS PARA LLENAR MANUALMENTE ===
+      // Signos vitales de egreso - DEBEN llenarse manualmente
+      presion_arterial_egreso: '',
+      frecuencia_cardiaca_egreso: null,
+      frecuencia_respiratoria_egreso: null,
+      saturacion_oxigeno_egreso: null,
+      temperatura_egreso: null,
+      
+      // Escala de Aldrete - DEBE evaluarse en tiempo real
+      aldrete_actividad: 0,
+      aldrete_respiracion: 0,
+      aldrete_circulacion: 0,
+      aldrete_conciencia: 0,
+      aldrete_saturacion: 0,
+      
+      // Estados clínicos - DEBEN observarse y registrarse
+      estado_clinico_egreso: '',
+      estado_conciencia_egreso: '',
+      dolor_postoperatorio: '',
+      
+      // Medicamentos - DEBEN especificarse según lo usado realmente
+      medicamentos_utilizados: '',
+      agentes_anestesicos: '',
+      analgesicos_utilizados: '',
+      
+      // Plan de tratamiento - DEBE ser específico del caso
+      plan_tratamiento: '',
+      indicaciones_egreso: '',
+      tiempo_recuperacion: '',
+      
+      // Balance hídrico - DEBE calcularse con datos reales
+      liquidos_administrados: null,
+      balance_hidrico: ''
+    });
+    
+    console.log('✅ Datos reales propagados exitosamente');
+    this.mostrarExito('✅ Datos base propagados. COMPLETE todos los campos con observaciones reales del paciente');
+    
+  } catch (error) {
+    console.error('❌ Error al propagar datos:', error);
+    this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
+  }
+}
+
+/**
+ * Construir medicamentos utilizados durante la anestesia
+ */
+private construirMedicamentosUtilizados(datosPreanestesica: any): string {
+  const medicamentos = [];
+  
+  // Medicamentos según tipo de anestesia
+  const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
+  
+  if (tipoAnestesia.includes('General')) {
+    medicamentos.push('Propofol 2-2.5 mg/kg inducción');
+    medicamentos.push('Fentanyl 2-5 mcg/kg analgesia');
+    medicamentos.push('Rocuronio 0.6 mg/kg relajación muscular');
+    medicamentos.push('Sevoflurano 2-3% mantenimiento');
+  } else if (tipoAnestesia.includes('Regional')) {
+    medicamentos.push('Bupivacaína 0.5% dosis según bloqueo');
+    medicamentos.push('Lidocaína 2% complementaria');
+    medicamentos.push('Midazolam 1-2 mg sedación');
+  } else if (tipoAnestesia.includes('Local')) {
+    medicamentos.push('Lidocaína 2% con epinefrina');
+    medicamentos.push('Midazolam 1 mg ansiolisis');
+  }
+  
+  // Medicamentos de soporte
+  medicamentos.push('Ondansetrón 4 mg antiemético');
+  medicamentos.push('Dexametasona 8 mg antiinflamatorio');
+  
+  return medicamentos.length > 0 
+    ? medicamentos.join('\n• ') 
+    : 'Medicamentos según protocolo anestésico estándar';
+}
+
+/**
+ * Extraer agentes anestésicos específicos
+ */
+private extraerAgentesAnestesicos(datosPreanestesica: any): string {
+  const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
+  
+  if (tipoAnestesia.includes('General')) {
+    return 'Sevoflurano, Propofol, Fentanyl, Rocuronio';
+  } else if (tipoAnestesia.includes('Regional')) {
+    return 'Bupivacaína, Lidocaína';
+  } else if (tipoAnestesia.includes('Local')) {
+    return 'Lidocaína con epinefrina';
+  }
+  
+  return 'Según protocolo establecido';
+}
+
+/**
+ * Construir analgésicos utilizados
+ */
+private construirAnalgesicos(): string {
+  return 'Fentanyl transanestésico, Ketorolaco 30mg postoperatorio, Paracetamol 1g de rescate';
+}
+
+/**
+ * Construir presión arterial normal basada en datos iniciales
+ */
+private construirPresionArterialNormal(datosCaptura: any): string {
+  const sistolica = datosCaptura.presion_arterial_sistolica || 120;
+  const diastolica = datosCaptura.presion_arterial_diastolica || 80;
+  
+  // Ajustar a valores normales post-anestesia
+  const sistolicaAjustada = Math.max(100, Math.min(140, sistolica));
+  const diastolicaAjustada = Math.max(60, Math.min(90, diastolica));
+  
+  return `${sistolicaAjustada}/${diastolicaAjustada}`;
+}
+
+/**
+ * Ajustar frecuencia cardíaca a valores post-anestesia normales
+ */
+private ajustarFrecuenciaCardiaca(fcInicial: number): number {
+  if (!fcInicial) return 75; // Valor por defecto
+  
+  // Mantener en rangos seguros post-anestesia (60-100)
+  return Math.max(60, Math.min(100, fcInicial));
+}
+
+/**
+ * Construir estado clínico de egreso
+ */
+private construirEstadoClinicoEgreso(datosPostoperatoria: any): string {
+  const estadoPostop = datosPostoperatoria.estado_postquirurgico || '';
+  
+  if (estadoPostop.includes('estable')) {
+    return 'Paciente estable, con recuperación anestésica satisfactoria, signos vitales normales';
+  }
+  if (estadoPostop.includes('crítico') || estadoPostop.includes('grave')) {
+    return 'Paciente requiere vigilancia estrecha, signos vitales estables bajo monitoreo';
+  }
+  
+  return 'Paciente con recuperación anestésica adecuada, consciente, orientado, signos vitales estables';
+}
+
+/**
+ * Construir plan de tratamiento postanestésico
+ */
+private construirPlanTratamientoPostanestesico(datosPostoperatoria: any): string {
+  const planPostop = datosPostoperatoria.plan_postoperatorio || '';
+  
+  let plan = 'RECUPERACIÓN POSTANESTÉSICA:\n';
+  plan += '• Monitoreo de signos vitales cada 15 minutos\n';
+  plan += '• Escala de Aldrete cada 30 minutos hasta puntaje ≥9\n';
+  plan += '• Control de dolor con escala EVA\n';
+  plan += '• Vigilancia de náusea y vómito postoperatorio\n';
+  
+  if (planPostop) {
+    plan += '\nPLAN POSTOPERATORIO ESPECÍFICO:\n';
+    plan += `• ${planPostop}`;
+  }
+  
+  return plan;
+}
+
+/**
+ * Calcular tiempo de recuperación según ASA
+ */
+private calcularTiempoRecuperacion(asa: string): string {
+  switch (asa) {
+    case 'ASA I':
+    case 'ASA II':
+      return '60-90 minutos';
+    case 'ASA III':
+      return '90-120 minutos';
+    case 'ASA IV':
+    case 'ASA V':
+      return '120+ minutos con vigilancia estrecha';
+    default:
+      return '90 minutos promedio';
+  }
+}
+
+/**
+ * Construir indicaciones de egreso
+ */
+private construirIndicacionesEgreso(datosPreanestesica: any, datosPostoperatoria: any): string {
+  let indicaciones = 'CRITERIOS DE EGRESO DE RECUPERACIÓN:\n';
+  indicaciones += '• Aldrete ≥9 puntos\n';
+  indicaciones += '• Signos vitales estables\n';
+  indicaciones += '• Paciente despierto y orientado\n';
+  indicaciones += '• Control adecuado del dolor\n';
+  indicaciones += '• Sin náusea ni vómito\n';
+  
+  // Indicaciones específicas según tipo de anestesia
+  const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
+  if (tipoAnestesia.includes('Regional')) {
+    indicaciones += '• Recuperación parcial de función motora\n';
+    indicaciones += '• Ausencia de bloqueo motor completo\n';
+  }
+  
+  // Indicaciones del postoperatorio
+  const indicacionesPostop = datosPostoperatoria.indicaciones_postoperatorias || '';
+  if (indicacionesPostop) {
+    indicaciones += '\nINDICACIONES POSTOPERATORIAS:\n';
+    indicaciones += `• ${indicacionesPostop}`;
+  }
+  
+  return indicaciones;
+}
+
 
 // // Aplicar signos vitales de ingreso como base
 // aplicarSignosVitalesDeIngreso(): void {
@@ -6590,7 +7014,164 @@ private construirResumenInterrogatorio(datos: any): string {
   
   return partes.length > 0 ? partes.join('. ') + '.' : '';
 }
+// En el archivo perfil-paciente.ts - AGREGAR estos métodos auxiliares:
 
+/**
+ * Construir resumen completo del interrogatorio
+ */
+private construirResumenCompleto(datos: any): string {
+  const partes = [];
+  
+  // Padecimiento actual
+  if (datos.padecimiento_actual) {
+    partes.push(`MOTIVO DE CONSULTA: ${datos.padecimiento_actual}`);
+  }
+  
+  // Síntomas generales
+  if (datos.sintomas_generales) {
+    partes.push(`SÍNTOMAS ASOCIADOS: ${datos.sintomas_generales}`);
+  }
+  
+  // Interrogatorio por sistemas
+  if (datos.interrogatorio_cardiovascular) {
+    partes.push(`CARDIOVASCULAR: ${datos.interrogatorio_cardiovascular}`);
+  }
+  if (datos.interrogatorio_respiratorio) {
+    partes.push(`RESPIRATORIO: ${datos.interrogatorio_respiratorio}`);
+  }
+  if (datos.interrogatorio_digestivo) {
+    partes.push(`DIGESTIVO: ${datos.interrogatorio_digestivo}`);
+  }
+  if (datos.interrogatorio_genitourinario) {
+    partes.push(`GENITOURINARIO: ${datos.interrogatorio_genitourinario}`);
+  }
+  if (datos.interrogatorio_neurologico) {
+    partes.push(`NEUROLÓGICO: ${datos.interrogatorio_neurologico}`);
+  }
+  if (datos.interrogatorio_musculoesqueletico) {
+    partes.push(`MUSCULOESQUELÉTICO: ${datos.interrogatorio_musculoesqueletico}`);
+  }
+
+  // Antecedentes relevantes
+  if (datos.alergias && datos.alergias !== 'Ninguna conocida') {
+    partes.push(`ALERGIAS: ${datos.alergias}`);
+  }
+  
+  return partes.length > 0 ? partes.join('\n\n') : 'No se reportan síntomas específicos por sistemas.';
+}
+
+/**
+ * Construir exploración física completa
+ */
+private construirExploracionCompleta(datos: any): string {
+  const partes = [];
+  
+  // Signos vitales
+  const signos = this.construirSignosVitales(datos);
+  if (signos) {
+    partes.push(`SIGNOS VITALES:\n${signos}`);
+  }
+  
+  // Exploración general
+  if (datos.exploracion_general) {
+    partes.push(`EXPLORACIÓN GENERAL: ${datos.exploracion_general}`);
+  }
+  
+  if (datos.habitus_exterior) {
+    partes.push(`HABITUS EXTERIOR: ${datos.habitus_exterior}`);
+  }
+  
+  // Exploración por sistemas
+  if (datos.exploracion_cabeza) {
+    partes.push(`CABEZA: ${datos.exploracion_cabeza}`);
+  }
+  if (datos.exploracion_cuello) {
+    partes.push(`CUELLO: ${datos.exploracion_cuello}`);
+  }
+  if (datos.exploracion_torax) {
+    partes.push(`TÓRAX: ${datos.exploracion_torax}`);
+  }
+  if (datos.exploracion_abdomen) {
+    partes.push(`ABDOMEN: ${datos.exploracion_abdomen}`);
+  }
+  if (datos.exploracion_extremidades) {
+    partes.push(`EXTREMIDADES: ${datos.exploracion_extremidades}`);
+  }
+  if (datos.exploracion_genitales) {
+    partes.push(`GENITALES: ${datos.exploracion_genitales}`);
+  }
+  if (datos.exploracion_neurologico) {
+    partes.push(`NEUROLÓGICO: ${datos.exploracion_neurologico}`);
+  }
+  
+  return partes.length > 0 ? partes.join('\n\n') : 'Sin hallazgos significativos en la exploración física.';
+}
+
+/**
+ * Construir signos vitales formateados
+ */
+private construirSignosVitales(datos: any): string {
+  const signos = [];
+  
+  if (datos.temperatura) {
+    signos.push(`Temperatura: ${datos.temperatura}°C`);
+  }
+  if (datos.presion_arterial_sistolica && datos.presion_arterial_diastolica) {
+    signos.push(`TA: ${datos.presion_arterial_sistolica}/${datos.presion_arterial_diastolica} mmHg`);
+  }
+  if (datos.frecuencia_cardiaca) {
+    signos.push(`FC: ${datos.frecuencia_cardiaca} lpm`);
+  }
+  if (datos.frecuencia_respiratoria) {
+    signos.push(`FR: ${datos.frecuencia_respiratoria} rpm`);
+  }
+  if (datos.saturacion_oxigeno) {
+    signos.push(`SatO2: ${datos.saturacion_oxigeno}%`);
+  }
+  if (datos.peso) {
+    signos.push(`Peso: ${datos.peso} kg`);
+  }
+  if (datos.talla) {
+    signos.push(`Talla: ${datos.talla} cm`);
+  }
+  if (datos.glucosa) {
+    signos.push(`Glucosa: ${datos.glucosa} mg/dL`);
+  }
+  
+  return signos.join(', ');
+}
+
+/**
+ * Construir pronóstico inicial basado en diagnóstico
+ */
+private construirPronosticoInicial(datos: any): string {
+  if (!datos.impresion_diagnostica) {
+    return 'Se reserva hasta completar evaluación preoperatoria completa';
+  }
+  
+  // Pronóstico básico según la impresión diagnóstica
+  const diagnostico = datos.impresion_diagnostica.toLowerCase();
+  
+  if (diagnostico.includes('apendicitis') || diagnostico.includes('apendicular')) {
+    return 'Bueno para la vida, función y estético con manejo quirúrgico oportuno';
+  }
+  if (diagnostico.includes('hernia')) {
+    return 'Excelente para la vida y función con reparación quirúrgica electiva';
+  }
+  if (diagnostico.includes('colelitiasis') || diagnostico.includes('vesicular')) {
+    return 'Bueno para la vida y función con colecistectomía laparoscópica';
+  }
+  
+  return 'Se reserva hasta completar evaluación preoperatoria y definir plan quirúrgico definitivo';
+}
+
+/**
+ * Construir resultados de estudios
+ */
+private construirResultadosEstudios(datos: any): string {
+  // Por ahora retornamos un placeholder ya que los estudios se completarían después
+  return 'Pendientes laboratorios preoperatorios, estudios de imagen y valoración anestesiológica según protocolo institucional';
+}
 // // 🔥 MÉTODO PARA SINCRONIZAR SIGNOS VITALES (si no lo tienes)
 // sincronizarSignosVitales(): void {
 //   const signosActuales = {
@@ -6686,132 +7267,6 @@ sincronizarSignosVitales(): void {
 
 
 
-
-
-
-// propagarDatosEvolucion(): void {
-//   if (!this.capturaEvolucionForm.valid) {
-//     this.mostrarErrorMetodo('Por favor complete todos los campos obligatorios antes de propagar');
-//     return;
-//   }
-
-//   const datos = this.capturaEvolucionForm.value;
-//   const servicio = datos.servicio_destino;
-//   console.log('Propagando datos de evolución para servicio:', servicio);
-
-//   try {
-//     // 🔥 PROPAGAR A NOTA EVOLUCIÓN CON NOMBRE DEL SERVICIO
-//     this.notaEvolucionForm.patchValue({
-//       evolucion_analisis: datos.evolucion_analisis,
-//       diagnosticos: datos.diagnosticos,
-//       plan_estudios_tratamiento: datos.plan_estudios_tratamiento,
-//       pronostico: datos.pronostico,
-//       dias_hospitalizacion: datos.dias_hospitalizacion,
-//       interconsultas: datos.interconsultas,
-//       habitus_exterior: datos.habitus_exterior_actual,
-//       estado_nutricional: datos.estado_nutricional,
-//       // Signos vitales actuales
-//       presion_arterial_sistolica: datos.presion_arterial_sistolica_actual,
-//       frecuencia_cardiaca: datos.frecuencia_cardiaca_actual,
-//       temperatura: datos.temperatura_actual,
-//       saturacion_oxigeno: datos.saturacion_oxigeno_actual,
-//       peso_actual: datos.peso_actual
-//     });
-
-//     // 🔥 PROPAGAR A NOTA INTERCONSULTA
-//     this.notaInterconsultaForm.patchValue({
-//       resumen_caso: datos.evolucion_analisis,
-//       diagnostico_presuntivo: datos.diagnosticos,
-//       tratamiento_actual: datos.plan_estudios_tratamiento,
-//       evolucion_cuadro_clinico: datos.evolucion_analisis,
-//       presion_arterial_actual: datos.presion_arterial_sistolica_actual + '/' + (datos.presion_arterial_diastolica_actual || ''),
-//       frecuencia_cardiaca_actual: datos.frecuencia_cardiaca_actual,
-//       temperatura_actual: datos.temperatura_actual,
-//       saturacion_oxigeno_actual: datos.saturacion_oxigeno_actual
-//     });
-
-//     // 🔥 PROPAGAR A NOTA PREOPERATORIA (si aplica)
-//     this.notaPreoperatoriaForm.patchValue({
-//       resumen_interrogatorio: datos.evolucion_analisis,
-//       diagnostico_preoperatorio: datos.diagnosticos,
-//       plan_quirurgico: datos.plan_estudios_tratamiento,
-//       pronostico: datos.pronostico
-//     });
-
-//     // 🔥 CREAR TÍTULO PERSONALIZADO SEGÚN SERVICIO
-//     const tituloServicio = `NOTA EVOLUCIÓN - ${servicio.toUpperCase()}`;
-//     console.log('  Título generado:', tituloServicio);
-
-//     this.mostrarExito(`  Datos propagados exitosamente a las notas de ${servicio}`);
-//     console.log('  Propagación de evolución completada exitosamente');
-
-//   } catch (error) {
-//     console.error('❌ Error al propagar datos de evolución:', error);
-//     this.mostrarErrorMetodo('Error al propagar datos de evolución. Intente nuevamente.');
-//   }
-// }
-
-
-// En perfil-paciente.ts - AGREGAR este método:
-// propagarDatosEvolucion(): void {
-//   if (!this.capturaEvolucionForm.valid) {
-//     this.mostrarErrorMetodo('Por favor complete todos los campos obligatorios antes de propagar');
-//     return;
-//   }
-
-//   const datos = this.capturaEvolucionForm.value;
-//   console.log('🔄 Propagando datos de evolución:', datos);
-
-//   try {
-//     // 🔥 PROPAGAR A NOTA DE EVOLUCIÓN
-//     this.notaEvolucionForm.patchValue({
-//       // Datos del servicio
-//       servicio_destino: datos.servicio_destino,
-//       dias_hospitalizacion: datos.dias_hospitalizacion,
-      
-//       // Signos vitales actuales
-//       temperatura: datos.temperatura_actual,
-//       presion_arterial_sistolica: datos.presion_arterial_sistolica_actual,
-//       presion_arterial_diastolica: datos.presion_arterial_diastolica_actual,
-//       frecuencia_cardiaca: datos.frecuencia_cardiaca_actual,
-//       frecuencia_respiratoria: datos.frecuencia_respiratoria_actual,
-//       saturacion_oxigeno: datos.saturacion_oxigeno_actual,
-//       peso_actual: datos.peso_actual,
-//       talla_actual: datos.talla_actual,
-      
-//       // Exploración física actualizada
-//       habitus_exterior: datos.habitus_exterior_actual,
-//       exploracion_cabeza: datos.exploracion_cabeza_actual,
-//       exploracion_cuello: datos.exploracion_cuello_actual,
-//       exploracion_torax: datos.exploracion_torax_actual,
-//       exploracion_abdomen: datos.exploracion_abdomen_actual,
-//       exploracion_extremidades: datos.exploracion_extremidades_actual,
-//       exploracion_genitales: datos.exploracion_genitales_actual,
-//       exploracion_neurologico: datos.exploracion_neurologico_actual,
-      
-//       // Evolución clínica
-//       sintomas_signos: datos.sintomas_signos_actuales,
-//       estado_nutricional: datos.estado_nutricional,
-//       estudios_laboratorio_gabinete: datos.estudios_laboratorio_gabinete,
-//       evolucion_analisis: datos.evolucion_analisis,
-      
-//       // Diagnósticos y plan
-//       diagnosticos: datos.diagnosticos,
-//       plan_estudios_tratamiento: datos.plan_estudios_tratamiento,
-//       interconsultas: datos.interconsultas,
-//       pronostico: datos.pronostico,
-//       indicaciones_medicas: datos.indicaciones_medicas
-//     });
-
-//     console.log('  Datos propagados correctamente a Nota de Evolución');
-//     this.mostrarExito('  Datos propagados correctamente a Nota de Evolución');
-    
-//   } catch (error) {
-//     console.error('❌ Error propagando datos de evolución:', error);
-//     this.mostrarErrorMetodo('Error al propagar datos de evolución');
-//   }
-// }
-
 propagarDatosEvolucion(): void {
   if (!this.capturaEvolucionForm.valid) {
     this.mostrarErrorMetodo('Por favor complete todos los campos obligatorios antes de propagar');
@@ -6885,30 +7340,556 @@ console.log('- formulario final:', this.notaEvolucionForm.value);
   }
 }
 
+// En perfil-paciente.ts - AGREGAR este nuevo método:
 
-
-// // 🔥 MÉTODO PARA APLICAR SIGNOS VITALES DE EVOLUCIÓN
-// aplicarSignosVitalesDeEvolucion(): void {
-//   const signosEvolucion = this.capturaEvolucionForm.value;
+/**
+ * Propagar datos desde Nota Preoperatoria a Nota Preanestésica
+ * Este método se ejecuta cuando el usuario presiona el botón de propagación
+ */
+propagarDatosPreoperatoriaAPreanestesica(): void {
+  console.log('🔄 Propagando datos de Preoperatoria a Preanestésica...');
   
-//   if (!this.tieneSignosVitalesDeEvolucion()) {
-//     this.mostrarErrorMetodo('No hay signos vitales de evolución disponibles');
-//     return;
-//   }
-  
-//   this.notaEvolucionForm.patchValue({
-//     temperatura: signosEvolucion.temperatura_actual,
-//     presion_arterial_sistolica: signosEvolucion.presion_arterial_sistolica_actual,
-//     presion_arterial_diastolica: signosEvolucion.presion_arterial_diastolica_actual,
-//     frecuencia_cardiaca: signosEvolucion.frecuencia_cardiaca_actual,
-//     frecuencia_respiratoria: signosEvolucion.frecuencia_respiratoria_actual,
-//     saturacion_oxigeno: signosEvolucion.saturacion_oxigeno_actual,
-//     peso_actual: signosEvolucion.peso_actual,
-//     talla_actual: signosEvolucion.talla_actual
-//   });
+  // Verificar que hay datos en Nota Preoperatoria
+  if (!this.notaPreoperatoriaForm.valid) {
+    this.mostrarErrorMetodo('Por favor complete primero la Nota Preoperatoria antes de propagar a Preanestésica');
+    return;
+  }
 
-//   this.mostrarExito('  Signos vitales de evolución aplicados correctamente');
-// }
+  const datosPreoperatoria = this.notaPreoperatoriaForm.value;
+  const datosCaptura = this.capturaIngresoForm?.value || {};
+  
+  try {
+    // 🔥 PROPAGACIÓN COMPLETA A NOTA PREANESTÉSICA
+    this.notaPreanestesicaForm.patchValue({
+      // === DATOS BÁSICOS AUTOMÁTICOS ===
+      fecha_evaluacion: new Date().toISOString().split('T')[0],
+      hora_evaluacion: new Date().toTimeString().slice(0, 5),
+      
+      // === SIGNOS VITALES desde Captura Inicial ===
+      peso: datosCaptura.peso || null,
+      talla: datosCaptura.talla || null,
+      tension_arterial: this.construirTensionArterial(datosCaptura),
+      frecuencia_cardiaca: datosCaptura.frecuencia_cardiaca || null,
+      frecuencia_respiratoria: datosCaptura.frecuencia_respiratoria || null,
+      temperatura: datosCaptura.temperatura || null,
+      saturacion_oxigeno: datosCaptura.saturacion_oxigeno || null,
+      
+      // === EVALUACIÓN CLÍNICA desde Exploración Física ===
+      estado_general: this.extraerEstadoGeneral(datosPreoperatoria),
+      via_aerea: this.evaluarViaAerea(datosCaptura),
+      sistema_cardiovascular: this.evaluarSistemaCardiovascular(datosCaptura, datosPreoperatoria),
+      sistema_respiratorio: this.evaluarSistemaRespiratorio(datosCaptura, datosPreoperatoria),
+      sistema_nervioso: this.evaluarSistemaNervioso(datosCaptura, datosPreoperatoria),
+      
+      // === ANTECEDENTES desde Captura Inicial ===
+      alergias_medicamentos: datosCaptura.alergias || 'Ninguna conocida',
+      
+      // === CLASIFICACIÓN ASA desde Preoperatoria ===
+      asa: datosPreoperatoria.riesgo_quirurgico || '',
+      justificacion_asa: this.construirJustificacionASA(datosPreoperatoria),
+      
+      // === INFORMACIÓN DEL PROCEDIMIENTO ===
+      procedimiento_quirurgico: datosPreoperatoria.plan_quirurgico || '',
+      
+      // === RIESGO ANESTÉSICO CALCULADO ===
+      riesgo_anestesico: this.calcularRiesgoAnestesico(datosPreoperatoria.riesgo_quirurgico),
+      
+      // === ESTUDIOS DE LABORATORIO ===
+      laboratorios_relevantes: datosPreoperatoria.resultados_estudios || '',
+      
+      // === PLAN ANESTÉSICO INICIAL ===
+      plan_anestesia: this.generarPlanAnestesicoInicial(datosPreoperatoria),
+      consideraciones_especiales: this.generarConsideracionesEspeciales(datosCaptura, datosPreoperatoria)
+    });
+    
+    console.log('✅ Datos propagados exitosamente a Nota Preanestésica');
+    this.mostrarExito('✅ Datos propagados exitosamente desde Preoperatoria a Preanestésica');
+    
+  } catch (error) {
+    console.error('❌ Error al propagar datos a Preanestésica:', error);
+    this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
+  }
+}
+
+
+// En perfil-paciente.ts - AGREGAR estos métodos auxiliares:
+
+/**
+ * Construir tensión arterial formateada
+ */
+private construirTensionArterial(datosCaptura: any): string {
+  if (datosCaptura.presion_arterial_sistolica && datosCaptura.presion_arterial_diastolica) {
+    return `${datosCaptura.presion_arterial_sistolica}/${datosCaptura.presion_arterial_diastolica}`;
+  }
+  return '';
+}
+
+/**
+ * Extraer estado general desde exploración física
+ */
+private extraerEstadoGeneral(datosPreoperatoria: any): string {
+  // Buscar en la exploración física información sobre el estado general
+  const exploracion = datosPreoperatoria.exploracion_fisica || '';
+  
+  if (exploracion.toLowerCase().includes('buen estado')) {
+    return 'Buen estado general, paciente cooperador';
+  }
+  if (exploracion.toLowerCase().includes('regular')) {
+    return 'Estado general regular, requiere vigilancia';
+  }
+  if (exploracion.toLowerCase().includes('grave')) {
+    return 'Estado general grave, alto riesgo';
+  }
+  
+  return 'Paciente en condiciones estables para evaluación anestesiológica';
+}
+
+/**
+ * Evaluar vía aérea desde datos disponibles
+ */
+private evaluarViaAerea(datosCaptura: any): string {
+  // Evaluación básica basada en exploración de cabeza y cuello
+  const exploracionCabeza = datosCaptura.exploracion_cabeza || '';
+  const exploracionCuello = datosCaptura.exploracion_cuello || '';
+  
+  let evaluacion = 'Vía aérea permeable. ';
+  
+  if (exploracionCabeza.toLowerCase().includes('normal') && exploracionCuello.toLowerCase().includes('normal')) {
+    evaluacion += 'Anatomía normal, Mallampati pendiente de evaluar.';
+  } else if (exploracionCuello.toLowerCase().includes('masa') || exploracionCuello.toLowerCase().includes('tumor')) {
+    evaluacion += 'ATENCIÓN: Alteraciones cervicales que podrían comprometer vía aérea.';
+  } else {
+    evaluacion += 'Sin alteraciones evidentes. Evaluación completa pendiente.';
+  }
+  
+  return evaluacion;
+}
+
+/**
+ * Evaluar sistema cardiovascular
+ */
+private evaluarSistemaCardiovascular(datosCaptura: any, datosPreoperatoria: any): string {
+  const evaluacion = [];
+  
+  // Signos vitales cardiovasculares
+  if (datosCaptura.frecuencia_cardiaca) {
+    const fc = parseInt(datosCaptura.frecuencia_cardiaca);
+    if (fc < 60) {
+      evaluacion.push('Bradicardia en evaluación inicial');
+    } else if (fc > 100) {
+      evaluacion.push('Taquicardia en evaluación inicial');
+    } else {
+      evaluacion.push('Frecuencia cardíaca normal');
+    }
+  }
+  
+  // Presión arterial
+  if (datosCaptura.presion_arterial_sistolica) {
+    const pas = parseInt(datosCaptura.presion_arterial_sistolica);
+    if (pas > 140) {
+      evaluacion.push('Hipertensión arterial detectada');
+    } else if (pas < 90) {
+      evaluacion.push('Hipotensión detectada');
+    } else {
+      evaluacion.push('Presión arterial en rangos normales');
+    }
+  }
+  
+  // Exploración cardiovascular
+  const exploracionTorax = datosCaptura.exploracion_torax || '';
+  if (exploracionTorax.toLowerCase().includes('soplo')) {
+    evaluacion.push('ATENCIÓN: Soplo cardíaco detectado');
+  }
+  
+  return evaluacion.length > 0 
+    ? evaluacion.join('. ') + '.' 
+    : 'Sistema cardiovascular sin alteraciones evidentes en evaluación inicial.';
+}
+
+/**
+ * Evaluar sistema respiratorio
+ */
+private evaluarSistemaRespiratorio(datosCaptura: any, datosPreoperatoria: any): string {
+  const evaluacion = [];
+  
+  // Frecuencia respiratoria
+  if (datosCaptura.frecuencia_respiratoria) {
+    const fr = parseInt(datosCaptura.frecuencia_respiratoria);
+    if (fr < 12) {
+      evaluacion.push('Bradipnea detectada');
+    } else if (fr > 20) {
+      evaluacion.push('Taquipnea detectada');
+    } else {
+      evaluacion.push('Frecuencia respiratoria normal');
+    }
+  }
+  
+  // Saturación de oxígeno
+  if (datosCaptura.saturacion_oxigeno) {
+    const sat = parseInt(datosCaptura.saturacion_oxigeno);
+    if (sat < 95) {
+      evaluacion.push('ATENCIÓN: Desaturación detectada');
+    } else {
+      evaluacion.push('Saturación de oxígeno adecuada');
+    }
+  }
+  
+  // Exploración pulmonar
+  const exploracionTorax = datosCaptura.exploracion_torax || '';
+  if (exploracionTorax.toLowerCase().includes('estertores') || exploracionTorax.toLowerCase().includes('roncus')) {
+    evaluacion.push('Ruidos adventicios detectados');
+  }
+  
+  return evaluacion.length > 0 
+    ? evaluacion.join('. ') + '.' 
+    : 'Sistema respiratorio sin alteraciones evidentes.';
+}
+
+/**
+ * Evaluar sistema nervioso
+ */
+private evaluarSistemaNervioso(datosCaptura: any, datosPreoperatoria: any): string {
+  const exploracionNeuro = datosCaptura.exploracion_neurologico || '';
+  
+  if (exploracionNeuro.toLowerCase().includes('normal')) {
+    return 'Sistema nervioso sin alteraciones. Paciente consciente, orientado, cooperador.';
+  }
+  if (exploracionNeuro.toLowerCase().includes('alterado')) {
+    return 'ATENCIÓN: Alteraciones neurológicas detectadas que requieren evaluación especializada.';
+  }
+  
+  return 'Paciente consciente y orientado. Evaluación neurológica completa pendiente.';
+}
+
+/**
+ * Construir justificación ASA
+ */
+private construirJustificacionASA(datosPreoperatoria: any): string {
+  const asa = datosPreoperatoria.riesgo_quirurgico || '';
+  
+  switch (asa) {
+    case 'ASA I':
+      return 'Paciente sano, sin alteraciones sistémicas';
+    case 'ASA II':
+      return 'Paciente con enfermedad sistémica leve sin limitación funcional';
+    case 'ASA III':
+      return 'Paciente con enfermedad sistémica grave con limitación funcional';
+    case 'ASA IV':
+      return 'Paciente con enfermedad sistémica grave que constituye amenaza constante para la vida';
+    case 'ASA V':
+      return 'Paciente moribundo que no se espera sobreviva sin la operación';
+    case 'ASA VI':
+      return 'Paciente con muerte cerebral cuyos órganos se extirpan para donación';
+    default:
+      return 'Clasificación pendiente de evaluación anestesiológica completa';
+  }
+}
+
+/**
+ * Calcular riesgo anestésico basado en ASA
+ */
+private calcularRiesgoAnestesico(asaPreoperatoria: string): string {
+  switch (asaPreoperatoria) {
+    case 'ASA I':
+    case 'ASA II':
+      return 'Bajo';
+    case 'ASA III':
+      return 'Moderado';
+    case 'ASA IV':
+      return 'Alto';
+    case 'ASA V':
+    case 'ASA VI':
+      return 'Muy Alto';
+    default:
+      return 'Moderado';
+  }
+}
+
+/**
+ * Generar plan anestésico inicial
+ */
+private generarPlanAnestesicoInicial(datosPreoperatoria: any): string {
+  const planQuirurgico = datosPreoperatoria.plan_quirurgico || '';
+  const tipoNota = datosPreoperatoria.tipo_cirugia || '';
+  
+  let plan = '';
+  
+  // Según tipo de cirugía
+  if (tipoNota === 'Electiva') {
+    plan = 'Anestesia programada. ';
+  } else if (tipoNota === 'Urgente') {
+    plan = 'Anestesia de urgencia. ';
+  } else if (tipoNota === 'Emergente') {
+    plan = 'Anestesia de emergencia. ';
+  }
+  
+  // Según procedimiento (análisis básico)
+  if (planQuirurgico.toLowerCase().includes('apendicectomía')) {
+    plan += 'Se sugiere anestesia general balanceada con intubación orotraqueal.';
+  } else if (planQuirurgico.toLowerCase().includes('colecistectomía')) {
+    plan += 'Anestesia general con relajación muscular para laparoscopía.';
+  } else if (planQuirurgico.toLowerCase().includes('hernia')) {
+    plan += 'Anestesia regional espinal o general según preferencia del paciente.';
+  } else {
+    plan += 'Técnica anestésica a definir según procedimiento específico y condiciones del paciente.';
+  }
+  
+  return plan;
+}
+
+/**
+ * Generar consideraciones especiales
+ */
+private generarConsideracionesEspeciales(datosCaptura: any, datosPreoperatoria: any): string {
+  const consideraciones = [];
+  
+  // Alergias
+  if (datosCaptura.alergias && datosCaptura.alergias !== 'Ninguna conocida') {
+    consideraciones.push(`ALERGIAS: ${datosCaptura.alergias}`);
+  }
+  
+  // Edad pediátrica
+  const edad = this.calcularEdad();
+  if (edad < 18) {
+    consideraciones.push('PACIENTE PEDIÁTRICO: Considerar dosis y equipos apropiados para edad');
+  }
+  
+  // Ayuno
+  if (datosPreoperatoria.tipo_cirugia === 'Urgente' || datosPreoperatoria.tipo_cirugia === 'Emergente') {
+    consideraciones.push('CIRUGÍA DE URGENCIA: Verificar estado de ayuno, considerar estómago lleno');
+  }
+  
+  // Signos vitales alterados
+  if (datosCaptura.presion_arterial_sistolica > 140) {
+    consideraciones.push('HIPERTENSIÓN ARTERIAL: Control preoperatorio necesario');
+  }
+  
+  if (consideraciones.length === 0) {
+    consideraciones.push('Sin consideraciones especiales adicionales identificadas');
+  }
+  
+  return consideraciones.join('\n• ');
+}
+
+// En perfil-paciente.ts - AGREGAR este nuevo método:
+
+/**
+ * Propagar datos desde Nota Preoperatoria a Nota Postoperatoria
+ * Este método se ejecuta después de la cirugía
+ */
+propagarDatosPreoperatoriaAPostoperatoria(): void {
+  console.log('🔄 Propagando datos de Preoperatoria a Postoperatoria...');
+  
+  // Verificar que hay datos en Nota Preoperatoria
+  if (!this.notaPreoperatoriaForm.valid) {
+    this.mostrarErrorMetodo('Por favor complete primero la Nota Preoperatoria antes de propagar a Postoperatoria');
+    return;
+  }
+
+  const datosPreoperatoria = this.notaPreoperatoriaForm.value;
+  const datosCaptura = this.capturaIngresoForm?.value || {};
+  
+  try {
+    // 🔥 PROPAGACIÓN COMPLETA A NOTA POSTOPERATORIA
+    this.notaPostoperatoriaForm.patchValue({
+      // === INFORMACIÓN TEMPORAL AUTOMÁTICA ===
+      fecha_cirugia: datosPreoperatoria.fecha_cirugia || new Date().toISOString().split('T')[0],
+      servicio_hospitalizacion: 'Cirugía General',
+      
+      // === DIAGNÓSTICOS PROPAGADOS ===
+      diagnostico_preoperatorio: datosPreoperatoria.diagnostico_preoperatorio || '',
+      
+      // === PROCEDIMIENTOS DESDE PREOPERATORIA ===
+      operacion_planeada: this.extraerOperacionPlaneada(datosPreoperatoria),
+      
+      // === INFORMACIÓN DEL EQUIPO QUIRÚRGICO ===
+      cirujano_principal: this.medicoCompleto?.nombre_completo || 'Dr./Dra. [Nombre del Cirujano]',
+      anestesiologo: 'Dr./Dra. [Nombre del Anestesiólogo]',
+      instrumentista: '[Nombre del Instrumentista]',
+      circulante: '[Nombre de la Circulante]',
+      
+      // === VALORES POR DEFECTO SEGUROS ===
+      conteo_gasas_completo: 'Correcto',
+      conteo_instrumental_completo: 'Correcto',
+      conteo_compresas_completo: 'No aplica',
+      incidentes_accidentes: 'Sin incidentes',
+      sangrado_estimado: 0,
+      metodo_hemostasia: 'Hemostasia convencional',
+      estudios_transoperatorios: 'No se realizaron estudios transoperatorios',
+      estabilidad_hemodinamica: 'Estable',
+      piezas_enviadas_patologia: false,
+      
+      // === EVALUACIONES INICIALES ===
+      cirugia_sin_complicaciones: false, // Se debe marcar manualmente después de la cirugía
+      objetivos_alcanzados: false, // Se debe confirmar manualmente
+      nota_completa: false, // Se marca al final
+      revision_cirujano: false // Se marca al final
+    });
+    
+    console.log('✅ Datos base propagados exitosamente a Nota Postoperatoria');
+    this.mostrarExito('✅ Datos base propagados. Complete la información específica del procedimiento realizado');
+    
+  } catch (error) {
+    console.error('❌ Error al propagar datos a Postoperatoria:', error);
+    this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
+  }
+}
+
+/**
+ * Extraer operación planeada desde el plan quirúrgico
+ */
+private extraerOperacionPlaneada(datosPreoperatoria: any): string {
+  const planQuirurgico = datosPreoperatoria.plan_quirurgico || '';
+  
+  // Analizar el plan quirúrgico para extraer el procedimiento específico
+  if (planQuirurgico.toLowerCase().includes('apendicectomía')) {
+    return 'Apendicectomía laparoscópica';
+  }
+  if (planQuirurgico.toLowerCase().includes('colecistectomía')) {
+    return 'Colecistectomía laparoscópica';
+  }
+  if (planQuirurgico.toLowerCase().includes('hernia')) {
+    return 'Plastia inguinal';
+  }
+  if (planQuirurgico.toLowerCase().includes('cesárea')) {
+    return 'Operación cesárea';
+  }
+  if (planQuirurgico.toLowerCase().includes('histerectomía')) {
+    return 'Histerectomía abdominal total';
+  }
+  
+  // Si no se puede determinar, usar el plan quirúrgico completo
+  return planQuirurgico || 'Procedimiento quirúrgico según plan preoperatorio';
+}
+
+// En perfil-paciente.ts - AGREGAR este método para ayuda durante la cirugía:
+
+/**
+ * Autocompletar datos comunes según tipo de procedimiento
+ * Este método ayuda al cirujano con valores típicos
+ */
+autocompletarSegunProcedimiento(): void {
+  const operacionRealizada = this.notaPostoperatoriaForm.get('operacion_realizada')?.value || '';
+  
+  if (!operacionRealizada) {
+    this.mostrarErrorMetodo('Primero especifique la operación realizada');
+    return;
+  }
+
+  try {
+    let datosAutocompletado = {};
+    
+    // 🔥 APENDICECTOMÍA
+    if (operacionRealizada.toLowerCase().includes('apendicectomía')) {
+      datosAutocompletado = {
+        diagnostico_postoperatorio: 'Apendicitis aguda. Estado post apendicectomía',
+        descripcion_tecnica: 'Se realizó apendicectomía laparoscópica con técnica de 3 puertos. Disección cuidadosa del mesoapéndice. Ligadura de arteria apendicular. Sección de apéndice en base cecal. Hemostasia adecuada.',
+        hallazgos_transoperatorios: 'Apéndice cecal con signos de inflamación aguda. Sin perforación. Sin líquido libre en cavidad.',
+        sangrado_estimado: 50,
+        tipo_anestesia_utilizada: 'Anestesia general balanceada',
+        duracion_estimada: '45-60 minutos',
+        estado_postquirurgico: 'Paciente estable, despierto, con adecuada mecánica ventilatoria',
+        destino_paciente: 'Hospitalización en cirugía general',
+        plan_postoperatorio: 'Ayuno 6 horas, posteriormente dieta líquida progresiva. Analgesia multimodal. Vigilancia de signos de sangrado.',
+        indicaciones_postoperatorias: 'Paracetamol 1g IV c/8h, Ketorolaco 30mg IV c/8h, Omeprazol 40mg IV c/24h. Vigilar signos vitales. Movilización temprana.',
+        pronostico: 'Excelente para la vida y función'
+      };
+    }
+    
+    // 🔥 COLECISTECTOMÍA
+    else if (operacionRealizada.toLowerCase().includes('colecistectomía')) {
+      datosAutocompletado = {
+        diagnostico_postoperatorio: 'Colelitiasis. Estado post colecistectomía laparoscópica',
+        descripcion_tecnica: 'Colecistectomía laparoscópica por técnica francesa de 4 puertos. Disección del triángulo de Calot. Clipaje de arteria cística y conducto cístico. Disección de vesícula del lecho hepático.',
+        hallazgos_transoperatorios: 'Vesícula biliar con signos de colecistitis crónica litiásica. Múltiples cálculos en su interior. Anatomía normal de Calot.',
+        sangrado_estimado: 30,
+        tipo_anestesia_utilizada: 'Anestesia general balanceada con relajación muscular',
+        duracion_estimada: '60-90 minutos',
+        estado_postquirurgico: 'Paciente estable, hemodinámicamente compensado',
+        destino_paciente: 'Hospitalización en cirugía general',
+        plan_postoperatorio: 'Ayuno 4 horas, posteriormente dieta blanda. Control de dolor postoperatorio. Vigilancia de sitios de trocar.',
+        indicaciones_postoperatorias: 'Diclofenaco 75mg IM c/12h, Butilhioscina 20mg IV PRN, Ondansetrón 8mg IV PRN. Vigilar dolor abdominal.',
+        pronostico: 'Bueno para la vida y función'
+      };
+    }
+    
+    // 🔥 HERNIA INGUINAL
+    else if (operacionRealizada.toLowerCase().includes('hernia') || operacionRealizada.toLowerCase().includes('plastia')) {
+      datosAutocompletado = {
+        diagnostico_postoperatorio: 'Hernia inguinal. Estado post plastia inguinal',
+        descripcion_tecnica: 'Plastia inguinal con malla de polipropileno por técnica de Lichtenstein. Disección del saco herniario. Reducción del contenido. Colocación de malla sin tensión.',
+        hallazgos_transoperatorios: 'Hernia inguinal indirecta con saco herniario íntegro. Contenido reducible. Sin complicaciones.',
+        sangrado_estimado: 20,
+        tipo_anestesia_utilizada: 'Anestesia regional (bloqueo espinal)',
+        duracion_estimada: '45 minutos',
+        estado_postquirurgico: 'Paciente estable, sin datos de sangrado',
+        destino_paciente: 'Egreso a domicilio el mismo día',
+        plan_postoperatorio: 'Dieta normal inmediata. Movilización gradual. Evitar esfuerzos durante 2 semanas.',
+        indicaciones_postoperatorias: 'Paracetamol 500mg VO c/8h, Ibuprofeno 400mg VO c/12h. Curación de herida en 48h.',
+        pronostico: 'Excelente para la vida y función'
+      };
+    }
+    
+    // Si no hay procedimiento específico conocido
+    else {
+      this.mostrarErrorMetodo('Procedimiento no reconocido para autocompletado. Complete manualmente.');
+      return;
+    }
+    
+    // Aplicar el autocompletado
+    this.notaPostoperatoriaForm.patchValue(datosAutocompletado);
+    this.mostrarExito('✅ Datos autocompletados según procedimiento. Revise y ajuste según hallazgos específicos.');
+    
+  } catch (error) {
+    console.error('❌ Error en autocompletado:', error);
+    this.mostrarErrorMetodo('Error al autocompletar. Complete manualmente.');
+  }
+}
+
+/**
+ * Calcular duración real de la cirugía
+ */
+actualizarDuracionCirugia(): void {
+  const horaInicio = this.notaPostoperatoriaForm.get('hora_inicio')?.value;
+  const horaFin = this.notaPostoperatoriaForm.get('hora_fin')?.value;
+  
+  if (horaInicio && horaFin) {
+    const duracion = this.calcularDuracionCirugia();
+    if (duracion !== null) {
+      const horas = Math.floor(duracion / 60);
+      const minutos = duracion % 60;
+      const duracionTexto = horas > 0 ? `${horas}h ${minutos}min` : `${minutos} minutos`;
+      
+      console.log(`⏱️ Duración calculada: ${duracionTexto}`);
+      this.mostrarExito(`⏱️ Duración de cirugía: ${duracionTexto}`);
+    }
+  }
+}
+
+
+/**
+ * Validar que todos los checkboxes finales estén marcados
+ */
+validarCheckboxesFinales(): boolean {
+  const checkboxes = [
+    'cirugia_sin_complicaciones',
+    'objetivos_alcanzados', 
+    'nota_completa',
+    'revision_cirujano'
+  ];
+  
+  const noMarcados = checkboxes.filter(checkbox => 
+    !this.notaPostoperatoriaForm.get(checkbox)?.value
+  );
+  
+  if (noMarcados.length > 0) {
+    this.mostrarErrorMetodo(`Debe marcar las siguientes validaciones: ${noMarcados.join(', ')}`);
+    return false;
+  }
+  
+  return true;
+}
+
 
 aplicarSignosVitalesDeEvolucion(): void {
   // Prevenir el comportamiento por defecto del formulario
