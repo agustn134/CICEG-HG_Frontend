@@ -27,7 +27,7 @@ import { ApiResponse, EstadoDocumento } from '../../models/base.models';
 import { AuthService } from '../../services/auth/auth.service';
 import { GuiasClinicasService } from '../../services/catalogos/guias-clinicas';
 import { GuiaClinica } from '../../models/guia-clinica.model';
-import { PdfGeneratorService } from '../../services/PDF/pdf-generator.service';
+import { PdfGeneratorService } from '../../services/pdf/pdf-generator.service';
 import { ConsentimientosInformados } from '../../services/documentos-clinicos/consentimientos-informados';
 import { NotasPreoperatoria } from '../../services/documentos-clinicos/notas-preoperatoria';
 import { NotasPostoperatoria } from '../../services/documentos-clinicos/notas-postoperatoria';
@@ -70,7 +70,7 @@ import { ValidacionesComunesService, ValidacionResult } from '../../services/val
 import { MedicamentosService } from '../../services/catalogos/medicamentos';
 import { Medicamento } from '../../models/medicamento.model';
 import { LogoResolverService } from '../../services/logo-resolver.service';
-import { PdfTemplatesService } from '../../services/PDF/PdfTemplatesService';
+import { PdfTemplatesService } from '../../services/pdf/PdfTemplatesService';
 import { ModoInteligenteService } from '../../services/modo-inteligente.service';
 import { CampoInteligenteComponent } from '../../campo-inteligente/campo-inteligente.component';
 
@@ -210,12 +210,12 @@ export class PerfilPaciente implements OnInit, OnDestroy {
 
   // Agregar este método en la clase PerfilPaciente
 mostrarCapturaIngreso(): boolean {
-  return this.tabActiva === 'capturaIngreso' || 
+  return this.tabActiva === 'capturaIngreso' ||
          (this.tabActiva as string) === 'capturaIngreso';
 }
 
 mostrarCapturaEvolucion(): boolean {
-  return this.tabActiva === 'capturaEvolucion' || 
+  return this.tabActiva === 'capturaEvolucion' ||
          (this.tabActiva as string) === 'capturaEvolucion';
 }
 
@@ -233,7 +233,7 @@ capturaEvolucionForm!: FormGroup;
   medicoCompleto: any | null = null;
   isLoading = true;
   fechaActual = new Date();
-  loading = false; 
+  loading = false;
   isCreatingDocument = false;
   guardandoFormulario = false;
   error: string | null = null;
@@ -289,7 +289,7 @@ capturaEvolucionForm!: FormGroup;
   estadoNutricionalPediatricoForm!: FormGroup;
   inmunizacionesForm!: FormGroup;
   vacunasAdicionalesForm!: FormGroup;
-  hojaFrontalForm!: FormGroup; 
+  hojaFrontalForm!: FormGroup;
   notaEgresoForm!: FormGroup;
   tabActiva: TabActiva = 'general';
   formularioActivo: FormularioActivo = 'signosVitales';
@@ -300,7 +300,7 @@ capturaEvolucionForm!: FormGroup;
   formulariosVisibles: string[] = [];
   modoPresentacion = false;
 
-  
+
   //   NUEVAS PROPIEDADES PARA MODO INTELIGENTE
   modoInteligenteActivo = true;
 
@@ -639,7 +639,7 @@ trackByCie10Id(index: number, codigo: any): string {
 }
 seleccionarCie10(codigo: any, formulario: string): void {
   const valorCompleto = `${codigo.codigo} - ${codigo.descripcion}`;
-  
+
   switch(formulario) {
     case 'historiaClinica':
       this.historiaClinicaForm.get('codigo_cie10')?.setValue(valorCompleto);
@@ -689,7 +689,7 @@ desactivarModoPresentacion(): void {
     quirurgicos: {
       nombre: 'Documentos Quirúrgicos',
       icono: 'fas fa-procedures',
-      color: 'red', 
+      color: 'red',
       formularios: ['notaPreoperatoria', 'notaPreanestesica', 'notaPostoperatoria', 'notaPostanestesica'],
     },
     solicitudes: {
@@ -910,7 +910,7 @@ desactivarModoPresentacion(): void {
 
 getFormErrors(): any[] {
   const errors: any[] = [];
-  
+
   Object.keys(this.notaPreoperatoriaForm.controls).forEach(key => {
     const control = this.notaPreoperatoriaForm.get(key);
     if (control && control.errors) {
@@ -923,8 +923,8 @@ getFormErrors(): any[] {
       });
     }
   });
-  
-  
+
+
   return errors;
 }
 
@@ -1044,7 +1044,7 @@ ngAfterViewInit(): void {
       };
 
       console.log('📄 Nota Postoperatoria preparada:', notaPostoperatoriaData);
-      
+
       this.success = '⚕️ Nota Postoperatoria guardada correctamente';
       this.formularioEstado.notaPostoperatoria = true;
 
@@ -1146,7 +1146,7 @@ ngAfterViewInit(): void {
     };
 
     console.log('📄 Nota Preanestésica preparada:', notaPreanestesicaData);
-    
+
     this.success = '  Nota Preanestésica guardada correctamente';
     this.formularioEstado.notaPreanestesica = true;
 
@@ -1171,14 +1171,14 @@ private generarFolioPreanestesico(): string {
 
 getFormErrorsPostanestecia(): any {
   const formErrors: any = {};
-  
+
   Object.keys(this.notaPostanestesicaForm.controls).forEach(key => {
     const controlErrors = this.notaPostanestesicaForm.get(key)?.errors;
     if (controlErrors) {
       formErrors[key] = controlErrors;
     }
   });
-  
+
   return formErrors;
 }
 
@@ -1217,7 +1217,7 @@ async guardarNotaPostanestesica(): Promise<void> {
     };
 
     console.log('📄 Nota Postanestésica preparada:', notaPostanestesicaData);
-    
+
     this.success = '  Nota Postanestésica guardada correctamente';
     this.formularioEstado.notaPostanestesica = true;
 
@@ -1235,16 +1235,16 @@ async guardarNotaPostanestesica(): Promise<void> {
 public calcularDuracionAnestesia(): string {
   const horaInicio = this.notaPostanestesicaForm.get('hora_inicio')?.value;
   const horaTermino = this.notaPostanestesicaForm.get('hora_termino')?.value;
-  
+
   if (horaInicio && horaTermino) {
     const inicio = new Date(`2000-01-01T${horaInicio}`);
     const termino = new Date(`2000-01-01T${horaTermino}`);
     const diferencia = termino.getTime() - inicio.getTime();
     const minutos = Math.floor(diferencia / (1000 * 60));
-    
+
     const horas = Math.floor(minutos / 60);
     const mins = minutos % 60;
-    
+
     return `${horas}h ${mins}min (${minutos} minutos)`;
   }
   return '';
@@ -1256,7 +1256,7 @@ public calcularDuracionAnestesia(): string {
 //   const circulacion = parseInt(this.notaPostanestesicaForm.get('aldrete_circulacion')?.value) || 0;
 //   const conciencia = parseInt(this.notaPostanestesicaForm.get('aldrete_conciencia')?.value) || 0;
 //   const saturacion = parseInt(this.notaPostanestesicaForm.get('aldrete_saturacion')?.value) || 0;
-  
+
 //   return actividad + respiracion + circulacion + conciencia + saturacion;
 // }
 
@@ -1268,14 +1268,14 @@ public calcularTotalAldrete(): number {
   const circulacion = parseInt(this.notaPostanestesicaForm.get('aldrete_circulacion')?.value) || 0;
   const conciencia = parseInt(this.notaPostanestesicaForm.get('aldrete_conciencia')?.value) || 0;
   const saturacion = parseInt(this.notaPostanestesicaForm.get('aldrete_saturacion')?.value) || 0;
-  
+
   const total = actividad + respiracion + circulacion + conciencia + saturacion;
-  
+
   // Actualizar automáticamente el campo total si existe
   if (this.notaPostanestesicaForm.get('aldrete_total')) {
     this.notaPostanestesicaForm.get('aldrete_total')?.setValue(total);
   }
-  
+
   return total;
 }
 
@@ -1284,7 +1284,7 @@ public calcularTotalAldrete(): number {
  */
 getInterpretacionAldrete(): string {
   const total = this.calcularTotalAldrete();
-  
+
   if (total >= 9) {
     return 'Paciente apto para egreso de recuperación';
   } else if (total >= 7) {
@@ -1301,7 +1301,7 @@ getInterpretacionAldrete(): string {
  */
 getColorAldrete(): string {
   const total = this.calcularTotalAldrete();
-  
+
   if (total >= 9) return 'text-green-600 bg-green-100';
   if (total >= 7) return 'text-yellow-600 bg-yellow-100';
   if (total >= 5) return 'text-orange-600 bg-orange-100';
@@ -1415,7 +1415,7 @@ private generarFolioPostanestesico(): string {
   //    MÉTODO ESPECIAL - ¡100% COMPLETADO!
   private mostrarMensaje100Porciento(): void {
     console.log(`
-           ¡FELICIDADES!       
+           ¡FELICIDADES!
 
     ██████  ██  ██████ ███████  ██████           ██   ██  ██████
     ██      ██ ██      ██      ██               ██   ██ ██
@@ -2013,7 +2013,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
         folio_referencia: this.generarFolioReferencia()
       }
     });
-    
+
       console.log('  PDF de Referencia y Contrarreferencia generado correctamente');
     } catch (error) {
       console.error('❌ Error al generar PDF:', error);
@@ -2160,12 +2160,12 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
   this.solicitudGasometriaForm = this.initializeSolicitudGasometriaForm();
   this.registroTransfusionForm = this.initializeRegistroTransfusionForm();
   this.altaVoluntariaForm = this.initializeAltaVoluntariaForm();
-  this.hojaFrontalForm = this.crearFormularioHojaFrontal(); 
+  this.hojaFrontalForm = this.crearFormularioHojaFrontal();
   this.capturaIngresoForm = this.initializeCapturaIngresoForm();
   this.capturaEvolucionForm = this.initializeCapturaEvolucionForm();
   this.prellenarDatosHojaFrontal();
   }
-  
+
   private inicializarFlujoPaciente(): void {
     this.inicializarFormularios();
     this.recuperarDatosLocales();
@@ -2192,7 +2192,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
       'signosVitales', 'historiaClinica', 'hojaFrontal',
       // Clínicos
       'notaUrgencias', 'notaEvolucion',
-      // Quirúrgicos 
+      // Quirúrgicos
       'notaPreoperatoria', 'notaPostoperatoria', 'notaPreanestesica', 'notaPostanestesica',
       // Solicitudes
       'solicitudEstudio', 'solicitudCultivo', 'solicitudGasometria',
@@ -2224,7 +2224,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
       notaUrgencias: 'Nota de Urgencias',
       notaEvolucion: 'Nota de Evolución',
 
-      // Documentos quirúrgicos 
+      // Documentos quirúrgicos
       notaPreoperatoria: 'Nota Preoperatoria',
       notaPostoperatoria: 'Nota Postoperatoria',
       notaPreanestesica: 'Nota Preanestésica',
@@ -2259,7 +2259,7 @@ await this.pdfGeneratorService.generarDocumento('Referencia y Contrarreferencia'
 // Verificar si mostrar un campo
 mostrarCampo(nombreCampo: string, formularioActual: string): boolean {
   if (!this.modoInteligenteService.isActivo()) return true;
-  
+
   return !this.modoInteligenteService.estaCompletoEnJerarquiaSuperior(nombreCampo, formularioActual);
 }
 
@@ -2993,7 +2993,7 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
       // Impresión diagnóstica y plan
       impresion_diagnostica: [''],
       id_guia_diagnostico: [null],
-      codigo_cie10: [''], 
+      codigo_cie10: [''],
       plan_diagnostico: [''],
       plan_terapeutico: [''],
       pronostico: [''],
@@ -3138,20 +3138,20 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
 //     // Información básica del responsable (OBLIGATORIO)
 //     nombre_responsable: ['', [Validators.required]],
 //     parentesco: ['paciente', [Validators.required]], // paciente, familiar, tutor
-    
+
 //     // Información médica básica
 //     numero_cama: [''],
 //     servicio_medico: [''],
-    
+
 //     // Fecha del consentimiento (OBLIGATORIO)
 //     fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
-    
+
 //     // Confirmación de aceptación (OBLIGATORIO para el consentimiento de hospitalización)
 //     acepta_hospitalizacion: [false, [Validators.requiredTrue]],
-    
+
 //     // Observaciones adicionales
 //     observaciones: [''],
-    
+
 //     // Campos calculados automáticamente (no requieren validación)
 //     folio_consentimiento: [''],
 //     medico_responsable: [''],
@@ -3161,29 +3161,29 @@ private obtenerDatoParaPDF(nombreCampo: string): string {
 private initializeConsentimientoForm(): FormGroup {
   return this.fb.group({
     // SELECTOR DE TIPO DE CONSENTIMIENTO
-    tipo_consentimiento: ['hospitalizacion', [Validators.required]], 
-    
+    tipo_consentimiento: ['hospitalizacion', [Validators.required]],
+
     // CAMPOS BÁSICOS (comunes a todos los tipos)
     nombre_responsable: ['', [Validators.required]],
     parentesco: ['paciente', [Validators.required]],
     numero_cama: [''],
     servicio_medico: [''],
     fecha_consentimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
-    
+
     // CAMPOS ESPECÍFICOS PARA CIRUGÍA/PROCEDIMIENTOS
-    nombre_procedimiento: [''], 
-    beneficios_procedimiento: [''], 
-    riesgos_especificos: [''], 
+    nombre_procedimiento: [''],
+    beneficios_procedimiento: [''],
+    riesgos_especificos: [''],
     riesgos_anestesia: ['Se han explicado los riesgos de la anestesia'],
     autoriza_procedimientos_adicionales: ['si'],
-    
+
     // CAMPOS ESPECÍFICOS PARA REFERENCIA
-    motivo_referencia: [''], 
-    unidad_destino: [''], 
+    motivo_referencia: [''],
+    unidad_destino: [''],
     especialidad_requerida: [''],
     fecha_ingreso_hospitalario: [''],
     diagnostico_referencia: [''],
-    
+
     // CAMPOS ESPECÍFICOS PARA TRATAMIENTO MÉDICO
     diagnostico_tratamiento: [''],
     estudios_autorizados: [''],
@@ -3195,14 +3195,14 @@ private initializeConsentimientoForm(): FormGroup {
     tipo_sangre_paciente: [''],
     estado_civil: [''],
     domicilio_completo: [''],
-    
+
     // TESTIGOS (común para algunos tipos)
     testigo1_nombre: [''],
     testigo2_nombre: [''],
-    
+
     // ACEPTACIÓN FINAL
     acepta_consentimiento: [false, [Validators.requiredTrue]],
-    
+
     // OBSERVACIONES
     observaciones: ['']
   });
@@ -3213,18 +3213,18 @@ private initializeConsentimientoForm(): FormGroup {
 
   private initializeNotaPreoperatoriaForm(): FormGroup {
     return this.fb.group({
-    
+
       fecha_cirugia: ['', [Validators.required]],
-          resumen_interrogatorio: ['', [Validators.required]], 
-      exploracion_fisica: ['', [Validators.required]], 
+          resumen_interrogatorio: ['', [Validators.required]],
+      exploracion_fisica: ['', [Validators.required]],
       resultados_estudios: [''],
-      diagnostico_preoperatorio: ['', [Validators.required]], 
+      diagnostico_preoperatorio: ['', [Validators.required]],
       id_guia_diagnostico: [null],
-      plan_quirurgico: ['', [Validators.required]], 
+      plan_quirurgico: ['', [Validators.required]],
       codigo_cie10_preoperatorio: [''], // ← NUEVA LÍNEA CIE-10
       plan_terapeutico_preoperatorio: [''],
-      pronostico: ['', [Validators.required]], 
-      
+      pronostico: ['', [Validators.required]],
+
       tipo_cirugia: ['', [Validators.required]],
       riesgo_quirurgico: ['', [Validators.required]]
     });
@@ -3242,52 +3242,52 @@ servicio_hospitalizacion: ['Cirugía General'],
     diagnostico_preoperatorio: ['', [Validators.required]],
     diagnostico_postoperatorio: ['', [Validators.required]],
     codigo_cie10_postoperatorio: [''],
-    
+
     // PROCEDIMIENTOS REALIZADOS (NOM-004 D10.13)
     operacion_planeada: ['', [Validators.required]],
     operacion_realizada: ['', [Validators.required]],
-    
+
     // DESCRIPCIÓN DE LA TÉCNICA QUIRÚRGICA (NOM-004 D10.15)
     descripcion_tecnica: ['', [Validators.required]],
     tipo_anestesia_utilizada: ['', [Validators.required]],
-    
+
     // HALLAZGOS TRANSOPERATORIOS (NOM-004 D10.16)
     hallazgos_transoperatorios: ['', [Validators.required]],
-    
+
     // REPORTE DE GASAS Y COMPRESAS (NOM-004 D10.17)
     conteo_gasas_completo: ['Correcto', [Validators.required]],
     conteo_instrumental_completo: ['Correcto', [Validators.required]],
     conteo_compresas_completo: ['No aplica'],
-    
+
     // INCIDENTES Y ACCIDENTES (NOM-004 D10.18)
     incidentes_accidentes: ['Sin incidentes'],
-    
+
     // CUANTIFICACIÓN DE SANGRADO (NOM-004 D10.19)
     sangrado_estimado: [0, [Validators.required, Validators.min(0)]],
     metodo_hemostasia: ['Hemostasia convencional'],
-    
+
     // ESTUDIOS TRANSOPERATORIOS (NOM-004 D10.20)
     estudios_transoperatorios: ['No se realizaron estudios transoperatorios'],
-    
+
     // ESTADO POSTQUIRÚRGICO INMEDIATO (NOM-004 D10.21)
     estado_postquirurgico: ['', [Validators.required]],
     estabilidad_hemodinamica: ['Estable'],
     estado_conciencia: [''],
     destino_paciente: ['', [Validators.required]],
-    
+
     // PLAN POSTOPERATORIO (NOM-004 D10.22)
     plan_postoperatorio: ['', [Validators.required]],
     indicaciones_postoperatorias: ['', [Validators.required]],
-    
+
     // ENVÍO DE PIEZAS A PATOLOGÍA (NOM-004 D10.23)
     piezas_enviadas_patologia: [false],
     descripcion_especimenes: [''],
     numero_frascos_patologia: [1],
-    
+
     // PRONÓSTICO
     pronostico: ['', [Validators.required]],
     expectativa_recuperacion: ['Favorable'],
-    
+
     // EQUIPO QUIRÚRGICO
     cirujano_principal: ['', [Validators.required]],
     primer_ayudante: [''],
@@ -3295,7 +3295,7 @@ servicio_hospitalizacion: ['Cirugía General'],
     anestesiologo: ['', [Validators.required]],
     instrumentista: ['', [Validators.required]],
     circulante: ['', [Validators.required]],
-    
+
     // EVALUACIÓN FINAL
     cirugia_sin_complicaciones: [false, [Validators.requiredTrue]],
     objetivos_alcanzados: [false, [Validators.requiredTrue]],
@@ -3425,11 +3425,11 @@ servicio_hospitalizacion: ['Cirugía General'],
 
 private initializeSolicitudEstudioForm(): FormGroup {
   const fechaHoy = new Date().toISOString().split('T')[0];
-  
+
   return this.fb.group({
     // TIPO DE SOLICITUD
     tipo_estudio: ['', [Validators.required]],
-    
+
     // DATOS BÁSICOS (comunes)
     fecha_solicitud: [fechaHoy, [Validators.required]],
     hora_solicitud: ['', [Validators.required]],
@@ -3437,11 +3437,11 @@ private initializeSolicitudEstudioForm(): FormGroup {
     numero_cama: [''],
       // curp_paciente: [''],
     urgencia: ['rutina', [Validators.required]],
-    
+
     // CAMPOS ESPECÍFICOS PARA LABORATORIO
     fecha_proxima_consulta: [''],
     numero_intervencion_causes: [''],
-    
+
     // ESTUDIOS DE LABORATORIO (HEMATOLOGÍA)
     biometria_hematica: [false],
     grupo_sanguineo: [false],
@@ -3449,17 +3449,17 @@ private initializeSolicitudEstudioForm(): FormGroup {
     reticulocitos: [false],
     frotis_sangre_gota: [false],
     hemoglobina_glicosilada: [false],
-    
+
     // INMUNOHEMATOLOGÍA
     pruebas_cruzadas: [false],
     coombs_directo: [false],
     coombs_indirecto: [false],
-    
+
     // COAGULACIÓN
     tiempo_protrombina: [false],
     tiempo_tromboplastina: [false],
     fibrinogeno: [false],
-    
+
     // BIOQUÍMICA CLÍNICA COMPLETA
     tamiz_gestacional_50g: [false],
     glucosa_postprandial: [false],
@@ -3487,7 +3487,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
     potasio: [false],
     sodio: [false],
     magnesio: [false],
-    
+
     // PAQUETES
     quimica_sanguinea_iii: [false],
     quimica_sanguinea_iv: [false],
@@ -3495,7 +3495,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
     perfil_quirurgico: [false],
     perfil_reumatico: [false],
     perfil_control_embarazo: [false],
-    
+
     // URIANÁLISIS AMPLIADO
     examen_general_orina: [false],
     cloro_orina: [false],
@@ -3503,7 +3503,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
     sodio_orina: [false],
     microalbuminuria_24hrs: [false],
     depuracion_creatinina: [false],
-    
+
     // INMUNOLOGÍA AMPLIADA
     reacciones_febriles: [false],
     proteina_c_reactiva: [false],
@@ -3514,15 +3514,15 @@ private initializeSolicitudEstudioForm(): FormGroup {
     rpr_sifilis: [false],
     hgc_beta_serica: [false],
     prueba_embarazo_orina: [false],
-    
+
     // SEROLOGÍA
     ac_hiv_1_2: [false],
-    
+
     // PERFIL CARDÍACO
     dhl: [false],
     cpk: [false],
     ck_mb: [false],
-    
+
     // PARASITOLOGÍA
     coproparasitoscopico_3: [false],
     coproparasitoscopico_1: [false],
@@ -3532,27 +3532,27 @@ private initializeSolicitudEstudioForm(): FormGroup {
     sangre_oculta_heces: [false],
     azucares_reductores: [false],
     rotavirus: [false],
-    
+
     // Control de horarios (laboratorio)
     hora_toma_muestra: [''],
     hora_recepcion_muestra: [''],
     hora_entrega_resultados: [''],
-    
+
     // CAMPOS ESPECÍFICOS PARA IMAGENOLOGÍA
     diagnostico_cie10: [''],
     intervencion_causes: [''],
     estudios_imagenologia: [''],
     hora_recibe_camillero: [''],
     hora_recibe_tecnico: [''],
-    
+
     // MÉDICO SOLICITANTE (común)
     // nombre_medico_solicitante: ['', [Validators.required]],
     // cedula_medico_solicitante: ['', [Validators.required]],
-    
+
     // INFORMACIÓN CLÍNICA (laboratorio)
     indicacion_clinica: [''],
     diagnostico_presuntivo: [''],
-    
+
     // OTROS
     otros_estudios: [''],
     observaciones: ['']
@@ -3561,7 +3561,7 @@ private initializeSolicitudEstudioForm(): FormGroup {
 private setupConditionalValidators(): void {
   this.solicitudEstudioForm.get('tipo_estudio')?.valueChanges.subscribe(tipo => {
     this.clearConditionalValidators();
-    
+
     if (tipo === 'imagenologia') {
       // Validaciones para imagenología
       this.solicitudEstudioForm.get('diagnostico_cie10')?.setValidators([Validators.required]);
@@ -3571,17 +3571,17 @@ private setupConditionalValidators(): void {
       this.solicitudEstudioForm.get('indicacion_clinica')?.setValidators([Validators.required]);
       this.solicitudEstudioForm.get('diagnostico_presuntivo')?.setValidators([Validators.required]);
     }
-    
+
     this.solicitudEstudioForm.updateValueAndValidity();
   });
 }
 
 private clearConditionalValidators(): void {
   const fieldsToReset = [
-    'diagnostico_cie10', 'estudios_imagenologia', 
+    'diagnostico_cie10', 'estudios_imagenologia',
     'indicacion_clinica', 'diagnostico_presuntivo'
   ];
-  
+
   fieldsToReset.forEach(field => {
     this.solicitudEstudioForm.get(field)?.clearValidators();
     this.solicitudEstudioForm.get(field)?.updateValueAndValidity();
@@ -3693,64 +3693,64 @@ private clearConditionalValidators(): void {
       fecha_procedimiento: [new Date().toISOString().split('T')[0], [Validators.required]],
       hora_inicio: ['', [Validators.required]],
       hora_termino: ['', [Validators.required]],
-      
+
       // INFORMACIÓN DEL PROCEDIMIENTO
       quirofano: [''],
       procedimiento_realizado: ['', [Validators.required]],
       clasificacion_asa: ['', [Validators.required]],
-      
+
       // TIPO Y TÉCNICA ANESTÉSICA (NOM-004)
       tipo_anestesia: ['', [Validators.required]],
       tecnica_anestesica: [''],
-      
+
       // MEDICAMENTOS UTILIZADOS (NOM-004 D11.12)
       medicamentos_utilizados: ['', [Validators.required]],
       agentes_anestesicos: [''],
       analgesicos_utilizados: [''],
-      
+
       // SIGNOS VITALES DE EGRESO
       presion_arterial_egreso: ['', [Validators.required]],
       frecuencia_cardiaca_egreso: ['', [Validators.required, Validators.min(30), Validators.max(200)]],
       frecuencia_respiratoria_egreso: ['', [Validators.required, Validators.min(8), Validators.max(60)]],
       saturacion_oxigeno_egreso: ['', [Validators.required, Validators.min(70), Validators.max(100)]],
       temperatura_egreso: ['', [Validators.required, Validators.min(32), Validators.max(45)]],
-      
+
       // ESCALA DE ALDRETE (NOM-004) - Con valores numéricos
       aldrete_actividad: [2, [Validators.required, Validators.min(0), Validators.max(2)]],
       aldrete_respiracion: [2, [Validators.required, Validators.min(0), Validators.max(2)]],
       aldrete_circulacion: [2, [Validators.required, Validators.min(0), Validators.max(2)]],
       aldrete_conciencia: [2, [Validators.required, Validators.min(0), Validators.max(2)]],
       aldrete_saturacion: [2, [Validators.required, Validators.min(0), Validators.max(2)]],
-      
+
       // EVALUACIÓN CLÍNICA DEL EGRESO (NOM-004)
       estado_clinico_egreso: ['', [Validators.required]],
       estado_conciencia_egreso: ['', [Validators.required]],
       dolor_postoperatorio: [''],
-      
+
       // INCIDENTES Y ACCIDENTES (NOM-004 D11.14)
       incidentes_accidentes: [''],
       complicaciones_transanestesicas: [''],
-      
+
       // BALANCE HÍDRICO (NOM-004 D11.15)
       liquidos_administrados: [0, [Validators.min(0)]],
       sangrado: [0, [Validators.min(0)]],
       hemoderivados_transfundidos: [''],
       balance_hidrico: [''],
-      
+
       // PLAN DE MANEJO (NOM-004 D11.17)
       plan_tratamiento: ['', [Validators.required]],
       tiempo_recuperacion: [''],
       indicaciones_egreso: [''],
-      
+
       // PRONÓSTICO
       pronostico: ['', [Validators.required]],
-      
+
       // INFORMACIÓN DEL ANESTESIÓLOGO
       // ❌ QUITAR ESTE CAMPO OBLIGATORIO - no lo usas en el HTML
       // id_anestesiologo: ['', [Validators.required]],
       anestesiologo_nombre: ['', [Validators.required]],
       cedula_anestesiologo: ['', [Validators.required]],
-      
+
       // OBSERVACIONES
       observaciones: [''],
       recomendaciones: ['']
@@ -3761,7 +3761,7 @@ private clearConditionalValidators(): void {
       // DATOS BÁSICOS DE EVALUACIÓN (NOM-004 Numeral 8.7)
       fecha_evaluacion: [new Date().toISOString().split('T')[0], [Validators.required]],
       hora_evaluacion: ['', [Validators.required]],
-      
+
       // SIGNOS VITALES PREOPERATORIOS
       peso: ['', [Validators.required, Validators.min(0.5), Validators.max(300)]],
       talla: ['', [Validators.required, Validators.min(30), Validators.max(250)]],
@@ -3770,7 +3770,7 @@ private clearConditionalValidators(): void {
       frecuencia_respiratoria: ['', [Validators.required, Validators.min(8), Validators.max(60)]],
       temperatura: ['', [Validators.required, Validators.min(32), Validators.max(45)]],
       saturacion_oxigeno: ['', [Validators.min(70), Validators.max(100)]],
-      
+
       // EVALUACIÓN CLÍNICA DEL PACIENTE (NOM-004)
       estado_general: ['', [Validators.required]],
       via_aerea: ['', [Validators.required]],
@@ -3778,49 +3778,49 @@ private clearConditionalValidators(): void {
       sistema_respiratorio: ['', [Validators.required]],
       sistema_nervioso: [''],
       estado_ayuno: ['', [Validators.required]],
-      
+
       // ANTECEDENTES ANESTÉSICOS
       anestesias_previas: [false],
       complicaciones_anestesicas: [''],
       alergias_medicamentos: [''],
       medicamentos_actuales: [''],
-      
+
       // CLASIFICACIÓN ASA (NOM-004)
       asa: ['', [Validators.required]],
       justificacion_asa: [''],
-      
+
       // TIPO DE ANESTESIA (NOM-004)
       tipo_anestesia: ['', [Validators.required]],
       tecnica_anestesica: [''],
-      
+
       // RIESGO ANESTÉSICO (NOM-004)
       riesgo_anestesico: ['', [Validators.required]],
       riesgo_cardiovascular: [''],
       riesgo_respiratorio: [''],
       factores_riesgo: [''],
-      
+
       // PLAN ANESTÉSICO
       plan_anestesia: ['', [Validators.required]],
       medicacion_preanestesica: [''],
       plan_monitorizacion: [''],
       consideraciones_especiales: [''],
-      
+
       // INFORMACIÓN DEL PROCEDIMIENTO
       procedimiento_quirurgico: [''],
       duracion_estimada: [''],
       posicion_quirurgica: [''],
-      
+
       // MÉDICO ANESTESIÓLOGO
       medico_anestesiologo: ['', [Validators.required]],
       cedula_anestesiologo: ['', [Validators.required]],
-      
+
       // ESTUDIOS DE LABORATORIO
       laboratorios_relevantes: [''],
       estudios_gabinete: [''],
-      
+
       // CONSENTIMIENTO
       consentimiento_informado: [false, [Validators.requiredTrue]],
-      
+
       // OBSERVACIONES
       observaciones: [''],
       recomendaciones: ['']
@@ -3957,7 +3957,7 @@ private inicializarModoInteligente(): void {
   this.modoInteligenteService.registrarFormulario('notaUrgencias', this.notaUrgenciasForm);
   this.modoInteligenteService.registrarFormulario('notaEvolucion', this.notaEvolucionForm);
   this.modoInteligenteService.registrarFormulario('hojaFrontal', this.hojaFrontalForm);
-  
+
   console.log('🎯 Modo inteligente inicializado con formularios:', {
     capturaIngreso: !!this.capturaIngresoForm,
     historiaClinica: !!this.historiaClinicaForm,
@@ -4166,7 +4166,7 @@ private inicializarModoInteligente(): void {
   this.notaPostoperatoriaForm.get('hora_inicio')?.valueChanges.subscribe(() => {
     this.actualizarDuracionCirugia();
   });
-  
+
   this.notaPostoperatoriaForm.get('hora_fin')?.valueChanges.subscribe(() => {
     this.actualizarDuracionCirugia();
   });
@@ -4174,7 +4174,7 @@ private inicializarModoInteligente(): void {
     // 🔥 AGREGAR listeners para cálculo automático de Aldrete
   const camposAldrete = [
     'aldrete_actividad',
-    'aldrete_respiracion', 
+    'aldrete_respiracion',
     'aldrete_circulacion',
     'aldrete_conciencia',
     'aldrete_saturacion'
@@ -4428,7 +4428,7 @@ case 'Evolución':
   console.log('📋 Datos que se envían al PDF:');
   console.log('- paciente:', this.pacienteCompleto);
   console.log('- notaPreoperatoria:', this.notaPreoperatoriaForm.value);
-  
+
   await this.pdfGeneratorService.generarDocumento('Nota Preoperatoria', {
     paciente: this.pacienteCompleto,
     medico: medicoCompleto,
@@ -4573,7 +4573,7 @@ private generarFolioSolicitud(): string {
 
 // public construirEstudiosSeleccionados(): string {
 //   const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio;
-  
+
 //   if (tipoEstudio === 'otros') {
 //     return this.solicitudEstudioForm.value.otros_estudios || 'No especificado';
 //   }
@@ -4590,7 +4590,7 @@ private generarFolioSolicitud(): string {
 //     }
 //   });
 
-//   return estudiosSeleccionados.length > 0 
+//   return estudiosSeleccionados.length > 0
 //     ? estudiosSeleccionados.join('\n')
 //     : 'No se seleccionaron estudios específicos';
 // }
@@ -4606,7 +4606,7 @@ private convertirNombreCampoATexto(campo: string): string {
     'ultrasonido_abdominal': 'Ultrasonido abdominal',
     // ... agregar más según necesites
   };
-  
+
   return traducciones[campo] || campo.replace(/_/g, ' ');
 }
 
@@ -4665,7 +4665,7 @@ private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
     return this.formulariosVisibles
       .filter((key) => this.configFormularios[key])
       .map((key) => ({
-        key: key, 
+        key: key,
         ...this.configFormularios[key]
       }));
   }
@@ -4699,7 +4699,7 @@ private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
     switch (this.formularioActivo) {
       case 'signosVitales': return this.signosVitalesForm.valid;
       case 'historiaClinica': return this.historiaClinicaForm.valid;
-      case 'hojaFrontal': return this.hojaFrontalForm.valid; 
+      case 'hojaFrontal': return this.hojaFrontalForm.valid;
       case 'notaUrgencias': return this.notaUrgenciasForm.valid;
       case 'notaEvolucion': return this.notaEvolucionForm.valid;
       case 'consentimiento': return this.consentimientoForm.valid;
@@ -5035,7 +5035,7 @@ private async generarPDFSolicitudEstudio(tipoEstudio: string): Promise<void> {
   // Métodos para guías clínicas
 agregarGuiaClinica(guia: GuiaClinica): void {
   console.log('➕ Agregando guía clínica:', guia.nombre);
-  
+
   // Verificar si ya está seleccionada
   if (this.esGuiaSeleccionada(guia)) {
     console.log('⚠️ La guía ya está seleccionada');
@@ -5044,73 +5044,73 @@ agregarGuiaClinica(guia: GuiaClinica): void {
 
   // Agregar a la lista
   this.guiasClinicasSeleccionadas.push(guia);
-  
+
   // 🔥 ACTUALIZAR LOS FORMCONTROLS
   const idsSeleccionados = this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico);
-  
+
   // Historia Clínica (permite múltiples)
   if (this.historiaClinicaForm && this.historiaClinicaForm.get('guias_clinicas_ids')) {
     this.historiaClinicaForm.get('guias_clinicas_ids')?.setValue(idsSeleccionados);
   }
-  
+
   // Nota Urgencias (solo una principal)
   if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('id_guia_diagnostico')) {
     // Si es la primera guía, establecerla como principal
-    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1 
-      ? guia.id_guia_diagnostico 
+    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1
+      ? guia.id_guia_diagnostico
       : this.notaUrgenciasForm.get('id_guia_diagnostico')?.value;
     this.notaUrgenciasForm.get('id_guia_diagnostico')?.setValue(guiaPrincipal);
   }
-  
+
   // Nota Evolución (solo una principal)
   if (this.notaEvolucionForm && this.notaEvolucionForm.get('id_guia_diagnostico')) {
-    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1 
-      ? guia.id_guia_diagnostico 
+    const guiaPrincipal = this.guiasClinicasSeleccionadas.length === 1
+      ? guia.id_guia_diagnostico
       : this.notaEvolucionForm.get('id_guia_diagnostico')?.value;
     this.notaEvolucionForm.get('id_guia_diagnostico')?.setValue(guiaPrincipal);
   }
-  
+
   // 🔥 LIMPIAR LA BÚSQUEDA Y CERRAR DROPDOWN
   this.limpiarBusquedaGuia();
-  
+
   console.log('  Guía agregada. Total guías:', this.guiasClinicasSeleccionadas.length);
 }
 
   eliminarGuiaClinica(guia: GuiaClinica): void {
     console.log('🗑️ Eliminando guía clínica:', guia.nombre);
-    
+
     // Filtrar la guía de la lista seleccionada
     this.guiasClinicasSeleccionadas = this.guiasClinicasSeleccionadas.filter(
       g => g.id_guia_diagnostico !== guia.id_guia_diagnostico
     );
-    
+
     // 🔥 ACTUALIZAR EL FORMCONTROL CORRESPONDIENTE
     const idsSeleccionados = this.guiasClinicasSeleccionadas.map(g => g.id_guia_diagnostico);
-    
+
     // Actualizar todos los formularios que tengan guías clínicas
     if (this.historiaClinicaForm && this.historiaClinicaForm.get('guias_clinicas_ids')) {
       this.historiaClinicaForm.get('guias_clinicas_ids')?.setValue(idsSeleccionados);
     }
-    
+
     if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('id_guia_diagnostico')) {
       // Si solo queda una guía, mantenerla en el campo único
       // Si no quedan guías, limpiar el campo
-      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0 
-        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico 
+      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0
+        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico
         : null;
       this.notaUrgenciasForm.get('id_guia_diagnostico')?.setValue(nuevaGuiaPrincipal);
     }
-    
+
     if (this.notaEvolucionForm && this.notaEvolucionForm.get('id_guia_diagnostico')) {
-      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0 
-        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico 
+      const nuevaGuiaPrincipal = this.guiasClinicasSeleccionadas.length > 0
+        ? this.guiasClinicasSeleccionadas[0].id_guia_diagnostico
         : null;
       this.notaEvolucionForm.get('id_guia_diagnostico')?.setValue(nuevaGuiaPrincipal);
     }
-    
+
     // 🔥 MOSTRAR FEEDBACK VISUAL
     console.log('  Guía eliminada. Guías restantes:', this.guiasClinicasSeleccionadas.length);
-    
+
     // Opcional: Mostrar mensaje temporal
     if (this.guiasClinicasSeleccionadas.length === 0) {
       console.log('ℹ️ No hay guías clínicas seleccionadas');
@@ -5348,10 +5348,10 @@ private construirEstudiosSeleccionados(): string {
   const tipoEstudio = this.solicitudEstudioForm.value.tipo_estudio || 'laboratorio'; //   Obtener desde el formulario
   const form = this.solicitudEstudioForm.value;
   const estudios: string[] = [];
-  
+
   // Mapeos según el tipo de estudio
   let mapeoEstudios: { [key: string]: string } = {};
-  
+
   if (tipoEstudio === 'laboratorio') {
     mapeoEstudios = {
       biometria_hematica: 'Biometría hemática completa',
@@ -5409,19 +5409,19 @@ private construirEstudiosSeleccionados(): string {
       densitometria_osea: 'Densitometría ósea'
     };
   }
-  
+
   // Agregar estudios seleccionados
   Object.keys(mapeoEstudios).forEach(campo => {
     if (form[campo]) {
       estudios.push(mapeoEstudios[campo]);
     }
   });
-  
+
   // Agregar otros estudios si los hay
   if (form.otros_estudios && form.otros_estudios.trim()) {
     estudios.push(form.otros_estudios.trim());
   }
-  
+
   return estudios.length > 0 ? estudios.join('\n') : 'No se seleccionaron estudios específicos';
 }
 
@@ -5467,16 +5467,16 @@ private construirEstudiosSeleccionados(): string {
   // Métodos para cálculos automáticos en urgencias
 onSignosVitalesChange(): void {
   console.log('🔄 Cambio detectado en signos vitales de urgencias');
-  
+
   // 1. 🔥 AUTO-SINCRONIZACIÓN con formulario principal
   this.sincronizarSignosVitalesAutomatico();
-  
+
   // 2. 🔥 VALIDACIONES EN TIEMPO REAL
   this.validarRangosSignosVitales();
-  
+
   // 3. 🔥 CÁLCULOS AUTOMÁTICOS
   this.actualizarCalculosAutomaticos();
-  
+
   // 4. 🔥 ACTUALIZAR INTERPRETACIONES
   this.actualizarInterpretacionesSignosVitales();
 }
@@ -5484,10 +5484,10 @@ onSignosVitalesChange(): void {
 
 private sincronizarSignosVitalesAutomatico(): void {
   const signosUrgencias = this.notaUrgenciasForm.value;
-  
+
   // Solo sincronizar valores que no estén vacíos
   const valoresParaSincronizar: any = {};
-  
+
   if (signosUrgencias.temperatura) valoresParaSincronizar.temperatura = signosUrgencias.temperatura;
   if (signosUrgencias.presion_arterial_sistolica) valoresParaSincronizar.presion_arterial_sistolica = signosUrgencias.presion_arterial_sistolica;
   if (signosUrgencias.presion_arterial_diastolica) valoresParaSincronizar.presion_arterial_diastolica = signosUrgencias.presion_arterial_diastolica;
@@ -5496,10 +5496,10 @@ private sincronizarSignosVitalesAutomatico(): void {
   if (signosUrgencias.saturacion_oxigeno) valoresParaSincronizar.saturacion_oxigeno = signosUrgencias.saturacion_oxigeno;
   if (signosUrgencias.glucosa) valoresParaSincronizar.glucosa = signosUrgencias.glucosa;
   if (signosUrgencias.peso) valoresParaSincronizar.peso = signosUrgencias.peso;
-  
+
   // Actualizar formulario principal sin triggear eventos infinitos
   this.signosVitalesForm.patchValue(valoresParaSincronizar, { emitEvent: false });
-  
+
   console.log('  Signos vitales sincronizados automáticamente');
 }
 
@@ -5507,7 +5507,7 @@ private validarRangosSignosVitales(): void {
   // 🔥 CORREGIR: Calcular edad desde fecha de nacimiento
   const edad = this.calcularEdadPaciente();
   const signosActuales = this.notaUrgenciasForm.value;
-  
+
   // 🔥 VALIDAR CADA SIGNO VITAL
   this.validarTemperatura(signosActuales.temperatura);
   this.validarPresionArterial(signosActuales.presion_arterial_sistolica, signosActuales.presion_arterial_diastolica);
@@ -5522,23 +5522,23 @@ private calcularEdadPaciente(): number {
   if (!this.pacienteCompleto?.persona?.fecha_nacimiento) {
     return 25; // Edad por defecto si no hay datos
   }
-  
+
   const fechaNacimiento = new Date(this.pacienteCompleto.persona.fecha_nacimiento);
   const hoy = new Date();
   const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
   const mes = hoy.getMonth() - fechaNacimiento.getMonth();
-  
+
   if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
     return edad - 1;
   }
-  
+
   return edad;
 }
 private actualizarCalculosAutomaticos(): void {
   // Forzar recálculo de todos los valores calculados
   // Esto hará que Angular actualice los valores mostrados en el template
   this.changeDetectorRef?.detectChanges();
-  
+
   console.log('📊 Cálculos actualizados:', {
     imc: this.getIMCCalculado(),
     superficieCorporal: this.getSuperficieCorporal(),
@@ -5552,7 +5552,7 @@ private actualizarCalculosAutomaticos(): void {
 getPresionArterialFormatted(): string | null {
   const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
   const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
-  
+
   if (sistolica && diastolica) {
     return `${sistolica}/${diastolica}`;
   }
@@ -5562,9 +5562,9 @@ getPresionArterialFormatted(): string | null {
 getColorPresionArterial(): string {
   const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
   const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
-  
+
   if (!sistolica || !diastolica) return '';
-  
+
   if (sistolica > 180 || diastolica > 110) return 'bg-red-100 text-red-800';
   if (sistolica > 140 || diastolica > 90) return 'bg-orange-100 text-orange-800';
   if (sistolica < 90 || diastolica < 60) return 'bg-yellow-100 text-yellow-800';
@@ -5574,9 +5574,9 @@ getColorPresionArterial(): string {
 getInterpretacionPresionArterial(): string {
   const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
   const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
-  
+
   if (!sistolica || !diastolica) return '';
-  
+
   if (sistolica > 180 || diastolica > 110) return 'Crisis hipertensiva';
   if (sistolica > 140 || diastolica > 90) return 'Hipertensión';
   if (sistolica < 90 || diastolica < 60) return 'Hipotensión';
@@ -5587,14 +5587,14 @@ getInterpretacionPresionArterial(): string {
 getColorFrecuenciaCardiaca(): string {
   const fc = this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value;
   const edad = this.calcularEdadPaciente();
-  
+
   if (!fc) return '';
-  
+
   let rangoNormal = { min: 60, max: 100 }; // Adulto por defecto
   if (edad < 1) rangoNormal = { min: 100, max: 160 };
   else if (edad < 12) rangoNormal = { min: 80, max: 120 };
   else if (edad < 18) rangoNormal = { min: 70, max: 110 };
-  
+
   if (fc > 150 || fc < 50) return 'bg-red-100 text-red-800'; // Crítico
   if (fc < rangoNormal.min || fc > rangoNormal.max) return 'bg-orange-100 text-orange-800';
   return 'bg-green-100 text-green-800';
@@ -5603,14 +5603,14 @@ getColorFrecuenciaCardiaca(): string {
 getInterpretacionFrecuenciaCardiaca(): string {
   const fc = this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value;
   const edad = this.calcularEdadPaciente();
-  
+
   if (!fc) return '';
-  
+
   let rangoNormal = { min: 60, max: 100 };
   if (edad < 1) rangoNormal = { min: 100, max: 160 };
   else if (edad < 12) rangoNormal = { min: 80, max: 120 };
   else if (edad < 18) rangoNormal = { min: 70, max: 110 };
-  
+
   if (fc > 150) return 'Taquicardia severa';
   if (fc < 50) return 'Bradicardia severa';
   if (fc < rangoNormal.min) return 'Bradicardia';
@@ -5622,14 +5622,14 @@ getInterpretacionFrecuenciaCardiaca(): string {
 getColorFrecuenciaRespiratoria(): string {
   const fr = this.notaUrgenciasForm.get('frecuencia_respiratoria')?.value;
   const edad = this.calcularEdadPaciente();
-  
+
   if (!fr) return '';
-  
+
   let rangoNormal = { min: 12, max: 20 }; // Adulto
   if (edad < 1) rangoNormal = { min: 30, max: 60 };
   else if (edad < 5) rangoNormal = { min: 20, max: 30 };
   else if (edad < 12) rangoNormal = { min: 16, max: 25 };
-  
+
   if (fr < rangoNormal.min || fr > rangoNormal.max) return 'bg-orange-100 text-orange-800';
   return 'bg-green-100 text-green-800';
 }
@@ -5637,14 +5637,14 @@ getColorFrecuenciaRespiratoria(): string {
 getInterpretacionFrecuenciaRespiratoria(): string {
   const fr = this.notaUrgenciasForm.get('frecuencia_respiratoria')?.value;
   const edad = this.calcularEdadPaciente();
-  
+
   if (!fr) return '';
-  
+
   let rangoNormal = { min: 12, max: 20 };
   if (edad < 1) rangoNormal = { min: 30, max: 60 };
   else if (edad < 5) rangoNormal = { min: 20, max: 30 };
   else if (edad < 12) rangoNormal = { min: 16, max: 25 };
-  
+
   if (fr < rangoNormal.min) return 'Bradipnea';
   if (fr > rangoNormal.max) return 'Taquipnea';
   return 'Normal';
@@ -5653,9 +5653,9 @@ getInterpretacionFrecuenciaRespiratoria(): string {
 // Temperatura
 getColorTemperatura(): string {
   const temp = this.notaUrgenciasForm.get('temperatura')?.value;
-  
+
   if (!temp) return '';
-  
+
   if (temp > 40.0 || temp < 35.0) return 'bg-red-100 text-red-800'; // Crítico
   if (temp > 38.5) return 'bg-orange-100 text-orange-800'; // Fiebre
   if (temp < 36.0) return 'bg-blue-100 text-blue-800'; // Hipotermia leve
@@ -5664,9 +5664,9 @@ getColorTemperatura(): string {
 
 getInterpretacionTemperatura(): string {
   const temp = this.notaUrgenciasForm.get('temperatura')?.value;
-  
+
   if (!temp) return '';
-  
+
   if (temp > 40.0) return 'Hipertermia crítica';
   if (temp > 38.5) return 'Fiebre';
   if (temp < 35.0) return 'Hipotermia';
@@ -5677,9 +5677,9 @@ getInterpretacionTemperatura(): string {
 // Saturación de Oxígeno
 getColorSaturacionOxigeno(): string {
   const satO2 = this.notaUrgenciasForm.get('saturacion_oxigeno')?.value;
-  
+
   if (!satO2) return '';
-  
+
   if (satO2 < 90) return 'bg-red-100 text-red-800'; // Crítico
   if (satO2 < 95) return 'bg-orange-100 text-orange-800'; // Bajo
   return 'bg-green-100 text-green-800';
@@ -5687,9 +5687,9 @@ getColorSaturacionOxigeno(): string {
 
 getInterpretacionSaturacionOxigeno(): string {
   const satO2 = this.notaUrgenciasForm.get('saturacion_oxigeno')?.value;
-  
+
   if (!satO2) return '';
-  
+
   if (satO2 < 90) return 'Hipoxemia crítica';
   if (satO2 < 95) return 'Saturación baja';
   return 'Normal';
@@ -5698,9 +5698,9 @@ getInterpretacionSaturacionOxigeno(): string {
 // Glucosa
 getColorGlucosa(): string {
   const glucosa = this.notaUrgenciasForm.get('glucosa')?.value;
-  
+
   if (!glucosa) return '';
-  
+
   if (glucosa < 50 || glucosa > 400) return 'bg-red-100 text-red-800'; // Crítico
   if (glucosa < 70 || glucosa > 200) return 'bg-orange-100 text-orange-800';
   return 'bg-green-100 text-green-800';
@@ -5708,9 +5708,9 @@ getColorGlucosa(): string {
 
 getInterpretacionGlucosa(): string {
   const glucosa = this.notaUrgenciasForm.get('glucosa')?.value;
-  
+
   if (!glucosa) return '';
-  
+
   if (glucosa < 50) return 'Hipoglucemia crítica';
   if (glucosa > 400) return 'Hiperglucemia crítica';
   if (glucosa < 70) return 'Hipoglucemia';
@@ -5721,9 +5721,9 @@ getInterpretacionGlucosa(): string {
 // Escala de Dolor
 getColorEscalaDolor(): string {
   const dolor = this.notaUrgenciasForm.get('escala_dolor')?.value;
-  
+
   if (dolor === null || dolor === undefined) return '';
-  
+
   if (dolor >= 8) return 'bg-red-100 text-red-800'; // Severo
   if (dolor >= 5) return 'bg-orange-100 text-orange-800'; // Moderado
   if (dolor >= 1) return 'bg-yellow-100 text-yellow-800'; // Leve
@@ -5732,9 +5732,9 @@ getColorEscalaDolor(): string {
 
 getInterpretacionEscalaDolor(): string {
   const dolor = this.notaUrgenciasForm.get('escala_dolor')?.value;
-  
+
   if (dolor === null || dolor === undefined) return '';
-  
+
   if (dolor >= 8) return 'Dolor severo';
   if (dolor >= 5) return 'Dolor moderado';
   if (dolor >= 1) return 'Dolor leve';
@@ -5744,9 +5744,9 @@ getInterpretacionEscalaDolor(): string {
 // IMC
 getColorIMC(): string {
   const imc = parseFloat(this.getIMCCalculado() || '0');
-  
+
   if (!imc) return '';
-  
+
   if (imc < 18.5 || imc >= 30) return 'bg-orange-100 text-orange-800';
   if (imc >= 25) return 'bg-yellow-100 text-yellow-800';
   return 'bg-green-100 text-green-800';
@@ -5754,9 +5754,9 @@ getColorIMC(): string {
 
 getInterpretacionIMC(): string {
   const imc = parseFloat(this.getIMCCalculado() || '0');
-  
+
   if (!imc) return '';
-  
+
   if (imc < 18.5) return 'Bajo peso';
   if (imc >= 18.5 && imc < 25) return 'Normal';
   if (imc >= 25 && imc < 30) return 'Sobrepeso';
@@ -5766,18 +5766,18 @@ getInterpretacionIMC(): string {
 // PAM (Presión Arterial Media)
 getColorPAM(): string {
   const pam = this.getPresionArterialMedia();
-  
+
   if (!pam) return '';
-  
+
   if (pam < 65 || pam > 110) return 'bg-orange-100 text-orange-800';
   return 'bg-green-100 text-green-800';
 }
 
 getInterpretacionPAM(): string {
   const pam = this.getPresionArterialMedia();
-  
+
   if (!pam) return '';
-  
+
   if (pam < 65) return 'PAM baja';
   if (pam > 110) return 'PAM alta';
   return 'PAM normal';
@@ -5789,7 +5789,7 @@ getInterpretacionPAM(): string {
 private actualizarInterpretacionesSignosVitales(): void {
   // Este método fuerza la actualización de todas las interpretaciones
   // que se muestran en el template (Normal, Alto, Bajo, etc.)
-  
+
   // Marcar el formulario como "dirty" para que Angular detecte cambios
   this.notaUrgenciasForm.markAsDirty();
 }
@@ -5797,7 +5797,7 @@ private actualizarInterpretacionesSignosVitales(): void {
 // 🔥 MÉTODOS DE VALIDACIÓN ESPECÍFICOS
 private validarTemperatura(temperatura: number): void {
   if (!temperatura) return;
-  
+
   if (temperatura < 35.0) {
     console.warn('⚠️ Hipotermia detectada:', temperatura);
   } else if (temperatura > 38.5) {
@@ -5809,7 +5809,7 @@ private validarTemperatura(temperatura: number): void {
 
 private validarPresionArterial(sistolica: number, diastolica: number): void {
   if (!sistolica || !diastolica) return;
-  
+
   if (sistolica > 180 || diastolica > 110) {
     console.error('  Crisis hipertensiva CRÍTICA:', `${sistolica}/${diastolica}`);
   } else if (sistolica > 140 || diastolica > 90) {
@@ -5821,20 +5821,20 @@ private validarPresionArterial(sistolica: number, diastolica: number): void {
 
 private validarFrecuenciaCardiaca(fc: number, edad: number): void {
   if (!fc) return;
-  
+
   // Rangos por edad
   let rangoNormal = { min: 60, max: 100 }; // Adulto
-  
+
   if (edad < 1) rangoNormal = { min: 100, max: 160 }; // Lactante
   else if (edad < 12) rangoNormal = { min: 80, max: 120 }; // Niño
   else if (edad < 18) rangoNormal = { min: 70, max: 110 }; // Adolescente
-  
+
   if (fc < rangoNormal.min) {
     console.warn('⚠️ Bradicardia detectada:', fc);
   } else if (fc > rangoNormal.max) {
     console.warn('⚠️ Taquicardia detectada:', fc);
   }
-  
+
   if (fc > 150) {
     console.error('  Taquicardia CRÍTICA:', fc);
   } else if (fc < 50) {
@@ -5844,14 +5844,14 @@ private validarFrecuenciaCardiaca(fc: number, edad: number): void {
 
 private validarFrecuenciaRespiratoria(fr: number, edad: number): void {
   if (!fr) return;
-  
+
   // Rangos por edad
   let rangoNormal = { min: 12, max: 20 }; // Adulto
-  
+
   if (edad < 1) rangoNormal = { min: 30, max: 60 }; // Lactante
   else if (edad < 5) rangoNormal = { min: 20, max: 30 }; // Preescolar
   else if (edad < 12) rangoNormal = { min: 16, max: 25 }; // Escolar
-  
+
   if (fr < rangoNormal.min) {
     console.warn('⚠️ Bradipnea detectada:', fr);
   } else if (fr > rangoNormal.max) {
@@ -5861,7 +5861,7 @@ private validarFrecuenciaRespiratoria(fr: number, edad: number): void {
 
 private validarSaturacionOxigeno(satO2: number): void {
   if (!satO2) return;
-  
+
   if (satO2 < 90) {
     console.error('  Hipoxemia CRÍTICA:', satO2);
   } else if (satO2 < 95) {
@@ -5871,13 +5871,13 @@ private validarSaturacionOxigeno(satO2: number): void {
 
 private validarGlucosa(glucosa: number): void {
   if (!glucosa) return;
-  
+
   if (glucosa < 70) {
     console.warn('⚠️ Hipoglucemia detectada:', glucosa);
   } else if (glucosa > 200) {
     console.warn('⚠️ Hiperglucemia detectada:', glucosa);
   }
-  
+
   if (glucosa < 50) {
     console.error('  Hipoglucemia CRÍTICA:', glucosa);
   } else if (glucosa > 400) {
@@ -5895,7 +5895,7 @@ tieneSignosVitalesParaCalculos(): boolean {
 getIMCCalculado(): string | null {
   const peso = this.notaUrgenciasForm.get('peso')?.value;
   const talla = this.pacienteCompleto?.signosVitales?.[0]?.talla; // Obtener talla del historial
-  
+
   if (peso && talla) {
     const tallaM = talla / 100;
     const imc = peso / (tallaM * tallaM);
@@ -5907,7 +5907,7 @@ getIMCCalculado(): string | null {
 getSuperficieCorporal(): string | null {
   const peso = this.notaUrgenciasForm.get('peso')?.value;
   const talla = this.pacienteCompleto?.signosVitales?.[0]?.talla;
-  
+
   if (peso && talla) {
     // Fórmula de Mosteller: SC = √(peso × talla) / 60
     const sc = Math.sqrt(peso * talla) / 60;
@@ -5919,7 +5919,7 @@ getSuperficieCorporal(): string | null {
 getPresionArterialMedia(): number | null {
   const sistolica = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
   const diastolica = this.notaUrgenciasForm.get('presion_arterial_diastolica')?.value;
-  
+
   if (sistolica && diastolica) {
     // PAM = (2 × diastólica + sistólica) / 3
     return Math.round((2 * diastolica + sistolica) / 3);
@@ -6473,7 +6473,7 @@ tieneSignosVitalesPrevios(): boolean {
  */
 // propagarDatosAPostanestesica(): void {
 //   console.log('🔄 Propagando datos a Postanestésica desde Preanestésica y Postoperatoria...');
-  
+
 //   // Verificar que hay datos en documentos previos
 //   if (!this.notaPreanestesicaForm.valid) {
 //     this.mostrarErrorMetodo('Se requiere completar primero la Nota Preanestésica');
@@ -6483,7 +6483,7 @@ tieneSignosVitalesPrevios(): boolean {
 //   const datosPreanestesica = this.notaPreanestesicaForm.value;
 //   const datosPostoperatoria = this.notaPostoperatoriaForm?.value || {};
 //   const datosCaptura = this.capturaIngresoForm?.value || {};
-  
+
 //   try {
 //     // 🔥 PROPAGACIÓN COMPLETA A NOTA POSTANESTÉSICA
 //     this.notaPostanestesicaForm.patchValue({
@@ -6492,51 +6492,51 @@ tieneSignosVitalesPrevios(): boolean {
 //       hora_inicio: datosPostoperatoria.hora_inicio || '',
 //       hora_termino: datosPostoperatoria.hora_fin || '',
 //       quirofano: datosPostoperatoria.quirofano_utilizado || '',
-      
+
 //       // === INFORMACIÓN DEL PROCEDIMIENTO ===
 //       procedimiento_realizado: datosPostoperatoria.operacion_realizada || datosPreanestesica.procedimiento_quirurgico || '',
 //       clasificacion_asa: datosPreanestesica.asa || '',
-      
+
 //       // === TIPO Y TÉCNICA ANESTÉSICA ===
 //       tipo_anestesia: datosPreanestesica.tipo_anestesia || '',
 //       tecnica_anestesica: datosPreanestesica.tecnica_anestesica || '',
-      
+
 //       // === MEDICAMENTOS DESDE PREANESTÉSICA ===
 //       medicamentos_utilizados: this.construirMedicamentosUtilizados(datosPreanestesica),
 //       agentes_anestesicos: this.extraerAgentesAnestesicos(datosPreanestesica),
 //       analgesicos_utilizados: this.construirAnalgesicos(),
-      
+
 //       // === SIGNOS VITALES DE EGRESO (valores seguros por defecto) ===
 //       presion_arterial_egreso: this.construirPresionArterialNormal(datosCaptura),
 //       frecuencia_cardiaca_egreso: this.ajustarFrecuenciaCardiaca(datosCaptura.frecuencia_cardiaca),
 //       frecuencia_respiratoria_egreso: datosCaptura.frecuencia_respiratoria || 18,
 //       saturacion_oxigeno_egreso: datosCaptura.saturacion_oxigeno || 98,
 //       temperatura_egreso: datosCaptura.temperatura || 36.5,
-      
+
 //       // === ESCALA DE ALDRETE (valores óptimos por defecto) ===
 //       aldrete_actividad: 2, // Máximo
 //       aldrete_respiracion: 2, // Máximo
 //       aldrete_circulacion: 2, // Máximo
 //       aldrete_conciencia: 2, // Máximo
 //       aldrete_saturacion: 2, // Máximo
-      
+
 //       // === EVALUACIÓN CLÍNICA DE EGRESO ===
 //       estado_clinico_egreso: this.construirEstadoClinicoEgreso(datosPostoperatoria),
 //       estado_conciencia_egreso: 'Despierto, orientado',
 //       dolor_postoperatorio: 'Controlado con analgesia',
-      
+
 //       // === INFORMACIÓN DEL ANESTESIÓLOGO ===
 //       anestesiologo_nombre: datosPreanestesica.medico_anestesiologo || datosPostoperatoria.anestesiologo || '[Nombre del Anestesiólogo]',
 //       cedula_anestesiologo: datosPreanestesica.cedula_anestesiologo || '[Cédula]',
-      
+
 //       // === PLAN DE TRATAMIENTO ===
 //       plan_tratamiento: this.construirPlanTratamientoPostanestesico(datosPostoperatoria),
 //       tiempo_recuperacion: this.calcularTiempoRecuperacion(datosPreanestesica.asa),
 //       indicaciones_egreso: this.construirIndicacionesEgreso(datosPreanestesica, datosPostoperatoria),
-      
+
 //       // === PRONÓSTICO ===
 //       pronostico: datosPostoperatoria.pronostico || 'Favorable con recuperación anestésica satisfactoria',
-      
+
 //       // === CAMPOS SEGUROS POR DEFECTO ===
 //       incidentes_accidentes: datosPostoperatoria.incidentes_accidentes || 'Sin incidentes transanestésicos',
 //       complicaciones_transanestesicas: 'Sin complicaciones anestésicas',
@@ -6544,10 +6544,10 @@ tieneSignosVitalesPrevios(): boolean {
 //       sangrado: datosPostoperatoria.sangrado_estimado || 0,
 //       balance_hidrico: 'Equilibrado'
 //     });
-    
+
 //     console.log('✅ Datos propagados exitosamente a Nota Postanestésica');
 //     this.mostrarExito('✅ Datos propagados desde documentos previos. Ajuste valores según evolución real del paciente');
-    
+
 //   } catch (error) {
 //     console.error('❌ Error al propagar datos a Postanestésica:', error);
 //     this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
@@ -6560,7 +6560,7 @@ tieneSignosVitalesPrevios(): boolean {
  */
 propagarDatosAPostanestesica(): void {
   console.log('🔄 Propagando datos REALES a Postanestésica...');
-  
+
   if (!this.notaPreanestesicaForm.valid) {
     this.mostrarErrorMetodo('Se requiere completar primero la Nota Preanestésica');
     return;
@@ -6568,7 +6568,7 @@ propagarDatosAPostanestesica(): void {
 
   const datosPreanestesica = this.notaPreanestesicaForm.value;
   const datosPostoperatoria = this.notaPostoperatoriaForm?.value || {};
-  
+
   try {
     // 🔥 PROPAGACIÓN DE DATOS REALES ÚNICAMENTE
     this.notaPostanestesicaForm.patchValue({
@@ -6577,28 +6577,28 @@ propagarDatosAPostanestesica(): void {
       hora_inicio: datosPostoperatoria.hora_inicio || '',
       hora_termino: datosPostoperatoria.hora_fin || '',
       quirofano: datosPostoperatoria.quirofano_utilizado || '',
-      
+
       // === INFORMACIÓN REAL DEL PROCEDIMIENTO ===
       procedimiento_realizado: datosPostoperatoria.operacion_realizada || datosPreanestesica.procedimiento_quirurgico || '',
       clasificacion_asa: datosPreanestesica.asa || '',
-      
+
       // === TIPO Y TÉCNICA ANESTÉSICA REAL ===
       tipo_anestesia: datosPreanestesica.tipo_anestesia || '',
       tecnica_anestesica: datosPreanestesica.tecnica_anestesica || '',
-      
+
       // === INFORMACIÓN DEL ANESTESIÓLOGO REAL ===
       anestesiologo_nombre: datosPreanestesica.medico_anestesiologo || datosPostoperatoria.anestesiologo || '',
       cedula_anestesiologo: datosPreanestesica.cedula_anestesiologo || '',
-      
+
       // === PRONÓSTICO REAL ===
       pronostico: datosPostoperatoria.pronostico || '',
-      
+
       // === INCIDENTES REALES (si los hay) ===
       incidentes_accidentes: datosPostoperatoria.incidentes_accidentes || '',
-      
+
       // === SANGRADO REAL ===
       sangrado: datosPostoperatoria.sangrado_estimado || 0,
-      
+
       // === CAMPOS VACÍOS PARA LLENAR MANUALMENTE ===
       // Signos vitales de egreso - DEBEN llenarse manualmente
       presion_arterial_egreso: '',
@@ -6606,37 +6606,37 @@ propagarDatosAPostanestesica(): void {
       frecuencia_respiratoria_egreso: null,
       saturacion_oxigeno_egreso: null,
       temperatura_egreso: null,
-      
+
       // Escala de Aldrete - DEBE evaluarse en tiempo real
       aldrete_actividad: 0,
       aldrete_respiracion: 0,
       aldrete_circulacion: 0,
       aldrete_conciencia: 0,
       aldrete_saturacion: 0,
-      
+
       // Estados clínicos - DEBEN observarse y registrarse
       estado_clinico_egreso: '',
       estado_conciencia_egreso: '',
       dolor_postoperatorio: '',
-      
+
       // Medicamentos - DEBEN especificarse según lo usado realmente
       medicamentos_utilizados: '',
       agentes_anestesicos: '',
       analgesicos_utilizados: '',
-      
+
       // Plan de tratamiento - DEBE ser específico del caso
       plan_tratamiento: '',
       indicaciones_egreso: '',
       tiempo_recuperacion: '',
-      
+
       // Balance hídrico - DEBE calcularse con datos reales
       liquidos_administrados: null,
       balance_hidrico: ''
     });
-    
+
     console.log('✅ Datos reales propagados exitosamente');
     this.mostrarExito('✅ Datos base propagados. COMPLETE todos los campos con observaciones reales del paciente');
-    
+
   } catch (error) {
     console.error('❌ Error al propagar datos:', error);
     this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
@@ -6648,10 +6648,10 @@ propagarDatosAPostanestesica(): void {
  */
 private construirMedicamentosUtilizados(datosPreanestesica: any): string {
   const medicamentos = [];
-  
+
   // Medicamentos según tipo de anestesia
   const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
-  
+
   if (tipoAnestesia.includes('General')) {
     medicamentos.push('Propofol 2-2.5 mg/kg inducción');
     medicamentos.push('Fentanyl 2-5 mcg/kg analgesia');
@@ -6665,13 +6665,13 @@ private construirMedicamentosUtilizados(datosPreanestesica: any): string {
     medicamentos.push('Lidocaína 2% con epinefrina');
     medicamentos.push('Midazolam 1 mg ansiolisis');
   }
-  
+
   // Medicamentos de soporte
   medicamentos.push('Ondansetrón 4 mg antiemético');
   medicamentos.push('Dexametasona 8 mg antiinflamatorio');
-  
-  return medicamentos.length > 0 
-    ? medicamentos.join('\n• ') 
+
+  return medicamentos.length > 0
+    ? medicamentos.join('\n• ')
     : 'Medicamentos según protocolo anestésico estándar';
 }
 
@@ -6680,7 +6680,7 @@ private construirMedicamentosUtilizados(datosPreanestesica: any): string {
  */
 private extraerAgentesAnestesicos(datosPreanestesica: any): string {
   const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
-  
+
   if (tipoAnestesia.includes('General')) {
     return 'Sevoflurano, Propofol, Fentanyl, Rocuronio';
   } else if (tipoAnestesia.includes('Regional')) {
@@ -6688,7 +6688,7 @@ private extraerAgentesAnestesicos(datosPreanestesica: any): string {
   } else if (tipoAnestesia.includes('Local')) {
     return 'Lidocaína con epinefrina';
   }
-  
+
   return 'Según protocolo establecido';
 }
 
@@ -6705,11 +6705,11 @@ private construirAnalgesicos(): string {
 private construirPresionArterialNormal(datosCaptura: any): string {
   const sistolica = datosCaptura.presion_arterial_sistolica || 120;
   const diastolica = datosCaptura.presion_arterial_diastolica || 80;
-  
+
   // Ajustar a valores normales post-anestesia
   const sistolicaAjustada = Math.max(100, Math.min(140, sistolica));
   const diastolicaAjustada = Math.max(60, Math.min(90, diastolica));
-  
+
   return `${sistolicaAjustada}/${diastolicaAjustada}`;
 }
 
@@ -6718,7 +6718,7 @@ private construirPresionArterialNormal(datosCaptura: any): string {
  */
 private ajustarFrecuenciaCardiaca(fcInicial: number): number {
   if (!fcInicial) return 75; // Valor por defecto
-  
+
   // Mantener en rangos seguros post-anestesia (60-100)
   return Math.max(60, Math.min(100, fcInicial));
 }
@@ -6728,14 +6728,14 @@ private ajustarFrecuenciaCardiaca(fcInicial: number): number {
  */
 private construirEstadoClinicoEgreso(datosPostoperatoria: any): string {
   const estadoPostop = datosPostoperatoria.estado_postquirurgico || '';
-  
+
   if (estadoPostop.includes('estable')) {
     return 'Paciente estable, con recuperación anestésica satisfactoria, signos vitales normales';
   }
   if (estadoPostop.includes('crítico') || estadoPostop.includes('grave')) {
     return 'Paciente requiere vigilancia estrecha, signos vitales estables bajo monitoreo';
   }
-  
+
   return 'Paciente con recuperación anestésica adecuada, consciente, orientado, signos vitales estables';
 }
 
@@ -6744,18 +6744,18 @@ private construirEstadoClinicoEgreso(datosPostoperatoria: any): string {
  */
 private construirPlanTratamientoPostanestesico(datosPostoperatoria: any): string {
   const planPostop = datosPostoperatoria.plan_postoperatorio || '';
-  
+
   let plan = 'RECUPERACIÓN POSTANESTÉSICA:\n';
   plan += '• Monitoreo de signos vitales cada 15 minutos\n';
   plan += '• Escala de Aldrete cada 30 minutos hasta puntaje ≥9\n';
   plan += '• Control de dolor con escala EVA\n';
   plan += '• Vigilancia de náusea y vómito postoperatorio\n';
-  
+
   if (planPostop) {
     plan += '\nPLAN POSTOPERATORIO ESPECÍFICO:\n';
     plan += `• ${planPostop}`;
   }
-  
+
   return plan;
 }
 
@@ -6787,21 +6787,21 @@ private construirIndicacionesEgreso(datosPreanestesica: any, datosPostoperatoria
   indicaciones += '• Paciente despierto y orientado\n';
   indicaciones += '• Control adecuado del dolor\n';
   indicaciones += '• Sin náusea ni vómito\n';
-  
+
   // Indicaciones específicas según tipo de anestesia
   const tipoAnestesia = datosPreanestesica.tipo_anestesia || '';
   if (tipoAnestesia.includes('Regional')) {
     indicaciones += '• Recuperación parcial de función motora\n';
     indicaciones += '• Ausencia de bloqueo motor completo\n';
   }
-  
+
   // Indicaciones del postoperatorio
   const indicacionesPostop = datosPostoperatoria.indicaciones_postoperatorias || '';
   if (indicacionesPostop) {
     indicaciones += '\nINDICACIONES POSTOPERATORIAS:\n';
     indicaciones += `• ${indicacionesPostop}`;
   }
-  
+
   return indicaciones;
 }
 
@@ -6809,12 +6809,12 @@ private construirIndicacionesEgreso(datosPreanestesica: any, datosPostoperatoria
 // // Aplicar signos vitales de ingreso como base
 // aplicarSignosVitalesDeIngreso(): void {
 //   const signosIngreso = this.getSignosPrevios();
-  
+
 //   if (!this.tieneSignosVitalesPrevios()) {
 //     this.mostrarErrorMetodo('No hay signos vitales de ingreso disponibles');
 //     return;
 //   }
-  
+
 //   this.notaUrgenciasForm.patchValue({
 //     temperatura: signosIngreso.temperatura,
 //     presion_arterial_sistolica: signosIngreso.presion_arterial_sistolica,
@@ -6832,18 +6832,18 @@ private construirIndicacionesEgreso(datosPreanestesica: any, datosPostoperatoria
 aplicarSignosVitalesDeIngreso(): void {
   // Prevenir el comportamiento por defecto
   event?.preventDefault();
-  
+
   const signosIngreso = this.capturaIngresoForm?.value || {};
-  
+
   if (!this.tieneSignosVitalesDeIngreso()) {
     this.mostrarErrorMetodo('No hay signos vitales de ingreso disponibles para copiar');
     return;
   }
-  
+
   // Determinar qué formulario estamos llenando
   const formularioActual = this.formularioActivo;
   let targetForm: any = null;
-  
+
   switch (formularioActual) {
     case 'notaUrgencias':
       targetForm = this.notaUrgenciasForm;
@@ -6858,7 +6858,7 @@ aplicarSignosVitalesDeIngreso(): void {
 
   // Aplicar datos solo si existen
   const datosParaAplicar: any = {};
-  
+
   if (signosIngreso.temperatura) {
     datosParaAplicar.temperatura = signosIngreso.temperatura;
   }
@@ -6885,7 +6885,7 @@ aplicarSignosVitalesDeIngreso(): void {
   }
 
   targetForm.patchValue(datosParaAplicar);
-  
+
   const camposAplicados = Object.keys(datosParaAplicar).length;
   this.mostrarExito(`   Signos vitales de ingreso aplicados: ${camposAplicados} campos copiados`);
 }
@@ -6894,19 +6894,19 @@ aplicarSignosVitalesDeIngreso(): void {
 getCambioPresionArterial(): string {
   const actual = this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value;
   const previo = this.getSignosPrevios().presion_arterial_sistolica;
-  
+
   if (!actual || !previo) return '';
-  
+
   const diferencia = actual - previo;
   if (Math.abs(diferencia) < 5) return ''; // No mostrar cambios menores a 5 mmHg
-  
+
   return diferencia > 0 ? `+${diferencia}` : `${diferencia}`;
 }
 
 getColorCambioPresion(): string {
   const cambio = this.getCambioPresionArterial();
   if (!cambio) return '';
-  
+
   const valor = parseInt(cambio);
   if (valor > 20) return 'bg-red-100 text-red-700'; // Aumento significativo
   if (valor > 10) return 'bg-yellow-100 text-yellow-700'; // Aumento moderado
@@ -6918,7 +6918,7 @@ getColorCambioPresion(): string {
 getIconoCambioPresion(): string {
   const cambio = this.getCambioPresionArterial();
   if (!cambio) return '';
-  
+
   const valor = parseInt(cambio);
   return valor > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
 }
@@ -6927,19 +6927,19 @@ getIconoCambioPresion(): string {
 getCambioFrecuenciaCardiaca(): string {
   const actual = this.notaUrgenciasForm.get('frecuencia_cardiaca')?.value;
   const previo = this.getSignosPrevios().frecuencia_cardiaca;
-  
+
   if (!actual || !previo) return '';
-  
+
   const diferencia = actual - previo;
   if (Math.abs(diferencia) < 5) return ''; // No mostrar cambios menores a 5 lpm
-  
+
   return diferencia > 0 ? `+${diferencia}` : `${diferencia}`;
 }
 
 getColorCambioFC(): string {
   const cambio = this.getCambioFrecuenciaCardiaca();
   if (!cambio) return '';
-  
+
   const valor = parseInt(cambio);
   if (valor > 20 || valor < -20) return 'bg-red-100 text-red-700'; // Cambio significativo
   if (valor > 10 || valor < -10) return 'bg-yellow-100 text-yellow-700'; // Cambio moderado
@@ -6949,7 +6949,7 @@ getColorCambioFC(): string {
 getIconoCambioFC(): string {
   const cambio = this.getCambioFrecuenciaCardiaca();
   if (!cambio) return '';
-  
+
   const valor = parseInt(cambio);
   return valor > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
 }
@@ -6958,21 +6958,21 @@ getIconoCambioFC(): string {
 getCambioTemperatura(): string {
   const actual = this.notaUrgenciasForm.get('temperatura')?.value;
   const previo = this.getSignosPrevios().temperatura;
-  
+
   if (!actual || !previo) return '';
-  
+
   const diferencia = (actual - previo).toFixed(1);
   const diferenciaNum = parseFloat(diferencia);
-  
+
   if (Math.abs(diferenciaNum) < 0.3) return ''; // No mostrar cambios menores a 0.3°C
-  
+
   return diferenciaNum > 0 ? `+${diferencia}°` : `${diferencia}°`;
 }
 
 getColorCambioTemp(): string {
   const cambio = this.getCambioTemperatura();
   if (!cambio) return '';
-  
+
   const valor = parseFloat(cambio);
   if (valor > 1.0) return 'bg-red-100 text-red-700'; // Fiebre significativa
   if (valor > 0.5) return 'bg-yellow-100 text-yellow-700'; // Fiebre moderada
@@ -6984,7 +6984,7 @@ getColorCambioTemp(): string {
 getIconoCambioTemp(): string {
   const cambio = this.getCambioTemperatura();
   if (!cambio) return '';
-  
+
   const valor = parseFloat(cambio);
   return valor > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
 }
@@ -6992,7 +6992,7 @@ getIconoCambioTemp(): string {
 // 🔥 ACTUALIZAR EL MÉTODO construirResumenInterrogatorio (si no lo tienes)
 private construirResumenInterrogatorio(datos: any): string {
   const partes = [];
-  
+
   if (datos.interrogatorio_cardiovascular) {
     partes.push(`Cardiovascular: ${datos.interrogatorio_cardiovascular}`);
   }
@@ -7011,7 +7011,7 @@ private construirResumenInterrogatorio(datos: any): string {
   if (datos.interrogatorio_musculoesqueletico) {
     partes.push(`Musculoesquelético: ${datos.interrogatorio_musculoesqueletico}`);
   }
-  
+
   return partes.length > 0 ? partes.join('. ') + '.' : '';
 }
 // En el archivo perfil-paciente.ts - AGREGAR estos métodos auxiliares:
@@ -7021,17 +7021,17 @@ private construirResumenInterrogatorio(datos: any): string {
  */
 private construirResumenCompleto(datos: any): string {
   const partes = [];
-  
+
   // Padecimiento actual
   if (datos.padecimiento_actual) {
     partes.push(`MOTIVO DE CONSULTA: ${datos.padecimiento_actual}`);
   }
-  
+
   // Síntomas generales
   if (datos.sintomas_generales) {
     partes.push(`SÍNTOMAS ASOCIADOS: ${datos.sintomas_generales}`);
   }
-  
+
   // Interrogatorio por sistemas
   if (datos.interrogatorio_cardiovascular) {
     partes.push(`CARDIOVASCULAR: ${datos.interrogatorio_cardiovascular}`);
@@ -7056,7 +7056,7 @@ private construirResumenCompleto(datos: any): string {
   if (datos.alergias && datos.alergias !== 'Ninguna conocida') {
     partes.push(`ALERGIAS: ${datos.alergias}`);
   }
-  
+
   return partes.length > 0 ? partes.join('\n\n') : 'No se reportan síntomas específicos por sistemas.';
 }
 
@@ -7065,22 +7065,22 @@ private construirResumenCompleto(datos: any): string {
  */
 private construirExploracionCompleta(datos: any): string {
   const partes = [];
-  
+
   // Signos vitales
   const signos = this.construirSignosVitales(datos);
   if (signos) {
     partes.push(`SIGNOS VITALES:\n${signos}`);
   }
-  
+
   // Exploración general
   if (datos.exploracion_general) {
     partes.push(`EXPLORACIÓN GENERAL: ${datos.exploracion_general}`);
   }
-  
+
   if (datos.habitus_exterior) {
     partes.push(`HABITUS EXTERIOR: ${datos.habitus_exterior}`);
   }
-  
+
   // Exploración por sistemas
   if (datos.exploracion_cabeza) {
     partes.push(`CABEZA: ${datos.exploracion_cabeza}`);
@@ -7103,7 +7103,7 @@ private construirExploracionCompleta(datos: any): string {
   if (datos.exploracion_neurologico) {
     partes.push(`NEUROLÓGICO: ${datos.exploracion_neurologico}`);
   }
-  
+
   return partes.length > 0 ? partes.join('\n\n') : 'Sin hallazgos significativos en la exploración física.';
 }
 
@@ -7112,7 +7112,7 @@ private construirExploracionCompleta(datos: any): string {
  */
 private construirSignosVitales(datos: any): string {
   const signos = [];
-  
+
   if (datos.temperatura) {
     signos.push(`Temperatura: ${datos.temperatura}°C`);
   }
@@ -7137,7 +7137,7 @@ private construirSignosVitales(datos: any): string {
   if (datos.glucosa) {
     signos.push(`Glucosa: ${datos.glucosa} mg/dL`);
   }
-  
+
   return signos.join(', ');
 }
 
@@ -7148,10 +7148,10 @@ private construirPronosticoInicial(datos: any): string {
   if (!datos.impresion_diagnostica) {
     return 'Se reserva hasta completar evaluación preoperatoria completa';
   }
-  
+
   // Pronóstico básico según la impresión diagnóstica
   const diagnostico = datos.impresion_diagnostica.toLowerCase();
-  
+
   if (diagnostico.includes('apendicitis') || diagnostico.includes('apendicular')) {
     return 'Bueno para la vida, función y estético con manejo quirúrgico oportuno';
   }
@@ -7161,7 +7161,7 @@ private construirPronosticoInicial(datos: any): string {
   if (diagnostico.includes('colelitiasis') || diagnostico.includes('vesicular')) {
     return 'Bueno para la vida y función con colecistectomía laparoscópica';
   }
-  
+
   return 'Se reserva hasta completar evaluación preoperatoria y definir plan quirúrgico definitivo';
 }
 
@@ -7201,7 +7201,7 @@ private construirResultadosEstudios(datos: any): string {
 
 //   // Aquí podrías hacer la sincronización real con el backend
 //   console.log('🔄 Sincronizando signos vitales:', signosActuales);
-  
+
 //   this.mostrarExito('  Signos vitales sincronizados con el historial principal del paciente');
 // }
 
@@ -7209,7 +7209,7 @@ private construirResultadosEstudios(datos: any): string {
 sincronizarSignosVitales(): void {
   // Prevenir comportamiento por defecto
   event?.preventDefault();
-  
+
   const signosActuales = {
     temperatura: this.notaUrgenciasForm.get('temperatura')?.value,
     presion_arterial_sistolica: this.notaUrgenciasForm.get('presion_arterial_sistolica')?.value,
@@ -7223,7 +7223,7 @@ sincronizarSignosVitales(): void {
 
   // Verificar que hay datos para sincronizar
   const tieneDatos = Object.values(signosActuales).some(valor => valor !== null && valor !== undefined);
-  
+
   if (!tieneDatos) {
     this.mostrarErrorMetodo('No hay signos vitales para sincronizar');
     return;
@@ -7250,7 +7250,7 @@ sincronizarSignosVitales(): void {
   //   });
 
   console.log('🔄 Sincronizando signos vitales:', signosActuales);
-  
+
   // Contar cuántos campos se sincronizaron
   const camposSincronizados = Object.values(signosActuales).filter(valor => valor !== null && valor !== undefined).length;
   this.mostrarExito(`   Signos vitales sincronizados: ${camposSincronizados} campos actualizados en el historial principal`);
@@ -7282,7 +7282,7 @@ propagarDatosEvolucion(): void {
       // Datos del servicio (¡importante para la doctora!)
       servicio_destino: datos.servicio_destino,
       dias_hospitalizacion: datos.dias_hospitalizacion,
-      
+
       // Signos vitales actuales
       temperatura: datos.temperatura_actual,
       presion_arterial_sistolica: datos.presion_arterial_sistolica_actual,
@@ -7292,7 +7292,7 @@ propagarDatosEvolucion(): void {
       saturacion_oxigeno: datos.saturacion_oxigeno_actual,
       peso_actual: datos.peso_actual,
       talla_actual: datos.talla_actual,
-      
+
       // Exploración física actualizada
       habitus_exterior: datos.habitus_exterior_actual,
       exploracion_cabeza: datos.exploracion_cabeza_actual,
@@ -7302,13 +7302,13 @@ propagarDatosEvolucion(): void {
       exploracion_extremidades: datos.exploracion_extremidades_actual,
       exploracion_genitales: datos.exploracion_genitales_actual,
       exploracion_neurologico: datos.exploracion_neurologico_actual,
-      
+
       // Síntomas y evolución clínica
       sintomas_signos: datos.sintomas_signos_actuales,
       estado_nutricional: datos.estado_nutricional,
       estudios_laboratorio_gabinete: datos.estudios_laboratorio_gabinete,
       evolucion_analisis: datos.evolucion_analisis,
-      
+
       // Diagnósticos y plan
       diagnosticos: datos.diagnosticos,
       plan_estudios_tratamiento: datos.plan_estudios_tratamiento,
@@ -7318,7 +7318,7 @@ propagarDatosEvolucion(): void {
 
   numero_cama: this.camaSeleccionada?.numero || null,
   cama: this.camaSeleccionada ? `${this.camaSeleccionada.area}-${this.camaSeleccionada.numero}` : null,
-  
+
 
 
     });
@@ -7348,7 +7348,7 @@ console.log('- formulario final:', this.notaEvolucionForm.value);
  */
 propagarDatosPreoperatoriaAPreanestesica(): void {
   console.log('🔄 Propagando datos de Preoperatoria a Preanestésica...');
-  
+
   // Verificar que hay datos en Nota Preoperatoria
   if (!this.notaPreoperatoriaForm.valid) {
     this.mostrarErrorMetodo('Por favor complete primero la Nota Preoperatoria antes de propagar a Preanestésica');
@@ -7357,14 +7357,14 @@ propagarDatosPreoperatoriaAPreanestesica(): void {
 
   const datosPreoperatoria = this.notaPreoperatoriaForm.value;
   const datosCaptura = this.capturaIngresoForm?.value || {};
-  
+
   try {
     // 🔥 PROPAGACIÓN COMPLETA A NOTA PREANESTÉSICA
     this.notaPreanestesicaForm.patchValue({
       // === DATOS BÁSICOS AUTOMÁTICOS ===
       fecha_evaluacion: new Date().toISOString().split('T')[0],
       hora_evaluacion: new Date().toTimeString().slice(0, 5),
-      
+
       // === SIGNOS VITALES desde Captura Inicial ===
       peso: datosCaptura.peso || null,
       talla: datosCaptura.talla || null,
@@ -7373,38 +7373,38 @@ propagarDatosPreoperatoriaAPreanestesica(): void {
       frecuencia_respiratoria: datosCaptura.frecuencia_respiratoria || null,
       temperatura: datosCaptura.temperatura || null,
       saturacion_oxigeno: datosCaptura.saturacion_oxigeno || null,
-      
+
       // === EVALUACIÓN CLÍNICA desde Exploración Física ===
       estado_general: this.extraerEstadoGeneral(datosPreoperatoria),
       via_aerea: this.evaluarViaAerea(datosCaptura),
       sistema_cardiovascular: this.evaluarSistemaCardiovascular(datosCaptura, datosPreoperatoria),
       sistema_respiratorio: this.evaluarSistemaRespiratorio(datosCaptura, datosPreoperatoria),
       sistema_nervioso: this.evaluarSistemaNervioso(datosCaptura, datosPreoperatoria),
-      
+
       // === ANTECEDENTES desde Captura Inicial ===
       alergias_medicamentos: datosCaptura.alergias || 'Ninguna conocida',
-      
+
       // === CLASIFICACIÓN ASA desde Preoperatoria ===
       asa: datosPreoperatoria.riesgo_quirurgico || '',
       justificacion_asa: this.construirJustificacionASA(datosPreoperatoria),
-      
+
       // === INFORMACIÓN DEL PROCEDIMIENTO ===
       procedimiento_quirurgico: datosPreoperatoria.plan_quirurgico || '',
-      
+
       // === RIESGO ANESTÉSICO CALCULADO ===
       riesgo_anestesico: this.calcularRiesgoAnestesico(datosPreoperatoria.riesgo_quirurgico),
-      
+
       // === ESTUDIOS DE LABORATORIO ===
       laboratorios_relevantes: datosPreoperatoria.resultados_estudios || '',
-      
+
       // === PLAN ANESTÉSICO INICIAL ===
       plan_anestesia: this.generarPlanAnestesicoInicial(datosPreoperatoria),
       consideraciones_especiales: this.generarConsideracionesEspeciales(datosCaptura, datosPreoperatoria)
     });
-    
+
     console.log('✅ Datos propagados exitosamente a Nota Preanestésica');
     this.mostrarExito('✅ Datos propagados exitosamente desde Preoperatoria a Preanestésica');
-    
+
   } catch (error) {
     console.error('❌ Error al propagar datos a Preanestésica:', error);
     this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
@@ -7430,7 +7430,7 @@ private construirTensionArterial(datosCaptura: any): string {
 private extraerEstadoGeneral(datosPreoperatoria: any): string {
   // Buscar en la exploración física información sobre el estado general
   const exploracion = datosPreoperatoria.exploracion_fisica || '';
-  
+
   if (exploracion.toLowerCase().includes('buen estado')) {
     return 'Buen estado general, paciente cooperador';
   }
@@ -7440,7 +7440,7 @@ private extraerEstadoGeneral(datosPreoperatoria: any): string {
   if (exploracion.toLowerCase().includes('grave')) {
     return 'Estado general grave, alto riesgo';
   }
-  
+
   return 'Paciente en condiciones estables para evaluación anestesiológica';
 }
 
@@ -7451,9 +7451,9 @@ private evaluarViaAerea(datosCaptura: any): string {
   // Evaluación básica basada en exploración de cabeza y cuello
   const exploracionCabeza = datosCaptura.exploracion_cabeza || '';
   const exploracionCuello = datosCaptura.exploracion_cuello || '';
-  
+
   let evaluacion = 'Vía aérea permeable. ';
-  
+
   if (exploracionCabeza.toLowerCase().includes('normal') && exploracionCuello.toLowerCase().includes('normal')) {
     evaluacion += 'Anatomía normal, Mallampati pendiente de evaluar.';
   } else if (exploracionCuello.toLowerCase().includes('masa') || exploracionCuello.toLowerCase().includes('tumor')) {
@@ -7461,7 +7461,7 @@ private evaluarViaAerea(datosCaptura: any): string {
   } else {
     evaluacion += 'Sin alteraciones evidentes. Evaluación completa pendiente.';
   }
-  
+
   return evaluacion;
 }
 
@@ -7470,7 +7470,7 @@ private evaluarViaAerea(datosCaptura: any): string {
  */
 private evaluarSistemaCardiovascular(datosCaptura: any, datosPreoperatoria: any): string {
   const evaluacion = [];
-  
+
   // Signos vitales cardiovasculares
   if (datosCaptura.frecuencia_cardiaca) {
     const fc = parseInt(datosCaptura.frecuencia_cardiaca);
@@ -7482,7 +7482,7 @@ private evaluarSistemaCardiovascular(datosCaptura: any, datosPreoperatoria: any)
       evaluacion.push('Frecuencia cardíaca normal');
     }
   }
-  
+
   // Presión arterial
   if (datosCaptura.presion_arterial_sistolica) {
     const pas = parseInt(datosCaptura.presion_arterial_sistolica);
@@ -7494,15 +7494,15 @@ private evaluarSistemaCardiovascular(datosCaptura: any, datosPreoperatoria: any)
       evaluacion.push('Presión arterial en rangos normales');
     }
   }
-  
+
   // Exploración cardiovascular
   const exploracionTorax = datosCaptura.exploracion_torax || '';
   if (exploracionTorax.toLowerCase().includes('soplo')) {
     evaluacion.push('ATENCIÓN: Soplo cardíaco detectado');
   }
-  
-  return evaluacion.length > 0 
-    ? evaluacion.join('. ') + '.' 
+
+  return evaluacion.length > 0
+    ? evaluacion.join('. ') + '.'
     : 'Sistema cardiovascular sin alteraciones evidentes en evaluación inicial.';
 }
 
@@ -7511,7 +7511,7 @@ private evaluarSistemaCardiovascular(datosCaptura: any, datosPreoperatoria: any)
  */
 private evaluarSistemaRespiratorio(datosCaptura: any, datosPreoperatoria: any): string {
   const evaluacion = [];
-  
+
   // Frecuencia respiratoria
   if (datosCaptura.frecuencia_respiratoria) {
     const fr = parseInt(datosCaptura.frecuencia_respiratoria);
@@ -7523,7 +7523,7 @@ private evaluarSistemaRespiratorio(datosCaptura: any, datosPreoperatoria: any): 
       evaluacion.push('Frecuencia respiratoria normal');
     }
   }
-  
+
   // Saturación de oxígeno
   if (datosCaptura.saturacion_oxigeno) {
     const sat = parseInt(datosCaptura.saturacion_oxigeno);
@@ -7533,15 +7533,15 @@ private evaluarSistemaRespiratorio(datosCaptura: any, datosPreoperatoria: any): 
       evaluacion.push('Saturación de oxígeno adecuada');
     }
   }
-  
+
   // Exploración pulmonar
   const exploracionTorax = datosCaptura.exploracion_torax || '';
   if (exploracionTorax.toLowerCase().includes('estertores') || exploracionTorax.toLowerCase().includes('roncus')) {
     evaluacion.push('Ruidos adventicios detectados');
   }
-  
-  return evaluacion.length > 0 
-    ? evaluacion.join('. ') + '.' 
+
+  return evaluacion.length > 0
+    ? evaluacion.join('. ') + '.'
     : 'Sistema respiratorio sin alteraciones evidentes.';
 }
 
@@ -7550,14 +7550,14 @@ private evaluarSistemaRespiratorio(datosCaptura: any, datosPreoperatoria: any): 
  */
 private evaluarSistemaNervioso(datosCaptura: any, datosPreoperatoria: any): string {
   const exploracionNeuro = datosCaptura.exploracion_neurologico || '';
-  
+
   if (exploracionNeuro.toLowerCase().includes('normal')) {
     return 'Sistema nervioso sin alteraciones. Paciente consciente, orientado, cooperador.';
   }
   if (exploracionNeuro.toLowerCase().includes('alterado')) {
     return 'ATENCIÓN: Alteraciones neurológicas detectadas que requieren evaluación especializada.';
   }
-  
+
   return 'Paciente consciente y orientado. Evaluación neurológica completa pendiente.';
 }
 
@@ -7566,7 +7566,7 @@ private evaluarSistemaNervioso(datosCaptura: any, datosPreoperatoria: any): stri
  */
 private construirJustificacionASA(datosPreoperatoria: any): string {
   const asa = datosPreoperatoria.riesgo_quirurgico || '';
-  
+
   switch (asa) {
     case 'ASA I':
       return 'Paciente sano, sin alteraciones sistémicas';
@@ -7611,9 +7611,9 @@ private calcularRiesgoAnestesico(asaPreoperatoria: string): string {
 private generarPlanAnestesicoInicial(datosPreoperatoria: any): string {
   const planQuirurgico = datosPreoperatoria.plan_quirurgico || '';
   const tipoNota = datosPreoperatoria.tipo_cirugia || '';
-  
+
   let plan = '';
-  
+
   // Según tipo de cirugía
   if (tipoNota === 'Electiva') {
     plan = 'Anestesia programada. ';
@@ -7622,7 +7622,7 @@ private generarPlanAnestesicoInicial(datosPreoperatoria: any): string {
   } else if (tipoNota === 'Emergente') {
     plan = 'Anestesia de emergencia. ';
   }
-  
+
   // Según procedimiento (análisis básico)
   if (planQuirurgico.toLowerCase().includes('apendicectomía')) {
     plan += 'Se sugiere anestesia general balanceada con intubación orotraqueal.';
@@ -7633,7 +7633,7 @@ private generarPlanAnestesicoInicial(datosPreoperatoria: any): string {
   } else {
     plan += 'Técnica anestésica a definir según procedimiento específico y condiciones del paciente.';
   }
-  
+
   return plan;
 }
 
@@ -7642,32 +7642,32 @@ private generarPlanAnestesicoInicial(datosPreoperatoria: any): string {
  */
 private generarConsideracionesEspeciales(datosCaptura: any, datosPreoperatoria: any): string {
   const consideraciones = [];
-  
+
   // Alergias
   if (datosCaptura.alergias && datosCaptura.alergias !== 'Ninguna conocida') {
     consideraciones.push(`ALERGIAS: ${datosCaptura.alergias}`);
   }
-  
+
   // Edad pediátrica
   const edad = this.calcularEdad();
   if (edad < 18) {
     consideraciones.push('PACIENTE PEDIÁTRICO: Considerar dosis y equipos apropiados para edad');
   }
-  
+
   // Ayuno
   if (datosPreoperatoria.tipo_cirugia === 'Urgente' || datosPreoperatoria.tipo_cirugia === 'Emergente') {
     consideraciones.push('CIRUGÍA DE URGENCIA: Verificar estado de ayuno, considerar estómago lleno');
   }
-  
+
   // Signos vitales alterados
   if (datosCaptura.presion_arterial_sistolica > 140) {
     consideraciones.push('HIPERTENSIÓN ARTERIAL: Control preoperatorio necesario');
   }
-  
+
   if (consideraciones.length === 0) {
     consideraciones.push('Sin consideraciones especiales adicionales identificadas');
   }
-  
+
   return consideraciones.join('\n• ');
 }
 
@@ -7679,7 +7679,7 @@ private generarConsideracionesEspeciales(datosCaptura: any, datosPreoperatoria: 
  */
 propagarDatosPreoperatoriaAPostoperatoria(): void {
   console.log('🔄 Propagando datos de Preoperatoria a Postoperatoria...');
-  
+
   // Verificar que hay datos en Nota Preoperatoria
   if (!this.notaPreoperatoriaForm.valid) {
     this.mostrarErrorMetodo('Por favor complete primero la Nota Preoperatoria antes de propagar a Postoperatoria');
@@ -7688,26 +7688,26 @@ propagarDatosPreoperatoriaAPostoperatoria(): void {
 
   const datosPreoperatoria = this.notaPreoperatoriaForm.value;
   const datosCaptura = this.capturaIngresoForm?.value || {};
-  
+
   try {
     // 🔥 PROPAGACIÓN COMPLETA A NOTA POSTOPERATORIA
     this.notaPostoperatoriaForm.patchValue({
       // === INFORMACIÓN TEMPORAL AUTOMÁTICA ===
       fecha_cirugia: datosPreoperatoria.fecha_cirugia || new Date().toISOString().split('T')[0],
       servicio_hospitalizacion: 'Cirugía General',
-      
+
       // === DIAGNÓSTICOS PROPAGADOS ===
       diagnostico_preoperatorio: datosPreoperatoria.diagnostico_preoperatorio || '',
-      
+
       // === PROCEDIMIENTOS DESDE PREOPERATORIA ===
       operacion_planeada: this.extraerOperacionPlaneada(datosPreoperatoria),
-      
+
       // === INFORMACIÓN DEL EQUIPO QUIRÚRGICO ===
       cirujano_principal: this.medicoCompleto?.nombre_completo || 'Dr./Dra. [Nombre del Cirujano]',
       anestesiologo: 'Dr./Dra. [Nombre del Anestesiólogo]',
       instrumentista: '[Nombre del Instrumentista]',
       circulante: '[Nombre de la Circulante]',
-      
+
       // === VALORES POR DEFECTO SEGUROS ===
       conteo_gasas_completo: 'Correcto',
       conteo_instrumental_completo: 'Correcto',
@@ -7718,17 +7718,17 @@ propagarDatosPreoperatoriaAPostoperatoria(): void {
       estudios_transoperatorios: 'No se realizaron estudios transoperatorios',
       estabilidad_hemodinamica: 'Estable',
       piezas_enviadas_patologia: false,
-      
+
       // === EVALUACIONES INICIALES ===
       cirugia_sin_complicaciones: false, // Se debe marcar manualmente después de la cirugía
       objetivos_alcanzados: false, // Se debe confirmar manualmente
       nota_completa: false, // Se marca al final
       revision_cirujano: false // Se marca al final
     });
-    
+
     console.log('✅ Datos base propagados exitosamente a Nota Postoperatoria');
     this.mostrarExito('✅ Datos base propagados. Complete la información específica del procedimiento realizado');
-    
+
   } catch (error) {
     console.error('❌ Error al propagar datos a Postoperatoria:', error);
     this.mostrarErrorMetodo('Error al propagar datos. Intente nuevamente.');
@@ -7740,7 +7740,7 @@ propagarDatosPreoperatoriaAPostoperatoria(): void {
  */
 private extraerOperacionPlaneada(datosPreoperatoria: any): string {
   const planQuirurgico = datosPreoperatoria.plan_quirurgico || '';
-  
+
   // Analizar el plan quirúrgico para extraer el procedimiento específico
   if (planQuirurgico.toLowerCase().includes('apendicectomía')) {
     return 'Apendicectomía laparoscópica';
@@ -7757,7 +7757,7 @@ private extraerOperacionPlaneada(datosPreoperatoria: any): string {
   if (planQuirurgico.toLowerCase().includes('histerectomía')) {
     return 'Histerectomía abdominal total';
   }
-  
+
   // Si no se puede determinar, usar el plan quirúrgico completo
   return planQuirurgico || 'Procedimiento quirúrgico según plan preoperatorio';
 }
@@ -7770,7 +7770,7 @@ private extraerOperacionPlaneada(datosPreoperatoria: any): string {
  */
 autocompletarSegunProcedimiento(): void {
   const operacionRealizada = this.notaPostoperatoriaForm.get('operacion_realizada')?.value || '';
-  
+
   if (!operacionRealizada) {
     this.mostrarErrorMetodo('Primero especifique la operación realizada');
     return;
@@ -7778,7 +7778,7 @@ autocompletarSegunProcedimiento(): void {
 
   try {
     let datosAutocompletado = {};
-    
+
     // 🔥 APENDICECTOMÍA
     if (operacionRealizada.toLowerCase().includes('apendicectomía')) {
       datosAutocompletado = {
@@ -7795,7 +7795,7 @@ autocompletarSegunProcedimiento(): void {
         pronostico: 'Excelente para la vida y función'
       };
     }
-    
+
     // 🔥 COLECISTECTOMÍA
     else if (operacionRealizada.toLowerCase().includes('colecistectomía')) {
       datosAutocompletado = {
@@ -7812,7 +7812,7 @@ autocompletarSegunProcedimiento(): void {
         pronostico: 'Bueno para la vida y función'
       };
     }
-    
+
     // 🔥 HERNIA INGUINAL
     else if (operacionRealizada.toLowerCase().includes('hernia') || operacionRealizada.toLowerCase().includes('plastia')) {
       datosAutocompletado = {
@@ -7829,17 +7829,17 @@ autocompletarSegunProcedimiento(): void {
         pronostico: 'Excelente para la vida y función'
       };
     }
-    
+
     // Si no hay procedimiento específico conocido
     else {
       this.mostrarErrorMetodo('Procedimiento no reconocido para autocompletado. Complete manualmente.');
       return;
     }
-    
+
     // Aplicar el autocompletado
     this.notaPostoperatoriaForm.patchValue(datosAutocompletado);
     this.mostrarExito('✅ Datos autocompletados según procedimiento. Revise y ajuste según hallazgos específicos.');
-    
+
   } catch (error) {
     console.error('❌ Error en autocompletado:', error);
     this.mostrarErrorMetodo('Error al autocompletar. Complete manualmente.');
@@ -7852,14 +7852,14 @@ autocompletarSegunProcedimiento(): void {
 actualizarDuracionCirugia(): void {
   const horaInicio = this.notaPostoperatoriaForm.get('hora_inicio')?.value;
   const horaFin = this.notaPostoperatoriaForm.get('hora_fin')?.value;
-  
+
   if (horaInicio && horaFin) {
     const duracion = this.calcularDuracionCirugia();
     if (duracion !== null) {
       const horas = Math.floor(duracion / 60);
       const minutos = duracion % 60;
       const duracionTexto = horas > 0 ? `${horas}h ${minutos}min` : `${minutos} minutos`;
-      
+
       console.log(`⏱️ Duración calculada: ${duracionTexto}`);
       this.mostrarExito(`⏱️ Duración de cirugía: ${duracionTexto}`);
     }
@@ -7873,20 +7873,20 @@ actualizarDuracionCirugia(): void {
 validarCheckboxesFinales(): boolean {
   const checkboxes = [
     'cirugia_sin_complicaciones',
-    'objetivos_alcanzados', 
+    'objetivos_alcanzados',
     'nota_completa',
     'revision_cirujano'
   ];
-  
-  const noMarcados = checkboxes.filter(checkbox => 
+
+  const noMarcados = checkboxes.filter(checkbox =>
     !this.notaPostoperatoriaForm.get(checkbox)?.value
   );
-  
+
   if (noMarcados.length > 0) {
     this.mostrarErrorMetodo(`Debe marcar las siguientes validaciones: ${noMarcados.join(', ')}`);
     return false;
   }
-  
+
   return true;
 }
 
@@ -7894,17 +7894,17 @@ validarCheckboxesFinales(): boolean {
 aplicarSignosVitalesDeEvolucion(): void {
   // Prevenir el comportamiento por defecto del formulario
   event?.preventDefault();
-  
+
   const signosEvolucion = this.capturaEvolucionForm.value;
-  
+
   if (!this.tieneSignosVitalesDeEvolucion()) {
     this.mostrarErrorMetodo('No hay signos vitales de evolución disponibles para copiar');
     return;
   }
-  
+
   // Aplicar solo los valores que existen
   const datosParaAplicar: any = {};
-  
+
   if (signosEvolucion.temperatura_actual) {
     datosParaAplicar.temperatura = signosEvolucion.temperatura_actual;
   }
@@ -7946,8 +7946,8 @@ aplicarSignosVitalesDeEvolucion(): void {
 
 tieneSignosVitalesDeEvolucion(): boolean {
   const signos = this.capturaEvolucionForm.value;
-  return !!(signos.temperatura_actual || 
-           signos.presion_arterial_sistolica_actual || 
+  return !!(signos.temperatura_actual ||
+           signos.presion_arterial_sistolica_actual ||
            signos.frecuencia_cardiaca_actual ||
            signos.frecuencia_respiratoria_actual ||
            signos.saturacion_oxigeno_actual ||
@@ -7957,8 +7957,8 @@ tieneSignosVitalesDeEvolucion(): boolean {
 
 tieneSignosVitalesDeIngreso(): boolean {
   const signos = this.capturaIngresoForm?.value || {};
-  return !!(signos.temperatura || 
-           signos.presion_arterial_sistolica || 
+  return !!(signos.temperatura ||
+           signos.presion_arterial_sistolica ||
            signos.frecuencia_cardiaca ||
            signos.frecuencia_respiratoria ||
            signos.saturacion_oxigeno ||
@@ -8014,7 +8014,7 @@ guardarCapturaEvolucion(): void {
   console.log('💾 Guardando captura de evolución...');
 
   const datos = this.capturaEvolucionForm.value;
-  
+
   // Simular guardado (aquí conectarías con tu backend)
   setTimeout(() => {
     this.formularioEstado.capturaEvolucion = true;
@@ -8040,7 +8040,7 @@ guardarCapturaEvolucion(): void {
 //     exploracion_genitales: [''],
 //     exploracion_neurologico: [''],
 //     habitus_exterior: [''],
-    
+
 //     // Antecedentes (una sola vez)
 //     antecedentes_heredo_familiares: ['', Validators.required],
 //     alergias: ['', Validators.required],
@@ -8061,11 +8061,11 @@ guardarCapturaEvolucion(): void {
 // interrogatorio_musculoesqueletico: [''],
 // interrogatorio_endocrino: [''],
 // interrogatorio_tegumentario: [''],
-    
+
 //     // Padecimiento actual
 //     padecimiento_actual: ['', Validators.required],
 //     sintomas_generales: [''],
-    
+
 //     // Signos vitales de ingreso
 //     presion_arterial_sistolica: [null],
 //     presion_arterial_diastolica: [null],
@@ -8075,14 +8075,14 @@ guardarCapturaEvolucion(): void {
 //     saturacion_oxigeno: [null],
 //     peso: [null],
 //     talla: [null],
-    
+
 //     // Diagnóstico inicial
 //     impresion_diagnostica: ['', Validators.required],
 //     plan_terapeutico: ['', Validators.required],
 
 //     // Signos vitales de ingreso (OBLIGATORIOS)
 // presion_arterial_sistolica: [null, Validators.required],
-// presion_arterial_diastolica: [null, Validators.required], 
+// presion_arterial_diastolica: [null, Validators.required],
 // frecuencia_cardiaca: [null, Validators.required],
 // frecuencia_respiratoria: [null, Validators.required],
 // temperatura: [null, Validators.required],
@@ -8108,18 +8108,18 @@ private initializeCapturaIngresoForm(): FormGroup {
     exploracion_genitales: [''],
     exploracion_neurologico: [''],
     habitus_exterior: [''],
-    
+
     // Antecedentes (una sola vez)
     antecedentes_heredo_familiares: ['', Validators.required],
     alergias: ['', Validators.required],
-    
+
     // Antecedentes personales no patológicos
     habitos_higienicos: [''],
     habitos_alimenticios: [''],
     actividad_fisica: [''],
     vivienda: [''],
     toxicomanias: [''],
-    
+
     // Interrogatorio por aparatos y sistemas
     interrogatorio_cardiovascular: [''],
     interrogatorio_respiratorio: [''],
@@ -8129,14 +8129,14 @@ private initializeCapturaIngresoForm(): FormGroup {
     interrogatorio_musculoesqueletico: [''],
     interrogatorio_endocrino: [''],
     interrogatorio_tegumentario: [''],
-    
+
     // Padecimiento actual
     padecimiento_actual: ['', Validators.required],
     sintomas_generales: [''],
-    
+
     //   SIGNOS VITALES ÚNICOS CON VALIDACIONES CORRECTAS
     presion_arterial_sistolica: [null, Validators.required],
-    presion_arterial_diastolica: [null, Validators.required], 
+    presion_arterial_diastolica: [null, Validators.required],
     frecuencia_cardiaca: [null, Validators.required],
     frecuencia_respiratoria: [null, Validators.required],
     temperatura: [null, Validators.required],
@@ -8145,7 +8145,7 @@ private initializeCapturaIngresoForm(): FormGroup {
     talla: [null, Validators.required],
     glucosa: [null],
     observaciones_signos_vitales: [''],
-    
+
     // Diagnóstico inicial
     impresion_diagnostica: ['', Validators.required],
     plan_terapeutico: ['', Validators.required]
@@ -8157,27 +8157,27 @@ private initializeCapturaIngresoForm(): FormGroup {
 //   return this.fb.group({
 //     // Selector de servicio (CLAVE!)
 //     servicio_destino: ['', Validators.required], // Urgencias, Medicina Interna, Cirugía
-    
+
 //     // Evolución actual
 //     evolucion_analisis: ['', Validators.required],
 //     diagnosticos: ['', Validators.required],
 //     plan_estudios_tratamiento: ['', Validators.required],
 //     pronostico: ['', Validators.required],
-    
+
 //     // Signos vitales actuales
 //     presion_arterial_sistolica_actual: [null],
 //     frecuencia_cardiaca_actual: [null],
 //     temperatura_actual: [null],
 //     saturacion_oxigeno_actual: [null],
 //     peso_actual: [null],
-    
+
 //     // Exploración de seguimiento
 //     habitus_exterior_actual: [''],
 //     estado_nutricional: [''],
-    
+
 //     // Días hospitalización
 //     dias_hospitalizacion: [null],
-    
+
 //     // Interconsultas
 //     interconsultas: ['No se solicitaron interconsultas']
 //   });
@@ -8189,7 +8189,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
     // 🏥 DATOS DEL SERVICIO (petición especial de la doctora)
     servicio_destino: ['', Validators.required],
     dias_hospitalizacion: [null, Validators.required],
-    
+
     // 🩺 SIGNOS VITALES ACTUALES (completos como el ejemplo)
     presion_arterial_sistolica_actual: [null],
     presion_arterial_diastolica_actual: [null],
@@ -8199,7 +8199,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
     saturacion_oxigeno_actual: [null],
     peso_actual: [null],
     talla_actual: [null],
-    
+
     // 🔍 EXPLORACIÓN FÍSICA DETALLADA (como el ejemplo)
     habitus_exterior_actual: ['', Validators.required],
     exploracion_cabeza_actual: [''],
@@ -8209,21 +8209,21 @@ private initializeCapturaEvolucionForm(): FormGroup {
     exploracion_extremidades_actual: [''],
     exploracion_genitales_actual: [''],
     exploracion_neurologico_actual: [''],
-    
+
     // 📊 SÍNTOMAS Y ESTADO ACTUAL (como el ejemplo)
     sintomas_signos_actuales: ['', Validators.required], // "Paciente sin dificultad respiratoria..."
     estado_nutricional: ['', Validators.required], // "Peso adecuado para la edad"
-    
+
     // 🧪 ESTUDIOS Y EVOLUCIÓN (como el ejemplo)
     estudios_laboratorio_gabinete: [''], // "no nuevos"
     evolucion_analisis: ['', Validators.required], // "Paciente con mejoría respiratoria..."
-    
+
     // 🎯 DIAGNÓSTICOS Y PLAN (como el ejemplo)
     diagnosticos: ['', Validators.required],
     plan_estudios_tratamiento: ['', Validators.required],
     interconsultas: [''], // "Por el momento no amerita"
     pronostico: ['', Validators.required], // "Estable, se espera bueno"
-    
+
     // 📝 INDICACIONES ADICIONALES
     indicaciones_medicas: ['']
   });
@@ -8383,7 +8383,7 @@ private initializeCapturaEvolucionForm(): FormGroup {
         formularioActivo: this.formularioActivo,
         signosVitales: this.signosVitalesForm.value,
         historiaClinica: this.historiaClinicaForm.value,
-        hojaFrontal: this.hojaFrontalForm?.value || {}, 
+        hojaFrontal: this.hojaFrontalForm?.value || {},
         notaUrgencias: this.notaUrgenciasForm.value,
         notaEvolucion: this.notaEvolucionForm.value,
         consentimiento: this.consentimientoForm.value,
@@ -8625,7 +8625,7 @@ verificarEstadoFormulario(): void {
   console.log('🔍 Estado del formulario Nota Urgencias:');
   console.log('Válido:', this.notaUrgenciasForm.valid);
   console.log('Errores por campo:');
-  
+
   Object.keys(this.notaUrgenciasForm.controls).forEach(key => {
     const control = this.notaUrgenciasForm.get(key);
     if (control && control.invalid) {
@@ -8950,20 +8950,20 @@ getGruposVisibles(): any[] {
 
   limpiarCama(): void {
   console.log('🗑️ Limpiando selección de cama');
-  
+
   this.camaSeleccionada = null;
   this.filtroCama = '';
-  
+
   // 🔥 LIMPIAR EN TODOS LOS FORMULARIOS
   const formulariosConCama = [
     'historiaClinicaForm',
-    'notaUrgenciasForm', 
+    'notaUrgenciasForm',
     'notaEvolucionForm',
     'notaPreoperatoriaForm',
     'notaPostoperatoriaForm',
     'notaInterconsultaForm'
   ];
-  
+
   formulariosConCama.forEach(formName => {
     const form = (this as any)[formName];
     if (form) {
@@ -8975,26 +8975,26 @@ getGruposVisibles(): any[] {
       }
     }
   });
-  
+
   console.log('  Cama limpiada de todos los formularios');
 }
 
   seleccionarCama(cama: any): void {
   console.log('🛏️ Seleccionando cama:', cama);
-  
+
   this.camaSeleccionada = cama;
   this.filtroCama = cama.numero;
   this.mostrarDropdownCamas = false;
-  
+
   // 🔥 SINCRONIZAR CON TODOS LOS FORMULARIOS RELEVANTES
   const numeroCama = `${cama.area ? cama.area + '-' : ''}${cama.numero}`;
-  
+
   // Historia Clínica
   if (this.historiaClinicaForm && this.historiaClinicaForm.get('numero_cama')) {
     this.historiaClinicaForm.get('numero_cama')?.setValue(numeroCama);
     this.historiaClinicaForm.get('id_cama')?.setValue(cama.id_cama);
   }
-  
+
   // Nota Urgencias
   if (this.notaUrgenciasForm && this.notaUrgenciasForm.get('numero_cama')) {
     this.notaUrgenciasForm.get('numero_cama')?.setValue(numeroCama);
@@ -9003,7 +9003,7 @@ getGruposVisibles(): any[] {
       this.notaUrgenciasForm.get('id_cama')?.setValue(cama.id_cama);
     }
   }
-  
+
   // Nota Evolución
   if (this.notaEvolucionForm && this.notaEvolucionForm.get('numero_cama')) {
     this.notaEvolucionForm.get('numero_cama')?.setValue(numeroCama);
@@ -9011,14 +9011,14 @@ getGruposVisibles(): any[] {
       this.notaEvolucionForm.get('id_cama')?.setValue(cama.id_cama);
     }
   }
-  
+
   // Otros formularios que usen cama
   const formulariosConCama = [
     'notaPreoperatoriaForm',
-    'notaPostoperatoriaForm', 
+    'notaPostoperatoriaForm',
     'notaInterconsultaForm'
   ];
-  
+
   formulariosConCama.forEach(formName => {
     const form = (this as any)[formName];
     if (form && form.get('numero_cama')) {
@@ -9028,7 +9028,7 @@ getGruposVisibles(): any[] {
       }
     }
   });
-  
+
   console.log('  Cama sincronizada con formularios:', {
     cama: numeroCama,
     id_cama: cama.id_cama,
@@ -9204,7 +9204,7 @@ async guardarHojaFrontal(): Promise<void> {
       this.error = 'Por favor complete todos los campos obligatorios';
       return;
     }
-  
+
     if (!this.pacienteCompleto?.expediente.id_expediente) {
       throw new Error('No hay expediente disponible');
     }
@@ -9220,10 +9220,10 @@ async guardarHojaFrontal(): Promise<void> {
       id_expediente: this.pacienteCompleto.expediente.id_expediente,
       id_paciente: this.pacienteCompleto.paciente.id_paciente,
       id_personal_registro: this.medicoActual!,
-      
+
       // Datos básicos
       ...this.hojaFrontalForm.value,
-      
+
       // Generar campos adicionales
       folio: this.generarFolioHojaFrontal(),
       fecha_apertura: new Date().toISOString(),
@@ -9313,9 +9313,9 @@ toggleContacto2(event?: Event): void {
   } else {
     this.mostrarContacto2 = !this.mostrarContacto2;
   }
-  
+
   console.log('🔄 Toggle contacto 2:', this.mostrarContacto2);
-  
+
   if (!this.mostrarContacto2) {
     this.limpiarContacto2();
   }
@@ -9350,7 +9350,7 @@ onTextareaKeydown(event: KeyboardEvent): void {
   if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
     event.stopPropagation();
   }
-  
+
   // Permitir navegación normal con Tab
   if (event.key === 'Tab') {
     return;
@@ -9376,7 +9376,7 @@ async verificarCompletitudNOM004(): Promise<void> {
 
   try {
     this.isLoading = true;
-    
+
     const response = await firstValueFrom(
       this.hojaFrontalService.verificarCompletitudNOM004(this.pacienteCompleto.expediente.id_expediente)
     ) as ApiResponse<any>;
@@ -9405,7 +9405,7 @@ async generarCaratula(): Promise<void> {
 
   try {
     this.isLoading = true;
-    
+
     const blob = await firstValueFrom(
       this.hojaFrontalService.generarCaratula(this.pacienteCompleto.expediente.id_expediente)
     );
@@ -9417,7 +9417,7 @@ async generarCaratula(): Promise<void> {
       link.download = `Caratula_${this.pacienteCompleto.expediente.numero_expediente}.pdf`;
       link.click();
       window.URL.revokeObjectURL(url);
-      
+
       this.success = 'Carátula generada exitosamente';
       console.log('  Carátula generada exitosamente');
     }
