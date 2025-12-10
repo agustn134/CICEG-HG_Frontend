@@ -678,7 +678,6 @@ desactivarModoPresentacion(): void {
   console.log('🔧 Modo desarrollo activado - Todos los documentos');
 }
 
-//////////////////////////// INICIO FORMULARIO /////////////////////////////////////
   gruposFormularios = {
     basicos: {
       nombre: 'Documentos Básicos',
@@ -748,10 +747,6 @@ desactivarModoPresentacion(): void {
   formularios: { [key: string]: FormGroup } = {};
   mostrarModalEditarExpediente = false;
   numeroAdministrativoTemporal = '';
-//////////////////////////// FIN FORMULARIO /////////////////////////////////////
-
-
-
 
   constructor(
     private authService: AuthService,
@@ -798,7 +793,7 @@ desactivarModoPresentacion(): void {
     private medicamentosService: MedicamentosService,
     private validacionesService: ValidacionesComunesService,
     private logoResolverService: LogoResolverService,
-    private modoInteligenteService: ModoInteligenteService //   AGREGAR
+    private modoInteligenteService: ModoInteligenteService
   ) {
     this.inicializarFormularios();
     this.signosVitalesForm = this.initializeSignosVitalesForm();
@@ -819,16 +814,10 @@ desactivarModoPresentacion(): void {
   }
 
 
-//   NUEVO MÉTODO PARA CONTROLAR MODO INTELIGENTE
   toggleModoInteligente(event: any): void {
     this.modoInteligenteActivo = event.target.checked;
     this.modoInteligenteService.configurarModo(this.modoInteligenteActivo);
   }
-
-
-  // ===================================
-  // CONSENTIMIENTO INFORMADO
-  // ===================================
 
   async guardarConsentimientoInformado(): Promise<void> {
     if (!this.consentimientoForm.valid) {
@@ -841,33 +830,25 @@ desactivarModoPresentacion(): void {
     this.error = null;
 
     try {
-      // Verificar que hay expediente
       if (!this.pacienteCompleto?.expediente.id_expediente) {
         throw new Error('No hay expediente disponible');
       }
 
-      // Crear documento padre si no existe
       if (!this.documentoClinicoActual) {
         await this.crearDocumentoClinicoPadre('Consentimiento Informado');
       }
 
-      // Preparar datos para el consentimiento
       const consentimientoData = {
         id_documento: this.documentoClinicoActual!,
         ...this.consentimientoForm.value,
-        // Campos calculados
         folio_consentimiento: this.generarFolioConsentimiento(),
         estado_consentimiento: 'firmado',
         fecha_elaboracion: new Date().toISOString()
       };
 
-      // Guardar consentimiento (integrar con servicio backend cuando esté listo)
       console.log('📄 Datos de consentimiento preparados:', consentimientoData);
-
       this.success = '📋 Consentimiento Informado guardado correctamente';
       this.formularioEstado.consentimiento = true;
-
-      // Generar PDF automáticamente
       await this.generarPDFConsentimiento();
 
     } catch (error: any) {
@@ -928,10 +909,6 @@ getFormErrors(): any[] {
   return errors;
 }
 
-  // ===================================
-  // NOTA PREOPERATORIA CICEG-HG_Frontend\src\app\personas\perfil-paciente\perfil-paciente.ts
-  // ===================================
-
   async guardarNotaPreoperatoria(): Promise<void> {
     if (!this.notaPreoperatoriaForm.valid) {
       this.marcarCamposInvalidos(this.notaPreoperatoriaForm);
@@ -943,35 +920,24 @@ getFormErrors(): any[] {
     this.error = null;
 
     try {
-      // Verificar que hay expediente
       if (!this.pacienteCompleto?.expediente.id_expediente) {
         throw new Error('No hay expediente disponible');
       }
-
-      // Crear documento padre si no existe
       if (!this.documentoClinicoActual) {
         await this.crearDocumentoClinicoPadre('Nota Preoperatoria');
       }
-
-      // Preparar datos para la nota preoperatoria
       const notaPreoperatoriaData = {
         id_documento: this.documentoClinicoActual!,
         ...this.notaPreoperatoriaForm.value,
-        // Campos calculados
         folio_preoperatorio: this.generarFolioPreoperatorio(),
         fecha_evaluacion: new Date().toISOString(),
         medico_evaluador: this.medicoActual
       };
 
-      // Guardar nota preoperatoria (integrar con servicio backend cuando esté listo)
-      console.log('📄 Datos de nota preoperatoria preparados:', notaPreoperatoriaData);
+      console.log(' Datos de nota preoperatoria preparados:', notaPreoperatoriaData);
 
       this.success = '  Nota Preoperatoria guardada correctamente';
       this.formularioEstado.notaPreoperatoria = true;
-
-      // Generar PDF automáticamente
-      // await this.generarPDFNotaPreoperatoria();
-
     } catch (error: any) {
       console.error('❌ Error al guardar nota preoperatoria:', error);
       this.error = 'Error al guardar la nota preoperatoria. Por favor intente nuevamente.';
@@ -990,8 +956,6 @@ getFormErrors(): any[] {
   private actualizarIMC(): void {
   this.imcCalculado = this.calcularIMC();
 }
-
-  // Método auxiliar para calcular IMC
   calcularIMC(): number | null {
   const peso = this.notaPreanestesicaForm?.get('peso')?.value;
   const talla = this.notaPreanestesicaForm?.get('talla')?.value;
@@ -1003,15 +967,11 @@ getFormErrors(): any[] {
   return null;
 }
 
-// Escuchar cambios en peso y talla
 ngAfterViewInit(): void {
   this.notaPreanestesicaForm.get('peso')?.valueChanges.subscribe(() => this.actualizarIMC());
   this.notaPreanestesicaForm.get('talla')?.valueChanges.subscribe(() => this.actualizarIMC());
 }
 
-  // ===================================
-  // NOTA POSTOPERATORIA
-  // ===================================
   async guardarNotaPostoperatoria(): Promise<void> {
     if (!this.notaPostoperatoriaForm.valid) {
       this.marcarCamposInvalidos(this.notaPostoperatoriaForm);
